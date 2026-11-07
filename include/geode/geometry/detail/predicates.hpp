@@ -23,7 +23,11 @@
 
 #pragma once
 
+#include <array>
+#include <cmath>
+
 #include <geode/geometry/common.hpp>
+#include <geode/geometry/point.hpp>
 
 #define GEOGRAM_PSM
 #ifndef GEO_STATIC_LIBS
@@ -585,6 +589,247 @@ namespace GEO
         opengeode_geometry_api SIGN dot_2d( const geode::Point2D& p0,
             const geode::Point2D& p1,
             const geode::Point2D& p2 );
+
+        /*!
+         * Position of p4 with respect to the circumsphere of the positively
+         * oriented tetrahedron (p0, p1, p2, p3): positive if p4 is inside,
+         * negative if outside. Never returns zero: cospherical configurations
+         * are resolved by symbolic perturbation ordered by the points address.
+         * The points must therefore be references to distinct elements of one
+         * stable contiguous array, whose element order is the perturbation
+         * order (e.g. the mesh points, in vertex order). Never pass copies or
+         * temporaries: their addresses depend on the stack, which makes the
+         * result of the degenerate cases arbitrary and not reproducible. The
+         * order is only used for degenerate cases, a non degenerate result
+         * does not depend on it.
+         */
+        opengeode_geometry_api SIGN in_sphere_3d_SOS( const geode::Point3D& p0,
+            const geode::Point3D& p1,
+            const geode::Point3D& p2,
+            const geode::Point3D& p3,
+            const geode::Point3D& p4 );
+
+        /*!
+         * Position of p3, coplanar with (p0, p1, p2), with respect to the
+         * circumcircle of the triangle (p0, p1, p2): positive if inside,
+         * negative if outside. Never returns zero: cocircular configurations
+         * are resolved by symbolic perturbation ordered by the points address:
+         * same requirements as in_sphere_3d_SOS on the points.
+         */
+        opengeode_geometry_api SIGN in_circle_3d_SOS( const geode::Point3D& p0,
+            const geode::Point3D& p1,
+            const geode::Point3D& p2,
+            const geode::Point3D& p3 );
+
+        /*!
+         * Inline floating point filter of orient_3d, with the semi-static
+         * error bound of the orient_3d filter: returns the sign of
+         * orient_3d( p0, p1, p2, p3 ), or zero if the filter cannot decide
+         * (then use orient_3d).
+         */
+        inline SIGN orient_3d_inline_filter( const geode::Point3D& p0,
+            const geode::Point3D& p1,
+            const geode::Point3D& p2,
+            const geode::Point3D& p3 )
+        {
+            const double a11 = p1.value( 0 ) - p0.value( 0 );
+            const double a12 = p1.value( 1 ) - p0.value( 1 );
+            const double a13 = p1.value( 2 ) - p0.value( 2 );
+            const double a21 = p2.value( 0 ) - p0.value( 0 );
+            const double a22 = p2.value( 1 ) - p0.value( 1 );
+            const double a23 = p2.value( 2 ) - p0.value( 2 );
+            const double a31 = p3.value( 0 ) - p0.value( 0 );
+            const double a32 = p3.value( 1 ) - p0.value( 1 );
+            const double a33 = p3.value( 2 ) - p0.value( 2 );
+            const double delta =
+                ( ( ( a11 * ( ( a22 * a33 ) - ( a23 * a32 ) ) )
+                      - ( a21 * ( ( a12 * a33 ) - ( a13 * a32 ) ) ) )
+                    + ( a31 * ( ( a12 * a23 ) - ( a13 * a22 ) ) ) );
+            const double max1 =
+                std::fmax( std::fmax( std::fabs( a11 ), std::fabs( a21 ) ),
+                    std::fabs( a31 ) );
+            const double max2 =
+                std::fmax( std::fmax( std::fabs( a12 ), std::fabs( a13 ) ),
+                    std::fmax( std::fabs( a22 ), std::fabs( a23 ) ) );
+            const double max3 =
+                std::fmax( std::fmax( std::fabs( a22 ), std::fabs( a23 ) ),
+                    std::fmax( std::fabs( a32 ), std::fabs( a33 ) ) );
+            const double lower_bound =
+                std::fmin( std::fmin( max1, max2 ), max3 );
+            const double upper_bound =
+                std::fmax( std::fmax( max1, max2 ), max3 );
+            if( !( lower_bound >= 1.63288018496748314939e-98 )
+                || !( upper_bound <= 5.59936185544450928309e+101 ) )
+            {
+                return zero;
+            }
+            const double eps =
+                5.11071278299732992696e-15 * ( ( max2 * max3 ) * max1 );
+            if( delta > eps )
+            {
+                return positive;
+            }
+            if( delta < -eps )
+            {
+                return negative;
+            }
+            return zero;
+        }
+
+        /*!
+         * Floating point data of a tetrahedron (p0, p1, p2, p3) used to filter
+         * many in_sphere_3d queries against it: the cofactors of the
+         * in_sphere_3d determinant (relative to p0) along the row of the
+         * tested point, and the largest absolute coordinate difference to p0
+         * (zero if out of the range supported by the filter).
+         */
+        struct InSphereCoefficients
+        {
+            std::array< double, 4 > cofactors;
+            double max_difference;
+        };
+
+        /*!
+         * Compute the InSphereCoefficients of the tetrahedron (p0, p1, p2,
+         * p3).
+         */
+        inline InSphereCoefficients in_sphere_3d_coefficients(
+            const geode::Point3D& p0,
+            const geode::Point3D& p1,
+            const geode::Point3D& p2,
+            const geode::Point3D& p3 )
+        {
+            const double bx = p1.value( 0 ) - p0.value( 0 );
+            const double by = p1.value( 1 ) - p0.value( 1 );
+            const double bz = p1.value( 2 ) - p0.value( 2 );
+            const double cx = p2.value( 0 ) - p0.value( 0 );
+            const double cy = p2.value( 1 ) - p0.value( 1 );
+            const double cz = p2.value( 2 ) - p0.value( 2 );
+            const double dx = p3.value( 0 ) - p0.value( 0 );
+            const double dy = p3.value( 1 ) - p0.value( 1 );
+            const double dz = p3.value( 2 ) - p0.value( 2 );
+            const double lb = ( bx * bx ) + ( by * by ) + ( bz * bz );
+            const double lc = ( cx * cx ) + ( cy * cy ) + ( cz * cz );
+            const double ld = ( dx * dx ) + ( dy * dy ) + ( dz * dz );
+            // 2x2 minors of the coordinate columns of rows c and d
+            const double xy = ( cx * dy ) - ( cy * dx );
+            const double xz = ( cx * dz ) - ( cz * dx );
+            const double yz = ( cy * dz ) - ( cz * dy );
+            // 2x2 minors of a coordinate column and the lifted column
+            const double x_lifted = ( cx * ld ) - ( lc * dx );
+            const double y_lifted = ( cy * ld ) - ( lc * dy );
+            const double z_lifted = ( cz * ld ) - ( lc * dz );
+            InSphereCoefficients result{};
+            result.cofactors[0] =
+                -( ( by * z_lifted ) - ( bz * y_lifted ) + ( lb * yz ) );
+            result.cofactors[1] =
+                ( bx * z_lifted ) - ( bz * x_lifted ) + ( lb * xz );
+            result.cofactors[2] =
+                -( ( bx * y_lifted ) - ( by * x_lifted ) + ( lb * xy ) );
+            result.cofactors[3] = ( bx * yz ) - ( by * xz ) + ( bz * xy );
+            const double max_difference = std::fmax(
+                std::fmax( std::fmax( std::fabs( bx ), std::fabs( by ) ),
+                    std::fmax( std::fabs( bz ), std::fabs( cx ) ) ),
+                std::fmax( std::fmax( std::fabs( cy ), std::fabs( cz ) ),
+                    std::fmax( std::fmax( std::fabs( dx ), std::fabs( dy ) ),
+                        std::fabs( dz ) ) ) );
+            result.max_difference =
+                max_difference >= 1e-30 && max_difference <= 1e30
+                    ? max_difference
+                    : 0.;
+            return result;
+        }
+
+        /*!
+         * Filtered in_sphere_3d of p4 against the positively oriented
+         * tetrahedron (p0, p1, p2, p3) whose coefficients are given: positive
+         * if p4 is inside the circumsphere, negative if outside, zero if the
+         * floating point evaluation cannot decide (then use in_sphere_3d_SOS).
+         * When not zero, the result is the one of in_sphere_3d_SOS.
+         * Error bound (first order forward error propagation, the model of
+         * the geogram filter generator, u = 2^-53): rounded differences have
+         * value <= m (tetrahedron) or e (query) and error <= u times that; a
+         * sum c = a + b has err(c) <= err(a) + err(b) + u |c|, a product
+         * c = a * b has err(c) <= |a| err(b) + |b| err(a) + u |c|, the
+         * coefficients and the query being one expression. Propagated: |det|
+         * <= 54 e m^4 + 18 e^2 m^3 and err(det) <= 864 u e m^4 + 258 u e^2 m^3
+         * = 9.592e-14 e m^4 + 2.865e-14 e^2 m^3. The second order terms, the
+         * bounds of the exact differences ((1 + u) times the computed ones)
+         * and the rounding of the eps computation (6 operations) are covered
+         * by the margins of 1.0e-13 (4%) and 3.0e-14 (4.7%). The range
+         * [1e-30, 1e30] of m and e makes underflow and overflow harmless.
+         */
+        inline SIGN in_sphere_3d_coefficients_filter(
+            const InSphereCoefficients& tet,
+            const geode::Point3D& p0,
+            const geode::Point3D& p4 )
+        {
+            const double ex = p4.value( 0 ) - p0.value( 0 );
+            const double ey = p4.value( 1 ) - p0.value( 1 );
+            const double ez = p4.value( 2 ) - p0.value( 2 );
+            const double m = tet.max_difference;
+            const double e =
+                std::fmax( std::fmax( std::fabs( ex ), std::fabs( ey ) ),
+                    std::fabs( ez ) );
+            if( !( m > 0. ) || !( e >= 1e-30 ) || !( e <= 1e30 ) )
+            {
+                return zero;
+            }
+            const double le = ( ex * ex ) + ( ey * ey ) + ( ez * ez );
+            const auto& k = tet.cofactors;
+            const double det =
+                ( ( ex * k[0] + ey * k[1] ) + ez * k[2] ) + ( le * k[3] );
+            const double m3 = m * m * m;
+            const double eps = e * m3 * ( 1.0e-13 * m + 3.0e-14 * e );
+            if( det > eps )
+            {
+                return negative;
+            }
+            if( det < -eps )
+            {
+                return positive;
+            }
+            return zero;
+        }
+
+        /*!
+         * Entry points exposed only to validate the filters of the
+         * predicates above in the tests: not for production code.
+         */
+        namespace testing
+        {
+            /*!
+             * Same results as in_sphere_3d_SOS and in_circle_3d_SOS, always
+             * evaluated with exact arithmetic (no floating point filter). Used
+             * to validate the filters.
+             */
+            opengeode_geometry_api SIGN in_sphere_3d_SOS_exact(
+                const geode::Point3D& p0,
+                const geode::Point3D& p1,
+                const geode::Point3D& p2,
+                const geode::Point3D& p3,
+                const geode::Point3D& p4 );
+
+            /*!
+             * Floating point filter of in_circle_3d_SOS alone: its sign, or
+             * zero if the filter cannot decide. Used to test the filter.
+             */
+            opengeode_geometry_api SIGN in_circle_3d_SOS_filter(
+                const geode::Point3D& p0,
+                const geode::Point3D& p1,
+                const geode::Point3D& p2,
+                const geode::Point3D& p3 );
+
+            /*!
+             * Same results as in_circle_3d_SOS, always evaluated with exact
+             * arithmetic.
+             */
+            opengeode_geometry_api SIGN in_circle_3d_SOS_exact(
+                const geode::Point3D& p0,
+                const geode::Point3D& p1,
+                const geode::Point3D& p2,
+                const geode::Point3D& p3 );
+        } // namespace testing
 
         opengeode_geometry_api void initialize();
     } // namespace PCK

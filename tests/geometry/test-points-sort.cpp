@@ -73,6 +73,24 @@ double average_step( const std::vector< geode::Point< dimension > >& points,
     return total / ( mapping.size() - 1 );
 }
 
+// Tied points are ordered by index, so the order does not depend on the
+// standard library (std::nth_element puts tied elements anywhere).
+template < geode::index_t dimension >
+void check_duplicated_points_order(
+    const std::vector< geode::Point< dimension > >& points,
+    const std::vector< geode::index_t >& mapping )
+{
+    for( const auto i : geode::Range{ 1, mapping.size() } )
+    {
+        if( points[mapping[i - 1]] == points[mapping[i]] )
+        {
+            geode::OpenGeodeGeometryException::test(
+                mapping[i - 1] < mapping[i],
+                "Duplicated points should be ordered by index" );
+        }
+    }
+}
+
 template < geode::index_t dimension >
 void check_permutation( std::vector< geode::index_t > mapping )
 {
@@ -114,6 +132,17 @@ void test_flat_morton_mapping()
     check_permutation< 3 >( flat_mapping );
     check_permutation< 2 >( mapping2d );
     check_permutation< 3 >( mapping3d );
+    check_duplicated_points_order< 3 >( flat_points, flat_mapping );
+    check_duplicated_points_order< 2 >( points2d, mapping2d );
+    check_duplicated_points_order< 3 >( points3d, mapping3d );
+    check_duplicated_points_order< 3 >(
+        flat_points, geode::hilbert_mapping< 3 >( flat_points ) );
+    check_duplicated_points_order< 2 >(
+        points2d, geode::hilbert_mapping< 2 >( points2d ) );
+    check_duplicated_points_order< 3 >(
+        points3d, geode::hilbert_mapping< 3 >( points3d ) );
+    check_duplicated_points_order< 3 >(
+        points3d, geode::lexicographic_mapping< 3 >( points3d ) );
     const auto flat_step = average_step< 3 >( flat_points, flat_mapping );
     const auto step2d = average_step< 2 >( points2d, mapping2d );
     geode::OpenGeodeGeometryException::test( flat_step < 1.2 * step2d,
@@ -122,12 +151,42 @@ void test_flat_morton_mapping()
     const auto same_points =
         std::vector< geode::Point3D >( 1000, geode::Point3D{ { 1, 2, 3 } } );
     check_permutation< 3 >( geode::morton_mapping< 3 >( same_points ) );
+    check_duplicated_points_order< 3 >(
+        same_points, geode::morton_mapping< 3 >( same_points ) );
+}
+
+void test_mapping_order()
+{
+    // Orders are part of the results of their users (e.g. tetrahedral mesh
+    // numbering): they must not change with the implementation, nor with the
+    // standard library. Grid with ties and duplicated points.
+    const std::vector< geode::Point3D > points{ geode::Point3D{ { 0, 0, 0 } },
+        geode::Point3D{ { 1, 0, 1 } }, geode::Point3D{ { 0, 1, 0 } },
+        geode::Point3D{ { 1, 1, 1 } }, geode::Point3D{ { 0, 2, 0 } },
+        geode::Point3D{ { 1, 2, 1 } }, geode::Point3D{ { 1, 0, 0 } },
+        geode::Point3D{ { 2, 0, 1 } }, geode::Point3D{ { 1, 1, 0 } },
+        geode::Point3D{ { 2, 1, 1 } }, geode::Point3D{ { 1, 2, 0 } },
+        geode::Point3D{ { 2, 2, 1 } }, geode::Point3D{ { 2, 0, 0 } },
+        geode::Point3D{ { 0, 0, 1 } }, geode::Point3D{ { 2, 1, 0 } },
+        geode::Point3D{ { 0, 1, 1 } }, geode::Point3D{ { 2, 2, 0 } },
+        geode::Point3D{ { 0, 2, 1 } }, geode::Point3D{ { 0, 2, 0 } },
+        geode::Point3D{ { 0, 0, 0 } } };
+    const std::vector< geode::index_t > hilbert{ 5, 3, 11, 9, 16, 7, 1, 12, 14,
+        6, 17, 2, 10, 4, 18, 15, 13, 8, 0, 19 };
+    const std::vector< geode::index_t > morton{ 0, 2, 19, 13, 1, 4, 18, 15, 3,
+        17, 6, 8, 7, 12, 9, 14, 10, 16, 5, 11 };
+    geode::OpenGeodeGeometryException::test(
+        geode::hilbert_mapping< 3 >( points ) == hilbert,
+        "Wrong Hilbert order" );
+    geode::OpenGeodeGeometryException::test(
+        geode::morton_mapping< 3 >( points ) == morton, "Wrong Morton order" );
 }
 
 void test()
 {
     test_lexicographic_mapping();
     test_flat_morton_mapping();
+    test_mapping_order();
 }
 
 OPENGEODE_TEST( "points_sort" )

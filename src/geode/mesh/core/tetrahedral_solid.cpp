@@ -43,6 +43,26 @@ namespace
         const geode::PolyhedronVertices& vertices_adj,
         geode::index_t polyhedron_adj )
     {
+        // Two adjacent tetrahedra share the three facet vertices: the facet
+        // of the adjacent tetrahedron is opposite to its only other vertex
+        const auto vertices = solid.polyhedron_vertices( facet.polyhedron_id );
+        geode::local_index_t nb_others{ 0 };
+        geode::local_index_t other{ geode::NO_LID };
+        for( const auto v : geode::LRange{ 4 } )
+        {
+            if( absl::c_find( vertices, vertices_adj[v] ) == vertices.end() )
+            {
+                nb_others++;
+                other = v;
+            }
+        }
+        if( nb_others == 1
+            && solid.polyhedron_adjacent( { polyhedron_adj, other } )
+                   == facet.polyhedron_id )
+        {
+            return std::optional< geode::PolyhedronFacet >{ std::in_place,
+                polyhedron_adj, other };
+        }
         geode::PolyhedronFacetVertices facet_vertices;
         for( const auto v : geode::LRange{ 3 } )
         {
@@ -285,6 +305,27 @@ namespace geode
             "[TetrahedralSolid::opposite_edge_incident_facets] Given edge "
             "vertices are not vertices of given tetrahedron" );
         return opposite_facets;
+    }
+
+    template < index_t dimension >
+    PolyhedronVertices TetrahedralSolid< dimension >::polyhedron_vertices(
+        index_t polyhedron_id ) const
+    {
+        OpenGeodeMeshException::check_assertion(
+            polyhedron_id < this->nb_polyhedra(),
+            "[TetrahedralSolid::polyhedron_vertices] Trying to access an "
+            "invalid polyhedron" );
+        return get_polyhedron_vertices( polyhedron_id );
+    }
+
+    template < index_t dimension >
+    PolyhedronVertices TetrahedralSolid< dimension >::get_polyhedron_vertices(
+        index_t polyhedron_id ) const
+    {
+        return { this->polyhedron_vertex( { polyhedron_id, 0 } ),
+            this->polyhedron_vertex( { polyhedron_id, 1 } ),
+            this->polyhedron_vertex( { polyhedron_id, 2 } ),
+            this->polyhedron_vertex( { polyhedron_id, 3 } ) };
     }
 
     template < index_t dimension >

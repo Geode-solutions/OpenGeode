@@ -68,6 +68,13 @@ namespace geode
         [[nodiscard]] std::unique_ptr< TetrahedralSolid< dimension > >
             clone() const;
 
+        /*!
+         * Return the four vertices of the tetrahedron in one call.
+         * Same result as SolidMesh::polyhedron_vertices.
+         */
+        [[nodiscard]] PolyhedronVertices polyhedron_vertices(
+            index_t polyhedron_id ) const;
+
         [[nodiscard]] PolyhedronEdgesVertices polyhedron_edges_vertices(
             index_t polyhedron ) const final;
 
@@ -174,6 +181,15 @@ namespace geode
 
         [[nodiscard]] PolyhedronFacets polyhedron_vertex_facets(
             const PolyhedronVertex& polyhedron_vertex ) const final;
+
+        /*!
+         * Vertices of the tetrahedron, by default from get_polyhedron_vertex
+         * (one call by vertex).
+         * Declared after the SolidMesh virtual functions to keep their
+         * slots in the virtual table.
+         */
+        [[nodiscard]] virtual PolyhedronVertices get_polyhedron_vertices(
+            index_t polyhedron_id ) const;
     };
     ALIAS_3D( TetrahedralSolid );
 } // namespace geode

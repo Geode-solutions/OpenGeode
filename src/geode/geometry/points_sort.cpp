@@ -24,6 +24,7 @@
 #include <geode/geometry/points_sort.hpp>
 
 #include <algorithm>
+#include <array>
 #include <limits>
 
 #include <absl/algorithm/container.h>
@@ -33,26 +34,69 @@
 
 namespace
 {
-    using itr = std::vector< geode::index_t >::iterator;
+    // The sorts move copies of the points coordinates with their index
+    // (instead of indices into the points) for memory locality. The
+    // comparisons are the same, so the resulting order is the same.
+    // Ties are broken by index: the comparators are strict total orders, so
+    // the set of elements std::nth_element puts on each side of the middle is
+    // unique and the recursion goes down to ranges of size <= 1. The order is
+    // therefore the same whatever the standard library implementation.
+    template < geode::index_t dimension >
+    struct SortedPoint
+    {
+        std::array< double, dimension > coordinates;
+        geode::index_t index;
+    };
+
+    template < geode::index_t dimension >
+    using itr = typename std::vector< SortedPoint< dimension > >::iterator;
+
+    template < geode::index_t dimension >
+    std::vector< SortedPoint< dimension > > sorted_points(
+        absl::Span< const geode::Point< dimension > > points )
+    {
+        std::vector< SortedPoint< dimension > > result( points.size() );
+        for( const auto p : geode::Indices{ points } )
+        {
+            for( const auto d : geode::LRange{ dimension } )
+            {
+                result[p].coordinates[d] = points[p].value( d );
+            }
+            result[p].index = p;
+        }
+        return result;
+    }
+
+    template < geode::index_t dimension >
+    std::vector< geode::index_t > sorted_indices(
+        const std::vector< SortedPoint< dimension > >& sorted )
+    {
+        std::vector< geode::index_t > mapping( sorted.size() );
+        for( const auto p : geode::Indices{ sorted } )
+        {
+            mapping[p] = sorted[p].index;
+        }
+        return mapping;
+    }
 
     template < geode::index_t dimension >
     class Morton_cmp
     {
     public:
-        Morton_cmp( absl::Span< const geode::Point< dimension > > points,
-            geode::local_index_t coord )
-            : points_( points ), coord_( coord )
-        {
-        }
+        explicit Morton_cmp( geode::local_index_t coord ) : coord_( coord ) {}
 
-        bool operator()( geode::index_t box1, geode::index_t box2 ) const
+        bool operator()( const SortedPoint< dimension >& box1,
+            const SortedPoint< dimension >& box2 ) const
         {
-            return points_[box1].value( coord_ )
-                   < points_[box2].value( coord_ );
+            const auto value1 = box1.coordinates[coord_];
+            const auto value2 = box2.coordinates[coord_];
+            // Bitwise operators on bool: branchless, faster in
+            // std::nth_element than the logical ones (or a ternary)
+            return ( value1 < value2 )
+                   | ( ( value1 == value2 ) & ( box1.index < box2.index ) );
         }
 
     private:
-        absl::Span< const geode::Point< dimension > > points_;
         geode::local_index_t coord_;
     };
     ALIAS_1D_AND_2D_AND_3D( Morton_cmp );
@@ -61,20 +105,20 @@ namespace
     class Hilbert_cmp
     {
     public:
-        Hilbert_cmp( absl::Span< const geode::Point< dimension > > points,
-            geode::local_index_t coord )
-            : points_( points ), coord_( coord )
-        {
-        }
+        explicit Hilbert_cmp( geode::local_index_t coord ) : coord_( coord ) {}
 
-        bool operator()( geode::index_t box1, geode::index_t box2 ) const
+        bool operator()( const SortedPoint< dimension >& box1,
+            const SortedPoint< dimension >& box2 ) const
         {
-            return points_[box1].value( coord_ )
-                   > points_[box2].value( coord_ );
+            const auto value1 = box1.coordinates[coord_];
+            const auto value2 = box2.coordinates[coord_];
+            // Bitwise operators on bool: branchless, faster in
+            // std::nth_element than the logical ones (or a ternary)
+            return ( value1 > value2 )
+                   | ( ( value1 == value2 ) & ( box1.index < box2.index ) );
         }
 
     private:
-        absl::Span< const geode::Point< dimension > > points_;
         geode::local_index_t coord_;
     };
     ALIAS_1D_AND_2D_AND_3D( Hilbert_cmp );
@@ -91,14 +135,15 @@ namespace
      * \return an iterator to the middle of the sequence that separates
      *  the two halves
      */
-    template < typename Compare >
-    itr split_container( const itr& begin, const itr& end, const Compare& cmp )
+    template < typename Iterator, typename Compare >
+    Iterator split_container(
+        const Iterator& begin, const Iterator& end, const Compare& cmp )
     {
         if( begin >= end )
         {
             return begin;
         }
-        const itr middle = begin + ( end - begin ) / 2;
+        const Iterator middle = begin + ( ( end - begin ) / 2 );
         std::nth_element( begin, middle, end, cmp );
         return middle;
     }
@@ -112,27 +157,23 @@ namespace
      */
     template < geode::local_index_t COORDX,
         template < geode::index_t > typename Comparator >
-    void morton_mapping( absl::Span< const geode::Point3D > points,
-        const itr& begin,
-        const itr& end );
+    void morton_mapping( const itr< 3 >& begin, const itr< 3 >& end );
 
     template < template < geode::index_t > typename Comparator >
-    void morton_mapping_from_axis( geode::local_index_t axis,
-        absl::Span< const geode::Point3D > points,
-        const itr& begin,
-        const itr& end )
+    void morton_mapping_from_axis(
+        geode::local_index_t axis, const itr< 3 >& begin, const itr< 3 >& end )
     {
         if( axis == 0 )
         {
-            morton_mapping< 0, Comparator >( points, begin, end );
+            morton_mapping< 0, Comparator >( begin, end );
         }
         else if( axis == 1 )
         {
-            morton_mapping< 1, Comparator >( points, begin, end );
+            morton_mapping< 1, Comparator >( begin, end );
         }
         else
         {
-            morton_mapping< 2, Comparator >( points, begin, end );
+            morton_mapping< 2, Comparator >( begin, end );
         }
     }
 
@@ -143,9 +184,8 @@ namespace
     template < template < geode::index_t > typename Comparator >
     bool morton_mapping_skipping_flat_axes(
         const std::array< geode::local_index_t, 3 >& axes,
-        absl::Span< const geode::Point3D > points,
-        const itr& begin,
-        const itr& end )
+        const itr< 3 >& begin,
+        const itr< 3 >& end )
     {
         static constexpr double FLAT_RATIO{ 1e-3 };
         std::array< double, 3 > min;
@@ -154,11 +194,11 @@ namespace
         max.fill( std::numeric_limits< double >::lowest() );
         for( auto it = begin; it != end; ++it )
         {
-            const auto& point = points[*it];
+            const auto& point = it->coordinates;
             for( const auto d : geode::LRange{ 3 } )
             {
-                min[d] = std::min( min[d], point.value( d ) );
-                max[d] = std::max( max[d], point.value( d ) );
+                min[d] = std::min( min[d], point[d] );
+                max[d] = std::max( max[d], point[d] );
             }
         }
         double max_extent{ 0 };
@@ -168,7 +208,13 @@ namespace
         }
         if( max_extent == 0 )
         {
-            // All points are colocated: any order is fine
+            // All points are colocated: order them by index so that the order
+            // does not depend on the previous std::nth_element calls
+            std::sort( begin, end,
+                []( const SortedPoint< 3 >& point1,
+                    const SortedPoint< 3 >& point2 ) {
+                    return point1.index < point2.index;
+                } );
             return true;
         }
         absl::InlinedVector< geode::local_index_t, 3 > kept_axes;
@@ -185,33 +231,29 @@ namespace
         }
         if( kept_axes.size() == 1 )
         {
-            const Comparator< 3 > compX{ points, kept_axes[0] };
+            const Comparator< 3 > compX{ kept_axes[0] };
             const auto m1 = split_container( begin, end, compX );
-            morton_mapping_from_axis< Comparator >(
-                kept_axes[0], points, begin, m1 );
-            morton_mapping_from_axis< Comparator >(
-                kept_axes[0], points, m1, end );
+            morton_mapping_from_axis< Comparator >( kept_axes[0], begin, m1 );
+            morton_mapping_from_axis< Comparator >( kept_axes[0], m1, end );
             return true;
         }
-        const Comparator< 3 > compX{ points, kept_axes[0] };
-        const Comparator< 3 > compY{ points, kept_axes[1] };
+        const Comparator< 3 > compX{ kept_axes[0] };
+        const Comparator< 3 > compY{ kept_axes[1] };
         const auto m0 = begin;
         const auto m4 = end;
         const auto m2 = split_container( m0, m4, compX );
         const auto m1 = split_container( m0, m2, compY );
         const auto m3 = split_container( m2, m4, compY );
-        morton_mapping_from_axis< Comparator >( kept_axes[1], points, m0, m1 );
-        morton_mapping_from_axis< Comparator >( kept_axes[0], points, m1, m2 );
-        morton_mapping_from_axis< Comparator >( kept_axes[0], points, m2, m3 );
-        morton_mapping_from_axis< Comparator >( kept_axes[1], points, m3, m4 );
+        morton_mapping_from_axis< Comparator >( kept_axes[1], m0, m1 );
+        morton_mapping_from_axis< Comparator >( kept_axes[0], m1, m2 );
+        morton_mapping_from_axis< Comparator >( kept_axes[0], m2, m3 );
+        morton_mapping_from_axis< Comparator >( kept_axes[1], m3, m4 );
         return true;
     }
 
     template < geode::local_index_t COORDX,
         template < geode::index_t > typename Comparator >
-    void morton_mapping( absl::Span< const geode::Point3D > points,
-        const itr& begin,
-        const itr& end )
+    void morton_mapping( const itr< 3 >& begin, const itr< 3 >& end )
     {
         if( end - begin <= 1 )
         {
@@ -220,14 +262,14 @@ namespace
         constexpr geode::local_index_t COORDY = COORDX == 2 ? 0 : COORDX + 1;
         constexpr geode::local_index_t COORDZ = COORDY == 2 ? 0 : COORDY + 1;
         if( morton_mapping_skipping_flat_axes< Comparator >(
-                { COORDX, COORDY, COORDZ }, points, begin, end ) )
+                { COORDX, COORDY, COORDZ }, begin, end ) )
         {
             return;
         }
 
-        const Comparator< 3 > compX{ points, COORDX };
-        const Comparator< 3 > compY{ points, COORDY };
-        const Comparator< 3 > compZ{ points, COORDZ };
+        const Comparator< 3 > compX{ COORDX };
+        const Comparator< 3 > compY{ COORDY };
+        const Comparator< 3 > compZ{ COORDZ };
 
         const auto m0 = begin;
         const auto m8 = end;
@@ -238,21 +280,19 @@ namespace
         const auto m6 = split_container( m4, m8, compY );
         const auto m5 = split_container( m4, m6, compZ );
         const auto m7 = split_container( m6, m8, compZ );
-        morton_mapping< COORDZ, Comparator >( points, m0, m1 );
-        morton_mapping< COORDY, Comparator >( points, m1, m2 );
-        morton_mapping< COORDY, Comparator >( points, m2, m3 );
-        morton_mapping< COORDX, Comparator >( points, m3, m4 );
-        morton_mapping< COORDX, Comparator >( points, m4, m5 );
-        morton_mapping< COORDY, Comparator >( points, m5, m6 );
-        morton_mapping< COORDY, Comparator >( points, m6, m7 );
-        morton_mapping< COORDZ, Comparator >( points, m7, m8 );
+        morton_mapping< COORDZ, Comparator >( m0, m1 );
+        morton_mapping< COORDY, Comparator >( m1, m2 );
+        morton_mapping< COORDY, Comparator >( m2, m3 );
+        morton_mapping< COORDX, Comparator >( m3, m4 );
+        morton_mapping< COORDX, Comparator >( m4, m5 );
+        morton_mapping< COORDY, Comparator >( m5, m6 );
+        morton_mapping< COORDY, Comparator >( m6, m7 );
+        morton_mapping< COORDZ, Comparator >( m7, m8 );
     }
 
     template < geode::local_index_t COORDX,
         template < geode::index_t > typename Comparator >
-    void morton_mapping( absl::Span< const geode::Point2D > points,
-        const itr& begin,
-        const itr& end )
+    void morton_mapping( const itr< 2 >& begin, const itr< 2 >& end )
     {
         if( end - begin <= 1 )
         {
@@ -260,37 +300,35 @@ namespace
         }
         constexpr geode::local_index_t COORDY = COORDX == 1 ? 0 : COORDX + 1;
 
-        const Comparator< 2 > compX{ points, COORDX };
-        const Comparator< 2 > compY{ points, COORDY };
+        const Comparator< 2 > compX{ COORDX };
+        const Comparator< 2 > compY{ COORDY };
 
         const auto m0 = begin;
         const auto m4 = end;
         const auto m2 = split_container( m0, m4, compX );
         const auto m1 = split_container( m0, m2, compY );
         const auto m3 = split_container( m2, m4, compY );
-        morton_mapping< COORDY, Comparator >( points, m0, m1 );
-        morton_mapping< COORDX, Comparator >( points, m1, m2 );
-        morton_mapping< COORDX, Comparator >( points, m2, m3 );
-        morton_mapping< COORDY, Comparator >( points, m3, m4 );
+        morton_mapping< COORDY, Comparator >( m0, m1 );
+        morton_mapping< COORDX, Comparator >( m1, m2 );
+        morton_mapping< COORDX, Comparator >( m2, m3 );
+        morton_mapping< COORDY, Comparator >( m3, m4 );
     }
 
     template < geode::local_index_t COORDX,
         template < geode::index_t > typename Comparator >
-    void morton_mapping( absl::Span< const geode::Point1D > points,
-        const itr& begin,
-        const itr& end )
+    void morton_mapping( const itr< 1 >& begin, const itr< 1 >& end )
     {
         if( end - begin <= 1 )
         {
             return;
         }
-        const Comparator< 1 > compX{ points, COORDX };
+        const Comparator< 1 > compX{ COORDX };
 
         const auto m0 = begin;
         const auto m2 = end;
         const auto m1 = split_container( m0, m2, compX );
-        morton_mapping< COORDX, Comparator >( points, m0, m1 );
-        morton_mapping< COORDX, Comparator >( points, m1, m2 );
+        morton_mapping< COORDX, Comparator >( m0, m1 );
+        morton_mapping< COORDX, Comparator >( m1, m2 );
     }
 
     /*
@@ -323,7 +361,9 @@ namespace geode
     {
         std::vector< index_t > mapping( points.size() );
         absl::c_iota( mapping, index_t{ 0 } );
-        absl::c_sort( mapping, [&points]( index_t i, index_t j ) {
+        // Stable sort: identical points stay ordered by index, whatever the
+        // standard library implementation
+        absl::c_stable_sort( mapping, [&points]( index_t i, index_t j ) {
             return lexicographic_compare( points[i], points[j] );
         } );
         return mapping;
@@ -333,22 +373,18 @@ namespace geode
     std::vector< index_t > morton_mapping(
         absl::Span< const Point< dimension > > points )
     {
-        std::vector< index_t > mapping( points.size() );
-        absl::c_iota( mapping, index_t{ 0 } );
-        ::morton_mapping< 0_uc, Morton_cmp >(
-            points, mapping.begin(), mapping.end() );
-        return mapping;
+        auto sorted = sorted_points( points );
+        ::morton_mapping< 0_uc, Morton_cmp >( sorted.begin(), sorted.end() );
+        return sorted_indices( sorted );
     }
 
     template < index_t dimension >
     std::vector< index_t > hilbert_mapping(
         absl::Span< const Point< dimension > > points )
     {
-        std::vector< index_t > mapping( points.size() );
-        absl::c_iota( mapping, index_t{ 0 } );
-        ::morton_mapping< 0_uc, Hilbert_cmp >(
-            points, mapping.begin(), mapping.end() );
-        return mapping;
+        auto sorted = sorted_points( points );
+        ::morton_mapping< 0_uc, Hilbert_cmp >( sorted.begin(), sorted.end() );
+        return sorted_indices( sorted );
     }
 
     template std::vector< index_t > opengeode_geometry_api

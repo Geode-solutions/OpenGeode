@@ -99,6 +99,24 @@ void test_reserve_with_facets_and_edges()
         "[reserve] Wrong number of edges after reserve" );
 }
 
+void test_polyhedron_vertices( const geode::TetrahedralSolid3D& solid )
+{
+    const geode::SolidMesh3D& mesh = solid;
+    for( const auto p : geode::Range{ solid.nb_polyhedra() } )
+    {
+        const auto vertices = solid.polyhedron_vertices( p );
+        geode::OpenGeodeMeshException::test(
+            vertices == mesh.polyhedron_vertices( p ),
+            "Wrong tetrahedron vertices" );
+        for( const auto v : geode::LRange{ 4 } )
+        {
+            geode::OpenGeodeMeshException::test(
+                vertices[v] == solid.polyhedron_vertex( { p, v } ),
+                "Wrong tetrahedron vertex" );
+        }
+    }
+}
+
 void test_polyhedron_volumes( const geode::TetrahedralSolid3D& solid )
 {
     for( const auto p : geode::Range{ solid.nb_polyhedra() } )
@@ -885,6 +903,7 @@ void test()
     test_create_vertices( *solid, *builder );
     test_create_tetrahedra( *solid, *builder );
     test_reserve_with_facets_and_edges();
+    test_polyhedron_vertices( *solid );
     test_polyhedron_volumes( *solid );
     test_polyhedron_facet_area( *solid );
     test_polyhedron_adjacencies( *solid, *builder );

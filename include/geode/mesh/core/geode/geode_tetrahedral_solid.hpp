@@ -118,6 +118,9 @@ namespace geode
         [[nodiscard]] index_t get_polyhedron_vertex(
             const PolyhedronVertex& polyhedron_vertex ) const override;
 
+        [[nodiscard]] PolyhedronVertices get_polyhedron_vertices(
+            index_t polyhedron_id ) const override;
+
         [[nodiscard]] PolyhedronVertex get_polyhedron_facet_vertex_id(
             const PolyhedronFacetVertex& polyhedron_facet_vertex )
             const override;
