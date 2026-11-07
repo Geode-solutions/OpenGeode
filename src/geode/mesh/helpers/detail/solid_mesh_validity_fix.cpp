@@ -64,7 +64,7 @@ namespace geode
                     continue;
                 }
                 PolyhedraAroundVertex total_polyhedra;
-                while( nb_polyhedra_around != polyhedron_vertices.size() )
+                while( nb_polyhedra_around < polyhedron_vertices.size() )
                 {
                     for( auto&& polyhedron : polyhedra_around )
                     {
@@ -88,6 +88,12 @@ namespace geode
                     vertex_mappings.map( vertex_id, new_vertex_id );
                     polyhedra_around =
                         mesh.polyhedra_around_vertex( vertex_id );
+                    OpenGeodeMeshException::check_exception(
+                        !polyhedra_around.empty(), vertex_id,
+                        OpenGeodeException::TYPE::internal,
+                        "[repair_non_manifold_vertices] No polyhedron "
+                        "processed while duplicating vertex ",
+                        vertex_id );
                     nb_polyhedra_around += polyhedra_around.size();
                 }
             }

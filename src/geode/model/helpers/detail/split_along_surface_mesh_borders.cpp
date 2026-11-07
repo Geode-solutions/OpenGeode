@@ -192,7 +192,7 @@ namespace geode
                         "[SplitAlongSurfaceMeshBorders] Wrong size "
                         "comparison" );
                     PolygonsAroundVertex total_polygons;
-                    while( nb_polygons_around != polygon_vertices.size() )
+                    while( nb_polygons_around < polygon_vertices.size() )
                     {
                         for( auto& polygon : polygons_around )
                         {
@@ -203,6 +203,12 @@ namespace geode
                                 vertex_id, total_polygons, polygon_vertices ) );
                         polygons_around =
                             mesh.polygons_around_vertex( vertex_id );
+                        OpenGeodeModelException::check_exception(
+                            !polygons_around.empty(), vertex_id,
+                            OpenGeodeException::TYPE::internal,
+                            "[SplitAlongSurfaceMeshBorders] No polygon "
+                            "processed while duplicating vertex ",
+                            vertex_id );
                         nb_polygons_around += polygons_around.size();
                     }
                 }
