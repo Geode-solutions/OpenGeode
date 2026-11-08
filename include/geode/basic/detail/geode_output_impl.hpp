@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <exception>
 #include <filesystem>
 #include <memory>
 #include <string>
@@ -33,6 +34,7 @@
 #include <absl/strings/str_join.h>
 
 #include <geode/basic/filename.hpp>
+#include <geode/basic/io.hpp>
 #include <geode/basic/logger.hpp>
 #include <geode/basic/timer.hpp>
 
@@ -43,8 +45,7 @@ namespace geode::detail
         geode_object_output_writer( std::string_view& filename )
     {
         filename = absl::StripAsciiWhitespace( filename );
-        const auto extension =
-            absl::AsciiStrToLower( extension_from_filename( filename ) );
+        const auto extension = lowercase_extension( filename );
         OpenGeodeBasicException::check_exception(
             Factory::has_creator( extension ), nullptr,
             OpenGeodeException::TYPE::data, "Unknown extension \"", extension,
@@ -72,5 +73,23 @@ namespace geode::detail
         Logger::info( type, " saved in ",
             absl::StrJoin( output_filenames, ", " ), " in ", timer.duration() );
         return output_filenames;
+    }
+
+    template < typename Exception,
+        typename Factory,
+        typename... ParentFactories,
+        typename... ParentTypes >
+    [[noreturn]] void throw_geode_object_output_exception(
+        std::string_view type,
+        std::string_view filename,
+        const std::exception& exception,
+        const ParentTypes&... parent_types )
+    {
+        Logger::error( exception.what() );
+        print_available_extensions_if_unknown< Factory, ParentFactories... >(
+            type, filename, parent_types... );
+        throw Exception{ nullptr, OpenGeodeException::TYPE::internal,
+            "Cannot save ", type, " in file: ", filename, ": ",
+            exception.what() };
     }
 } // namespace geode::detail

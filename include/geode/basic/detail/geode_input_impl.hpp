@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <exception>
 #include <filesystem>
 #include <memory>
 #include <string_view>
@@ -33,6 +34,7 @@
 #include <geode/basic/filename.hpp>
 #include <geode/basic/identifier.hpp>
 #include <geode/basic/identifier_builder.hpp>
+#include <geode/basic/io.hpp>
 #include <geode/basic/logger.hpp>
 #include <geode/basic/timer.hpp>
 
@@ -43,8 +45,7 @@ namespace geode::detail
         geode_object_input_reader( std::string_view& filename )
     {
         filename = absl::StripAsciiWhitespace( filename );
-        const auto extension =
-            absl::AsciiStrToLower( extension_from_filename( filename ) );
+        const auto extension = lowercase_extension( filename );
         OpenGeodeBasicException::check_exception(
             Factory::has_creator( extension ), nullptr,
             OpenGeodeException::TYPE::data, "Unknown extension \"", extension,
@@ -72,6 +73,23 @@ namespace geode::detail
         Logger::info(
             type, " loaded from ", filename, " in ", timer.duration() );
         return object;
+    }
+
+    template < typename Exception,
+        typename Factory,
+        typename... ParentFactories,
+        typename... ParentTypes >
+    [[noreturn]] void throw_geode_object_input_exception( std::string_view type,
+        std::string_view filename,
+        const std::exception& exception,
+        const ParentTypes&... parent_types )
+    {
+        Logger::error( exception.what() );
+        print_available_extensions_if_unknown< Factory, ParentFactories... >(
+            type, filename, parent_types... );
+        throw Exception{ nullptr, OpenGeodeException::TYPE::data,
+            "Cannot load ", type, " from file: ", filename, ": ",
+            exception.what() };
     }
 
     inline void add_to_message( std::string& message,

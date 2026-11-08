@@ -30,7 +30,6 @@
 
 #include <geode/basic/detail/geode_input_impl.hpp>
 #include <geode/basic/factory.hpp>
-#include <geode/basic/io.hpp>
 #include <geode/basic/logger.hpp>
 
 #include <geode/mesh/core/light_regular_grid.hpp>
@@ -49,23 +48,11 @@ namespace geode
             Logger::info( type, " has: ", grid.nb_cells(), " cells" );
             return grid;
         }
-        catch( const OpenGeodeException& e )
+        catch( const std::exception& exception )
         {
-            Logger::error( e.what() );
-            print_available_extensions<
-                LightRegularGridInputFactory< dimension > >( type );
-            throw OpenGeodeMeshException{ nullptr,
-                OpenGeodeException::TYPE::internal,
-                "Cannot load LightRegularGrid from file: ", filename, ": ",
-                e.what() };
-        }
-        catch( const std::exception& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeMeshException{ nullptr,
-                OpenGeodeException::TYPE::internal,
-                "Cannot load LightRegularGrid from file: ", filename, ": ",
-                e.what() };
+            detail::throw_geode_object_input_exception< OpenGeodeMeshException,
+                LightRegularGridInputFactory< dimension > >(
+                type, filename, exception );
         }
     }
 

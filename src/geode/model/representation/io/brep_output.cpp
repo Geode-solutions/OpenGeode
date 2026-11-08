@@ -28,8 +28,6 @@
 #include <vector>
 
 #include <geode/basic/detail/geode_output_impl.hpp>
-#include <geode/basic/io.hpp>
-#include <geode/basic/logger.hpp>
 
 #include <geode/model/representation/core/brep.hpp>
 
@@ -44,13 +42,11 @@ namespace geode
             return detail::geode_object_output_impl< BRepOutputFactory >(
                 TYPE, brep, filename );
         }
-        catch( const OpenGeodeException& e )
+        catch( const std::exception& exception )
         {
-            Logger::error( e.what() );
-            print_available_extensions< BRepOutputFactory >( TYPE );
-            throw OpenGeodeModelException{ nullptr,
-                OpenGeodeException::TYPE::internal,
-                "Cannot save BRep in file: ", filename, ": ", e.what() };
+            detail::throw_geode_object_output_exception<
+                OpenGeodeModelException, BRepOutputFactory >(
+                TYPE, filename, exception );
         }
     }
 

@@ -30,8 +30,6 @@
 #include <absl/strings/str_cat.h>
 
 #include <geode/basic/detail/geode_output_impl.hpp>
-#include <geode/basic/io.hpp>
-#include <geode/basic/logger.hpp>
 
 #include <geode/mesh/core/triangulated_surface.hpp>
 #include <geode/mesh/io/vertex_set_output.hpp>
@@ -50,17 +48,12 @@ namespace geode
                 TriangulatedSurfaceOutputFactory< dimension > >(
                 type, triangulated_surface, filename );
         }
-        catch( const OpenGeodeException& e )
+        catch( const std::exception& exception )
         {
-            Logger::error( e.what() );
-            print_available_extensions<
-                TriangulatedSurfaceOutputFactory< dimension > >( type );
-            Logger::info( "Other extensions are available in parent classes." );
-            print_available_extensions< VertexSetOutputFactory >( "VertexSet" );
-            throw OpenGeodeMeshException{ nullptr,
-                OpenGeodeException::TYPE::internal,
-                "Cannot save TriangulatedSurface in file: ", filename, ": ",
-                e.what() };
+            detail::throw_geode_object_output_exception< OpenGeodeMeshException,
+                TriangulatedSurfaceOutputFactory< dimension >,
+                VertexSetOutputFactory >(
+                type, filename, exception, "VertexSet" );
         }
     }
 
