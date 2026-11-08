@@ -25,6 +25,8 @@
 
 #include <string_view>
 
+#include <absl/strings/str_cat.h>
+
 #include <geode/basic/detail/geode_input_impl.hpp>
 
 #include <geode/image/core/raster_image.hpp>
@@ -34,21 +36,19 @@ namespace geode
     template < index_t dimension >
     RasterImage< dimension > load_raster_image( std::string_view filename )
     {
+        const auto type = absl::StrCat( "RasterImage", dimension, "D" );
         try
         {
-            const auto type = absl::StrCat( "RasterImage", dimension, "D" );
             auto raster = detail::geode_object_input_impl<
                 RasterImageInputFactory< dimension > >( type, filename );
             Logger::info( type, " has: ", raster.nb_cells(), " cells" );
             return raster;
         }
-        catch( const std::exception& e )
+        catch( const std::exception& exception )
         {
-            Logger::error( e.what() );
-            throw OpenGeodeImageException{ nullptr,
-                OpenGeodeException::TYPE::internal,
-                "Cannot load RasterImage from file: ", filename, ": ",
-                e.what() };
+            detail::throw_geode_object_input_exception< OpenGeodeImageException,
+                RasterImageInputFactory< dimension > >(
+                type, filename, exception );
         }
     }
 

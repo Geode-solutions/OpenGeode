@@ -46,14 +46,12 @@ namespace geode
                 RasterImageOutputFactory< dimension > >(
                 type, raster, filename );
         }
-        catch( const std::exception& e )
+        catch( const std::exception& exception )
         {
-            Logger::error( e.what() );
-            print_available_extensions< RasterImageOutputFactory< dimension > >(
-                type );
-            throw OpenGeodeImageException{ nullptr,
-                OpenGeodeException::TYPE::internal,
-                "Cannot save RasterImage in file: ", filename, ": ", e.what() };
+            detail::throw_geode_object_output_exception<
+                OpenGeodeImageException,
+                RasterImageOutputFactory< dimension > >(
+                type, filename, exception );
         }
     }
 

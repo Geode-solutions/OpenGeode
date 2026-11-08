@@ -24,6 +24,7 @@
 #include <fstream>
 
 #include <absl/hash/hash.h>
+#include <absl/strings/match.h>
 
 #include <geode/basic/logger.hpp>
 
@@ -84,6 +85,54 @@ void test_io( const geode::VertexSet& vertex_set, std::string_view filename )
         "Reloaded VertexSet should have 6 vertices" );
 }
 
+template < typename Action >
+void test_io_failure( const Action& action,
+    geode::OpenGeodeException::TYPE expected_type,
+    std::string_view expected_message )
+{
+    try
+    {
+        action();
+    }
+    catch( const geode::OpenGeodeException& exception )
+    {
+        geode::OpenGeodeMeshException::test( exception.type() == expected_type,
+            "[Test] Wrong exception type for: ", exception.what() );
+        geode::OpenGeodeMeshException::test(
+            absl::StrContains( exception.what(), expected_message ),
+            "[Test] Wrong exception message: ", exception.what() );
+        return;
+    }
+    throw geode::OpenGeodeMeshException{ nullptr,
+        geode::OpenGeodeException::TYPE::internal,
+        "[Test] IO should have failed with: ", expected_message };
+}
+
+void test_io_failures( const geode::VertexSet& vertex_set )
+{
+    test_io_failure(
+        [] {
+            return geode::load_vertex_set( "unknown.extension" );
+        },
+        geode::OpenGeodeException::TYPE::data,
+        "Cannot load VertexSet from file: unknown.extension: Unknown "
+        "extension" );
+    test_io_failure(
+        [] {
+            return geode::load_vertex_set( "missing.og_vts" );
+        },
+        geode::OpenGeodeException::TYPE::data,
+        "Cannot load VertexSet from file: missing.og_vts: [VertexSet] File "
+        "\"missing.og_vts\" does not exist" );
+    test_io_failure(
+        [&vertex_set] {
+            return geode::save_vertex_set( vertex_set, "unknown.extension" );
+        },
+        geode::OpenGeodeException::TYPE::internal,
+        "Cannot save VertexSet in file: unknown.extension: Unknown "
+        "extension" );
+}
+
 void test_clone( const geode::VertexSet& vertex_set )
 {
     const auto vertex_set_clone = vertex_set.clone();
@@ -125,6 +174,7 @@ void test()
     test_create_vertices( vertex_set, *builder );
     test_io(
         vertex_set, absl::StrCat( "test.", vertex_set.native_extension() ) );
+    test_io_failures( vertex_set );
     test_delete_vertex( vertex_set, *builder );
     test_clone( vertex_set );
     test_move( vertex_set );

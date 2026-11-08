@@ -23,8 +23,10 @@
 
 #pragma once
 
+#include <string>
 #include <string_view>
 
+#include <absl/strings/ascii.h>
 #include <absl/strings/str_cat.h>
 
 #include <geode/basic/common.hpp>
@@ -63,4 +65,38 @@ namespace geode
         }
         Logger::info( message );
     }
+
+    namespace detail
+    {
+        [[nodiscard]] inline std::string lowercase_extension(
+            std::string_view filename )
+        {
+            return absl::AsciiStrToLower( extension_from_filename(
+                absl::StripAsciiWhitespace( filename ) ) );
+        }
+
+        template < typename Factory,
+            typename... ParentFactories,
+            typename... ParentTypes >
+        void print_available_extensions_if_unknown( std::string_view type,
+            std::string_view filename,
+            const ParentTypes&... parent_types )
+        {
+            static_assert(
+                sizeof...( ParentFactories ) == sizeof...( ParentTypes ),
+                "Each parent factory needs a type name" );
+            if( Factory::has_creator( lowercase_extension( filename ) ) )
+            {
+                return;
+            }
+            print_available_extensions< Factory >( type );
+            if constexpr( sizeof...( ParentFactories ) > 0 )
+            {
+                Logger::info(
+                    "Other extensions are available in parent classes." );
+                ( print_available_extensions< ParentFactories >( parent_types ),
+                    ... );
+            }
+        }
+    } // namespace detail
 } // namespace geode

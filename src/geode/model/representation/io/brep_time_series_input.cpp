@@ -29,7 +29,6 @@
 
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/detail/geode_input_impl.hpp>
-#include <geode/basic/io.hpp>
 #include <geode/basic/logger.hpp>
 #include <geode/basic/timer.hpp>
 
@@ -86,21 +85,10 @@ namespace geode
                 TYPE, " loaded from ", filename, " in ", timer.duration() );
             log_time_series( brep );
         }
-        catch( const OpenGeodeException& e )
+        catch( const std::exception& exception )
         {
-            Logger::error( e.what() );
-            print_available_extensions< BRepTimeSeriesInputFactory >( TYPE );
-            throw OpenGeodeModelException{ nullptr,
-                OpenGeodeException::TYPE::data,
-                "Cannot load BRep time series from file: ", filename, ": ",
-                e.what() };
-        }
-        catch( const std::exception& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeModelException{ nullptr,
-                OpenGeodeException::TYPE::internal,
-                "Cannot load BRep time series from file: ", filename };
+            detail::throw_geode_object_input_exception< OpenGeodeModelException,
+                BRepTimeSeriesInputFactory >( TYPE, filename, exception );
         }
     }
 

@@ -31,8 +31,6 @@
 #include <absl/strings/str_cat.h>
 
 #include <geode/basic/detail/geode_output_impl.hpp>
-#include <geode/basic/io.hpp>
-#include <geode/basic/logger.hpp>
 
 #include <geode/mesh/core/light_regular_grid.hpp>
 
@@ -78,15 +76,11 @@ namespace geode
                 LightRegularGridOutputFactory< dimension > >(
                 type, light_regular_grid, filename );
         }
-        catch( const OpenGeodeException& e )
+        catch( const std::exception& exception )
         {
-            Logger::error( e.what() );
-            print_available_extensions<
-                LightRegularGridOutputFactory< dimension > >( type );
-            throw OpenGeodeMeshException{ nullptr,
-                OpenGeodeException::TYPE::internal,
-                "Cannot save LightRegularGrid in file: ", filename, ": ",
-                e.what() };
+            detail::throw_geode_object_output_exception< OpenGeodeMeshException,
+                LightRegularGridOutputFactory< dimension > >(
+                type, filename, exception );
         }
     }
 
