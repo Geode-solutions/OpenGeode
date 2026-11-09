@@ -23,5 +23,19 @@
 
 #undef DEBUG
 #undef SDEBUG
-#define DEBUG( a ) geode_unused( a );
-#define SDEBUG( a ) geode_unused( a );
+#define DEBUG( a )                                                             \
+    do                                                                         \
+    {                                                                          \
+        if( false )                                                            \
+        {                                                                      \
+            geode_unused( a );                                                 \
+        }                                                                      \
+    } while( false );
+#define SDEBUG( a )                                                            \
+    do                                                                         \
+    {                                                                          \
+        if( false )                                                            \
+        {                                                                      \
+            geode_unused( a );                                                 \
+        }                                                                      \
+    } while( false );
