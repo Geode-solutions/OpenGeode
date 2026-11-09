@@ -74,8 +74,8 @@ namespace geode::detail
         OpenGeodeBasicException::check_exception( !objects.empty(), nullptr,
             OpenGeodeException::TYPE::data, "[", type,
             "] No object found in file \"", filename, "\"" );
-        Logger::info( type, " loaded from ", filename, " in ",
-            timer.duration(), " (", objects.size(),
+        Logger::info( type, " loaded from ", filename, " in ", timer.duration(),
+            " (", objects.size(),
             objects.size() == 1 ? " object)" : " objects)" );
         return objects;
     }
