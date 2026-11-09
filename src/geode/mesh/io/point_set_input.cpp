@@ -37,17 +37,20 @@
 namespace geode
 {
     template < index_t dimension >
-    std::unique_ptr< PointSet< dimension > > load_point_set(
+    std::vector< std::unique_ptr< PointSet< dimension > > > load_point_set(
         const MeshImpl& impl, std::string_view filename )
     {
         const auto type = absl::StrCat( "PointSet", dimension, "D" );
         try
         {
-            auto point_set = detail::geode_object_input_impl<
+            auto point_sets = detail::geode_object_input_impl<
                 PointSetInputFactory< dimension > >( type, filename, impl );
-            Logger::info(
-                type, " has: ", point_set->nb_vertices(), " vertices" );
-            return point_set;
+            for( const auto& point_set : point_sets )
+            {
+                Logger::info(
+                    type, " has: ", point_set->nb_vertices(), " vertices" );
+            }
+            return point_sets;
         }
         catch( const std::exception& exception )
         {
@@ -58,7 +61,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::unique_ptr< PointSet< dimension > > load_point_set(
+    std::vector< std::unique_ptr< PointSet< dimension > > > load_point_set(
         std::string_view filename )
     {
         return load_point_set< dimension >(
@@ -98,15 +101,15 @@ namespace geode
         return input->object_priority();
     }
 
-    template std::unique_ptr< PointSet< 2 > > opengeode_mesh_api load_point_set(
-        const MeshImpl&, std::string_view );
-    template std::unique_ptr< PointSet< 3 > > opengeode_mesh_api load_point_set(
-        const MeshImpl&, std::string_view );
+    template std::vector< std::unique_ptr< PointSet< 2 > > >
+        opengeode_mesh_api load_point_set( const MeshImpl&, std::string_view );
+    template std::vector< std::unique_ptr< PointSet< 3 > > >
+        opengeode_mesh_api load_point_set( const MeshImpl&, std::string_view );
 
-    template std::unique_ptr< PointSet< 2 > > opengeode_mesh_api load_point_set(
-        std::string_view );
-    template std::unique_ptr< PointSet< 3 > > opengeode_mesh_api load_point_set(
-        std::string_view );
+    template std::vector< std::unique_ptr< PointSet< 2 > > >
+        opengeode_mesh_api load_point_set( std::string_view );
+    template std::vector< std::unique_ptr< PointSet< 3 > > >
+        opengeode_mesh_api load_point_set( std::string_view );
 
     template AdditionalFiles opengeode_mesh_api point_set_additional_files< 2 >(
         std::string_view );

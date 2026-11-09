@@ -25,6 +25,7 @@ import geode_test_env
 import opengeode_py_basic as geode
 import opengeode_py_geometry as geom
 import opengeode_py_mesh as mesh
+import opengeode
 
 
 def test_cell_number(grid):
@@ -364,7 +365,7 @@ def test_attribute_2d():
 
 def test_io(grid, filename):
     mesh.save_light_regular_grid3D(grid, filename)
-    mesh.load_light_regular_grid3D(filename)
+    opengeode.load_one(mesh.load_light_regular_grid3D(filename), filename)
 
 
 def test_coordinate_reference_systems():

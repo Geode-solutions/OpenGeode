@@ -25,6 +25,7 @@ import geode_test_env
 
 import opengeode_py_basic as basic
 import opengeode_py_image as image
+import opengeode
 
 
 def test_raster(raster):
@@ -64,12 +65,12 @@ if __name__ == "__main__":
     test_raster(raster)
     test_raster(raster.clone())
     image.save_raster_image2D(raster, "test.og_img2d")
-    reload = image.load_raster_image2D("test.og_img2d")
+    reload = opengeode.load_one(image.load_raster_image2D("test.og_img2d"), "test.og_img2d")
     test_raster(reload)
     test_out_of_bounds(raster)
     raster1d = image.RasterImage1D([7])
     raster1d.set_color(3, image.RGBColor(1, 2, 3))
     image.save_raster_image1D(raster1d, "test.og_img1d")
-    reload1d = image.load_raster_image1D("test.og_img1d")
+    reload1d = opengeode.load_one(image.load_raster_image1D("test.og_img1d"), "test.og_img1d")
     if reload1d.nb_cells() != 7 or reload1d.color(3) != image.RGBColor(1, 2, 3):
         raise ValueError("[Test] Wrong reloaded 1D raster")

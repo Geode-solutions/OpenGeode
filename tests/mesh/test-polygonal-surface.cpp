@@ -512,10 +512,13 @@ void test_io( const geode::PolygonalSurface3D& polygonal_surface,
     const geode::uuid edge_attribute_id )
 {
     geode::save_polygonal_surface( polygonal_surface, filename );
-    const auto reloaded = geode::load_polygonal_surface< 3 >( filename );
+    const auto reloaded = geode::load_one(
+        geode::load_polygonal_surface< 3 >( filename ), filename );
     geode_unused( reloaded );
-    const auto new_polygonal_surface = geode::load_polygonal_surface< 3 >(
-        geode::OpenGeodePolygonalSurface3D::impl_name_static(), filename );
+    const auto new_polygonal_surface = geode::load_one(
+        geode::load_polygonal_surface< 3 >(
+            geode::OpenGeodePolygonalSurface3D::impl_name_static(), filename ),
+        filename );
 
     geode::OpenGeodeMeshException::test(
         new_polygonal_surface->nb_vertices() == 7,
@@ -559,8 +562,10 @@ void test_io( const geode::PolygonalSurface3D& polygonal_surface,
 
 void test_backward_io( const std::string& filename )
 {
-    const auto new_polygonal_surface = geode::load_polygonal_surface< 3 >(
-        geode::OpenGeodePolygonalSurface3D::impl_name_static(), filename );
+    const auto new_polygonal_surface = geode::load_one(
+        geode::load_polygonal_surface< 3 >(
+            geode::OpenGeodePolygonalSurface3D::impl_name_static(), filename ),
+        filename );
 
     geode::OpenGeodeMeshException::test(
         new_polygonal_surface->nb_vertices() == 7,
@@ -928,13 +933,17 @@ void check_v18_5( const geode::PolygonalSurface3D& surface )
 
 void test_backward_v18_5()
 {
-    const auto surface = geode::load_polygonal_surface< 3 >(
-        absl::StrCat( geode::DATA_PATH, "backward_io/v18_5/v18_5.og_psf3d" ) );
+    const auto surface_filename =
+        absl::StrCat( geode::DATA_PATH, "backward_io/v18_5/v18_5.og_psf3d" );
+    const auto surface =
+        geode::load_one( geode::load_polygonal_surface< 3 >( surface_filename ),
+            surface_filename );
     check_v18_5( *surface );
     const auto filename =
         absl::StrCat( "v18_5_reload.", surface->native_extension() );
     geode::save_polygonal_surface( *surface, filename );
-    check_v18_5( *geode::load_polygonal_surface< 3 >( filename ) );
+    check_v18_5( *geode::load_one(
+        geode::load_polygonal_surface< 3 >( filename ), filename ) );
 }
 
 void test_create_invalid_polygons()

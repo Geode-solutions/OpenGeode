@@ -93,7 +93,8 @@ namespace
         {
             if( type == geode::RegularGrid< 2 >::type_name_static() )
             {
-                return geode::load_regular_grid< 2 >( impl, file );
+                return geode::load_one(
+                    geode::load_regular_grid< 2 >( impl, file ), file );
             }
         }
         return nullptr;
@@ -222,8 +223,10 @@ namespace geode
                 if( type
                     == TriangulatedSurface< dimension >::type_name_static() )
                 {
-                    surface.set_mesh( load_triangulated_surface< dimension >(
-                                          impl, file->second ),
+                    surface.set_mesh(
+                        load_one( load_triangulated_surface< dimension >(
+                                      impl, file->second ),
+                            file->second ),
                         typename Surface< dimension >::SurfacesKey{} );
                 }
                 else if( auto grid = load_grid_surface< dimension >(
@@ -234,8 +237,10 @@ namespace geode
                 }
                 else
                 {
-                    surface.set_mesh( load_polygonal_surface< dimension >(
-                                          impl, file->second ),
+                    surface.set_mesh(
+                        load_one( load_polygonal_surface< dimension >(
+                                      impl, file->second ),
+                            file->second ),
                         typename Surface< dimension >::SurfacesKey{} );
                 }
             } );

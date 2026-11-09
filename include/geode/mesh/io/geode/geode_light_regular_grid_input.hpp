@@ -52,7 +52,8 @@ namespace geode
         }
 
     protected:
-        [[nodiscard]] LightRegularGrid< dimension > read() override
+        [[nodiscard]] std::vector< LightRegularGrid< dimension > >
+            read() override
         {
             std::ifstream file{ to_string( this->filename() ),
                 std::ifstream::binary };
@@ -94,7 +95,9 @@ namespace geode
                 nullptr, OpenGeodeException::TYPE::internal,
                 "[Bitsery::read] Error while reading file: ",
                 this->filename() );
-            return grid;
+            std::vector< LightRegularGrid< dimension > > grids;
+            grids.emplace_back( std::move( grid ) );
+            return grids;
         }
 
         AdditionalFiles additional_files() const override

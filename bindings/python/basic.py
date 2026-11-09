@@ -20,3 +20,15 @@
 
 from opengeode_py_basic import *
 OpenGeodeBasicLibrary.initialize()
+
+
+def load_one(objects, filename):
+    """Extract the single object loaded from a file.
+
+    Raise a RuntimeError if the file does not hold exactly one object.
+    """
+    if len(objects) != 1:
+        raise RuntimeError(
+            f'[load_one] File "{filename}" holds {len(objects)} objects, expected exactly one'
+        )
+    return objects[0]

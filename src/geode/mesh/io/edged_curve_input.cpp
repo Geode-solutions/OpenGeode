@@ -37,17 +37,20 @@
 namespace geode
 {
     template < index_t dimension >
-    std::unique_ptr< EdgedCurve< dimension > > load_edged_curve(
+    std::vector< std::unique_ptr< EdgedCurve< dimension > > > load_edged_curve(
         const MeshImpl& impl, std::string_view filename )
     {
         const auto type = absl::StrCat( "EdgedCurve", dimension, "D" );
         try
         {
-            auto edged_curve = detail::geode_object_input_impl<
+            auto edged_curves = detail::geode_object_input_impl<
                 EdgedCurveInputFactory< dimension > >( type, filename, impl );
-            Logger::info( type, " has: ", edged_curve->nb_vertices(),
-                " vertices, ", edged_curve->nb_edges(), " edges" );
-            return edged_curve;
+            for( const auto& edged_curve : edged_curves )
+            {
+                Logger::info( type, " has: ", edged_curve->nb_vertices(),
+                    " vertices, ", edged_curve->nb_edges(), " edges" );
+            }
+            return edged_curves;
         }
         catch( const std::exception& exception )
         {
@@ -58,7 +61,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::unique_ptr< EdgedCurve< dimension > > load_edged_curve(
+    std::vector< std::unique_ptr< EdgedCurve< dimension > > > load_edged_curve(
         std::string_view filename )
     {
         return load_edged_curve< dimension >(
@@ -98,14 +101,16 @@ namespace geode
         return input->object_priority();
     }
 
-    template std::unique_ptr< EdgedCurve< 2 > > opengeode_mesh_api
-        load_edged_curve( const MeshImpl&, std::string_view );
-    template std::unique_ptr< EdgedCurve< 3 > > opengeode_mesh_api
-        load_edged_curve( const MeshImpl&, std::string_view );
+    template std::vector< std::unique_ptr< EdgedCurve< 2 > > >
+        opengeode_mesh_api load_edged_curve(
+            const MeshImpl&, std::string_view );
+    template std::vector< std::unique_ptr< EdgedCurve< 3 > > >
+        opengeode_mesh_api load_edged_curve(
+            const MeshImpl&, std::string_view );
 
-    template std::unique_ptr< EdgedCurve< 2 > >
+    template std::vector< std::unique_ptr< EdgedCurve< 2 > > >
         opengeode_mesh_api load_edged_curve( std::string_view );
-    template std::unique_ptr< EdgedCurve< 3 > >
+    template std::vector< std::unique_ptr< EdgedCurve< 3 > > >
         opengeode_mesh_api load_edged_curve( std::string_view );
 
     template AdditionalFiles opengeode_mesh_api

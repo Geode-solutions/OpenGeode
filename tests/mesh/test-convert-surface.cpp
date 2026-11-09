@@ -45,8 +45,11 @@
 
 void convert_surface_dimension()
 {
-    const auto surface2d = geode::load_triangulated_surface< 2 >(
-        absl::StrCat( geode::DATA_PATH, "3patches.og_tsf2d" ) );
+    const auto surface2d_filename =
+        absl::StrCat( geode::DATA_PATH, "3patches.og_tsf2d" );
+    const auto surface2d = geode::load_one(
+        geode::load_triangulated_surface< 2 >( surface2d_filename ),
+        surface2d_filename );
     const auto surface3d =
         geode::convert_triangulated_surface2d_into_3d( *surface2d, 2, 0. );
     geode::OpenGeodeMeshException::test(
@@ -111,8 +114,11 @@ void convert_grid_to_surface()
         geode::convert_grid_into_triangulated_surface( *mesh_grid );
 
     geode::Logger::debug( "Triangulated surface from old RegularGrid" );
-    const auto old_regular_grid = geode::load_regular_grid< 2 >(
-        absl::StrCat( geode::DATA_PATH, "old_regular_grid.og_rgd2d" ) );
+    const auto old_regular_grid_filename =
+        absl::StrCat( geode::DATA_PATH, "old_regular_grid.og_rgd2d" );
+    const auto old_regular_grid = geode::load_one(
+        geode::load_regular_grid< 2 >( old_regular_grid_filename ),
+        old_regular_grid_filename );
     const auto old_regular_grid_surface =
         geode::convert_grid_into_triangulated_surface( *old_regular_grid );
     geode::AttributeProperties attribute_properties;

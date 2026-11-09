@@ -46,8 +46,10 @@
 
 void test_convert_brep_section()
 {
-    auto brep = geode::load_brep(
-        absl::StrCat( geode::DATA_PATH, "random_dfn.og_brep" ) );
+    const auto brep_filename =
+        absl::StrCat( geode::DATA_PATH, "random_dfn.og_brep" );
+    auto brep =
+        geode::load_one( geode::load_brep( brep_filename ), brep_filename );
     const auto section =
         std::get< 0 >( geode::convert_brep_into_section( brep, 2 ) );
     geode::OpenGeodeModelException::test(
@@ -69,8 +71,10 @@ void test_convert_brep_section()
 
 void test_convert_brep_with_blocks_into_section()
 {
-    const auto brep = geode::load_brep(
-        absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" ) );
+    const auto brep_filename =
+        absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" );
+    const auto brep =
+        geode::load_one( geode::load_brep( brep_filename ), brep_filename );
     geode::OpenGeodeModelException::test(
         brep.nb_blocks() > 0, "BRep should have Blocks" );
     geode::index_t nb_non_block_unique_vertices{ 0 };
@@ -109,8 +113,10 @@ void test_convert_brep_with_blocks_into_section()
 
 void test_extrusion_section_to_brep()
 {
-    const auto section = geode::load_section(
-        absl::StrCat( geode::DATA_PATH, "fractures.og_sctn" ) );
+    const auto section_filename =
+        absl::StrCat( geode::DATA_PATH, "fractures.og_sctn" );
+    const auto section = geode::load_one(
+        geode::load_section( section_filename ), section_filename );
     geode::SectionExtruderOptions options;
     options.axis_to_extrude = 2;
     options.min_coordinate = 0.;
@@ -132,8 +138,10 @@ void test_extrusion_section_to_brep()
 
 void test_extrusion_quad_section_to_brep()
 {
-    const auto section =
-        geode::load_section( absl::StrCat( geode::DATA_PATH, "quad.og_sctn" ) );
+    const auto section_filename =
+        absl::StrCat( geode::DATA_PATH, "quad.og_sctn" );
+    const auto section = geode::load_one(
+        geode::load_section( section_filename ), section_filename );
     geode::SectionExtruderOptions options;
     options.axis_to_extrude = 2;
     options.min_coordinate = 0.;
@@ -191,8 +199,10 @@ void test_extrusion_pentagon_section_to_brep()
 
 void test_extrusion_section_with_empty_corner_to_brep()
 {
-    auto section = geode::load_section(
-        absl::StrCat( geode::DATA_PATH, "fractures.og_sctn" ) );
+    const auto section_filename =
+        absl::StrCat( geode::DATA_PATH, "fractures.og_sctn" );
+    auto section = geode::load_one(
+        geode::load_section( section_filename ), section_filename );
     const auto nb_corners = section.nb_corners();
     geode::SectionBuilder builder{ section };
     builder.add_corner();

@@ -123,10 +123,14 @@ void check_collections( const geode::BRep& brep,
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
-    auto brep = geode::load_brep(
-        absl::StrCat( geode::DATA_PATH, "prism_curve.og_brep" ) );
-    auto brep2 = geode::load_brep(
-        absl::StrCat( geode::DATA_PATH, "dangling.og_brep" ) );
+    const auto brep_filename =
+        absl::StrCat( geode::DATA_PATH, "prism_curve.og_brep" );
+    auto brep =
+        geode::load_one( geode::load_brep( brep_filename ), brep_filename );
+    const auto brep2_filename =
+        absl::StrCat( geode::DATA_PATH, "dangling.og_brep" );
+    auto brep2 =
+        geode::load_one( geode::load_brep( brep2_filename ), brep2_filename );
     add_collections( brep2 );
     std::array< geode::index_t, 5 > nb_components{ brep.nb_corners()
                                                        + brep2.nb_corners(),

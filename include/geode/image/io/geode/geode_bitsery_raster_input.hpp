@@ -39,7 +39,7 @@ namespace geode
         {
         }
 
-        [[nodiscard]] RasterImage< dimension > read() final
+        [[nodiscard]] std::vector< RasterImage< dimension > > read() final
         {
             std::ifstream file{ to_string( this->filename() ),
                 std::ifstream::binary };
@@ -61,7 +61,9 @@ namespace geode
                 nullptr, OpenGeodeException::TYPE::data,
                 "[Bitsery::read] Error while reading file: ",
                 this->filename() );
-            return image;
+            std::vector< RasterImage< dimension > > images;
+            images.emplace_back( std::move( image ) );
+            return images;
         }
 
         AdditionalFiles additional_files() const final

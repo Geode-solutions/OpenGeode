@@ -24,6 +24,7 @@ import geode_test_env
 import opengeode_py_basic as basic
 import opengeode_py_mesh as mesh
 import opengeode_py_model as model
+import opengeode
 
 
 def find_uuid_in_list(uuids, uuid):
@@ -506,5 +507,5 @@ if __name__ == '__main__':
     file_io = "test." + section.native_extension()
     model.save_section(section, file_io)
 
-    section2 = model.load_section(file_io)
+    section2 = opengeode.load_one(model.load_section(file_io), file_io)
     test_add_component_with_mesh_impl()

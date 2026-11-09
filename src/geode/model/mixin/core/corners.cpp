@@ -134,9 +134,10 @@ namespace geode
                     return;
                 }
                 corner.set_mesh(
-                    load_point_set< dimension >(
-                        detail::loadable_mesh_impl(
-                            corner.mesh_type(), type, file->second ),
+                    load_one( load_point_set< dimension >(
+                                  detail::loadable_mesh_impl(
+                                      corner.mesh_type(), type, file->second ),
+                                  file->second ),
                         file->second ),
                     typename Corner< dimension >::CornersKey{} );
             } );

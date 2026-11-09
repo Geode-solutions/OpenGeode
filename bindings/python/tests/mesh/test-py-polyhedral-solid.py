@@ -24,6 +24,7 @@ import geode_test_env
 import opengeode_py_basic as basic
 import opengeode_py_geometry as geom
 import opengeode_py_mesh as mesh
+import opengeode
 
 
 def test_create_vertices(polyhedral_solid, builder):
@@ -186,7 +187,7 @@ def test_delete_polyhedra(polyhedral_solid, builder,edge_attribute_id):
 
 def test_io(polyhedral_solid, filename, facet_attribute_id):
     mesh.save_polyhedral_solid3D(polyhedral_solid, filename)
-    new_polyhedral_solid = mesh.load_polyhedral_solid3D(filename)
+    new_polyhedral_solid = opengeode.load_one(mesh.load_polyhedral_solid3D(filename), filename)
 
     if new_polyhedral_solid.nb_vertices() != 8:
         raise ValueError(

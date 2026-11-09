@@ -135,10 +135,14 @@ void check_same_brep( const geode::BRep& brep, const geode::BRep& other )
 
 void test_batch_removal()
 {
-    auto one_by_one = geode::load_brep(
-        absl::StrCat( geode::DATA_PATH, "dangling.og_brep" ) );
-    auto batch = geode::load_brep(
-        absl::StrCat( geode::DATA_PATH, "dangling.og_brep" ) );
+    const auto one_by_one_filename =
+        absl::StrCat( geode::DATA_PATH, "dangling.og_brep" );
+    auto one_by_one = geode::load_one(
+        geode::load_brep( one_by_one_filename ), one_by_one_filename );
+    const auto batch_filename =
+        absl::StrCat( geode::DATA_PATH, "dangling.og_brep" );
+    auto batch =
+        geode::load_one( geode::load_brep( batch_filename ), batch_filename );
     std::vector< geode::uuid > surfaces;
     for( const auto& surface : one_by_one.surfaces() )
     {
@@ -175,13 +179,17 @@ void test_batch_removal()
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
-    auto brep = geode::load_brep(
-        absl::StrCat( geode::DATA_PATH, "prism_curve.og_brep" ) );
+    const auto brep_filename =
+        absl::StrCat( geode::DATA_PATH, "prism_curve.og_brep" );
+    auto brep =
+        geode::load_one( geode::load_brep( brep_filename ), brep_filename );
     geode::filter_brep_components_with_regards_to_blocks( brep );
     check_brep_prism( brep );
 
-    auto brep2 = geode::load_brep(
-        absl::StrCat( geode::DATA_PATH, "dangling.og_brep" ) );
+    const auto brep2_filename =
+        absl::StrCat( geode::DATA_PATH, "dangling.og_brep" );
+    auto brep2 =
+        geode::load_one( geode::load_brep( brep2_filename ), brep2_filename );
     geode::filter_brep_components_with_regards_to_blocks( brep2 );
     check_brep_dangling( brep2 );
     add_inactive_surface( brep2 );

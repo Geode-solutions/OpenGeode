@@ -24,6 +24,7 @@ import geode_test_env
 import opengeode_py_basic as basic
 import opengeode_py_geometry as geom
 import opengeode_py_mesh as mesh
+import opengeode
 
 
 def test_create_vertices(surface, builder):
@@ -91,7 +92,7 @@ def test_delete_polygon(surface, builder):
 
 def test_io(surface, filename):
     mesh.save_triangulated_surface3D(surface, filename)
-    new_surface = mesh.load_triangulated_surface3D(filename)
+    new_surface = opengeode.load_one(mesh.load_triangulated_surface3D(filename), filename)
 
 
 def test_clone(surface):

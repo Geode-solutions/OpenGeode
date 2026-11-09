@@ -1765,20 +1765,25 @@ void check_version_1_physical_properties(
 // The first physical properties files stored the enum values
 void test_physical_properties_backward_io()
 {
-    const auto brep = geode::load_brep(
-        absl::StrCat( geode::DATA_PATH, "physical_properties_v1.og_brep" ) );
+    const auto brep_filename =
+        absl::StrCat( geode::DATA_PATH, "physical_properties_v1.og_brep" );
+    const auto brep =
+        geode::load_one( geode::load_brep( brep_filename ), brep_filename );
     check_version_1_physical_properties( brep, "[Backward_IO]" );
     const auto file_io = absl::StrCat(
         "physical_properties_v2.", geode::BRep::native_extension_static() );
     geode::save_brep( brep, file_io );
     check_version_1_physical_properties(
-        geode::load_brep( file_io ), "[Backward_IO] reload" );
+        geode::load_one( geode::load_brep( file_io ), file_io ),
+        "[Backward_IO] reload" );
 }
 
 void test_backward_io()
 {
-    auto brep = geode::load_brep(
-        absl::StrCat( geode::DATA_PATH, "dangling.og_brep" ) );
+    const auto brep_filename =
+        absl::StrCat( geode::DATA_PATH, "dangling.og_brep" );
+    auto brep =
+        geode::load_one( geode::load_brep( brep_filename ), brep_filename );
     geode::BRepBuilder brep_builder{ brep };
     for( const auto& block : brep.blocks() )
     {
@@ -1815,8 +1820,10 @@ void test_backward_io()
             "[Backward_IO] Incorrect brep unique_vertex_id." );
     }
     test_registry( brep, 4, 13, 17, 7, 1, 0, 0, 0, 0, 0, 0 );
-    auto brep_v17 = geode::load_brep(
-        absl::StrCat( geode::DATA_PATH, "backward_io/v17/v17.og_brep" ) );
+    const auto brep_v17_filename =
+        absl::StrCat( geode::DATA_PATH, "backward_io/v17/v17.og_brep" );
+    auto brep_v17 = geode::load_one(
+        geode::load_brep( brep_v17_filename ), brep_v17_filename );
     geode::BRepBuilder brep_builder_v17{ brep_v17 };
     for( const auto& block : brep_v17.blocks() )
     {
@@ -1851,8 +1858,10 @@ void test_backward_io()
             "[Backward_IO] Incorrect brep unique_vertex_id." );
     }
     test_registry( brep_v17, 4, 6, 9, 5, 1, 5, 2, 2, 2, 1, 3 );
-    auto brep_v18_0 = geode::load_brep(
-        absl::StrCat( geode::DATA_PATH, "backward_io/v18_0/v18_0.og_brep" ) );
+    const auto brep_v18_0_filename =
+        absl::StrCat( geode::DATA_PATH, "backward_io/v18_0/v18_0.og_brep" );
+    auto brep_v18_0 = geode::load_one(
+        geode::load_brep( brep_v18_0_filename ), brep_v18_0_filename );
     geode::BRepBuilder brep_builder_v18{ brep_v18_0 };
     for( const auto& block : brep_v18_0.blocks() )
     {
@@ -1913,8 +1922,10 @@ void test_registry_remove_unknown_type()
 
 void test_components_filter()
 {
-    const auto brep = geode::load_brep(
-        absl::StrCat( geode::DATA_PATH, "structural_model.og_brep" ) );
+    const auto brep_filename =
+        absl::StrCat( geode::DATA_PATH, "structural_model.og_brep" );
+    const auto brep =
+        geode::load_one( geode::load_brep( brep_filename ), brep_filename );
     geode::OpenGeodeModelException::test(
         brep.nb_components_with_relations() == 9,
         "Wrong number of components with relations, there are ",
@@ -2323,7 +2334,7 @@ void test()
     test_steal_mesh( model );
     const auto file_io = absl::StrCat( "test.", model.native_extension() );
     geode::save_brep( model, file_io );
-    auto model2 = geode::load_brep( file_io );
+    auto model2 = geode::load_one( geode::load_brep( file_io ), file_io );
     geode::BRepBuilder model2_builder{ model2 };
     for( const auto& surface : model2.surfaces() )
     {

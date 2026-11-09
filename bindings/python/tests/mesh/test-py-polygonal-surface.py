@@ -24,6 +24,7 @@ import geode_test_env
 import opengeode_py_basic as basic
 import opengeode_py_geometry as geom
 import opengeode_py_mesh as mesh
+import opengeode
 
 
 def test_create_vertices(polygonal_surface, builder):
@@ -221,7 +222,7 @@ def test_polygon_vertex_normal():
 
 def test_io(polygonal_surface, filename, attribute_id):
     mesh.save_polygonal_surface3D(polygonal_surface, filename)
-    new_polygonal_surface = mesh.load_polygonal_surface3D(filename)
+    new_polygonal_surface = opengeode.load_one(mesh.load_polygonal_surface3D(filename), filename)
 
     if new_polygonal_surface.nb_vertices() != 7:
         raise ValueError(
