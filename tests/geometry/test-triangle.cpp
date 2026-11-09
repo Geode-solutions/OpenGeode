@@ -23,6 +23,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <random>
 
 #include <geode/basic/assert.hpp>
@@ -81,6 +82,17 @@ void test_degenerated_consistency()
             "Wrong degeneracy for sliver of thickness ", width,
             " * GLOBAL_EPSILON" );
     }
+
+    const geode::Point3D aligned0{ { 0.52448510400824233, -9.7493556905495193,
+        9.5361002445770318 } };
+    const geode::Point3D aligned1{ { 0.18921772880608145, -9.5143820563316499,
+        9.5008270020600563 } };
+    const auto aligned2 = aligned0 * 0.25 + aligned1 * 0.75;
+    const auto aligned3 = aligned0 * 2 - aligned1;
+    const geode::Tetrahedron aligned_tetra{ aligned0, aligned1, aligned2,
+        aligned3 };
+    geode::OpenGeodeGeometryException::test( aligned_tetra.is_degenerated(),
+        "Tetrahedron with aligned vertices should be degenerated" );
 
     std::mt19937 generator{ 42 };
     std::uniform_real_distribution< double > distribution{ -1., 1. };
@@ -166,7 +178,8 @@ void test_degenerated_tetrahedron_vertex_order()
     for( const auto factor : { 0.5, 0.9, 1.1, 2. } )
     {
         const auto width = factor * geode::GLOBAL_EPSILON;
-        const std::array< std::array< std::array< double, 3 >, 4 >, 3 >
+        const auto needle_offset = std::sqrt( 2. ) * width;
+        const std::array< std::array< std::array< double, 3 >, 4 >, 4 >
             configurations{ {
                 // Cap: the apex projects inside the opposite facet
                 { { { 0, 0, 0 }, { 1, 0, 0 }, { 0, 1, 0 },
@@ -178,6 +191,9 @@ void test_degenerated_tetrahedron_vertex_order()
                 // Sliver: thinnest between two opposite edges
                 { { { 0, 0, 0 }, { 1, 1, 0 }, { 1, 0, width },
                     { 0, 1, width } } },
+                // Needle: all vertices close to its longest edge
+                { { { 0, 0, 0 }, { 1000, 0, 0 }, { 500, needle_offset, 0 },
+                    { 500, 0, needle_offset } } },
             } };
         for( const auto offset : { 0., 1e3, 1e6 } )
         {

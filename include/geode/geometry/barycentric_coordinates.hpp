@@ -42,7 +42,7 @@ namespace geode
      * tetrahedron.
      * @return an array containing the parametric coordinates corresponding to
      * the tetrahedron vertices.
-     * @exception throws if the tetrahedron is degenerated
+     * @exception throws if the tetrahedron volume is null
      */
     [[nodiscard]] std::array< double, 4 >
         opengeode_geometry_api tetrahedron_barycentric_coordinates(
@@ -51,8 +51,8 @@ namespace geode
     /*!
      * Compute the barycentric coordinates of a point with regards to a
      * tetrahedron.
-     * If tetrahedron is degenerated, computation fallbacks onto its largest
-     * facet.
+     * If tetrahedron is degenerated (see Tetrahedron::is_degenerated),
+     * computation fallbacks onto its largest facet.
      * @return an array containing the parametric coordinates corresponding to
      * the tetrahedron vertices.
      */
@@ -64,7 +64,7 @@ namespace geode
      * Compute barycentric coordinates of a point with regards to a triangle.
      * @return an array containing the parametric coordinates corresponding to
      * the triangle vertices.
-     * @exception throws if the triangle is degenerated
+     * @exception throws if the triangle area is null
      */
     template < index_t dimension >
     [[nodiscard]] std::array< double, 3 > triangle_barycentric_coordinates(
@@ -73,8 +73,8 @@ namespace geode
 
     /*!
      * Compute barycentric coordinates of a point with regards to a triangle.
-     * If triangle is degenerated, computation fallbacks onto its longest
-     * segment.
+     * If triangle is degenerated (see Triangle::is_degenerated), computation
+     * fallbacks onto its longest segment.
      * @return an array containing the parametric coordinates corresponding to
      * the triangle vertices.
      */

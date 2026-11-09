@@ -30,8 +30,6 @@
 #include <absl/strings/str_cat.h>
 
 #include <geode/basic/detail/geode_output_impl.hpp>
-#include <geode/basic/io.hpp>
-#include <geode/basic/logger.hpp>
 
 #include <geode/mesh/core/regular_grid_solid.hpp>
 #include <geode/mesh/core/regular_grid_surface.hpp>
@@ -51,16 +49,11 @@ namespace geode
                 RegularGridOutputFactory< dimension > >(
                 type, regular_grid, filename );
         }
-        catch( const OpenGeodeException& e )
+        catch( const std::exception& exception )
         {
-            Logger::error( e.what() );
-            print_available_extensions< RegularGridOutputFactory< dimension > >(
-                type );
-            Logger::info( "Other extensions are available in parent classes." );
-            print_available_extensions< VertexSetOutputFactory >( "VertexSet" );
-            throw OpenGeodeMeshException{ nullptr,
-                OpenGeodeException::TYPE::internal,
-                "Cannot save RegularGrid in file: ", filename, ": ", e.what() };
+            detail::throw_geode_object_output_exception< OpenGeodeMeshException,
+                RegularGridOutputFactory< dimension >, VertexSetOutputFactory >(
+                type, filename, exception, "VertexSet" );
         }
     }
 

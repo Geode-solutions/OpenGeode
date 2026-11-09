@@ -61,8 +61,8 @@
 #define PYTHON_TRIANGLE( dimension )                                           \
     const auto triangle##dimension =                                           \
         "Triangle" + std::to_string( dimension ) + "D";                        \
-    pybind11::class_< Triangle##dimension##D >(                                \
-        module, triangle##dimension.c_str() )                                  \
+    define_string_representation( pybind11::class_< Triangle##dimension##D >(  \
+                                      module, triangle##dimension.c_str() ) )  \
         .def( pybind11::init< const Point< dimension >&,                       \
             const Point< dimension >&, const Point< dimension >& >() )         \
         .def( "vertices", &Triangle##dimension##D::vertices )                  \
@@ -73,10 +73,7 @@
             &Triangle##dimension##D::longest_edge_index )                      \
         .def( "smallest_edge_index",                                           \
             &Triangle##dimension##D::smallest_edge_index )                     \
-        .def( "barycenter", &Triangle##dimension##D::barycenter )              \
-        .def( "string", &Triangle##dimension##D::string )                      \
-        .def( "__str__", &Triangle##dimension##D::string )                     \
-        .def( "__repr__", &Triangle##dimension##D::string )
+        .def( "barycenter", &Triangle##dimension##D::barycenter )
 
 #define PYTHON_SPHERE( dimension )                                             \
     const auto sphere##dimension =                                             \

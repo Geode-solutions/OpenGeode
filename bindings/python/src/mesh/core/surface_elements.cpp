@@ -29,18 +29,16 @@ namespace geode
 {
     void define_surface_elements( pybind11::module& module )
     {
-        auto vertex =
-            pybind11::class_< PolygonVertex >( module, "PolygonVertex" );
-        auto edge = pybind11::class_< PolygonEdge >( module, "PolygonEdge" );
+        auto vertex = define_string_representation(
+            pybind11::class_< PolygonVertex >( module, "PolygonVertex" ) );
+        auto edge = define_string_representation(
+            pybind11::class_< PolygonEdge >( module, "PolygonEdge" ) );
 
         vertex.def( pybind11::init<>() )
             .def( pybind11::init< index_t, index_t >() )
             .def( pybind11::init< PolygonEdge >() )
             .def( pybind11::self == pybind11::self )
             .def( pybind11::self != pybind11::self )
-            .def( "string", &PolygonVertex::string )
-            .def( "__str__", &PolygonVertex::string )
-            .def( "__repr__", &PolygonVertex::string )
             .def_readwrite( "polygon_id", &PolygonVertex::polygon_id )
             .def_readwrite( "vertex_id", &PolygonVertex::vertex_id );
 
@@ -49,9 +47,6 @@ namespace geode
             .def( pybind11::init< PolygonVertex >() )
             .def( pybind11::self == pybind11::self )
             .def( pybind11::self != pybind11::self )
-            .def( "string", &PolygonEdge::string )
-            .def( "__str__", &PolygonEdge::string )
-            .def( "__repr__", &PolygonEdge::string )
             .def_readwrite( "polygon_id", &PolygonEdge::polygon_id )
             .def_readwrite( "edge_id", &PolygonEdge::edge_id );
     }

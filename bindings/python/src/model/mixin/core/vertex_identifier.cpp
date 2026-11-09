@@ -29,12 +29,10 @@ namespace geode
 {
     void define_vertex_identifier( pybind11::module& module )
     {
-        pybind11::class_< ComponentMeshVertex >( module, "ComponentMeshVertex" )
+        define_string_representation( pybind11::class_< ComponentMeshVertex >(
+                                          module, "ComponentMeshVertex" ) )
             .def( pybind11::init< ComponentID, index_t >() )
             .def( pybind11::self == pybind11::self )
-            .def( "string", &ComponentMeshVertex::string )
-            .def( "__str__", &ComponentMeshVertex::string )
-            .def( "__repr__", &ComponentMeshVertex::string )
             .def_readwrite( "component_id", &ComponentMeshVertex::component_id )
             .def_readwrite( "vertex", &ComponentMeshVertex::vertex );
 

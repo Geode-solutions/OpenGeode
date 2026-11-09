@@ -28,7 +28,6 @@
 #include <absl/strings/str_cat.h>
 
 #include <geode/basic/detail/geode_input_impl.hpp>
-#include <geode/basic/io.hpp>
 #include <geode/basic/logger.hpp>
 
 #include <geode/model/representation/builder/brep_builder.hpp>
@@ -67,20 +66,10 @@ namespace geode
             }
             return breps;
         }
-        catch( const OpenGeodeException& e )
+        catch( const std::exception& exception )
         {
-            Logger::error( e.what() );
-            print_available_extensions< BRepInputFactory >( TYPE );
-            throw OpenGeodeModelException{ nullptr,
-                OpenGeodeException::TYPE::data,
-                "Cannot load BRep from file: ", filename, ": ", e.what() };
-        }
-        catch( const std::exception& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeModelException{ nullptr,
-                OpenGeodeException::TYPE::internal,
-                "Cannot load BRep from file: ", filename };
+            detail::throw_geode_object_input_exception< OpenGeodeModelException,
+                BRepInputFactory >( TYPE, filename, exception );
         }
     }
 

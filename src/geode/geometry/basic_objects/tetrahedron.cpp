@@ -29,6 +29,40 @@
 #include <geode/geometry/distance.hpp>
 #include <geode/geometry/vector.hpp>
 
+namespace
+{
+    constexpr double MIN_RELIABLE_VOLUME_RATIO{ 1e-9 };
+
+    double six_volume_along_longest_edge(
+        const std::array< geode::Vector3D, 6 >& edges )
+    {
+        static constexpr std::array< std::array< geode::local_index_t, 2 >, 6 >
+            EDGES_SHARING_ORIGIN{ { { 1, 2 }, { 0, 2 }, { 0, 1 }, { 0, 4 },
+                { 0, 3 }, { 1, 3 } } };
+        geode::local_index_t longest{ 0 };
+        for( const auto edge : geode::LRange{ 1, 6 } )
+        {
+            if( edges[edge].length2() > edges[longest].length2() )
+            {
+                longest = edge;
+            }
+        }
+        const auto& longest_edge = edges[longest];
+        const auto longest_length2 = longest_edge.length2();
+        const auto& other_edge0 = edges[EDGES_SHARING_ORIGIN[longest][0]];
+        const auto& other_edge1 = edges[EDGES_SHARING_ORIGIN[longest][1]];
+        const auto rejection0 =
+            other_edge0
+            - longest_edge
+                  * ( other_edge0.dot( longest_edge ) / longest_length2 );
+        const auto rejection1 =
+            other_edge1
+            - longest_edge
+                  * ( other_edge1.dot( longest_edge ) / longest_length2 );
+        return longest_edge.dot( rejection0.cross( rejection1 ) );
+    }
+} // namespace
+
 namespace geode
 {
     template < typename PointType >
@@ -102,14 +136,33 @@ namespace geode
         const Vector3D edge12{ point1, point2 };
         const Vector3D edge13{ point1, point3 };
         const Vector3D edge23{ point2, point3 };
-        const auto six_volume = edge01.dot( edge02.cross( edge03 ) );
-        const auto max_cross2 = std::max( { edge01.cross( edge02 ).length2(),
-            edge01.cross( edge03 ).length2(), edge02.cross( edge03 ).length2(),
-            edge12.cross( edge13 ).length2(), edge01.cross( edge23 ).length2(),
-            edge02.cross( edge13 ).length2(),
+        const auto max_facet_cross2 =
+            std::max( { edge01.cross( edge02 ).length2(),
+                edge01.cross( edge03 ).length2(),
+                edge02.cross( edge03 ).length2(),
+                edge12.cross( edge13 ).length2() } );
+        const auto max_cross2 = std::max( { max_facet_cross2,
+            edge01.cross( edge23 ).length2(), edge02.cross( edge13 ).length2(),
             edge03.cross( edge12 ).length2() } );
-        return six_volume * six_volume
-               <= GLOBAL_EPSILON * GLOBAL_EPSILON * max_cross2;
+        const auto epsilon2 = GLOBAL_EPSILON * GLOBAL_EPSILON;
+        const auto six_volume = edge01.dot( edge02.cross( edge03 ) );
+        if( six_volume * six_volume
+            > MIN_RELIABLE_VOLUME_RATIO * MIN_RELIABLE_VOLUME_RATIO
+                  * edge01.length2() * edge02.length2() * edge03.length2() )
+        {
+            return six_volume * six_volume <= epsilon2 * max_cross2;
+        }
+        const auto max_length2 =
+            std::max( { edge01.length2(), edge02.length2(), edge03.length2(),
+                edge12.length2(), edge13.length2(), edge23.length2() } );
+        if( max_facet_cross2 <= epsilon2 * max_length2 )
+        {
+            return true;
+        }
+        const auto accurate_six_volume = six_volume_along_longest_edge(
+            { edge01, edge02, edge03, edge12, edge13, edge23 } );
+        return accurate_six_volume * accurate_six_volume
+               <= epsilon2 * max_cross2;
     }
 
     template < typename PointType >

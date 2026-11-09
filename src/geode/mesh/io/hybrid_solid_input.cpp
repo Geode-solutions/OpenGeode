@@ -28,7 +28,6 @@
 #include <absl/strings/str_cat.h>
 
 #include <geode/basic/detail/geode_input_impl.hpp>
-#include <geode/basic/io.hpp>
 #include <geode/basic/logger.hpp>
 
 #include <geode/mesh/core/hybrid_solid.hpp>
@@ -53,25 +52,11 @@ namespace geode
             }
             return hybrid_solids;
         }
-        catch( const OpenGeodeException& e )
+        catch( const std::exception& exception )
         {
-            Logger::error( e.what() );
-            print_available_extensions< HybridSolidInputFactory< dimension > >(
-                type );
-            Logger::info( "Other extensions are available in parent classes." );
-            print_available_extensions< VertexSetInputFactory >( "VertexSet" );
-            throw OpenGeodeMeshException{ nullptr,
-                OpenGeodeException::TYPE::internal,
-                "Cannot load HybridSolid from file: ", filename, ": ",
-                e.what() };
-        }
-        catch( const std::exception& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeMeshException{ nullptr,
-                OpenGeodeException::TYPE::internal,
-                "Cannot load HybridSolid from file: ", filename, ": ",
-                e.what() };
+            detail::throw_geode_object_input_exception< OpenGeodeMeshException,
+                HybridSolidInputFactory< dimension >, VertexSetInputFactory >(
+                type, filename, exception, "VertexSet" );
         }
     }
 

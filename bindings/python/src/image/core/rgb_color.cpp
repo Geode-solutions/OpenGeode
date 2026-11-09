@@ -29,7 +29,8 @@ namespace geode
 {
     void define_rgb_color( pybind11::module& module )
     {
-        pybind11::class_< RGBColor >( module, "RGBColor" )
+        define_string_representation(
+            pybind11::class_< RGBColor >( module, "RGBColor" ) )
             .def( pybind11::init<>() )
             .def( pybind11::init< local_index_t, local_index_t,
                 local_index_t >() )
@@ -39,9 +40,6 @@ namespace geode
             .def( "set_red", &RGBColor::set_red )
             .def( "set_green", &RGBColor::set_green )
             .def( "set_blue", &RGBColor::set_blue )
-            .def( "string", &RGBColor::string )
-            .def( "__str__", &RGBColor::string )
-            .def( "__repr__", &RGBColor::string )
             .def( pybind11::self == pybind11::self )
             .def( pybind11::self != pybind11::self )
             .def( pybind11::self + pybind11::self )

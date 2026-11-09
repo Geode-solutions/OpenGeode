@@ -433,6 +433,17 @@ namespace geode
         [[nodiscard]] std::optional< PolygonEdge > polygon_edge_from_vertices(
             index_t from_vertex_id, index_t to_vertex_id ) const;
 
+        /*!
+         * Find one polygon edge corresponding to an unordered pair of vertex
+         * indices.
+         * @param[in] edge_vertices Indices of the two edge vertices, in any
+         * order
+         * @return Local index of one of the edges if found.
+         */
+        [[nodiscard]] std::optional< PolygonEdge >
+            polygon_edge_from_edge_vertices(
+                const std::array< index_t, 2 >& edge_vertices ) const;
+
         [[nodiscard]] Segment< dimension > segment(
             const PolygonEdge& polygon_edge ) const;
 

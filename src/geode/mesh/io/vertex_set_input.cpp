@@ -26,7 +26,6 @@
 #include <string_view>
 
 #include <geode/basic/detail/geode_input_impl.hpp>
-#include <geode/basic/io.hpp>
 
 #include <geode/mesh/core/mesh_factory.hpp>
 #include <geode/mesh/core/vertex_set.hpp>
@@ -57,20 +56,10 @@ namespace geode
             }
             return vertex_sets;
         }
-        catch( const OpenGeodeException& e )
+        catch( const std::exception& exception )
         {
-            Logger::error( e.what() );
-            print_available_extensions< VertexSetInputFactory >( TYPE );
-            throw OpenGeodeMeshException{ nullptr,
-                OpenGeodeException::TYPE::internal,
-                "Cannot load VertexSet from file: ", filename, ": ", e.what() };
-        }
-        catch( const std::exception& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeMeshException{ nullptr,
-                OpenGeodeException::TYPE::internal,
-                "Cannot load VertexSet from file: ", filename, ": ", e.what() };
+            detail::throw_geode_object_input_exception< OpenGeodeMeshException,
+                VertexSetInputFactory >( TYPE, filename, exception );
         }
     }
 

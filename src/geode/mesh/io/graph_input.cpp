@@ -26,7 +26,6 @@
 #include <string_view>
 
 #include <geode/basic/detail/geode_input_impl.hpp>
-#include <geode/basic/io.hpp>
 #include <geode/basic/logger.hpp>
 
 #include <geode/mesh/core/graph.hpp>
@@ -50,22 +49,11 @@ namespace geode
             }
             return graphs;
         }
-        catch( const OpenGeodeException& e )
+        catch( const std::exception& exception )
         {
-            Logger::error( e.what() );
-            print_available_extensions< GraphInputFactory >( TYPE );
-            Logger::info( "Other extensions are available in parent classes." );
-            print_available_extensions< VertexSetInputFactory >( "VertexSet" );
-            throw OpenGeodeMeshException{ nullptr,
-                OpenGeodeException::TYPE::internal,
-                "Cannot load Graph from file: ", filename, ": ", e.what() };
-        }
-        catch( const std::exception& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeMeshException{ nullptr,
-                OpenGeodeException::TYPE::internal,
-                "Cannot load Graph from file: ", filename, ": ", e.what() };
+            detail::throw_geode_object_input_exception< OpenGeodeMeshException,
+                GraphInputFactory, VertexSetInputFactory >(
+                TYPE, filename, exception, "VertexSet" );
         }
     }
 

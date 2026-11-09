@@ -28,7 +28,6 @@
 #include <absl/strings/str_cat.h>
 
 #include <geode/basic/detail/geode_input_impl.hpp>
-#include <geode/basic/io.hpp>
 #include <geode/basic/logger.hpp>
 
 #include <geode/model/representation/builder/section_builder.hpp>
@@ -65,20 +64,10 @@ namespace geode
             }
             return sections;
         }
-        catch( const OpenGeodeException& e )
+        catch( const std::exception& exception )
         {
-            Logger::error( e.what() );
-            print_available_extensions< SectionInputFactory >( TYPE );
-            throw OpenGeodeModelException{ nullptr,
-                OpenGeodeException::TYPE::internal,
-                "Cannot load Section from file: ", filename, ": ", e.what() };
-        }
-        catch( const std::exception& e )
-        {
-            Logger::error( e.what() );
-            throw OpenGeodeModelException{ nullptr,
-                OpenGeodeException::TYPE::internal,
-                "Cannot load Section from file: ", filename };
+            detail::throw_geode_object_input_exception< OpenGeodeModelException,
+                SectionInputFactory >( TYPE, filename, exception );
         }
     }
 

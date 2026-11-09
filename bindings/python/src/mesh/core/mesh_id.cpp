@@ -31,11 +31,10 @@ namespace
     template < typename Type >
     void define_mesh_id( pybind11::module& module, const char* name )
     {
-        pybind11::class_< Type >( module, name )
+        define_string_representation(
+            pybind11::class_< Type >( module, name ), &Type::get )
             .def( pybind11::init< std::string >() )
             .def( "get", &Type::get )
-            .def( "__str__", &Type::get )
-            .def( "__repr__", &Type::get )
             .def( pybind11::self == pybind11::self )
             .def( pybind11::self != pybind11::self )
             .def( "__hash__", []( const Type& id ) {
