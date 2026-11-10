@@ -24,6 +24,7 @@ import geode_test_env
 import opengeode_py_basic as basic
 import opengeode_py_geometry as geom
 import opengeode_py_mesh as mesh
+import opengeode
 
 
 def test_create_vertices(solid, builder):
@@ -95,7 +96,7 @@ def test_delete_polyhedron(solid, builder):
 
 def test_io(solid, filename):
     mesh.save_tetrahedral_solid3D(solid, filename)
-    new_solid = mesh.load_tetrahedral_solid3D(filename)
+    new_solid = opengeode.load_one(mesh.load_tetrahedral_solid3D(filename), filename)
     if new_solid.nb_vertices() != 6:
         raise ValueError(
             "[Test] Reloaded TetrahedralSolid should have 6 vertices")

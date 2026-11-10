@@ -31,8 +31,11 @@
 
 void test_polygons_around_vertex()
 {
-    const auto moebius_strip = geode::load_triangulated_surface< 3 >(
-        absl::StrCat( geode::DATA_PATH, "moebius_strip.og_tsf3d" ) );
+    const auto moebius_strip_filename =
+        absl::StrCat( geode::DATA_PATH, "moebius_strip.og_tsf3d" );
+    const auto moebius_strip = geode::load_one(
+        geode::load_triangulated_surface< 3 >( moebius_strip_filename ),
+        moebius_strip_filename );
 
     const geode::index_t vertex_id_0{ 0 };
     const auto polygons_around_0 =

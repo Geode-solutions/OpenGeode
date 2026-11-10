@@ -27,6 +27,7 @@ import opengeode_py_basic as basic
 import opengeode_py_geometry as geometry
 import opengeode_py_mesh as mesh
 import opengeode_py_model as model
+import opengeode
 
 PRESSURE = "pressure"
 VELOCITY = "velocity"
@@ -134,7 +135,7 @@ if __name__ == "__main__":
     test_dir = os.path.dirname(__file__)
     data_dir = os.path.abspath(os.path.join(test_dir, "../../../../tests/data"))
     filename = os.path.join(data_dir, "test_mesh3.og_brep")
-    brep = model.load_brep(filename)
+    brep = opengeode.load_one(model.load_brep(filename), filename)
     block_id = next(iter(brep.blocks())).id()
     time_series = create_time_series(brep, block_id)
     output = "python_time_series." + model.ExternalTimeSeries.native_extension_static()
@@ -143,7 +144,7 @@ if __name__ == "__main__":
     check_pressures(brep)
     check_velocities(brep, block_id)
 
-    other = model.load_brep(filename)
+    other = opengeode.load_one(model.load_brep(filename), filename)
     model.load_brep_time_series(other, output)
     check_pressures(other)
 
@@ -151,7 +152,7 @@ if __name__ == "__main__":
         brep, block_id, geometry.Point3D([100 * basic.GLOBAL_EPSILON, 0.0, 0.0])
     )
     try:
-        wrong.apply_to(model.load_brep(filename))
+        wrong.apply_to(opengeode.load_one(model.load_brep(filename), filename))
     except Exception:
         pass
     else:

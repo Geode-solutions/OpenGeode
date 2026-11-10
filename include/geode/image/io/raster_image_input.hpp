@@ -44,7 +44,7 @@ namespace geode
      * @param[in] filename Path to the file to load.
      */
     template < index_t dimension >
-    [[nodiscard]] RasterImage< dimension > load_raster_image(
+    [[nodiscard]] std::vector< RasterImage< dimension > > load_raster_image(
         std::string_view filename );
 
     template < index_t dimension >

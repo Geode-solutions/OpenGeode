@@ -34,8 +34,8 @@ namespace geode
     {
         module.def( "save_graph", &save_graph );
         module.def( "load_graph",
-            static_cast< std::unique_ptr< Graph > ( * )( std::string_view ) >(
-                &load_graph ) );
+            static_cast< std::vector< std::unique_ptr< Graph > > ( * )(
+                std::string_view ) >( &load_graph ) );
         module.def( "graph_object_priority", &graph_object_priority );
         module.def( "is_graph_loadable", &is_graph_loadable );
         module.def( "is_graph_saveable", &is_graph_saveable );

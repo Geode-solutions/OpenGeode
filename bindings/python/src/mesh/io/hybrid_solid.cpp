@@ -37,8 +37,9 @@
     const auto load##dimension =                                               \
         "load_hybrid_solid" + std::to_string( dimension ) + "D";               \
     module.def( load##dimension.c_str(),                                       \
-        static_cast< std::unique_ptr< HybridSolid< dimension > > ( * )(        \
-            std::string_view ) >( &load_hybrid_solid< dimension > ) );         \
+        static_cast<                                                           \
+            std::vector< std::unique_ptr< HybridSolid< dimension > > > ( * )(  \
+                std::string_view ) >( &load_hybrid_solid< dimension > ) );     \
     const auto priority##dimension =                                           \
         "hybrid_solid_object_priority" + std::to_string( dimension ) + "D";    \
     module.def( priority##dimension.c_str(),                                   \

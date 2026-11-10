@@ -23,9 +23,11 @@ import os
 import geode_test_env
 
 import opengeode_py_model as model
+import opengeode
 
 def test_convert_brep_section(data_dir):
-    brep = model.load_brep(os.path.join(data_dir, "random_dfn.og_brep"))
+    brep_filename = os.path.join(data_dir, "random_dfn.og_brep")
+    brep = opengeode.load_one(model.load_brep(brep_filename), brep_filename)
     section, _ = model.convert_brep_into_section(brep, 2)
 
     if section.nb_corners() != 172:
@@ -44,7 +46,8 @@ def test_convert_brep_section(data_dir):
         raise ValueError("[Test] BRep should have 117 surfaces")
 
 def test_extrusion_section_to_brep(data_dir):
-    section = model.load_section(os.path.join(data_dir, "fractures.og_sctn"))
+    section_filename = os.path.join(data_dir, "fractures.og_sctn")
+    section = opengeode.load_one(model.load_section(section_filename), section_filename)
     options = model.SectionExtruderOptions()
     options.axis_to_extrude = 2
     options.min_coordinate = 0.

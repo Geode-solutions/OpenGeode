@@ -417,7 +417,8 @@ namespace
         }
         try
         {
-            const auto grid = geode::load_regular_grid< 3 >( corrupted );
+            const auto grid = geode::load_one(
+                geode::load_regular_grid< 3 >( corrupted ), corrupted );
             geode::Logger::error( "Grid loaded with cells ",
                 grid->nb_cells_in_direction( 0 ), " ",
                 grid->nb_cells_in_direction( 1 ), " ",
@@ -564,7 +565,8 @@ namespace
         {
         }
 
-        typename Base::InputData read( const Args&... /*unused*/ ) override
+        std::vector< typename Base::InputData > read(
+            const Args&... /*unused*/ ) override
         {
             throw std::runtime_error{ "[Test] Not an OpenGeodeException" };
         }
@@ -658,6 +660,50 @@ namespace
             } );
     }
 
+    template < typename Base, typename... Args >
+    class EmptyInput final : public Base
+    {
+    public:
+        explicit EmptyInput( std::string_view filename ) : Base{ filename } {}
+
+        std::vector< typename Base::InputData > read(
+            const Args&... /*unused*/ ) override
+        {
+            return {};
+        }
+
+        geode::AdditionalFiles additional_files() const override
+        {
+            return {};
+        }
+
+        geode::index_t object_priority() const override
+        {
+            return 0;
+        }
+
+        geode::Percentage is_loadable() const override
+        {
+            return geode::Percentage{ 1 };
+        }
+    };
+
+    void test_no_object_found()
+    {
+        const std::string extension{ "empty_input" };
+        geode::PointSetInputFactory3D::register_creator<
+            EmptyInput< geode::PointSetInput3D, geode::MeshImpl > >(
+            extension );
+        const auto filename = absl::StrCat( "no_object.", extension );
+        {
+            std::ofstream file{ filename };
+            file << "content";
+        }
+        expect_load_failure( filename, []( std::string_view file ) {
+            geode_unused( geode::load_point_set< 3 >( file ) );
+        } );
+    }
+
     void test_legacy_file_without_points()
     {
         // Rename the legacy vertex coordinates attribute
@@ -693,6 +739,7 @@ void test()
     test_active_crs();
     test_legacy_file_without_points();
     test_std_exceptions();
+    test_no_object_found();
 }
 
 OPENGEODE_TEST( "mesh-corrupted-files" )

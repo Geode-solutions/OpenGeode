@@ -119,10 +119,13 @@ void test_delete_vertex(
 void test_io( const geode::PointSet3D& point_set, std::string_view filename )
 {
     geode::save_point_set( point_set, filename );
-    const auto reload = geode::load_point_set< 3 >( filename );
-    geode_unused( reload );
-    const auto point_set2 = geode::load_point_set< 3 >(
-        geode::OpenGeodePointSet3D::impl_name_static(), filename );
+    const auto reloaded = geode::load_point_set< 3 >( filename );
+    geode::OpenGeodeMeshException::test( reloaded.size() == 1,
+        "Native PointSet file should be loaded as a single PointSet" );
+    const auto point_set2 = geode::load_one(
+        geode::load_point_set< 3 >(
+            geode::OpenGeodePointSet3D::impl_name_static(), filename ),
+        filename );
     for( const auto vertex_id : geode::Range{ point_set.nb_vertices() } )
     {
         geode::OpenGeodeMeshException::test(
@@ -155,7 +158,8 @@ void test_save_unwritable( const geode::PointSet3D& point_set )
 void test_backward_io(
     std::string_view filename, const geode::uuid& attribute_id )
 {
-    const auto point_set = geode::load_point_set< 3 >( filename );
+    const auto point_set =
+        geode::load_one( geode::load_point_set< 3 >( filename ), filename );
     geode::OpenGeodeMeshException::test(
         point_set->nb_vertices() == 4, "PointSet should have 4 vertices" );
     const geode::Point3D answer{ { 2.1, 9.4, 6.7 } };

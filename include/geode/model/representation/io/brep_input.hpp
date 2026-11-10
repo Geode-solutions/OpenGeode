@@ -42,9 +42,9 @@ namespace geode
      * API function for loading a BoundaryRepresentation.
      * The adequate loader is called depending on the filename extension.
      * @param[in] filename Path to the file to load.
-     * @return Loaded BRep.
+     * @return All the BReps held by the file.
      */
-    [[nodiscard]] BRep opengeode_model_api load_brep(
+    [[nodiscard]] std::vector< BRep > opengeode_model_api load_brep(
         std::string_view filename );
 
     class BRepInput : public Input< BRep >

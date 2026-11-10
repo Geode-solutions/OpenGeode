@@ -26,13 +26,15 @@ import opengeode_py_basic as basic
 import opengeode_py_geometry
 import opengeode_py_mesh as mesh
 import opengeode_py_model as model
+import opengeode
 
 
 def run_test_brep():
     test_dir = os.path.dirname(__file__)
     data_dir = os.path.abspath(os.path.join(
         test_dir, "../../../../tests/data"))
-    brep = model.load_brep(os.path.join(data_dir, "test_mesh3.og_brep"))
+    brep_filename = os.path.join(data_dir, "test_mesh3.og_brep")
+    brep = opengeode.load_one(model.load_brep(brep_filename), brep_filename)
 
     for block in brep.blocks():
         block_mesh = block.mesh()

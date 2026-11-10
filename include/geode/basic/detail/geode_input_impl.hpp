@@ -27,6 +27,7 @@
 #include <filesystem>
 #include <memory>
 #include <string_view>
+#include <vector>
 
 #include <absl/strings/ascii.h>
 #include <absl/strings/str_join.h>
@@ -58,7 +59,7 @@ namespace geode::detail
     }
 
     template < typename Factory, typename... Args >
-    [[nodiscard]] typename Factory::BaseClass::InputData
+    [[nodiscard]] std::vector< typename Factory::BaseClass::InputData >
         geode_object_input_impl(
             std::string_view type, std::string_view filename, Args... args )
     {
@@ -69,10 +70,14 @@ namespace geode::detail
                 std::filesystem::u8path( to_string( input->filename() ) ) ),
             nullptr, OpenGeodeException::TYPE::data, "[", type, "] File \"",
             filename, "\" does not exist" );
-        auto object = input->read( std::forward< Args >( args )... );
-        Logger::info(
-            type, " loaded from ", filename, " in ", timer.duration() );
-        return object;
+        auto objects = input->read( std::forward< Args >( args )... );
+        OpenGeodeBasicException::check_exception( !objects.empty(), nullptr,
+            OpenGeodeException::TYPE::data, "[", type,
+            "] No object found in file \"", filename, "\"" );
+        Logger::info( type, " loaded from ", filename, " in ", timer.duration(),
+            " (", objects.size(),
+            objects.size() == 1 ? " object)" : " objects)" );
+        return objects;
     }
 
     template < typename Exception,

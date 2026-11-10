@@ -25,12 +25,14 @@ import geode_test_env
 
 import opengeode_py_basic as basic
 import opengeode_py_model as model
+import opengeode
 
 
 def run_test_brep():
     test_dir = os.path.dirname(__file__)
     data_dir = os.path.abspath(os.path.join(test_dir, "../../../../tests/data"))
-    brep = model.load_brep(os.path.join(data_dir, "test_mesh3.og_brep"))
+    brep_filename = os.path.join(data_dir, "test_mesh3.og_brep")
+    brep = opengeode.load_one(model.load_brep(brep_filename), brep_filename)
 
     curve = model.convert_brep_into_curve(brep)
     surface = model.convert_brep_into_surface(brep)
@@ -54,7 +56,8 @@ def run_test_brep():
 def run_test_section():
     test_dir = os.path.dirname(__file__)
     data_dir = os.path.abspath(os.path.join(test_dir, "../../../../tests/data"))
-    section = model.load_section(os.path.join(data_dir, "quad.og_sctn"))
+    section_filename = os.path.join(data_dir, "quad.og_sctn")
+    section = opengeode.load_one(model.load_section(section_filename), section_filename)
 
     curve = model.convert_section_into_curve(section)
     surface = model.convert_section_into_surface(section)

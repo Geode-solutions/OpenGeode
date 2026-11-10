@@ -37,19 +37,23 @@
 namespace geode
 {
     template < index_t dimension >
-    std::unique_ptr< TetrahedralSolid< dimension > > load_tetrahedral_solid(
-        const MeshImpl& impl, std::string_view filename )
+    std::vector< std::unique_ptr< TetrahedralSolid< dimension > > >
+        load_tetrahedral_solid(
+            const MeshImpl& impl, std::string_view filename )
     {
         const auto type = absl::StrCat( "TetrahedralSolid", dimension, "D" );
         try
         {
-            auto tetrahedral_solid = detail::geode_object_input_impl<
+            auto tetrahedral_solids = detail::geode_object_input_impl<
                 TetrahedralSolidInputFactory< dimension > >(
                 type, filename, impl );
-            Logger::info( type, " has: ", tetrahedral_solid->nb_vertices(),
-                " vertices, ", tetrahedral_solid->nb_polyhedra(),
-                " tetrahedra" );
-            return tetrahedral_solid;
+            for( const auto& tetrahedral_solid : tetrahedral_solids )
+            {
+                Logger::info( type, " has: ", tetrahedral_solid->nb_vertices(),
+                    " vertices, ", tetrahedral_solid->nb_polyhedra(),
+                    " tetrahedra" );
+            }
+            return tetrahedral_solids;
         }
         catch( const std::exception& exception )
         {
@@ -61,8 +65,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::unique_ptr< TetrahedralSolid< dimension > > load_tetrahedral_solid(
-        std::string_view filename )
+    std::vector< std::unique_ptr< TetrahedralSolid< dimension > > >
+        load_tetrahedral_solid( std::string_view filename )
     {
         return load_tetrahedral_solid< dimension >(
             MeshFactory::default_impl(
@@ -102,10 +106,11 @@ namespace geode
         return input->object_priority();
     }
 
-    template std::unique_ptr< TetrahedralSolid< 3 > > opengeode_mesh_api
-        load_tetrahedral_solid( const MeshImpl&, std::string_view );
+    template std::vector< std::unique_ptr< TetrahedralSolid< 3 > > >
+        opengeode_mesh_api load_tetrahedral_solid(
+            const MeshImpl&, std::string_view );
 
-    template std::unique_ptr< TetrahedralSolid< 3 > >
+    template std::vector< std::unique_ptr< TetrahedralSolid< 3 > > >
         opengeode_mesh_api load_tetrahedral_solid( std::string_view );
 
     template AdditionalFiles opengeode_mesh_api

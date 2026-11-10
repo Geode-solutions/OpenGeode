@@ -485,7 +485,8 @@ void test_io(
     const geode::LightRegularGrid3D& grid, const std::string& filename )
 {
     geode::save_light_regular_grid( grid, filename );
-    const auto new_grid = geode::load_light_regular_grid< 3 >( filename );
+    const auto new_grid = geode::load_one(
+        geode::load_light_regular_grid< 3 >( filename ), filename );
 
     geode::OpenGeodeMeshException::test( new_grid.nb_grid_vertices() == 1056,
         "Reloaded LightRegularGrid should have 1056 vertices" );
@@ -624,7 +625,8 @@ void test_coordinate_reference_systems()
 
     const auto filename = absl::StrCat( "crs.", grid.native_extension() );
     geode::save_light_regular_grid( clone, filename );
-    auto reloaded = geode::load_light_regular_grid< 3 >( filename );
+    auto reloaded = geode::load_one(
+        geode::load_light_regular_grid< 3 >( filename ), filename );
     geode::OpenGeodeMeshException::test(
         reloaded.grid_coordinate_reference_system_manager()
                 .nb_coordinate_reference_systems()
@@ -650,8 +652,11 @@ void test_coordinate_reference_systems()
 
 void test_backward_io()
 {
-    const auto grid3d = geode::load_light_regular_grid< 3 >(
-        absl::StrCat( geode::DATA_PATH, "backward_io/v19_8/v19_8.og_lrgd3d" ) );
+    const auto grid3d_filename =
+        absl::StrCat( geode::DATA_PATH, "backward_io/v19_8/v19_8.og_lrgd3d" );
+    const auto grid3d =
+        geode::load_one( geode::load_light_regular_grid< 3 >( grid3d_filename ),
+            grid3d_filename );
     test_cell_number( grid3d );
     test_cell_geometry( grid3d );
     check_active_crs_is_grid_geometry( grid3d, "points" );
@@ -674,8 +679,11 @@ void test_backward_io()
             == 42,
         "[Test] Legacy grid should keep its cell attribute values" );
 
-    const auto grid2d = geode::load_light_regular_grid< 2 >(
-        absl::StrCat( geode::DATA_PATH, "backward_io/v19_8/v19_8.og_lrgd2d" ) );
+    const auto grid2d_filename =
+        absl::StrCat( geode::DATA_PATH, "backward_io/v19_8/v19_8.og_lrgd2d" );
+    const auto grid2d =
+        geode::load_one( geode::load_light_regular_grid< 2 >( grid2d_filename ),
+            grid2d_filename );
     check_active_crs_is_grid_geometry( grid2d, "points" );
     geode::OpenGeodeMeshException::test(
         grid2d.point( grid2d.vertex_index( { 1, 1 } ) )
@@ -685,7 +693,8 @@ void test_backward_io()
     const auto filename =
         absl::StrCat( "backward.", grid2d.native_extension() );
     geode::save_light_regular_grid( grid2d, filename );
-    const auto reloaded = geode::load_light_regular_grid< 2 >( filename );
+    const auto reloaded = geode::load_one(
+        geode::load_light_regular_grid< 2 >( filename ), filename );
     check_active_crs_is_grid_geometry( reloaded, "points" );
 }
 

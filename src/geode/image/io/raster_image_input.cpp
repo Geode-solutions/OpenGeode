@@ -34,15 +34,19 @@
 namespace geode
 {
     template < index_t dimension >
-    RasterImage< dimension > load_raster_image( std::string_view filename )
+    std::vector< RasterImage< dimension > > load_raster_image(
+        std::string_view filename )
     {
         const auto type = absl::StrCat( "RasterImage", dimension, "D" );
         try
         {
-            auto raster = detail::geode_object_input_impl<
+            auto rasters = detail::geode_object_input_impl<
                 RasterImageInputFactory< dimension > >( type, filename );
-            Logger::info( type, " has: ", raster.nb_cells(), " cells" );
-            return raster;
+            for( const auto& raster : rasters )
+            {
+                Logger::info( type, " has: ", raster.nb_cells(), " cells" );
+            }
+            return rasters;
         }
         catch( const std::exception& exception )
         {
@@ -76,12 +80,12 @@ namespace geode
         return input->object_priority();
     }
 
-    template RasterImage< 1 > opengeode_image_api load_raster_image(
-        std::string_view );
-    template RasterImage< 2 > opengeode_image_api load_raster_image(
-        std::string_view );
-    template RasterImage< 3 > opengeode_image_api load_raster_image(
-        std::string_view );
+    template std::vector< RasterImage< 1 > >
+        opengeode_image_api load_raster_image( std::string_view );
+    template std::vector< RasterImage< 2 > >
+        opengeode_image_api load_raster_image( std::string_view );
+    template std::vector< RasterImage< 3 > >
+        opengeode_image_api load_raster_image( std::string_view );
 
     template AdditionalFiles opengeode_image_api
         raster_image_additional_files< 1 >( std::string_view );

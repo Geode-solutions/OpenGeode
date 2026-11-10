@@ -40,8 +40,10 @@
 
 void run_test_brep()
 {
+    const auto model_filename =
+        absl::StrCat( geode::DATA_PATH, "layers.og_brep" );
     auto model =
-        geode::load_brep( absl::StrCat( geode::DATA_PATH, "layers.og_brep" ) );
+        geode::load_one( geode::load_brep( model_filename ), model_filename );
     geode::BRepBuilder builder{ model };
     geode::triangulate_surface_meshes( model, builder );
     geode::convert_surface_meshes_into_triangulated_surfaces( model, builder );
@@ -50,13 +52,15 @@ void run_test_brep()
         absl::StrCat( "test_triangulated_surfaces.", model.native_extension() );
     geode::save_brep( model, file_io );
 
-    auto model2 = geode::load_brep( file_io );
+    auto model2 = geode::load_one( geode::load_brep( file_io ), file_io );
 }
 
 void run_test_section()
 {
-    auto model =
-        geode::load_section( absl::StrCat( geode::DATA_PATH, "quad.og_sctn" ) );
+    const auto model_filename =
+        absl::StrCat( geode::DATA_PATH, "quad.og_sctn" );
+    auto model = geode::load_one(
+        geode::load_section( model_filename ), model_filename );
     geode::SectionBuilder builder{ model };
     geode::triangulate_surface_meshes( model, builder );
     geode::convert_surface_meshes_into_triangulated_surfaces( model, builder );
@@ -65,13 +69,15 @@ void run_test_section()
         absl::StrCat( "test_triangulated_surfaces.", model.native_extension() );
     geode::save_section( model, file_io );
 
-    auto model2 = geode::load_section( file_io );
+    auto model2 = geode::load_one( geode::load_section( file_io ), file_io );
 }
 
 void run_test_unsupported_mesh_type()
 {
-    auto model =
-        geode::load_section( absl::StrCat( geode::DATA_PATH, "quad.og_sctn" ) );
+    const auto model_filename =
+        absl::StrCat( geode::DATA_PATH, "quad.og_sctn" );
+    auto model = geode::load_one(
+        geode::load_section( model_filename ), model_filename );
     geode::SectionBuilder builder{ model };
     bool has_thrown{ false };
     try

@@ -37,18 +37,22 @@
 namespace geode
 {
     template < index_t dimension >
-    std::unique_ptr< PolyhedralSolid< dimension > > load_polyhedral_solid(
-        const MeshImpl& impl, std::string_view filename )
+    std::vector< std::unique_ptr< PolyhedralSolid< dimension > > >
+        load_polyhedral_solid( const MeshImpl& impl, std::string_view filename )
     {
         const auto type = absl::StrCat( "PolyhedralSolid", dimension, "D" );
         try
         {
-            auto polyhedral_solid = detail::geode_object_input_impl<
+            auto polyhedral_solids = detail::geode_object_input_impl<
                 PolyhedralSolidInputFactory< dimension > >(
                 type, filename, impl );
-            Logger::info( type, " has: ", polyhedral_solid->nb_vertices(),
-                " vertices, ", polyhedral_solid->nb_polyhedra(), " polyhedra" );
-            return polyhedral_solid;
+            for( const auto& polyhedral_solid : polyhedral_solids )
+            {
+                Logger::info( type, " has: ", polyhedral_solid->nb_vertices(),
+                    " vertices, ", polyhedral_solid->nb_polyhedra(),
+                    " polyhedra" );
+            }
+            return polyhedral_solids;
         }
         catch( const std::exception& exception )
         {
@@ -60,8 +64,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    std::unique_ptr< PolyhedralSolid< dimension > > load_polyhedral_solid(
-        std::string_view filename )
+    std::vector< std::unique_ptr< PolyhedralSolid< dimension > > >
+        load_polyhedral_solid( std::string_view filename )
     {
         return load_polyhedral_solid< dimension >(
             MeshFactory::default_impl(
@@ -101,10 +105,11 @@ namespace geode
         return input->object_priority();
     }
 
-    template std::unique_ptr< PolyhedralSolid< 3 > > opengeode_mesh_api
-        load_polyhedral_solid( const MeshImpl&, std::string_view );
+    template std::vector< std::unique_ptr< PolyhedralSolid< 3 > > >
+        opengeode_mesh_api load_polyhedral_solid(
+            const MeshImpl&, std::string_view );
 
-    template std::unique_ptr< PolyhedralSolid< 3 > >
+    template std::vector< std::unique_ptr< PolyhedralSolid< 3 > > >
         opengeode_mesh_api load_polyhedral_solid( std::string_view );
 
     template AdditionalFiles opengeode_mesh_api

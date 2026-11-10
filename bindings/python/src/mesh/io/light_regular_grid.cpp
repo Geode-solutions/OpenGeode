@@ -38,7 +38,7 @@
     const auto load##dimension =                                               \
         "load_light_regular_grid" + std::to_string( dimension ) + "D";         \
     module.def( load##dimension.c_str(),                                       \
-        static_cast< LightRegularGrid< dimension > ( * )(                      \
+        static_cast< std::vector< LightRegularGrid< dimension > > ( * )(       \
             std::string_view ) >( &load_light_regular_grid< dimension > ) );   \
     const auto priority##dimension = "light_regular_grid_object_priority"      \
                                      + std::to_string( dimension ) + "D";      \

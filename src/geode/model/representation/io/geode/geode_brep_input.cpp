@@ -40,12 +40,14 @@
 
 namespace geode
 {
-    BRep OpenGeodeBRepInput::read()
+    std::vector< BRep > OpenGeodeBRepInput::read()
     {
         const UnzipFile zip_reader{ filename(), uuid{}.string() };
         zip_reader.extract_all();
         BRep brep{ BITSERY::constructor };
         detail::load_brep_files( brep, zip_reader.directory() );
-        return brep;
+        std::vector< BRep > breps;
+        breps.emplace_back( std::move( brep ) );
+        return breps;
     }
 } // namespace geode

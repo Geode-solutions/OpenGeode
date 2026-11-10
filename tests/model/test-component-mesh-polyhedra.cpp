@@ -42,8 +42,10 @@
 
 void test_component_mesh_polyhedra()
 {
-    auto model = geode::load_brep(
-        absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" ) );
+    const auto model_filename =
+        absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" );
+    auto model =
+        geode::load_one( geode::load_brep( model_filename ), model_filename );
 
     for( const auto& block : model.blocks() )
     {
@@ -68,8 +70,10 @@ void test_component_mesh_polyhedra()
 
 void test_polyhedron_without_unique_vertex()
 {
-    auto model = geode::load_brep(
-        absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" ) );
+    const auto model_filename =
+        absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" );
+    auto model =
+        geode::load_one( geode::load_brep( model_filename ), model_filename );
     geode::BRepBuilder builder{ model };
     const auto& block = *model.blocks().begin();
     const geode::ComponentMeshVertex cmv{ block.component_id(),

@@ -37,8 +37,9 @@
     const auto load##dimension =                                               \
         "load_point_set" + std::to_string( dimension ) + "D";                  \
     module.def( load##dimension.c_str(),                                       \
-        static_cast< std::unique_ptr< PointSet< dimension > > ( * )(           \
-            std::string_view ) >( &load_point_set< dimension > ) );            \
+        static_cast<                                                           \
+            std::vector< std::unique_ptr< PointSet< dimension > > > ( * )(     \
+                std::string_view ) >( &load_point_set< dimension > ) );        \
     const auto priority##dimension =                                           \
         "point_set_object_priority" + std::to_string( dimension ) + "D";       \
     module.def( priority##dimension.c_str(),                                   \

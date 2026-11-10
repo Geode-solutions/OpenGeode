@@ -23,10 +23,6 @@ find_package(GDAL REQUIRED CONFIG NO_DEFAULT_PATH PATHS ${GDAL_INSTALL_PREFIX})
 
 add_subdirectory(src)
 
-if(OPENGEODE_WITH_TESTS)
-    add_subdirectory(tests)
-endif()
-
 add_geode_python_wheel(
     NAME "OpenGeode-core"
     DESCRIPTION 
@@ -41,3 +37,7 @@ add_geode_python_wheel(
     SUPERBUILD
     LICENSE "MIT"
 )
+
+if(OPENGEODE_WITH_TESTS)
+    add_subdirectory(tests)
+endif()

@@ -35,30 +35,34 @@
 
 namespace geode
 {
-    Section load_section( std::string_view filename )
+    std::vector< Section > load_section( std::string_view filename )
     {
         constexpr auto TYPE = "Section";
         try
         {
-            auto section =
+            auto sections =
                 detail::geode_object_input_impl< SectionInputFactory >(
                     TYPE, filename );
-            auto message = absl::StrCat( TYPE, " has: " );
-            detail::add_to_message(
-                message, section.nb_surfaces(), " Surfaces, " );
-            detail::add_to_message( message, section.nb_lines(), " Lines, " );
-            detail::add_to_message(
-                message, section.nb_corners(), " Corners, " );
-            detail::add_to_message(
-                message, section.nb_model_boundaries(), " ModelBoundaries" );
-            detail::add_to_message( message, section.nb_corner_collections(),
-                " CornerCollections, " );
-            detail::add_to_message(
-                message, section.nb_line_collections(), " LineCollections, " );
-            detail::add_to_message( message, section.nb_surface_collections(),
-                " SurfaceCollections" );
-            Logger::info( message );
-            return section;
+            for( const auto& section : sections )
+            {
+                auto message = absl::StrCat( TYPE, " has: " );
+                detail::add_to_message(
+                    message, section.nb_surfaces(), " Surfaces, " );
+                detail::add_to_message(
+                    message, section.nb_lines(), " Lines, " );
+                detail::add_to_message(
+                    message, section.nb_corners(), " Corners, " );
+                detail::add_to_message( message, section.nb_model_boundaries(),
+                    " ModelBoundaries" );
+                detail::add_to_message( message,
+                    section.nb_corner_collections(), " CornerCollections, " );
+                detail::add_to_message( message, section.nb_line_collections(),
+                    " LineCollections, " );
+                detail::add_to_message( message,
+                    section.nb_surface_collections(), " SurfaceCollections" );
+                Logger::info( message );
+            }
+            return sections;
         }
         catch( const std::exception& exception )
         {

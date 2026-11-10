@@ -124,8 +124,11 @@ void test_create()
 
 void test_import()
 {
-    auto surface = geode::load_triangulated_surface< 3 >(
-        absl::StrCat( geode::DATA_PATH, "surface_degen.og_tsf3d" ) );
+    const auto surface_filename =
+        absl::StrCat( geode::DATA_PATH, "surface_degen.og_tsf3d" );
+    auto surface = geode::load_one(
+        geode::load_triangulated_surface< 3 >( surface_filename ),
+        surface_filename );
     std::vector< std::reference_wrapper< const geode::SurfaceMesh3D > > meshes{
         *surface
     };
