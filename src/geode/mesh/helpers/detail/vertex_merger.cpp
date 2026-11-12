@@ -23,6 +23,8 @@
 
 #include <geode/mesh/helpers/detail/vertex_merger.hpp>
 
+#include <vector>
+
 #include <geode/basic/pimpl_impl.hpp>
 
 #include <geode/geometry/nn_search.hpp>
@@ -53,7 +55,7 @@ namespace geode
         public:
             Impl( absl::Span< const std::reference_wrapper< const Mesh > >
                     meshes )
-                : meshes_( meshes ),
+                : meshes_( meshes.begin(), meshes.end() ),
                   mesh_{ create_mesh( meshes ) },
                   builder_{ Builder::create( *mesh_ ) },
                   offset_vertices_( meshes.size() + 1 )
@@ -171,7 +173,9 @@ namespace geode
             }
 
         private:
-            absl::Span< const std::reference_wrapper< const Mesh > > meshes_;
+            // Copy of the given references: the given span may refer to a
+            // temporary (e.g. a braced list) destroyed after construction
+            std::vector< std::reference_wrapper< const Mesh > > meshes_;
             std::unique_ptr< Mesh > mesh_;
             std::unique_ptr< Builder > builder_;
             std::vector< index_t > vertices_;
