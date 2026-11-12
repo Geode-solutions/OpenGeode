@@ -4,6 +4,11 @@ if(result)
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
 endif()
 
+# CI test builds may replace the Debug flags (e.g. optimized with assertions kept)
+if(DEFINED ENV{GEODE_CI_DEBUG_FLAGS})
+    set(CMAKE_CXX_FLAGS_DEBUG "$ENV{GEODE_CI_DEBUG_FLAGS}")
+endif()
+
 function(_export_library library_name)
     export(TARGETS ${library_name}
         NAMESPACE ${PROJECT_NAME}::
