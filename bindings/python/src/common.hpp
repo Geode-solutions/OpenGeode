@@ -114,8 +114,15 @@ namespace geode
                 module.attr( "__name__" ).cast< std::string >();
             const auto dot = package.rfind( '.' );
             if( dot == std::string::npos
-                || !error.matches( PyExc_ModuleNotFoundError )
-                || error.value().attr( "name" ).cast< std::string >() != name )
+                || !error.matches( PyExc_ModuleNotFoundError ) )
+            {
+                throw;
+            }
+            // The name of the missing module is None for an error raised by
+            // hand
+            const auto missing = error.value().attr( "name" );
+            if( !pybind11::isinstance< pybind11::str >( missing )
+                || missing.cast< std::string >() != name )
             {
                 throw;
             }

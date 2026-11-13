@@ -235,9 +235,18 @@ def run_stubtest(modules, extra_arguments):
         message = block[len("error: ") :]
         if not any(pattern.match(message) for pattern in ignored):
             remaining.append(block)
-    if result.returncode not in (0, 1):
+    # stubtest ends with "Success: no issues found in N modules" or "Found N
+    # errors (checked M modules)": anything else (mypy missing, crash, ...) means
+    # that nothing was checked, which must not pass
+    if result.returncode == 0:
+        if "Success: no issues found" not in result.stdout:
+            print(result.stdout)
+            print("error: stubtest gave no result")
+            return 1
+    elif not re.search(r"^Found \d+ errors? \(checked \d+ modules?\)", result.stdout, re.M):
         print(result.stdout)
-        return result.returncode
+        print("error: stubtest did not run (exit code %d)" % result.returncode)
+        return result.returncode or 1
     for block in remaining:
         print(block)
     print(

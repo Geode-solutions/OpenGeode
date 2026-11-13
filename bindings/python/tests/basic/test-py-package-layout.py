@@ -26,6 +26,7 @@ is imported alone, in a fresh interpreter, from such a package."""
 
 import importlib.util
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -52,8 +53,9 @@ if __name__ == "__main__":
             open(init, "w").close()
         for module in MODULES:
             origin = importlib.util.find_spec(module).origin
-            os.symlink(origin, os.path.join(library, os.path.basename(origin)))
-        # The directories of the extension modules are not on the path anymore
+            shutil.copy(origin, os.path.join(library, os.path.basename(origin)))
+        # The directories of the extension modules are not on the path anymore (the
+        # libraries they link to are found by geode_test_env / LD_LIBRARY_PATH)
         environment = dict(os.environ)
         environment["PYTHONPATH"] = os.pathsep.join(
             [directory, os.path.dirname(geode_test_env.__file__)]
@@ -101,4 +103,42 @@ if __name__ == "__main__":
         if result.returncode != 0:
             raise ValueError(
                 "[Test] Exceptions not qualified by their module:\n" + result.stdout
+            )
+
+    # A ModuleNotFoundError raised by hand has no module name: it must be
+    # surfaced as it is, not replaced by an error about the missing name
+    with tempfile.TemporaryDirectory() as directory:
+        library = os.path.join(directory, "package", "lib")
+        os.makedirs(library)
+        for init in (
+            os.path.join(directory, "package", "__init__.py"),
+            os.path.join(library, "__init__.py"),
+        ):
+            open(init, "w").close()
+        origin = importlib.util.find_spec("opengeode_py_image").origin
+        shutil.copy(origin, os.path.join(library, os.path.basename(origin)))
+        broken = os.path.join(directory, "broken")
+        os.makedirs(broken)
+        with open(os.path.join(broken, "opengeode_py_basic.py"), "w") as module:
+            module.write("raise ModuleNotFoundError('hand-raised-failure')\n")
+        environment = dict(os.environ)
+        environment["PYTHONPATH"] = os.pathsep.join(
+            [directory, broken, os.path.dirname(geode_test_env.__file__)]
+        )
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                "import geode_test_env; import package.lib.opengeode_py_image",
+            ],
+            cwd=directory,
+            env=environment,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
+        if result.returncode == 0 or "hand-raised-failure" not in result.stdout:
+            raise ValueError(
+                "[Test] The original ModuleNotFoundError should be surfaced:\n"
+                + result.stdout
             )

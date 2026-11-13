@@ -290,7 +290,46 @@ def test_stubtest_detects_a_wrong_stub():
         raise ValueError("[Test] stubtest should reject an extra method:\n" + output)
 
 
+def test_stubtest_that_cannot_run_fails():
+    # A stubtest which does not run (mypy missing, crash...) checked nothing:
+    # it must not pass. A fake mypy.stubtest stands for each case.
+    cases = {
+        "crash": "import sys; print('Traceback: boom'); sys.exit(1)",
+        "silent": "import sys; sys.exit(1)",
+        "nothing": "pass",
+    }
+    for name, body in cases.items():
+        with tempfile.TemporaryDirectory() as directory:
+            package = os.path.join(directory, "mypy")
+            os.makedirs(package)
+            open(os.path.join(package, "__init__.py"), "w").close()
+            with open(os.path.join(package, "stubtest.py"), "w") as file:
+                file.write(body + "\n")
+            environment = dict(os.environ)
+            environment["PYTHONPATH"] = directory + os.pathsep + environment.get(
+                "PYTHONPATH", ""
+            )
+            status, output = run(["stubtest", "os"], environment)
+        if status == 0 or "0 error(s)" in output:
+            raise ValueError(
+                "[Test] A stubtest that cannot run should fail (%s):\n%s"
+                % (name, output)
+            )
+    # without mypy at all
+    with tempfile.TemporaryDirectory() as directory:
+        with open(os.path.join(directory, "mypy.py"), "w") as file:
+            file.write("raise ImportError('no mypy')\n")
+        environment = dict(os.environ)
+        environment["PYTHONPATH"] = directory + os.pathsep + environment.get(
+            "PYTHONPATH", ""
+        )
+        status, output = run(["stubtest", "os"], environment)
+    if status == 0:
+        raise ValueError("[Test] Missing mypy should fail stubtest:\n" + output)
+
+
 if __name__ == "__main__":
+    test_stubtest_that_cannot_run_fails()
     test_unnamed_parameter()
     test_named_parameters_close_to_argN()
     test_unresolved_annotation()

@@ -76,12 +76,42 @@ function(add_geode_python_test)
     endif()
 endfunction()
 
+# The stub gates match messages of these exact versions of the tools (the
+# pybind11 artefacts ignored by stubtest are recognised by their text): update
+# them together with check_python_stubs.py.
+set(GEODE_STUBGEN_REQUIREMENT "pybind11-stubgen==3.0.0")
+set(GEODE_MYPY_REQUIREMENT "mypy==2.4.1")
+
+# Fail the configuration, instead of silently skipping the stub gates, when the
+# Python used for the tests lacks the tools they need.
+function(geode_require_python_stub_tools)
+    execute_process(
+        COMMAND ${PYTHON_EXECUTABLE} -c
+"from importlib.metadata import version
+import mypy.stubtest
+assert version('pybind11-stubgen') == '3.0.0'
+assert version('mypy') == '2.4.1'"
+        RESULT_VARIABLE stub_tools_missing
+        OUTPUT_QUIET
+        ERROR_QUIET
+    )
+    if(stub_tools_missing)
+        message(FATAL_ERROR
+            "The Python stub quality gates need ${GEODE_STUBGEN_REQUIREMENT} and "
+            "${GEODE_MYPY_REQUIREMENT} in ${PYTHON_EXECUTABLE}. Install them with:\n"
+            "  ${PYTHON_EXECUTABLE} -m pip install ${GEODE_STUBGEN_REQUIREMENT} "
+            "${GEODE_MYPY_REQUIREMENT}"
+        )
+    endif()
+endfunction()
+
 # Quality gates on the stubs of the binding modules, run by CTest: generate the
 # stubs of the compiled modules with pybind11-stubgen, then check them with
 # check_python_stubs.py (no unnamed argN parameter, no unresolved or raw C++
 # type, mypy.stubtest unless NO_STUBTEST). The wheel target runs the same gates
 # on the wheel, with stubtest on the whole package.
-# Needs pybind11-stubgen and mypy in PYTHON_EXECUTABLE: skipped otherwise.
+# Needs the pinned pybind11-stubgen and mypy in PYTHON_EXECUTABLE, see
+# geode_require_python_stub_tools.
 function(add_geode_python_stub_test)
     cmake_parse_arguments(GEODE_STUB_TEST
         "NO_STUBTEST"
@@ -89,19 +119,7 @@ function(add_geode_python_stub_test)
         "MODULES;DEPENDENCIES"
         ${ARGN}
     )
-    execute_process(
-        COMMAND ${PYTHON_EXECUTABLE} -c "import pybind11_stubgen, mypy.stubtest"
-        RESULT_VARIABLE stub_tools_missing
-        OUTPUT_QUIET
-        ERROR_QUIET
-    )
-    if(stub_tools_missing)
-        message(STATUS
-            "pybind11-stubgen or mypy not found in ${PYTHON_EXECUTABLE}: "
-            "stub quality gates not tested"
-        )
-        return()
-    endif()
+    geode_require_python_stub_tools()
     if(NOT GEODE_STUB_TEST_NAME)
         set(GEODE_STUB_TEST_NAME "test-py-stubs")
     endif()
@@ -185,8 +203,18 @@ function(add_geode_python_wheel)
         COMMAND ${venv_bin}/python -m pip install --upgrade pip
     )
     execute_process(
-        COMMAND ${venv_bin}/pip install --upgrade wheel packaging setuptools build pybind11-stubgen mypy
+        COMMAND ${venv_bin}/pip install --upgrade wheel packaging setuptools build
     )
+    execute_process(
+        COMMAND ${venv_bin}/pip install ${GEODE_STUBGEN_REQUIREMENT} ${GEODE_MYPY_REQUIREMENT}
+        RESULT_VARIABLE stub_tools_result
+    )
+    if(stub_tools_result)
+        message(FATAL_ERROR
+            "Cannot install ${GEODE_STUBGEN_REQUIREMENT} and ${GEODE_MYPY_REQUIREMENT} "
+            "in ${venv_path}, needed by the wheel stub quality gates"
+        )
+    endif()
     execute_process(
         COMMAND ${venv_bin}/python -c 
 "from sysconfig import get_platform
