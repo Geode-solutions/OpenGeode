@@ -187,6 +187,39 @@ def test_check_module_in_binary_folder():
             expect("Python module in the binary folder" in output, "message", output)
 
 
+def test_check_rpath():
+    """The rpath of a real extension module of the build tree contains
+    $ORIGIN/<libdir> (@loader_path on macOS)."""
+    import importlib.util
+    import platform
+    import shutil
+
+    if platform.system() not in ("Linux", "Darwin"):
+        return
+    tool = "readelf" if platform.system() == "Linux" else "otool"
+    if shutil.which(tool) is None:
+        print("[Test] %s not found: rpath check not tested" % tool)
+        return
+    origin = importlib.util.find_spec("opengeode_py_basic").origin
+    binary_folder = os.path.basename(os.path.dirname(origin))
+    for folder, valid in ((binary_folder, True), ("not_the_folder", False)):
+        with tempfile.TemporaryDirectory() as directory:
+            package = make_checked_package(directory, "fakegeode")
+            os.makedirs(os.path.join(package, folder), exist_ok=True)
+            shutil.copy(origin, os.path.join(package, "fakegeode_py_basic" + SUFFIX))
+            status, output = run(["check", package, folder], pythonpath=directory)
+            if valid:
+                expect(status == 0, "the build rpath should be accepted", output)
+            else:
+                expect(status == 1, "a wrong folder should be rejected", output)
+                expect(
+                    "does not contain $ORIGIN/not_the_folder" in output
+                    or "does not contain @loader_path/not_the_folder" in output,
+                    "message",
+                    output,
+                )
+
+
 def test_check_type_in_subfolder_module():
     with tempfile.TemporaryDirectory() as directory:
         package = make_checked_package(
@@ -557,3 +590,4 @@ if __name__ == "__main__":
     test_check_stub_through_binary_folder()
     test_check_module_in_binary_folder()
     test_check_type_in_subfolder_module()
+    test_check_rpath()

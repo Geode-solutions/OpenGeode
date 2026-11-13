@@ -102,9 +102,12 @@ namespace geode
      * Import the extension module defining the types used by a binding module.
      * In the build tree the modules are top-level modules; in the wheel they
      * live at the root of a package (opengeode.opengeode_py_basic...): when the
-     * top-level module does not exist, the sibling of the module being
-     * initialized is imported. Any other error (the dependency is found but
-     * fails to import) is not masked.
+     * top-level module does not exist, the module of the same name in the
+     * package of the module being initialized is imported. Only the
+     * dependencies of the same package are resolved this way: a module of
+     * another package (an upstream project) must be imported by its package
+     * (pybind11::module_::import( "opengeode" )). Any other error (the
+     * dependency is found but fails to import) is not masked.
      */
     inline void import_binding_dependency(
         const pybind11::module_& module, const std::string& name )

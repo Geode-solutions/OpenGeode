@@ -42,8 +42,9 @@ previous build (stubs and build-tree modules) and the published wheels.
 check: once the package is installed and its stubs are generated, fails if an
 extension module or a stub is still in the binary folder, if a stub refers to an
 extension module through a binary folder (this package or another geode
-package), or if a public type of the package is not defined in a module at the
-root of the package.
+package), if a public type of the package is not defined in a module at the
+root of the package, or (Linux, macOS) if an extension module at the root does
+not look for the shared libraries in the binary folder (rpath).
 
 requirements: merges the requirements files of the project and of the geode
 projects it depends on into one file for pip, without the distributions of the
@@ -76,6 +77,7 @@ import importlib.machinery
 import importlib.metadata
 import inspect
 import os
+import platform
 import re
 import shutil
 import subprocess
@@ -91,6 +93,9 @@ REQUIREMENT_NAME = re.compile(r"^\s*([A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?)
 COMMENT = re.compile(r"(?:^|\s)#.*")
 # Version of a released C++ package: 1.2.3 or 1.2.3-rc.4
 PACKAGE_VERSION = re.compile(r"^v?(\d+\.\d+\.\d+)(?:-rc\.(\d+))?$")
+# rpath entries of an ELF file (readelf -d) and of a Mach-O file (otool -l)
+ELF_RPATH = re.compile(r"\((?:RPATH|RUNPATH)\)[^\[]*\[([^\]]*)\]")
+MACHO_RPATH = re.compile(r"^\s*path (\S+) \(offset \d+\)", re.MULTILINE)
 
 
 def normalize(name):
@@ -164,6 +169,47 @@ def run_layout(package, binary_folder):
     return 0
 
 
+def rpath_entries(module):
+    """rpath entries of an extension module, None when they cannot be read."""
+    system = platform.system()
+    if system == "Linux":
+        tool, pattern = ["readelf", "-d"], ELF_RPATH
+    elif system == "Darwin":
+        tool, pattern = ["otool", "-l"], MACHO_RPATH
+    else:
+        # Windows: the DLL directory is added by __init__.py
+        return None
+    if shutil.which(tool[0]) is None:
+        print("note: %s not found, the rpath of %s is not checked" % (tool[0], module))
+        return None
+    environment = dict(os.environ, LC_ALL="C")
+    output = subprocess.run(
+        tool + [module],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        env=environment,
+    ).stdout
+    entries = []
+    for match in pattern.finditer(output):
+        entries.extend(entry for entry in match.group(1).split(":") if entry)
+    return entries
+
+
+def check_rpath(module, binary_folder):
+    entries = rpath_entries(module)
+    if entries is None:
+        return []
+    origin = "@loader_path" if platform.system() == "Darwin" else "$ORIGIN"
+    expected = origin + "/" + binary_folder
+    if any(entry.rstrip("/") == expected for entry in entries):
+        return []
+    return [
+        "%s: the rpath %s does not contain %s: the shared libraries of the "
+        "package are not found" % (module, ":".join(entries) or "(none)", expected)
+    ]
+
+
 def run_check(package, binary_folder):
     errors = []
     folder = os.path.join(package, binary_folder)
@@ -186,6 +232,9 @@ def run_check(package, binary_folder):
                             "%s:%d: module reached through a binary folder: %s"
                             % (path, number, match.group(0))
                         )
+    for module_name in sorted(os.listdir(package)):
+        if is_extension_module(package, module_name):
+            errors.extend(check_rpath(os.path.join(package, module_name), binary_folder))
     name = package_name(package)
     module = importlib.import_module(name)
     for attribute, value in sorted(vars(module).items()):

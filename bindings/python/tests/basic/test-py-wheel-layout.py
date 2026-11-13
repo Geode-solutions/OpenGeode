@@ -73,6 +73,16 @@ def make_package(directory):
         path = os.path.join(build_directory, name)
         if os.path.isfile(path) and not is_extension_module(name) and not name.endswith(".py"):
             shutil.copy(path, os.path.join(libraries, name))
+    if platform.system() == "Windows":
+        # The wheel ships the DLLs of the dependencies too: the test must not
+        # find any DLL outside of the package
+        for directory in os.environ.get("GEODE_DLL_DIRECTORIES", "").split(os.pathsep):
+            if os.path.isdir(directory):
+                for name in os.listdir(directory):
+                    if name.lower().endswith(".dll"):
+                        target = os.path.join(libraries, name)
+                        if not os.path.exists(target):
+                            shutil.copy(os.path.join(directory, name), target)
     return libraries
 
 
@@ -82,10 +92,9 @@ def run_in_package(directory, libraries, code):
     for variable in ("LD_LIBRARY_PATH", "DYLD_LIBRARY_PATH"):
         environment.pop(variable, None)
     if platform.system() == "Windows":
-        # What the __init__.py of the wheel does
-        environment["GEODE_DLL_DIRECTORIES"] = os.pathsep.join(
-            [libraries, environment.get("GEODE_DLL_DIRECTORIES", "")]
-        )
+        # What the __init__.py of the wheel does, and only that: a wrong DLL
+        # directory must fail
+        environment["GEODE_DLL_DIRECTORIES"] = libraries
     environment["PYTHONPATH"] = os.pathsep.join(
         [directory, os.path.dirname(geode_test_env.__file__)]
     )

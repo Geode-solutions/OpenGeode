@@ -70,6 +70,8 @@ add_geode_python_test(
 add_geode_python_test(
     SOURCE "test-py-package-tools.py"
     ARGUMENTS "${PROJECT_SOURCE_DIR}/cmake/geode_python_package.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
 )
 add_geode_python_test(
     SOURCE "test-py-python-requirements.py"
