@@ -250,16 +250,20 @@
                     SolidMesh##dimension##D::* )(                              \
                     const std::array< index_t, 2 >&, index_t ) const >(        \
                     &SolidMesh##dimension##D::polyhedra_around_edge ),         \
-                geode::VertexCheck{} ),                                        \
+                geode::VertexCheck{}, geode::PolyhedronCheck{} ),              \
             "Return the indices of all the polyhedra that contain both "       \
             "vertices of the edge, starting the search from the polyhedron "   \
-            "first_polyhedron; the polyhedron adjacencies must be computed",   \
+            "first_polyhedron, which must contain the edge: the result "       \
+            "always contains first_polyhedron, even if it does not contain "   \
+            "the edge (no polyhedron is then reliably found around the "       \
+            "edge); the polyhedron adjacencies must be computed",              \
             pybind11::arg( "vertices" ), pybind11::arg( "first_polyhedron" ) ) \
         .def( "polyhedra_from_facet_vertices",                                 \
             geode::checked( "polyhedra_from_facet_vertices",                   \
                 &SolidMesh##dimension##D::polyhedra_from_facet_vertices,       \
                 geode::VertexCheck{} ),                                        \
-            "Return all the polyhedron facets made of the given vertices",     \
+            "Return all the polyhedron facets made of the given vertices; "    \
+            "the polyhedron adjacencies must be computed",                     \
             pybind11::arg( "facet_vertices" ) )                                \
         .def( "polyhedron_attribute_manager",                                  \
             &SolidMesh##dimension##D::polyhedron_attribute_manager,            \

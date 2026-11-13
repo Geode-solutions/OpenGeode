@@ -236,7 +236,8 @@
                 &SurfaceMesh##dimension##D::polygon_edge_from_vertices,        \
                 geode::VertexCheck{}, geode::VertexCheck{} ),                  \
             "Return the polygon edge going from the first vertex to the "      \
-            "second one, or None if there is none",                            \
+            "second one, or None if there is none; the polygon adjacencies "   \
+            "must be computed",                                                \
             pybind11::arg( "from_vertex_id" ),                                 \
             pybind11::arg( "to_vertex_id" ) )                                  \
         .def( "polygon_edge_from_edge_vertices",                               \
@@ -244,13 +245,15 @@
                 &SurfaceMesh##dimension##D::polygon_edge_from_edge_vertices,   \
                 geode::VertexCheck{} ),                                        \
             "Return one polygon edge between the two vertices given in any "   \
-            "order, or None if there is none",                                 \
+            "order, or None if there is none; the polygon adjacencies must "   \
+            "be computed",                                                     \
             pybind11::arg( "edge_vertices" ) )                                 \
         .def( "polygons_from_edge_vertices",                                   \
             geode::checked( "polygons_from_edge_vertices",                     \
                 &SurfaceMesh##dimension##D::polygons_from_edge_vertices,       \
                 geode::VertexCheck{} ),                                        \
-            "Return all the polygon edges between the two given vertices",     \
+            "Return all the polygon edges between the two given vertices; "    \
+            "the polygon adjacencies must be computed",                        \
             pybind11::arg( "edge_vertices" ) )                                 \
         .def( "polygon_attribute_manager",                                     \
             &SurfaceMesh##dimension##D::polygon_attribute_manager,             \

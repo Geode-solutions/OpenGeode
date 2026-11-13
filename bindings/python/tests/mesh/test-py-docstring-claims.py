@@ -528,6 +528,283 @@ def test_helper_claims():
         )
 
 
+def tetrahedra_pair():
+    solid = mesh.TetrahedralSolid3D.create()
+    builder = mesh.TetrahedralSolidBuilder3D.create(solid)
+    for point in [(0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1), (1, 1, 1)]:
+        builder.create_point(point3(*point))
+    builder.create_tetrahedron([0, 1, 2, 3])
+    builder.create_tetrahedron([1, 2, 3, 4])
+    builder.compute_polyhedron_adjacencies()
+    return solid, builder
+
+
+def test_polyhedra_around_edge_hint():
+    solid, builder = tetrahedra_pair()
+    # a hint containing the edge gives all the polyhedra around it
+    for hint in (0, 1):
+        check(
+            sorted(solid.polyhedra_around_edge_with_hint([1, 2], hint)) == [0, 1],
+            f"polyhedra_around_edge_with_hint with the valid hint {hint}",
+        )
+    check(solid.polyhedra_around_edge([0, 1]) == [0], "edge of one polyhedron only")
+    # a hint that does not contain the edge is returned as is
+    check(
+        solid.polyhedra_around_edge_with_hint([0, 4], 1) == [1],
+        "a hint is returned even if no polyhedron contains the edge",
+    )
+    check(
+        1 in solid.polyhedra_around_edge_with_hint([0, 1], 1),
+        "a hint without the edge is still in the result",
+    )
+    check_raises(
+        lambda: solid.polyhedra_around_edge_with_hint([1, 2], 5),
+        IndexError,
+        "hint out of range",
+    )
+    check_raises(
+        lambda: solid.polyhedra_around_edge_with_hint([1, 9], 0),
+        IndexError,
+        "vertex out of range",
+    )
+
+
+def test_adjacency_dependent_queries():
+    surface = mesh.TriangulatedSurface2D.create()
+    builder = mesh.TriangulatedSurfaceBuilder2D.create(surface)
+    for x, y in [(0, 0), (1, 0), (0, 1), (1, 1)]:
+        builder.create_point(point2(x, y))
+    builder.create_triangle([0, 1, 2])
+    builder.create_triangle([1, 3, 2])
+    # without adjacencies the polygons around a vertex are incomplete
+    check(
+        len(surface.polygons_around_vertex(1)) == 1,
+        "without adjacencies only one polygon is found around a vertex",
+    )
+    check(
+        surface.polygon_edge_from_vertices(1, 2) is None
+        and surface.polygon_edge_from_vertices(2, 1) == mesh.PolygonEdge(1, 2),
+        "without adjacencies the edge of the first polygon is silently not found",
+    )
+    check(
+        len(surface.polygons_from_edge_vertices([1, 2])) == 1,
+        "without adjacencies the polygons around an edge are incomplete",
+    )
+    builder.compute_polygon_adjacencies()
+    check(len(surface.polygons_around_vertex(1)) == 2, "with adjacencies")
+    check(surface.polygon_edge_from_vertices(2, 1) == mesh.PolygonEdge(1, 2), "edge found")
+    check(surface.polygon_edge_from_vertices(1, 2) == mesh.PolygonEdge(0, 1), "other edge found")
+    check(
+        surface.polygon_edge_from_edge_vertices([1, 2]) is not None
+        and len(surface.polygons_from_edge_vertices([1, 2])) == 2,
+        "with adjacencies",
+    )
+    # polyhedra_from_facet_vertices needs the adjacencies to find both polyhedra
+    solid = mesh.TetrahedralSolid3D.create()
+    solid_builder = mesh.TetrahedralSolidBuilder3D.create(solid)
+    for point in [(0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1), (1, 1, 1)]:
+        solid_builder.create_point(point3(*point))
+    solid_builder.create_tetrahedron([0, 1, 2, 3])
+    solid_builder.create_tetrahedron([1, 2, 3, 4])
+    check(
+        len(solid.polyhedra_from_facet_vertices([1, 2, 3])) <= 1,
+        "without adjacencies at most one polyhedron facet is found",
+    )
+    solid_builder.compute_polyhedron_adjacencies()
+    check(
+        len(solid.polyhedra_from_facet_vertices([1, 2, 3])) == 2,
+        "with adjacencies both polyhedron facets are found",
+    )
+
+
+def test_graph_builder_results():
+    graph = mesh.Graph.create()
+    builder = mesh.GraphBuilder.create(graph)
+    builder.create_vertices(3)
+    for vertices in [(0, 1), (1, 2), (0, 2)]:
+        builder.create_edge_with_vertices(*vertices)
+    check(graph.nb_edges() == 3, "create_edge_with_vertices creates edges")
+    check(graph.edge_vertices(2) == [0, 2], "create_edge_with_vertices sets the vertices")
+    check(builder.permute_edges([2, 0, 1]) == [1, 2, 0], "permute_edges returns old to new")
+    check(
+        [graph.edge_vertices(i) for i in range(3)] == [[0, 2], [0, 1], [1, 2]],
+        "the edge at position i is the old edge permutation[i]",
+    )
+    check(
+        builder.delete_edges([False, True, False]) == [0, basic.NO_ID, 1],
+        "delete_edges returns NO_ID for a deleted edge",
+    )
+    check(graph.nb_edges() == 2, "delete_edges removes the edges")
+    check(
+        [graph.edge_vertices(i) for i in range(2)] == [[0, 2], [1, 2]],
+        "delete_edges keeps the other edges in order",
+    )
+    check(graph.edge_vertex(mesh.EdgeVertex(0, 1)) == 2, "edge endpoints after deletion")
+    check(len(graph.edges_around_vertex(0)) == 1, "edges around a vertex after deletion")
+    # Error paths, on a graph that is not used afterwards (a rejected call
+    # may leave the edges around the vertices inconsistent)
+    other = mesh.Graph.create()
+    other_builder = mesh.GraphBuilder.create(other)
+    other_builder.create_vertices(3)
+    for vertices in [(0, 1), (1, 2), (0, 2)]:
+        other_builder.create_edge_with_vertices(*vertices)
+    builder = other_builder
+    check_raises(
+        lambda: builder.permute_edges([0, 0, 1]),
+        basic.OpenGeodeDataError,
+        "permute_edges needs a permutation",
+    )
+    check_raises(
+        lambda: builder.permute_edges([0, 1]),
+        basic.OpenGeodeDataError,
+        "permute_edges needs one value per edge",
+    )
+    builder = mesh.GraphBuilder.create(other)
+    check_raises(
+        lambda: builder.delete_edges([True]),
+        basic.OpenGeodeDataError,
+        "delete_edges needs one flag per edge",
+    )
+
+
+def test_edges_and_facets_builders():
+    surface = mesh.TriangulatedSurface2D.create()
+    builder = mesh.TriangulatedSurfaceBuilder2D.create(surface)
+    for x, y in [(0, 0), (1, 0), (0, 1), (1, 1)]:
+        builder.create_point(point2(x, y))
+    builder.create_triangle([0, 1, 2])
+    builder.create_triangle([1, 3, 2])
+    builder.compute_polygon_adjacencies()
+    surface.enable_edges()
+    edges_builder = builder.edges_builder()
+    check(
+        edges_builder.delete_isolated_edges() == [0, 1, 2, 3, 4],
+        "no isolated edge to delete",
+    )
+    check(surface.edges().nb_edges() == 5, "edges kept")
+    builder.delete_polygons([False, True])
+    check(surface.edges().nb_edges() == 5, "deleting a polygon keeps its edges")
+    mapping = edges_builder.delete_isolated_edges()
+    check(
+        len(mapping) == 5 and mapping.count(basic.NO_ID) == 2,
+        "the two edges only used by the deleted polygon are deleted",
+    )
+    check(surface.edges().nb_edges() == 3, "isolated edges deleted")
+    check(
+        sorted(sorted(surface.edges().edge_vertices(i)) for i in range(3))
+        == [[0, 1], [0, 2], [1, 2]],
+        "the remaining edges are the edges of the kept polygon",
+    )
+    check(
+        surface.edges().edge_from_vertices([1, 3]) is None,
+        "a deleted edge is not found anymore",
+    )
+    # solid
+    solid, solid_builder = tetrahedra_pair()
+    solid.enable_edges()
+    solid.enable_facets()
+    edges_builder = solid_builder.edges_builder()
+    facets_builder = solid_builder.facets_builder()
+    check(solid.edges().nb_edges() == 9 and solid.facets().nb_facets() == 7, "counts")
+    check(
+        edges_builder.delete_isolated_edges() == list(range(9)),
+        "no isolated solid edge",
+    )
+    check(
+        facets_builder.delete_isolated_facets() == list(range(7)),
+        "no isolated solid facet",
+    )
+    solid_builder.delete_polyhedra([False, True])
+    facet_mapping = facets_builder.delete_isolated_facets()
+    check(
+        len(facet_mapping) == 7 and facet_mapping.count(basic.NO_ID) == 3,
+        "the three facets only used by the deleted tetrahedron are deleted",
+    )
+    check(solid.facets().nb_facets() == 4, "facets of the kept tetrahedron")
+    edge_mapping = edges_builder.delete_isolated_edges()
+    check(
+        len(edge_mapping) == 9 and edge_mapping.count(basic.NO_ID) == 3,
+        "the three edges only used by the deleted tetrahedron are deleted",
+    )
+    check(solid.edges().nb_edges() == 6, "edges of the kept tetrahedron")
+    check(
+        solid.facets().facet_from_vertices([1, 2, 4]) is None,
+        "a deleted facet is not found anymore",
+    )
+
+
+def test_grid_directions():
+    for dimension in (2, 3):
+        grid_type = mesh.RegularGrid2D if dimension == 2 else mesh.RegularGrid3D
+        builder_type = (
+            mesh.RegularGridBuilder2D if dimension == 2 else mesh.RegularGridBuilder3D
+        )
+        vector_type = geometry.Vector2D if dimension == 2 else geometry.Vector3D
+        make_point = point2 if dimension == 2 else (lambda x, y: point3(x, y, 0))
+        directions = [vector_type([2, 0] + [0] * (dimension - 2)), vector_type([0, 3] + [0] * (dimension - 2))]
+        if dimension == 3:
+            directions.append(vector_type([0, 0, 5]))
+        grid = grid_type.create()
+        builder_type.create(grid).initialize_grid_with_directions(
+            make_point(1, 1), [2] * dimension, directions
+        )
+        check(grid.cell_length_in_direction(0) == 2, "length along direction 0")
+        check(grid.cell_length_in_direction(1) == 3, "length along direction 1")
+        check(grid.nb_grid_vertices() == 3 ** dimension, "number of vertices")
+        check(grid.cell_size() == (6 if dimension == 2 else 30), "cell size")
+        check(
+            grid.grid_point([1] * dimension).inexact_equal(
+                make_point(3, 4) if dimension == 2 else point3(3, 4, 5)
+            ),
+            "grid point along the directions",
+        )
+        check(
+            grid.point(grid.vertex_index([2] * dimension)).inexact_equal(
+                make_point(5, 7) if dimension == 2 else point3(5, 7, 10)
+            ),
+            "mesh point along the directions",
+        )
+        check(
+            grid.grid_coordinate_system().origin().inexact_equal(make_point(1, 1)),
+            "origin",
+        )
+
+
+def test_gradient_without_value():
+    surface = mesh.TriangulatedSurface2D.create()
+    builder = mesh.TriangulatedSurfaceBuilder2D.create(surface)
+    for x, y in [(0, 0), (1, 0), (0, 1), (1, 1)]:
+        builder.create_point(point2(x, y))
+    builder.create_triangle([0, 1, 2])
+    builder.create_triangle([1, 3, 2])
+    builder.compute_polygon_adjacencies()
+    manager = surface.vertex_attribute_manager()
+    attribute_id = manager.create_attribute_variable_double("f", 0.0)
+    attribute = manager.find_attribute_variable_double(attribute_id)
+    for vertex in range(4):
+        attribute.set_value(vertex, float(vertex))
+    attribute.set_value(3, float("nan"))
+    gradient_id = mesh.compute_surface_scalar_function_gradient2D(surface, attribute_id)
+    gradient = manager.find_generic_attribute(gradient_id)
+    import math
+
+    def has_gradient(vertex):
+        return all(
+            math.isfinite(gradient.generic_item_value(vertex, item)) for item in range(2)
+        )
+
+    # vertex 3 has a NaN value and is the neighbor of vertices 1 and 2
+    check(has_gradient(0), "the gradient is computed where there are values")
+    check(
+        all(
+            math.isnan(gradient.generic_item_value(vertex, item))
+            for vertex in (1, 2, 3)
+            for item in range(2)
+        ),
+        "the vertices with a NaN scalar value or neighbor hold the NaN no_value",
+    )
+
+
 def test_names_claims():
     check(mesh.CRSType().get() == "", "a default CRSType has an empty name")
     check(mesh.CRSType("a").get() == "a", "CRSType(value)")
@@ -591,5 +868,11 @@ if __name__ == "__main__":
     test_grid_claims()
     test_texture_claims()
     test_helper_claims()
+    test_polyhedra_around_edge_hint()
+    test_adjacency_dependent_queries()
+    test_graph_builder_results()
+    test_edges_and_facets_builders()
+    test_grid_directions()
+    test_gradient_without_value()
     test_names_claims()
     test_io_claims()
