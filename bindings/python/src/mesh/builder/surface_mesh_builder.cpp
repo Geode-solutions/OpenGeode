@@ -42,16 +42,22 @@
             pybind11::keep_alive< 0, 1 >() )                                   \
         .def(                                                                  \
             "create_point", &SurfaceMeshBuilder##dimension##D::create_point )  \
+        .def( "set_point",                                                     \
+            geode::checked_builder< SurfaceMeshBuilder##dimension##D,          \
+                VertexSet >( "set_point",                                      \
+                &CoordinateReferenceSystemManagersBuilder<                     \
+                    dimension >::set_point,                                    \
+                geode::VertexCheck{} ) )                                       \
         .def( "create_polygon",                                                \
             &SurfaceMeshBuilder##dimension##D::create_polygon )                \
         .def( "set_polygon_vertex",                                            \
-            geode::checked_with_self< SurfaceMesh< dimension > >(              \
-                "set_polygon_vertex",                                          \
+            geode::checked_builder< SurfaceMeshBuilder##dimension##D,          \
+                SurfaceMesh< dimension > >( "set_polygon_vertex",              \
                 &SurfaceMeshBuilder##dimension##D::set_polygon_vertex,         \
-                geode::PolygonVertexCheck{}, geode::VertexOrNoIdCheck{} ) )    \
+                geode::PolygonVertexCheck{}, geode::VertexCheck{} ) )          \
         .def( "set_polygon_adjacent",                                          \
-            geode::checked_with_self< SurfaceMesh< dimension > >(              \
-                "set_polygon_adjacent",                                        \
+            geode::checked_builder< SurfaceMeshBuilder##dimension##D,          \
+                SurfaceMesh< dimension > >( "set_polygon_adjacent",            \
                 &SurfaceMeshBuilder##dimension##D::set_polygon_adjacent,       \
                 geode::PolygonEdgeCheck{}, geode::PolygonCheck{} ) )           \
         .def( "compute_polygon_adjacencies",                                   \

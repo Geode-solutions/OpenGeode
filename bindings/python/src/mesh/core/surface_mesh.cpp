@@ -186,6 +186,10 @@
             static_cast<                                                       \
                 std::unique_ptr< SurfaceMesh##dimension##D > ( * )() >(        \
                 &SurfaceMesh##dimension##D::create ) )                         \
+        .def( "point",                                                         \
+            geode::checked_as< SurfaceMesh##dimension##D >( "point",           \
+                &CoordinateReferenceSystemManagers< dimension >::point,        \
+                geode::VertexCheck{} ) )                                       \
         .def( "clone", &SurfaceMesh##dimension##D::clone )                     \
         .def( "is_triangulated_type",                                          \
             []( const SurfaceMesh< dimension >& surface ) {                    \

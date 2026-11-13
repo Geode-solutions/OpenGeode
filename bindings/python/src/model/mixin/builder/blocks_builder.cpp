@@ -37,9 +37,15 @@
         "BlocksBuilder" + std::to_string( dimension ) + "D";                   \
     pybind11::class_< BlocksBuilder##dimension##D >(                           \
         module, name##dimension.c_str() )                                      \
-        .def( "block_mesh_builder",                                            \
-            &BlocksBuilder##dimension##D::block_mesh_builder<                  \
-                SolidMesh< dimension > >,                                      \
+        .def(                                                                  \
+            "block_mesh_builder",                                              \
+            []( BlocksBuilder##dimension##D& builder,                          \
+                const Block##dimension##D& component ) {                       \
+                return geode::builder_with_mesh(                               \
+                    builder.block_mesh_builder< SolidMesh< dimension > >(      \
+                        component ),                                           \
+                    component.mesh() );                                        \
+            },                                                                 \
             pybind11::keep_alive< 0, 1 >() )                                   \
         .def( "set_block_name", &BlocksBuilder##dimension##D::set_block_name )
 

@@ -22,6 +22,7 @@
  */
 
 #include "../../common.hpp"
+#include "../index_check.hpp"
 
 #include <geode/geometry/point.hpp>
 
@@ -38,6 +39,12 @@
             geode::builder_creator(                                            \
                 &EdgedCurveBuilder##dimension##D::create ),                    \
             pybind11::keep_alive< 0, 1 >() )                                   \
+        .def( "set_point",                                                     \
+            geode::checked_builder< EdgedCurveBuilder##dimension##D,           \
+                VertexSet >( "set_point",                                      \
+                &CoordinateReferenceSystemManagersBuilder<                     \
+                    dimension >::set_point,                                    \
+                geode::VertexCheck{} ) )                                       \
         .def( "create_point", &EdgedCurveBuilder##dimension##D::create_point )
 
 namespace geode

@@ -37,9 +37,15 @@
         "SurfacesBuilder" + std::to_string( dimension ) + "D";                 \
     pybind11::class_< SurfacesBuilder##dimension##D >(                         \
         module, name##dimension.c_str() )                                      \
-        .def( "surface_mesh_builder",                                          \
-            &SurfacesBuilder##dimension##D::surface_mesh_builder<              \
-                SurfaceMesh< dimension > >,                                    \
+        .def(                                                                  \
+            "surface_mesh_builder",                                            \
+            []( SurfacesBuilder##dimension##D& builder,                        \
+                const Surface##dimension##D& component ) {                     \
+                return geode::builder_with_mesh(                               \
+                    builder.surface_mesh_builder< SurfaceMesh< dimension > >(  \
+                        component ),                                           \
+                    component.mesh() );                                        \
+            },                                                                 \
             pybind11::keep_alive< 0, 1 >() )                                   \
         .def( "set_surface_name",                                              \
             &SurfacesBuilder##dimension##D::set_surface_name )

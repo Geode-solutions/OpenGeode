@@ -22,7 +22,6 @@
  */
 
 #include "../../common.hpp"
-#include "../index_check.hpp"
 
 #include <geode/geometry/point.hpp>
 
@@ -63,10 +62,8 @@
                 &CoordinateReferenceSystemManagers##dimension##D::             \
                     main_coordinate_reference_system_manager ),                \
             pybind11::return_value_policy::reference_internal )                \
-        .def( "point",                                                         \
-            geode::checked_with_self< VertexSet >( "point",                    \
-                &CoordinateReferenceSystemManagers##dimension##D::point,       \
-                geode::VertexCheck{} ) )
+        .def(                                                                  \
+            "point", &CoordinateReferenceSystemManagers##dimension##D::point )
 
 namespace geode
 {

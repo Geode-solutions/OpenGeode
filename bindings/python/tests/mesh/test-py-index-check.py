@@ -24,6 +24,7 @@ import geode_test_env
 import opengeode_py_basic as basic
 import opengeode_py_geometry as geom
 import opengeode_py_mesh as mesh
+import opengeode_py_model as model
 
 
 def check(condition, message):
@@ -191,6 +192,57 @@ def test_solid():
     )
 
 
+def test_no_id():
+    # NO_ID is not accepted as a vertex by the C++ setters (it crashes), so it
+    # is reported as out of range instead.
+    surface, builder = create_triangle()
+    check_index_error(
+        lambda: builder.set_polygon_vertex(mesh.PolygonVertex(0, 0), basic.NO_ID),
+        "[set_polygon_vertex] vertex 4294967295 out of range [0, 3)",
+        "set_polygon_vertex NO_ID",
+    )
+    check_index_error(
+        lambda: surface.polygon_vertex(mesh.PolygonVertex(basic.NO_ID, 0)),
+        "[polygon_vertex] polygon 4294967295 out of range [0, 1)",
+        "polygon_vertex NO_ID",
+    )
+    solid, solid_builder = create_tetrahedron()
+    check_index_error(
+        lambda: solid_builder.set_polyhedron_vertex(
+            mesh.PolyhedronVertex(0, 0), basic.NO_ID
+        ),
+        "[set_polyhedron_vertex] vertex 4294967295 out of range [0, 4)",
+        "set_polyhedron_vertex NO_ID",
+    )
+    check(surface.polygon_vertex(mesh.PolygonVertex(0, 0)) == 0, "Surface unchanged")
+
+
+def test_model_builder():
+    brep = model.BRep()
+    brep_builder = model.BRepBuilder(brep)
+    surface_id = brep_builder.add_surface()
+    builder = brep_builder.surface_mesh_builder(brep.surface(surface_id))
+    builder.create_point(geom.Point3D([0, 0, 0]))
+    builder.create_point(geom.Point3D([1, 0, 0]))
+    builder.create_point(geom.Point3D([0, 1, 0]))
+    builder.create_polygon([0, 1, 2])
+    check_index_error(
+        lambda: builder.set_point(8, geom.Point3D([0, 0, 0])),
+        "[set_point] vertex 8 out of range [0, 3)",
+        "model builder set_point",
+    )
+    check_index_error(
+        lambda: builder.set_polygon_vertex(mesh.PolygonVertex(0, 0), 8),
+        "[set_polygon_vertex] vertex 8 out of range [0, 3)",
+        "model builder set_polygon_vertex",
+    )
+    builder.set_point(1, geom.Point3D([2, 0, 0]))
+    check(
+        brep.surface(surface_id).mesh().point(1).value(0) == 2,
+        "Valid model builder set_point should apply",
+    )
+
+
 def test_graph():
     curve = mesh.EdgedCurve3D.create()
     builder = mesh.EdgedCurveBuilder3D.create(curve)
@@ -253,4 +305,6 @@ if __name__ == "__main__":
     test_surface()
     test_solid()
     test_graph()
+    test_no_id()
+    test_model_builder()
     test_attribute()

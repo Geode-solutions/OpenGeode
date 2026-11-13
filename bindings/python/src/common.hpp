@@ -91,6 +91,25 @@ namespace pybind11
 
 namespace geode
 {
+    template < typename Type >
+    class TypedObject;
+}
+
+namespace pybind11
+{
+    namespace detail
+    {
+        // Use the Python name of Type in the signatures
+        template < typename Type >
+        struct handle_type_name< geode::TypedObject< Type > >
+        {
+            static constexpr auto name = make_caster< Type >::name;
+        };
+    } // namespace detail
+} // namespace pybind11
+
+namespace geode
+{
     template < typename Class, typename Getter, typename... Options >
     pybind11::class_< Class, Options... > define_string_representation(
         pybind11::class_< Class, Options... > python_class, Getter&& getter )
@@ -140,25 +159,6 @@ namespace geode
         {
             ( checks( name, mesh, std::get< Indices >( args ) ), ... );
         }
-
-        /*!
-         * Return the object which gives the sizes needed to check the
-         * arguments of a call: @a self if it is a Mesh, or the mesh stored
-         * by the builder @a self, or nullptr if there is none.
-         */
-        template < typename Mesh >
-        const Mesh* mesh_of( pybind11::handle self )
-        {
-            if( pybind11::isinstance< Mesh >( self ) )
-            {
-                return &self.cast< const Mesh& >();
-            }
-            if( pybind11::hasattr( self, "_mesh" ) )
-            {
-                return &self.attr( "_mesh" ).cast< const Mesh& >();
-            }
-            return nullptr;
-        }
     } // namespace detail
 
     /*!
@@ -186,65 +186,99 @@ namespace geode
     }
 
     /*!
-     * Same as checked() for a method of a class that does not know its size
-     * (CRS managers, builders). The sizes are read from the Python object
-     * `self`, which is a Mesh or a builder created from a Mesh. No check is
-     * done if `self` has no associated Mesh.
+     * Same as checked() for a method inherited from a class that does not
+     * know its size (CRS managers): the Python signature is typed with Mesh,
+     * which gives the size.
      */
     template < typename Mesh,
         typename Class,
         typename Return,
         typename... Args,
         typename... Checks >
-    auto checked_with_self( std::string_view name,
-        Return ( Class::*method )( Args... ),
-        Checks... checks )
-    {
-        static_assert( sizeof...( Checks ) <= sizeof...( Args ) );
-        return [name = std::string{ name }, method, checks...](
-                   pybind11::object self, Args... args ) -> Return {
-            if( const auto* mesh = detail::mesh_of< Mesh >( self ) )
-            {
-                detail::run_checks( name, *mesh, std::tie( args... ),
-                    std::index_sequence_for< Checks... >{}, checks... );
-            }
-            return ( self.cast< Class& >().*method )( args... );
-        };
-    }
-
-    template < typename Mesh,
-        typename Class,
-        typename Return,
-        typename... Args,
-        typename... Checks >
-    auto checked_with_self( std::string_view name,
+    auto checked_as( std::string_view name,
         Return ( Class::*method )( Args... ) const,
         Checks... checks )
     {
         static_assert( sizeof...( Checks ) <= sizeof...( Args ) );
         return [name = std::string{ name }, method, checks...](
-                   pybind11::object self, Args... args ) -> Return {
-            if( const auto* mesh = detail::mesh_of< Mesh >( self ) )
-            {
-                detail::run_checks( name, *mesh, std::tie( args... ),
-                    std::index_sequence_for< Checks... >{}, checks... );
-            }
-            return ( self.cast< const Class& >().*method )( args... );
+                   const Mesh& mesh, Args... args ) -> Return {
+            detail::run_checks( name, mesh, std::tie( args... ),
+                std::index_sequence_for< Checks... >{}, checks... );
+            return ( static_cast< const Class& >( mesh ).*method )( args... );
         };
     }
 
     /*!
-     * Wrap the static `create` function of a builder to remember the Mesh
-     * in the builder, to be able to check the indices given to the builder.
+     * Python object known to be an instance of the bound class Type. It is
+     * typed Type in the generated signatures, unlike a plain object.
+     */
+    template < typename Type >
+    class TypedObject : public pybind11::object
+    {
+    public:
+        PYBIND11_OBJECT_DEFAULT( TypedObject, pybind11::object, is_instance )
+
+        static bool is_instance( PyObject* object )
+        {
+            return pybind11::isinstance< Type >( pybind11::handle{ object } );
+        }
+    };
+
+    /*!
+     * Return a builder to Python and remember the mesh it modifies in its
+     * `_mesh` attribute, to check the indices given to the builder. Use it
+     * for every function returning a mesh builder.
+     */
+    template < typename Builder, typename Mesh >
+    TypedObject< Builder > builder_with_mesh(
+        std::unique_ptr< Builder > builder, const Mesh& mesh )
+    {
+        auto result = pybind11::reinterpret_steal< TypedObject< Builder > >(
+            pybind11::cast( std::move( builder ) ).release() );
+        result.attr( "_mesh" ) =
+            pybind11::cast( &mesh, pybind11::return_value_policy::reference );
+        return result;
+    }
+
+    /*!
+     * Wrap the static `create` function of a mesh builder with
+     * builder_with_mesh().
      */
     template < typename Return, typename Mesh >
     auto builder_creator( Return ( *create )( Mesh& ) )
     {
         return [create]( Mesh& mesh ) {
-            auto builder = pybind11::cast( create( mesh ) );
-            builder.attr( "_mesh" ) = pybind11::cast(
-                &mesh, pybind11::return_value_policy::reference );
-            return builder;
+            return builder_with_mesh( create( mesh ), mesh );
+        };
+    }
+
+    /*!
+     * Same as checked_as() for a builder method: the sizes are read from the
+     * mesh stored by builder_with_mesh() (no check if there is none). The
+     * Python signature is typed with Builder.
+     */
+    template < typename Builder,
+        typename Mesh,
+        typename Class,
+        typename Return,
+        typename... Args,
+        typename... Checks >
+    auto checked_builder( std::string_view name,
+        Return ( Class::*method )( Args... ),
+        Checks... checks )
+    {
+        static_assert( sizeof...( Checks ) <= sizeof...( Args ) );
+        return [name = std::string{ name }, method, checks...](
+                   TypedObject< Builder > self, Args... args ) -> Return {
+            if( pybind11::hasattr( self, "_mesh" ) )
+            {
+                detail::run_checks( name,
+                    self.attr( "_mesh" ).template cast< const Mesh& >(),
+                    std::tie( args... ), std::index_sequence_for< Checks... >{},
+                    checks... );
+            }
+            return ( static_cast< Class& >( self.template cast< Builder& >() )
+                     .*method )( args... );
         };
     }
 } // namespace geode

@@ -35,8 +35,9 @@
 namespace geode
 {
     /*!
-     * Checks to give to checked() and checked_with_self(): each one validates
-     * one argument of a mesh function against the size of the mesh.
+     * Checks to give to checked() and checked(), checked_as() and
+     * checked_builder(): each one validates one argument of a mesh function
+     * against the size of the mesh.
      */
     struct VertexCheck
     {
@@ -66,23 +67,6 @@ namespace geode
             for( const auto vertex : vertices )
             {
                 ( *this )( name, mesh, vertex );
-            }
-        }
-    };
-
-    /*!
-     * Same as VertexCheck but NO_ID is accepted, as the C++ functions use it
-     * for "no vertex".
-     */
-    struct VertexOrNoIdCheck
-    {
-        template < typename Mesh >
-        void operator()(
-            std::string_view name, const Mesh& mesh, index_t vertex ) const
-        {
-            if( vertex != NO_ID )
-            {
-                VertexCheck{}( name, mesh, vertex );
             }
         }
     };

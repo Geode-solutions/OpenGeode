@@ -40,16 +40,22 @@
             geode::builder_creator( &SolidMeshBuilder##dimension##D::create ), \
             pybind11::keep_alive< 0, 1 >() )                                   \
         .def( "create_point", &SolidMeshBuilder##dimension##D::create_point )  \
+        .def( "set_point",                                                     \
+            geode::checked_builder< SolidMeshBuilder##dimension##D,            \
+                VertexSet >( "set_point",                                      \
+                &CoordinateReferenceSystemManagersBuilder<                     \
+                    dimension >::set_point,                                    \
+                geode::VertexCheck{} ) )                                       \
         .def( "create_polyhedron",                                             \
             &SolidMeshBuilder##dimension##D::create_polyhedron )               \
         .def( "set_polyhedron_vertex",                                         \
-            geode::checked_with_self< SolidMesh< dimension > >(                \
-                "set_polyhedron_vertex",                                       \
+            geode::checked_builder< SolidMeshBuilder##dimension##D,            \
+                SolidMesh< dimension > >( "set_polyhedron_vertex",             \
                 &SolidMeshBuilder##dimension##D::set_polyhedron_vertex,        \
-                geode::PolyhedronVertexCheck{}, geode::VertexOrNoIdCheck{} ) ) \
+                geode::PolyhedronVertexCheck{}, geode::VertexCheck{} ) )       \
         .def( "set_polyhedron_adjacent",                                       \
-            geode::checked_with_self< SolidMesh< dimension > >(                \
-                "set_polyhedron_adjacent",                                     \
+            geode::checked_builder< SolidMeshBuilder##dimension##D,            \
+                SolidMesh< dimension > >( "set_polyhedron_adjacent",           \
                 &SolidMeshBuilder##dimension##D::set_polyhedron_adjacent,      \
                 geode::PolyhedronFacetCheck{}, geode::PolyhedronCheck{} ) )    \
         .def( "compute_polyhedron_adjacencies",                                \

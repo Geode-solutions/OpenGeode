@@ -45,6 +45,10 @@
         .def_static( "create",                                                 \
             static_cast< std::unique_ptr< SolidMesh##dimension##D > ( * )() >( \
                 &SolidMesh##dimension##D::create ) )                           \
+        .def( "point",                                                         \
+            geode::checked_as< SolidMesh##dimension##D >( "point",             \
+                &CoordinateReferenceSystemManagers< dimension >::point,        \
+                geode::VertexCheck{} ) )                                       \
         .def( "clone", &SolidMesh##dimension##D::clone )                       \
         .def( "nb_polyhedra", &SolidMesh##dimension##D::nb_polyhedra )         \
         .def(                                                                  \

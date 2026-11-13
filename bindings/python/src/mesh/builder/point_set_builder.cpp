@@ -22,6 +22,7 @@
  */
 
 #include "../../common.hpp"
+#include "../index_check.hpp"
 
 #include <geode/geometry/point.hpp>
 
@@ -37,6 +38,12 @@
         .def_static( "create",                                                 \
             geode::builder_creator( &PointSetBuilder##dimension##D::create ),  \
             pybind11::keep_alive< 0, 1 >() )                                   \
+        .def( "set_point",                                                     \
+            geode::checked_builder< PointSetBuilder##dimension##D,             \
+                VertexSet >( "set_point",                                      \
+                &CoordinateReferenceSystemManagersBuilder<                     \
+                    dimension >::set_point,                                    \
+                geode::VertexCheck{} ) )                                       \
         .def( "create_point", &PointSetBuilder##dimension##D::create_point )
 
 namespace geode

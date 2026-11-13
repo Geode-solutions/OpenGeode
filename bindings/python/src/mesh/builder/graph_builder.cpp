@@ -42,9 +42,9 @@ namespace geode
                     &GraphBuilder::create_edge ) )
             .def( "create_edges", &GraphBuilder::create_edges )
             .def( "set_edge_vertex",
-                geode::checked_with_self< Graph >( "set_edge_vertex",
-                    &GraphBuilder::set_edge_vertex, geode::EdgeVertexCheck{},
-                    geode::VertexCheck{} ) )
+                geode::checked_builder< GraphBuilder, Graph >(
+                    "set_edge_vertex", &GraphBuilder::set_edge_vertex,
+                    geode::EdgeVertexCheck{}, geode::VertexCheck{} ) )
             .def( "delete_edges", &GraphBuilder::delete_edges )
             .def( "permute_edges", &GraphBuilder::permute_edges )
             .def( "delete_isolated_vertices",

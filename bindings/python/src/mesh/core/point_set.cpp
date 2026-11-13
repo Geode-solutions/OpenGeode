@@ -22,6 +22,7 @@
  */
 
 #include "../../common.hpp"
+#include "../index_check.hpp"
 
 #include <geode/geometry/bounding_box.hpp>
 #include <geode/geometry/point.hpp>
@@ -37,6 +38,10 @@
         .def_static( "create",                                                 \
             static_cast< std::unique_ptr< PointSet##dimension##D > ( * )() >(  \
                 &PointSet##dimension##D::create ) )                            \
+        .def( "point",                                                         \
+            geode::checked_as< PointSet##dimension##D >( "point",              \
+                &CoordinateReferenceSystemManagers< dimension >::point,        \
+                geode::VertexCheck{} ) )                                       \
         .def( "clone", &PointSet##dimension##D::clone )                        \
         .def( "bounding_box", &PointSet##dimension##D::bounding_box )
 

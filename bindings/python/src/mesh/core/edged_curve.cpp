@@ -39,6 +39,10 @@
             static_cast<                                                       \
                 std::unique_ptr< EdgedCurve##dimension##D > ( * )() >(         \
                 &EdgedCurve##dimension##D::create ) )                          \
+        .def( "point",                                                         \
+            geode::checked_as< EdgedCurve##dimension##D >( "point",            \
+                &CoordinateReferenceSystemManagers< dimension >::point,        \
+                geode::VertexCheck{} ) )                                       \
         .def( "clone", &EdgedCurve##dimension##D::clone )                      \
         .def( "edge_length",                                                   \
             geode::checked( "edge_length",                                     \
