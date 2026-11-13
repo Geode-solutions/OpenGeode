@@ -62,12 +62,13 @@ namespace geode
 {
     void define_intersection( pybind11::module& module )
     {
-        pybind11::enum_< INTERSECTION_TYPE >( module, "INTERSECTION_TYPE" )
+        pybind11::native_enum< INTERSECTION_TYPE >(
+            module, "INTERSECTION_TYPE", "enum.Enum" )
             .value( "none", INTERSECTION_TYPE::none )
             .value( "intersect", INTERSECTION_TYPE::intersect )
             .value( "parallel", INTERSECTION_TYPE::parallel )
             .value( "incorrect", INTERSECTION_TYPE::incorrect )
-            .export_values();
+            .finalize();
 
         PYTHON_INTERSECTION_RESULT( Point2D );
         PYTHON_INTERSECTION_RESULT( Point3D );

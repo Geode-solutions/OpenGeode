@@ -32,14 +32,15 @@ namespace geode
         pybind11::class_< Logger,
             std::unique_ptr< Logger, pybind11::nodelete > >
             logger( module, "Logger" );
-        pybind11::enum_< Logger::LEVEL >( logger, "LEVEL" )
+        pybind11::native_enum< Logger::LEVEL >( logger, "LEVEL", "enum.Enum" )
             .value( "trace", Logger::LEVEL::trace )
             .value( "debug", Logger::LEVEL::debug )
             .value( "info", Logger::LEVEL::info )
             .value( "warning", Logger::LEVEL::warning )
             .value( "error", Logger::LEVEL::error )
             .value( "critical", Logger::LEVEL::critical )
-            .value( "off", Logger::LEVEL::off );
+            .value( "off", Logger::LEVEL::off )
+            .finalize();
         logger.def_static( "level", &Logger::level, "Current logging level" )
             .def_static( "set_level", &Logger::set_level,
                 pybind11::arg( "level" ),

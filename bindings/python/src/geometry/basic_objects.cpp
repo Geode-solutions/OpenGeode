@@ -170,13 +170,13 @@ namespace geode
             .def( "radius", &Circle::radius )
             .def( "bounding_box", &Circle::bounding_box );
 
-        pybind11::enum_< SIDE >( module, "Side" )
+        pybind11::native_enum< SIDE >( module, "Side", "enum.Enum" )
             .value( "positive", SIDE::positive )
             .value( "negative", SIDE::negative )
             .value( "zero", SIDE::zero )
-            .export_values();
+            .finalize();
 
-        pybind11::enum_< POSITION >( module, "Position" )
+        pybind11::native_enum< POSITION >( module, "Position", "enum.Enum" )
             .value( "outside", POSITION::outside )
             .value( "inside", POSITION::inside )
             .value( "vertex0", POSITION::vertex0 )
@@ -197,7 +197,7 @@ namespace geode
             .value( "facet2", POSITION::facet2 )
             .value( "facet3", POSITION::facet3 )
             .value( "parallel", POSITION::parallel )
-            .export_values();
+            .finalize();
 
         PYTHON_SEGMENT( 2 );
         PYTHON_SEGMENT( 3 );

@@ -29,8 +29,8 @@ namespace geode
 {
     void define_physical_properties( pybind11::module& module )
     {
-        pybind11::enum_< PHYSICAL_PROPERTY_NAME >(
-            module, "PHYSICAL_PROPERTY_NAME" )
+        pybind11::native_enum< PHYSICAL_PROPERTY_NAME >(
+            module, "PHYSICAL_PROPERTY_NAME", "enum.Enum" )
             .value( "porosity", PHYSICAL_PROPERTY_NAME::porosity )
             .value( "permeability", PHYSICAL_PROPERTY_NAME::permeability )
             .value(
@@ -60,7 +60,7 @@ namespace geode
                 "boundary_traction", PHYSICAL_PROPERTY_NAME::boundary_traction )
             .value( "boundary_normal_traction",
                 PHYSICAL_PROPERTY_NAME::boundary_normal_traction )
-            .export_values();
+            .finalize();
 
         pybind11::class_< PhysicalProperties::Info >( module, "Info" )
             .def( pybind11::init< ComponentType, uuid >() )

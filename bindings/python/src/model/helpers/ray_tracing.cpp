@@ -39,7 +39,6 @@ namespace geode
             .value( "outside", RayTracingResult::POSITION::outside )
             .value( "inside", RayTracingResult::POSITION::inside )
             .value( "on_border", RayTracingResult::POSITION::on_border )
-            .export_values()
             .finalize();
 
         pybind11::class_< RayTracingResult >( module, "RayTracingResult" )
