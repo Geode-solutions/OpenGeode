@@ -336,9 +336,35 @@ void test_delete_edges_and_vertices()
         "[Test] Wrong edges after edge permutation" );
 }
 
+void test_save_unknown_extension()
+{
+    auto graph =
+        geode::Graph::create( geode::OpenGeodeGraph::impl_name_static() );
+    for( const auto* filename : { "test.unknown_extension",
+             " test.unknown_extension ", "no_extension" } )
+    {
+        bool thrown{ false };
+        try
+        {
+            geode_unused( geode::save_graph( *graph, filename ) );
+        }
+        catch( const geode::OpenGeodeException& exception )
+        {
+            thrown = true;
+            geode::OpenGeodeMeshException::test(
+                exception.type() == geode::OpenGeodeException::TYPE::data,
+                "[Test] Saving in an unknown extension should be a data "
+                "error, like loading" );
+        }
+        geode::OpenGeodeMeshException::test(
+            thrown, "[Test] Saving in an unknown extension should throw" );
+    }
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
+    test_save_unknown_extension();
     test_backward_v18_5();
     auto graph =
         geode::Graph::create( geode::OpenGeodeGraph::impl_name_static() );

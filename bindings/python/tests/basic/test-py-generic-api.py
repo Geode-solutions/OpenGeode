@@ -354,8 +354,11 @@ def check_errors(directory):
     if error.type != "data":
         raise ValueError("[Test] Unknown extension should be a data error")
     expect_raises(og.OpenGeodeDataError, og.load_all, og.BRep, unknown)
-    # The C++ save functions wrap their failures in an internal error
-    expect_raises(og.OpenGeodeError, og.save, og.TriangulatedSurface3D.create(), unknown, contains="unknown_extension")
+    # An unknown extension is a data error when saving too, as when loading
+    error = expect_raises(og.OpenGeodeDataError, og.save, og.TriangulatedSurface3D.create(), unknown, contains="unknown_extension")
+    if error.type != "data":
+        raise ValueError("[Test] Unknown extension should be a data error when saving")
+    expect_raises(og.OpenGeodeDataError, og.save, og.BRep(), unknown, contains="unknown_extension")
     expect_raises(og.OpenGeodeDataError, og.additional_files, og.BRep, unknown)
     # Wrong types
     expect_raises(TypeError, og.load, int, unknown, contains="int")

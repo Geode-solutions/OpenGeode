@@ -88,8 +88,13 @@ namespace geode::detail
         Logger::error( exception.what() );
         print_available_extensions_if_unknown< Factory, ParentFactories... >(
             type, filename, parent_types... );
-        throw Exception{ nullptr, OpenGeodeException::TYPE::internal,
-            "Cannot save ", type, " in file: ", filename, ": ",
-            exception.what() };
+        // An unknown extension is an input error, like when loading
+        const auto type_of_error =
+            Factory::has_creator(
+                lowercase_extension( absl::StripAsciiWhitespace( filename ) ) )
+                ? OpenGeodeException::TYPE::internal
+                : OpenGeodeException::TYPE::data;
+        throw Exception{ nullptr, type_of_error, "Cannot save ", type,
+            " in file: ", filename, ": ", exception.what() };
     }
 } // namespace geode::detail

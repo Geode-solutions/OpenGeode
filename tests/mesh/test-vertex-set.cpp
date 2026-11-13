@@ -131,7 +131,7 @@ void test_io_failures( const geode::VertexSet& vertex_set )
         [&vertex_set] {
             return geode::save_vertex_set( vertex_set, "unknown.extension" );
         },
-        geode::OpenGeodeException::TYPE::internal,
+        geode::OpenGeodeException::TYPE::data,
         "Cannot save VertexSet in file: unknown.extension: Unknown "
         "extension" );
 }

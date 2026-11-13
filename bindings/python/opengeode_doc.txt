@@ -138,8 +138,9 @@ Errors of the C++ library are Python exceptions, all deriving OpenGeodeError
 (itself a RuntimeError):
 
     OpenGeodeDataError      the data is invalid or unsupported (unknown file
-                            extension, corrupted file, no attribute of that name)
-    OpenGeodeInternalError  an unexpected failure (std::exception)
+                            extension when loading or saving, corrupted file, no attribute of that name)
+    OpenGeodeInternalError  an unexpected failure (std::exception), e.g. a
+                            file that cannot be written
     OpenGeodeResultError    a Result holding an error was accessed
 
 They carry type, project, library, message and details, and the underlying

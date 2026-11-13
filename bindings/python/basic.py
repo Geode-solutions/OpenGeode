@@ -366,9 +366,9 @@ def save(obj: object, filename: str) -> "list[str]":
     The writer is the one of the closest registered class of type(obj), obj
     being resolved first (e.g. the SurfaceMesh3D of a model component is saved
     as its TriangulatedSurface3D or PolygonalSurface3D). Raise an
-    OpenGeodeError if no writer handles the extension or the writing fails
-    (currently an OpenGeodeInternalError: the C++ save functions wrap their
-    errors), a TypeError if the type of obj has no registered save.
+    OpenGeodeDataError if no writer handles the extension (as load does), an
+    OpenGeodeInternalError if the writing itself fails, a TypeError if the
+    type of obj has no registered save.
     """
     resolved, function = _object_operation(obj, "save")
     return list(function(resolved, filename))
