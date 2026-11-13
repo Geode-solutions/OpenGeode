@@ -107,10 +107,23 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
 {
     pybind11::module::import( "opengeode_py_basic" );
     pybind11::add_ostream_redirect( module );
-    module.doc() = "OpenGeode Python binding for mesh";
+    module.doc() =
+        "Meshes of OpenGeode: VertexSet, Graph, EdgedCurve, PointSet, "
+        "SurfaceMesh (PolygonalSurface, TriangulatedSurface), SolidMesh "
+        "(PolyhedralSolid, TetrahedralSolid, HybridSolid), grids "
+        "(LightRegularGrid, RegularGrid), their builders (XxxBuilder, the "
+        "only way to modify a mesh), the coordinate reference systems, the "
+        "textures, the functions loading and saving meshes (load_xxx, "
+        "save_xxx) and the mesh helpers (conversion, rasterization, "
+        "gradient, distance transform...). Functions and classes in 2D and "
+        "3D are suffixed with 2D or 3D. Indices given to the mesh and builder "
+        "methods are checked: an out-of-range index raises IndexError. Call "
+        "OpenGeodeMeshLibrary.initialize() before using the module.";
     pybind11::class_< geode::OpenGeodeMeshLibrary >(
-        module, "OpenGeodeMeshLibrary" )
-        .def_static( "initialize", &geode::OpenGeodeMeshLibrary::initialize );
+        module, "OpenGeodeMeshLibrary", "Initialization of the mesh module" )
+        .def_static( "initialize", &geode::OpenGeodeMeshLibrary::initialize,
+            "Initialize the mesh module and the modules it depends on; call it "
+            "before using meshes" );
 
     geode::define_crs( module );
     geode::define_crs_manager( module );

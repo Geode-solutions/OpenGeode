@@ -37,9 +37,10 @@ MODULES = [
     "opengeode_py_geometry",
     "opengeode_py_image",
     "opengeode_py_gdal",
+    "opengeode_py_mesh",
 ]
 # Python wrappers defined in the .py files shipped next to the extensions
-PYTHON_MODULES = ["basic", "geometry", "image", "gdal"]
+PYTHON_MODULES = ["basic", "geometry", "image", "gdal", "mesh"]
 
 GENERATED_ARG = re.compile(r"\barg\d+\b")
 SIGNATURE = re.compile(r"^(?:\d+\. )?(?P<name>[\w.]+)\((?P<args>.*)\) -> .*$")
@@ -50,6 +51,7 @@ PYBIND11_GENERATED = {
     "opengeode_py_gdal.ostream_redirect",
     "opengeode_py_geometry.ostream_redirect",
     "opengeode_py_image.ostream_redirect",
+    "opengeode_py_mesh.ostream_redirect",
 }
 # Containers made by pybind11::bind_vector: only their docstring is ours, the
 # generated methods have unnamed arguments
@@ -253,7 +255,7 @@ if __name__ == "__main__":
     for module_name in PYTHON_MODULES:
         check_python_module(importlib.import_module(module_name), problems)
     # The walker must really visit the bindings, not silently skip them
-    assert len(CHECKED) > 650, f"only {len(CHECKED)} callables were checked"
+    assert len(CHECKED) > 1400, f"only {len(CHECKED)} callables were checked"
     if problems:
         print(f"{len(problems)} documentation problem(s):")
         for problem in sorted(set(problems)):

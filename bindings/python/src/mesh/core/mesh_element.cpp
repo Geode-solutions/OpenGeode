@@ -29,18 +29,27 @@ namespace geode
 {
     void define_mesh_element( pybind11::module& module )
     {
-        define_string_representation(
-            pybind11::class_< MeshElement >( module, "MeshElement" ) )
-            .def( pybind11::init<>() )
-            .def( pybind11::init< uuid, index_t >() )
-            .def( pybind11::self == pybind11::self )
-            .def( pybind11::self != pybind11::self )
-            .def( pybind11::self < pybind11::self )
-            .def( "__hash__",
-                []( const MeshElement& value ) {
-                    return absl::HashOf( value );
-                } )
-            .def_readwrite( "mesh_id", &MeshElement::mesh_id )
-            .def_readwrite( "element_id", &MeshElement::element_id );
+        auto element = define_string_representation(
+            pybind11::class_< MeshElement >( module, "MeshElement",
+                "Element of a mesh identified by the unique id of the mesh "
+                "and the index of the element in the mesh" ) );
+        element
+            .def( pybind11::init<>(),
+                "Build an element with a default uuid and an invalid index "
+                "(NO_ID)" )
+            .def( pybind11::init< uuid, index_t >(), pybind11::arg( "mesh_id" ),
+                pybind11::arg( "element_id" ),
+                "Build the element element_id of the mesh identified by "
+                "mesh_id" )
+            .def( pybind11::self == pybind11::self, pybind11::arg( "other" ) )
+            .def( pybind11::self != pybind11::self, pybind11::arg( "other" ) )
+            .def( pybind11::self < pybind11::self, pybind11::arg( "other" ) )
+            .def( "__hash__", []( const MeshElement& value ) {
+                return absl::HashOf( value );
+            } );
+        def_readwrite_named( element, "mesh_id", &MeshElement::mesh_id,
+            "Unique id of the mesh" );
+        def_readwrite_named( element, "element_id", &MeshElement::element_id,
+            "Index of the element in the mesh" );
     }
 } // namespace geode

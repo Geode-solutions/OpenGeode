@@ -32,15 +32,27 @@
     const auto name##dimension =                                               \
         "TextureManager" + std::to_string( dimension ) + "D";                  \
     pybind11::class_< TextureManager< dimension > >(                           \
-        module, name##dimension.c_str() )                                      \
+        module, name##dimension.c_str(), "Named textures of a mesh" )          \
         .def( "find_or_create_texture",                                        \
             &TextureManager< dimension >::find_or_create_texture,              \
-            pybind11::return_value_policy::reference_internal )                \
+            pybind11::arg( "name" ),                                           \
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the texture with this name, creating it if it does not "   \
+            "exist" )                                                          \
         .def( "find_texture", &TextureManager< dimension >::find_texture,      \
-            pybind11::return_value_policy::reference_internal )                \
-        .def( "texture_names", &TextureManager< dimension >::texture_names )   \
-        .def( "texture_exists", &TextureManager< dimension >::texture_exists ) \
-        .def( "delete_texture", &TextureManager< dimension >::delete_texture )
+            pybind11::arg( "name" ),                                           \
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the texture with this name; raise an error if there is "   \
+            "none" )                                                           \
+        .def( "texture_names", &TextureManager< dimension >::texture_names,    \
+            "Return the names of the textures" )                               \
+        .def( "texture_exists", &TextureManager< dimension >::texture_exists,  \
+            "Return True if a texture has this name",                          \
+            pybind11::arg( "name" ) )                                          \
+        .def( "delete_texture", &TextureManager< dimension >::delete_texture,  \
+            "Delete the texture with this name and its attribute; raise an "   \
+            "error if there is none",                                          \
+            pybind11::arg( "name" ) )
 
 namespace geode
 {

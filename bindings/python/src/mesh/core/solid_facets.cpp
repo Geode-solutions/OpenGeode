@@ -30,15 +30,25 @@
 #define PYTHON_SOLID_FACETS( dimension )                                       \
     const auto name##dimension =                                               \
         "SolidFacets" + std::to_string( dimension ) + "D";                     \
-    pybind11::class_< SolidFacets##dimension##D >(                             \
-        module, name##dimension.c_str() )                                      \
-        .def( "nb_facets", &SolidFacets##dimension##D::nb_facets )             \
-        .def( "facet_vertices", &SolidFacets##dimension##D::facet_vertices )   \
+    pybind11::class_< SolidFacets##dimension##D >( module,                     \
+        name##dimension.c_str(),                                               \
+        "Facets of a solid mesh, available once enabled with "                 \
+        "enable_facets()" )                                                    \
+        .def( "nb_facets", &SolidFacets##dimension##D::nb_facets,              \
+            "Return the number of facets" )                                    \
+        .def( "facet_vertices", &SolidFacets##dimension##D::facet_vertices,    \
+            "Return the indices of the vertices of the facet",                 \
+            pybind11::arg( "facet_id" ) )                                      \
         .def( "facet_from_vertices",                                           \
-            &SolidFacets##dimension##D::facet_from_vertices )                  \
+            &SolidFacets##dimension##D::facet_from_vertices,                   \
+            "Return the index of the facet made of the given vertices, or "    \
+            "None if there is none",                                           \
+            pybind11::arg( "vertices" ) )                                      \
         .def( "facet_attribute_manager",                                       \
             &SolidFacets##dimension##D::facet_attribute_manager,               \
-            pybind11::return_value_policy::reference_internal )
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the manager of the attributes associated with the "        \
+            "facets" )
 
 namespace geode
 {

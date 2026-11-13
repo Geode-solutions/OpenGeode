@@ -34,34 +34,54 @@
     const auto save##dimension =                                               \
         "save_edged_curve" + std::to_string( dimension ) + "D";                \
     module.def( save##dimension.c_str(), &save_edged_curve< dimension >,       \
-        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
+        pybind11::arg( "edged_curve" ), pybind11::arg( "filename" ),           \
+        pybind11::call_guard< pybind11::gil_scoped_release >(),                \
+        "Save the edged curve in the file, whose extension selects the "       \
+        "format, and return the list of the written files; raise an error if " \
+        "the format is not supported" );                                       \
     const auto load##dimension =                                               \
         "load_edged_curve" + std::to_string( dimension ) + "D";                \
     module.def( load##dimension.c_str(),                                       \
         static_cast<                                                           \
             std::vector< std::unique_ptr< EdgedCurve< dimension > > > ( * )(   \
                 std::string_view ) >( &load_edged_curve< dimension > ),        \
-        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
+        pybind11::arg( "filename" ),                                           \
+        pybind11::call_guard< pybind11::gil_scoped_release >(),                \
+        "Load the edged curve objects of the file, with the default data "     \
+        "structure, and return them as a list; raise an error if the file "    \
+        "cannot be read" );                                                    \
     const auto priority##dimension =                                           \
         "edged_curve_object_priority" + std::to_string( dimension ) + "D";     \
     module.def( priority##dimension.c_str(),                                   \
         &edged_curve_object_priority< dimension >,                             \
-        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
+        pybind11::arg( "filename" ),                                           \
+        pybind11::call_guard< pybind11::gil_scoped_release >(),                \
+        "Return the priority of the loader chosen for the file, used to "      \
+        "select the geode object type when several can load it; raise an "     \
+        "error if no loader handles the file" );                               \
     const auto loadable##dimension =                                           \
         "is_edged_curve_loadable" + std::to_string( dimension ) + "D";         \
     module.def( loadable##dimension.c_str(),                                   \
-        &is_edged_curve_loadable< dimension >,                                 \
-        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
+        &is_edged_curve_loadable< dimension >, pybind11::arg( "filename" ),    \
+        pybind11::call_guard< pybind11::gil_scoped_release >(),                \
+        "Return a Percentage of how well the file can be loaded as an edged "  \
+        "curve, 0 if it cannot" );                                             \
     const auto check##dimension =                                              \
         "edged_curve_additional_files" + std::to_string( dimension ) + "D";    \
     module.def( check##dimension.c_str(),                                      \
         &edged_curve_additional_files< dimension >,                            \
-        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
+        pybind11::arg( "filename" ),                                           \
+        pybind11::call_guard< pybind11::gil_scoped_release >(),                \
+        "Return the additional files used when loading the file; raise an "    \
+        "error if no loader handles the file" );                               \
     const auto saveable##dimension =                                           \
         "is_edged_curve_saveable" + std::to_string( dimension ) + "D";         \
     module.def( saveable##dimension.c_str(),                                   \
-        &is_edged_curve_saveable< dimension >,                                 \
-        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
+        &is_edged_curve_saveable< dimension >, pybind11::arg( "edged_curve" ), \
+        pybind11::arg( "filename" ),                                           \
+        pybind11::call_guard< pybind11::gil_scoped_release >(),                \
+        "Return True if the edged curve can be saved in the file format "      \
+        "given by the filename" );                                             \
     PYTHON_FACTORY_CLASS( EdgedCurveInputFactory##dimension##D );              \
     PYTHON_FACTORY_CLASS( EdgedCurveOutputFactory##dimension##D )
 

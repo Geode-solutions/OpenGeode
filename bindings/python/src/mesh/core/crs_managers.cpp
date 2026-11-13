@@ -32,28 +32,33 @@
     const auto name##dimension = "CoordinateReferenceSystemManagers"           \
                                  + std::to_string( dimension ) + "D";          \
     pybind11::class_< CoordinateReferenceSystemManagers##dimension##D,         \
-        pybind11::smart_holder >( module, name##dimension.c_str() )            \
+        pybind11::smart_holder >( module, name##dimension.c_str(),             \
+        "Coordinate reference system managers of a mesh, one per dimension "   \
+        "(1D, 2D, 3D): the main one has the dimension of the mesh" )           \
         .def( "coordinate_reference_system_manager1D",                         \
             static_cast< const CoordinateReferenceSystemManager1D& (           \
                 CoordinateReferenceSystemManagers##dimension##D::*) ()         \
                     const >(                                                   \
                 &CoordinateReferenceSystemManagers##dimension##D::             \
                     coordinate_reference_system_manager1D ),                   \
-            pybind11::return_value_policy::reference_internal )                \
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the 1D coordinate reference system manager" )              \
         .def( "coordinate_reference_system_manager2D",                         \
             static_cast< const CoordinateReferenceSystemManager2D& (           \
                 CoordinateReferenceSystemManagers##dimension##D::*) ()         \
                     const >(                                                   \
                 &CoordinateReferenceSystemManagers##dimension##D::             \
                     coordinate_reference_system_manager2D ),                   \
-            pybind11::return_value_policy::reference_internal )                \
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the 2D coordinate reference system manager" )              \
         .def( "coordinate_reference_system_manager3D",                         \
             static_cast< const CoordinateReferenceSystemManager3D& (           \
                 CoordinateReferenceSystemManagers##dimension##D::*) ()         \
                     const >(                                                   \
                 &CoordinateReferenceSystemManagers##dimension##D::             \
                     coordinate_reference_system_manager3D ),                   \
-            pybind11::return_value_policy::reference_internal )                \
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the 3D coordinate reference system manager" )              \
         .def( "main_coordinate_reference_system_manager",                      \
             static_cast<                                                       \
                 const CoordinateReferenceSystemManager##dimension##D& (        \
@@ -61,9 +66,14 @@
                     const >(                                                   \
                 &CoordinateReferenceSystemManagers##dimension##D::             \
                     main_coordinate_reference_system_manager ),                \
-            pybind11::return_value_policy::reference_internal )                \
-        .def(                                                                  \
-            "point", &CoordinateReferenceSystemManagers##dimension##D::point )
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the coordinate reference system manager with the "         \
+            "dimension of the mesh" )                                          \
+        .def( "point",                                                         \
+            &CoordinateReferenceSystemManagers##dimension##D::point,           \
+            "Return the coordinates of a vertex in the active coordinate "     \
+            "reference system of the main manager",                            \
+            pybind11::arg( "vertex" ) )
 
 namespace geode
 {

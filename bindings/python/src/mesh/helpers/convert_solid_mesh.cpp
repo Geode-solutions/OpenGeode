@@ -35,9 +35,14 @@ namespace geode
         module
             .def( "convert_solid_mesh_into_tetrahedral_solid",
                 &convert_solid_mesh_into_tetrahedral_solid,
-                pybind11::call_guard< pybind11::gil_scoped_release >() )
+                pybind11::arg( "solid" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Return the solid converted into a tetrahedral solid, or None "
+                "if some polyhedron is not a tetrahedron" )
             .def( "convert_grid_into_tetrahedral_solid",
-                &convert_grid_into_tetrahedral_solid,
-                pybind11::call_guard< pybind11::gil_scoped_release >() );
+                &convert_grid_into_tetrahedral_solid, pybind11::arg( "grid" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Return a tetrahedral solid obtained by splitting every cell "
+                "of the 3D grid into tetrahedra" );
     }
 } // namespace geode

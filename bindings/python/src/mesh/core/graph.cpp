@@ -33,25 +33,38 @@ namespace geode
     void define_graph( pybind11::module& module )
     {
         pybind11::class_< Graph, VertexSet, pybind11::smart_holder >(
-            module, "Graph" )
-            .def_static(
-                "create", static_cast< std::unique_ptr< Graph > ( * )() >(
-                              &Graph::create ) )
-            .def( "clone", &Graph::clone )
+            module, "Graph", "Graph: a set of vertices linked by edges" )
+            .def_static( "create",
+                static_cast< std::unique_ptr< Graph > ( * )() >(
+                    &Graph::create ),
+                "Create an empty graph with the default data structure" )
+            .def( "clone", &Graph::clone,
+                "Return a copy of the graph, with the same data structure, "
+                "name and identifier" )
             .def( "edge_vertex",
                 geode::checked( "edge_vertex", &Graph::edge_vertex,
-                    geode::EdgeVertexCheck{} ) )
+                    geode::EdgeVertexCheck{} ),
+                "Return the index of the vertex at this edge endpoint",
+                pybind11::arg( "edge_vertex" ) )
             .def( "edge_vertices",
                 geode::checked( "edge_vertices", &Graph::edge_vertices,
-                    geode::EdgeCheck{} ) )
-            .def( "nb_edges", &Graph::nb_edges )
+                    geode::EdgeCheck{} ),
+                "Return the indices of the two vertices of the edge",
+                pybind11::arg( "edge_id" ) )
+            .def( "nb_edges", &Graph::nb_edges, "Return the number of edges" )
             .def( "edge_attribute_manager", &Graph::edge_attribute_manager,
-                pybind11::return_value_policy::reference_internal )
+                pybind11::return_value_policy::reference_internal,
+                "Return the manager of the attributes associated with the "
+                "edges" )
             .def( "edges_around_vertex",
                 geode::checked( "edges_around_vertex",
-                    &Graph::edges_around_vertex, geode::VertexCheck{} ) )
+                    &Graph::edges_around_vertex, geode::VertexCheck{} ),
+                "Return all the edge endpoints located at the vertex",
+                pybind11::arg( "vertex_id" ) )
             .def( "is_vertex_isolated",
                 geode::checked( "is_vertex_isolated",
-                    &Graph::is_vertex_isolated, geode::VertexCheck{} ) );
+                    &Graph::is_vertex_isolated, geode::VertexCheck{} ),
+                "Return True if the vertex is not an endpoint of any edge",
+                pybind11::arg( "vertex_id" ) );
     }
 } // namespace geode

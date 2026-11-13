@@ -30,15 +30,23 @@
 #define PYTHON_SOLID_EDGES( dimension )                                        \
     const auto name##dimension =                                               \
         "SolidEdges" + std::to_string( dimension ) + "D";                      \
-    pybind11::class_< SolidEdges##dimension##D >(                              \
-        module, name##dimension.c_str() )                                      \
-        .def( "nb_edges", &SolidEdges##dimension##D::nb_edges )                \
-        .def( "edge_vertices", &SolidEdges##dimension##D::edge_vertices )      \
+    pybind11::class_< SolidEdges##dimension##D >( module,                      \
+        name##dimension.c_str(),                                               \
+        "Edges of a solid mesh, available once enabled with enable_edges()" )  \
+        .def( "nb_edges", &SolidEdges##dimension##D::nb_edges,                 \
+            "Return the number of edges" )                                     \
+        .def( "edge_vertices", &SolidEdges##dimension##D::edge_vertices,       \
+            "Return the indices of the two vertices of the edge",              \
+            pybind11::arg( "edge_id" ) )                                       \
         .def( "edge_from_vertices",                                            \
-            &SolidEdges##dimension##D::edge_from_vertices )                    \
+            &SolidEdges##dimension##D::edge_from_vertices,                     \
+            "Return the index of the edge between the two given vertices, in " \
+            "any order, or None if there is none",                             \
+            pybind11::arg( "vertices" ) )                                      \
         .def( "edge_attribute_manager",                                        \
             &SolidEdges##dimension##D::edge_attribute_manager,                 \
-            pybind11::return_value_policy::reference_internal )
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the manager of the attributes associated with the edges" )
 
 namespace geode
 {

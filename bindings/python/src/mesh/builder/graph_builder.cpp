@@ -31,24 +31,45 @@ namespace geode
     void define_graph_builder( pybind11::module& module )
     {
         pybind11::class_< GraphBuilder, VertexSetBuilder >(
-            module, "GraphBuilder" )
+            module, "GraphBuilder", "Builder to modify a graph" )
             .def_static( "create",
                 geode::builder_creator( &GraphBuilder::create ),
-                pybind11::keep_alive< 0, 1 >() )
-            .def( "create_edge", static_cast< index_t ( GraphBuilder::* )() >(
-                                     &GraphBuilder::create_edge ) )
+                pybind11::arg( "mesh" ), pybind11::keep_alive< 0, 1 >(),
+                "Return the builder to modify the graph, which keeps the mesh "
+                "alive" )
+            .def( "create_edge",
+                static_cast< index_t ( GraphBuilder::* )() >(
+                    &GraphBuilder::create_edge ),
+                "Create an edge without vertices and return its index" )
             .def( "create_edge_with_vertices",
                 static_cast< index_t ( GraphBuilder::* )( index_t, index_t ) >(
-                    &GraphBuilder::create_edge ) )
-            .def( "create_edges", &GraphBuilder::create_edges )
+                    &GraphBuilder::create_edge ),
+                "Create an edge between two vertices and return its index",
+                pybind11::arg( "v0_id" ), pybind11::arg( "v1_id" ) )
+            .def( "create_edges", &GraphBuilder::create_edges,
+                "Create several edges and return the index of the first one",
+                pybind11::arg( "nb" ) )
             .def( "set_edge_vertex",
                 geode::checked_builder< GraphBuilder, Graph >(
                     "set_edge_vertex", &GraphBuilder::set_edge_vertex,
-                    geode::EdgeVertexCheck{}, geode::VertexCheck{} ) )
-            .def( "delete_edges", &GraphBuilder::delete_edges )
-            .def( "permute_edges", &GraphBuilder::permute_edges )
+                    geode::EdgeVertexCheck{}, geode::VertexCheck{} ),
+                "Set the vertex at an edge endpoint",
+                pybind11::arg( "edge_vertex" ), pybind11::arg( "vertex_id" ) )
+            .def( "delete_edges", &GraphBuilder::delete_edges,
+                "Delete the edges whose flag is True and return the mapping "
+                "from the old edge indices to the new ones, NO_ID for a "
+                "deleted edge; to_delete has one flag per edge",
+                pybind11::arg( "to_delete" ) )
+            .def( "permute_edges", &GraphBuilder::permute_edges,
+                "Reorder the edges so that the edge at position i is the old "
+                "edge permutation[i], and return the mapping from the old edge "
+                "indices to the new ones",
+                pybind11::arg( "permutation" ) )
             .def( "delete_isolated_vertices",
                 static_cast< std::vector< index_t > ( GraphBuilder::* )() >(
-                    &GraphBuilder::delete_isolated_vertices ) );
+                    &GraphBuilder::delete_isolated_vertices ),
+                "Delete the vertices that are not an edge endpoint and return "
+                "the mapping from the old vertex indices to the new ones, "
+                "NO_ID for a deleted vertex" );
     }
 } // namespace geode

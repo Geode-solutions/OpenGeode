@@ -40,19 +40,31 @@ namespace
             absl::StrCat( "LightRegularGrid", dimension, "D" );
         pybind11::class_< geode::LightRegularGrid< dimension >,
             geode::Grid< dimension >, geode::Identifier,
-            pybind11::smart_holder >( module, class_name.c_str() )
+            pybind11::smart_holder >( module, class_name.c_str(),
+            "Regular grid that only stores its geometry (origin, cell numbers "
+            "and lengths), without explicit vertices or cells" )
             .def( pybind11::init< geode::Point< dimension >,
-                std::array< geode::index_t, dimension >,
-                std::array< double, dimension > >() )
+                      std::array< geode::index_t, dimension >,
+                      std::array< double, dimension > >(),
+                "Build a grid from its origin, the number of cells and the "
+                "cell length in each direction, the directions being the axes",
+                pybind11::arg( "origin" ), pybind11::arg( "cells_number" ),
+                pybind11::arg( "cells_length" ) )
             .def( pybind11::init< geode::Point< dimension >,
-                std::array< geode::index_t, dimension >,
-                std::array< geode::Vector< dimension >, dimension > >() )
+                      std::array< geode::index_t, dimension >,
+                      std::array< geode::Vector< dimension >, dimension > >(),
+                "Build a grid from its origin, the number of cells in each "
+                "direction and the vector of a cell along each direction",
+                pybind11::arg( "origin" ), pybind11::arg( "cells_number" ),
+                pybind11::arg( "directions" ) )
             .def( "native_extension",
-                &geode::LightRegularGrid< dimension >::native_extension )
+                &geode::LightRegularGrid< dimension >::native_extension,
+                "Return the file extension of the native format of the grid" )
             .def( "grid_coordinate_reference_system_manager",
                 &geode::LightRegularGrid<
                     dimension >::grid_coordinate_reference_system_manager,
-                pybind11::return_value_policy::reference_internal );
+                pybind11::return_value_policy::reference_internal,
+                "Return the manager of the grid coordinate reference systems" );
     }
 } // namespace
 

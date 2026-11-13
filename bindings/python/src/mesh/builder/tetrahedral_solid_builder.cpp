@@ -30,13 +30,19 @@
     const auto name##dimension =                                               \
         "TetrahedralSolidBuilder" + std::to_string( dimension ) + "D";         \
     pybind11::class_< TetrahedralSolidBuilder##dimension##D,                   \
-        SolidMeshBuilder##dimension##D >( module, name##dimension.c_str() )    \
+        SolidMeshBuilder##dimension##D >( module, name##dimension.c_str(),     \
+        "Builder to modify a tetrahedral solid" )                              \
         .def_static( "create",                                                 \
             geode::builder_creator(                                            \
                 &TetrahedralSolidBuilder##dimension##D::create ),              \
-            pybind11::keep_alive< 0, 1 >() )                                   \
+            pybind11::arg( "mesh" ), pybind11::keep_alive< 0, 1 >(),           \
+            "Return the builder to modify the tetrahedral solid, which keeps " \
+            "the mesh alive" )                                                 \
         .def( "create_tetrahedron",                                            \
-            &TetrahedralSolidBuilder##dimension##D::create_tetrahedron )
+            &TetrahedralSolidBuilder##dimension##D::create_tetrahedron,        \
+            "Create a tetrahedron from its four vertices and return its "      \
+            "index",                                                           \
+            pybind11::arg( "vertices" ) )
 
 namespace geode
 {

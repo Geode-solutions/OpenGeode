@@ -39,12 +39,24 @@ namespace geode
         module
             .def( "compute_surface_scalar_function_gradient2D",
                 &compute_surface_scalar_function_gradient< 2 >,
-                pybind11::call_guard< pybind11::gil_scoped_release >() )
+                pybind11::arg( "mesh" ), pybind11::arg( "scalar_function_id" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Compute the gradient of a scalar vertex attribute and store "
+                "it in a new vertex attribute named <attribute name>_gradient, "
+                "whose id is returned" )
             .def( "compute_surface_scalar_function_gradient3D",
                 &compute_surface_scalar_function_gradient< 3 >,
-                pybind11::call_guard< pybind11::gil_scoped_release >() )
+                pybind11::arg( "mesh" ), pybind11::arg( "scalar_function_id" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Compute the gradient of a scalar vertex attribute and store "
+                "it in a new vertex attribute named <attribute name>_gradient, "
+                "whose id is returned" )
             .def( "compute_solid_scalar_function_gradient3D",
                 &compute_solid_scalar_function_gradient,
-                pybind11::call_guard< pybind11::gil_scoped_release >() );
+                pybind11::arg( "mesh" ), pybind11::arg( "scalar_function_id" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Compute the gradient of a scalar vertex attribute and store "
+                "it in a new vertex attribute named <attribute name>_gradient, "
+                "whose id is returned" );
     }
 } // namespace geode

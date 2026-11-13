@@ -30,19 +30,31 @@
     const auto name##dimension =                                               \
         "HybridSolidBuilder" + std::to_string( dimension ) + "D";              \
     pybind11::class_< HybridSolidBuilder##dimension##D,                        \
-        SolidMeshBuilder##dimension##D >( module, name##dimension.c_str() )    \
+        SolidMeshBuilder##dimension##D >(                                      \
+        module, name##dimension.c_str(), "Builder to modify a hybrid solid" )  \
         .def_static( "create",                                                 \
             geode::builder_creator(                                            \
                 &HybridSolidBuilder##dimension##D::create ),                   \
-            pybind11::keep_alive< 0, 1 >() )                                   \
+            pybind11::arg( "mesh" ), pybind11::keep_alive< 0, 1 >(),           \
+            "Return the builder to modify the hybrid solid, which keeps the "  \
+            "mesh alive" )                                                     \
         .def( "create_tetrahedron",                                            \
-            &HybridSolidBuilder##dimension##D::create_tetrahedron )            \
+            &HybridSolidBuilder##dimension##D::create_tetrahedron,             \
+            "Create a tetrahedron from its four vertices and return its "      \
+            "index",                                                           \
+            pybind11::arg( "vertices" ) )                                      \
         .def( "create_hexahedron",                                             \
-            &HybridSolidBuilder##dimension##D::create_hexahedron )             \
-        .def(                                                                  \
-            "create_prism", &HybridSolidBuilder##dimension##D::create_prism )  \
+            &HybridSolidBuilder##dimension##D::create_hexahedron,              \
+            "Create a hexahedron from its eight vertices and return its "      \
+            "index",                                                           \
+            pybind11::arg( "vertices" ) )                                      \
+        .def( "create_prism", &HybridSolidBuilder##dimension##D::create_prism, \
+            "Create a prism from its six vertices and return its index",       \
+            pybind11::arg( "vertices" ) )                                      \
         .def( "create_pyramid",                                                \
-            &HybridSolidBuilder##dimension##D::create_pyramid )
+            &HybridSolidBuilder##dimension##D::create_pyramid,                 \
+            "Create a pyramid from its five vertices and return its index",    \
+            pybind11::arg( "vertices" ) )
 
 namespace geode
 {

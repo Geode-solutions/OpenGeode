@@ -32,10 +32,17 @@ namespace geode
     void define_repair_polygon_orientations( pybind11::module& module )
     {
         module.def( "repair_polygon_orientations2D",
-            &repair_polygon_orientations< 2 >,
-            pybind11::call_guard< pybind11::gil_scoped_release >() );
+            &repair_polygon_orientations< 2 >, pybind11::arg( "mesh" ),
+            pybind11::arg( "builder" ),
+            pybind11::call_guard< pybind11::gil_scoped_release >(),
+            "Reverse the polygons whose orientation is negative, using the "
+            "polygon adjacencies to orient the polygons with a null area; "
+            "raise an error if all the polygons have a null area" );
         module.def( "repair_polygon_orientations3D",
-            &repair_polygon_orientations< 3 >,
-            pybind11::call_guard< pybind11::gil_scoped_release >() );
+            &repair_polygon_orientations< 3 >, pybind11::arg( "mesh" ),
+            pybind11::arg( "builder" ),
+            pybind11::call_guard< pybind11::gil_scoped_release >(),
+            "Reverse the polygons so that adjacent polygons have a consistent "
+            "orientation; raise an error if the surface is a Mobius strip" );
     }
 } // namespace geode

@@ -29,13 +29,18 @@
     const auto name##dimension =                                               \
         "PolygonalSurface" + std::to_string( dimension ) + "D";                \
     pybind11::class_< PolygonalSurface##dimension##D,                          \
-        SurfaceMesh##dimension##D, pybind11::smart_holder >(                   \
-        module, name##dimension.c_str() )                                      \
+        SurfaceMesh##dimension##D, pybind11::smart_holder >( module,           \
+        name##dimension.c_str(),                                               \
+        "Surface mesh made of polygons (triangles, quads, ...)" )              \
         .def_static( "create",                                                 \
             static_cast<                                                       \
                 std::unique_ptr< PolygonalSurface##dimension##D > ( * )() >(   \
-                &PolygonalSurface##dimension##D::create ) )                    \
-        .def( "clone", &PolygonalSurface##dimension##D::clone )
+                &PolygonalSurface##dimension##D::create ),                     \
+            "Create an empty polygonal surface with the default data "         \
+            "structure" )                                                      \
+        .def( "clone", &PolygonalSurface##dimension##D::clone,                 \
+            "Return a copy of the polygonal surface, with the same data "      \
+            "structure, name and identifier" )
 
 namespace geode
 {

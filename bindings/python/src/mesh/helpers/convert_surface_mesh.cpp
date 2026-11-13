@@ -36,38 +36,77 @@ namespace geode
         module
             .def( "convert_surface_mesh_into_triangulated_surface2D",
                 &convert_surface_mesh_into_triangulated_surface< 2 >,
-                pybind11::call_guard< pybind11::gil_scoped_release >() )
+                pybind11::arg( "surface" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Return the surface mesh converted into a triangulated "
+                "surface, or None if some polygon is not a triangle" )
             .def( "convert_surface_mesh_into_triangulated_surface3D",
                 &convert_surface_mesh_into_triangulated_surface< 3 >,
-                pybind11::call_guard< pybind11::gil_scoped_release >() )
+                pybind11::arg( "surface" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Return the surface mesh converted into a triangulated "
+                "surface, or None if some polygon is not a triangle" )
             .def( "convert_grid_into_triangulated_surface",
                 &convert_grid_into_triangulated_surface,
-                pybind11::call_guard< pybind11::gil_scoped_release >() )
+                pybind11::arg( "grid" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Return a triangulated surface obtained by splitting every "
+                "cell of the 2D grid into triangles" )
             .def( "triangulate_surface_mesh2D",
                 static_cast< void ( * )( SurfaceMesh< 2 >& ) >(
                     &triangulate_surface_mesh< 2 > ),
-                pybind11::call_guard< pybind11::gil_scoped_release >() )
+                pybind11::arg( "surface" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Replace, in place, every polygon with more than three "
+                "vertices by triangles" )
             .def( "triangulate_surface_mesh3D",
                 static_cast< void ( * )( SurfaceMesh< 3 >& ) >(
                     &triangulate_surface_mesh< 3 > ),
-                pybind11::call_guard< pybind11::gil_scoped_release >() )
+                pybind11::arg( "surface" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Replace, in place, every polygon with more than three "
+                "vertices by triangles" )
             .def( "convert_surface_mesh2d_into_3d",
-                &convert_surface_mesh2d_into_3d,
-                pybind11::call_guard< pybind11::gil_scoped_release >() )
+                &convert_surface_mesh2d_into_3d, pybind11::arg( "surface2d" ),
+                pybind11::arg( "axis_to_add" ),
+                pybind11::arg( "axis_coordinate" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Return a 3D surface mesh built from the 2D one by inserting a "
+                "coordinate along the axis axis_to_add, set to "
+                "axis_coordinate" )
             .def( "convert_surface_mesh3d_into_2d",
-                &convert_surface_mesh3d_into_2d,
-                pybind11::call_guard< pybind11::gil_scoped_release >() )
+                &convert_surface_mesh3d_into_2d, pybind11::arg( "surface3d" ),
+                pybind11::arg( "axis_to_remove" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Return a 2D surface mesh built from the 3D one by removing "
+                "the coordinate along the axis axis_to_remove" )
             .def( "convert_polygonal_surface2d_into_3d",
                 &convert_polygonal_surface2d_into_3d,
-                pybind11::call_guard< pybind11::gil_scoped_release >() )
+                pybind11::arg( "surface2d" ), pybind11::arg( "axis_to_add" ),
+                pybind11::arg( "axis_coordinate" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Return a 3D polygonal surface built from the 2D one by "
+                "inserting a coordinate along the axis axis_to_add, set to "
+                "axis_coordinate" )
             .def( "convert_polygonal_surface3d_into_2d",
                 &convert_polygonal_surface3d_into_2d,
-                pybind11::call_guard< pybind11::gil_scoped_release >() )
+                pybind11::arg( "surface3d" ), pybind11::arg( "axis_to_remove" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Return a 2D polygonal surface built from the 3D one by "
+                "removing the coordinate along the axis axis_to_remove" )
             .def( "convert_triangulated_surface2d_into_3d",
                 &convert_triangulated_surface2d_into_3d,
-                pybind11::call_guard< pybind11::gil_scoped_release >() )
+                pybind11::arg( "surface2d" ), pybind11::arg( "axis_to_add" ),
+                pybind11::arg( "axis_coordinate" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Return a 3D triangulated surface built from the 2D one by "
+                "inserting a coordinate along the axis axis_to_add, set to "
+                "axis_coordinate" )
             .def( "convert_triangulated_surface3d_into_2d",
                 &convert_triangulated_surface3d_into_2d,
-                pybind11::call_guard< pybind11::gil_scoped_release >() );
+                pybind11::arg( "surface3d" ), pybind11::arg( "axis_to_remove" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Return a 2D triangulated surface built from the 3D one by "
+                "removing the coordinate along the axis axis_to_remove" );
     }
 } // namespace geode

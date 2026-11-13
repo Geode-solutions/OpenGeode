@@ -34,19 +34,29 @@
 #define PYTHON_TEXTURE( dimension )                                            \
     const auto name##dimension =                                               \
         "Texture" + std::to_string( dimension ) + "D";                         \
-    pybind11::class_< Texture< dimension > >(                                  \
-        module, name##dimension.c_str() )                                      \
+    pybind11::class_< Texture< dimension > >( module, name##dimension.c_str(), \
+        "Texture of a mesh: a raster image with texture coordinates for the "  \
+        "vertices of the mesh elements" )                                      \
         .def( "image", &Texture< dimension >::image,                           \
-            pybind11::return_value_policy::reference_internal )                \
-        .def( "set_image",                                                     \
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the raster image of the texture" )                         \
+        .def(                                                                  \
+            "set_image",                                                       \
             []( Texture< dimension >& texture,                                 \
                 RasterImage< dimension >& image ) {                            \
                 texture.set_image( std::move( image ) );                       \
-            } )                                                                \
+            },                                                                 \
+            "Set the raster image of the texture, taking the content of the "  \
+            "given image",                                                     \
+            pybind11::arg( "image" ) )                                         \
         .def( "texture_coordinates",                                           \
-            &Texture< dimension >::texture_coordinates )                       \
+            &Texture< dimension >::texture_coordinates,                        \
+            "Return the texture coordinates of a vertex of a mesh element",    \
+            pybind11::arg( "vertex" ) )                                        \
         .def( "set_texture_coordinates",                                       \
-            &Texture< dimension >::set_texture_coordinates )
+            &Texture< dimension >::set_texture_coordinates,                    \
+            "Set the texture coordinates of a vertex of a mesh element",       \
+            pybind11::arg( "vertex" ), pybind11::arg( "coordinates" ) )
 
 namespace geode
 {

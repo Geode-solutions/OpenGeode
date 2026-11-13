@@ -43,15 +43,20 @@
     const auto translate_name##mesh##dimension = absl::StrCat(                 \
         "translate_", mesh_name, std::to_string( dimension ), "D" );           \
     module.def( translate_name##mesh##dimension.c_str(),                       \
-        &translate_mesh< mesh##dimension##D >,                                 \
-        pybind11::call_guard< pybind11::gil_scoped_release >() )
+        &translate_mesh< mesh##dimension##D >, pybind11::arg( "mesh" ),        \
+        pybind11::arg( "builder" ), pybind11::arg( "translation" ),            \
+        pybind11::call_guard< pybind11::gil_scoped_release >(),                \
+        "Translate every vertex of the mesh by the translation vector" )
 
 #define PYTHON_RESCALE( mesh, mesh_name, dimension )                           \
     const auto rescale_name##mesh##dimension = absl::StrCat(                   \
         "rescale_", mesh_name, std::to_string( dimension ), "D" );             \
     module.def( rescale_name##mesh##dimension.c_str(),                         \
-        &rescale_mesh< mesh##dimension##D >,                                   \
-        pybind11::call_guard< pybind11::gil_scoped_release >() )
+        &rescale_mesh< mesh##dimension##D >, pybind11::arg( "mesh" ),          \
+        pybind11::arg( "builder" ), pybind11::arg( "scale" ),                  \
+        pybind11::call_guard< pybind11::gil_scoped_release >(),                \
+        "Multiply the coordinates of every vertex of the mesh by the scale "   \
+        "factor of the matching axis" )
 
 namespace geode
 {

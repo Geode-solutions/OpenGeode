@@ -29,11 +29,14 @@
     const auto name##dimension =                                               \
         "PolyhedralSolidBuilder" + std::to_string( dimension ) + "D";          \
     pybind11::class_< PolyhedralSolidBuilder##dimension##D,                    \
-        SolidMeshBuilder##dimension##D >( module, name##dimension.c_str() )    \
+        SolidMeshBuilder##dimension##D >( module, name##dimension.c_str(),     \
+        "Builder to modify a polyhedral solid" )                               \
         .def_static( "create",                                                 \
             geode::builder_creator(                                            \
                 &PolyhedralSolidBuilder##dimension##D::create ),               \
-            pybind11::keep_alive< 0, 1 >() )
+            pybind11::arg( "mesh" ), pybind11::keep_alive< 0, 1 >(),           \
+            "Return the builder to modify the polyhedral solid, which keeps "  \
+            "the mesh alive" )
 
 namespace geode
 {

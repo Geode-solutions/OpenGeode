@@ -32,17 +32,26 @@ namespace geode
     void define_vertex_set( pybind11::module& module )
     {
         pybind11::class_< VertexSet, Identifier, pybind11::smart_holder >(
-            module, "VertexSet" )
-            .def_static(
-                "create", static_cast< std::unique_ptr< VertexSet > ( * )() >(
-                              &VertexSet::create ) )
-            .def( "clone", &VertexSet::clone )
-            .def( "native_extension", &VertexSet::native_extension )
-            .def( "impl_name", &VertexSet::impl_name )
-            .def( "type_name", &VertexSet::type_name )
-            .def( "nb_vertices", &VertexSet::nb_vertices )
+            module, "VertexSet", "Set of vertices, the base of every mesh" )
+            .def_static( "create",
+                static_cast< std::unique_ptr< VertexSet > ( * )() >(
+                    &VertexSet::create ),
+                "Create an empty vertex set with the default data structure" )
+            .def( "clone", &VertexSet::clone,
+                "Return a copy of the vertex set, with the same data "
+                "structure, name and identifier" )
+            .def( "native_extension", &VertexSet::native_extension,
+                "Return the file extension of the native format of the mesh" )
+            .def( "impl_name", &VertexSet::impl_name,
+                "Return the name of the data structure implementing the mesh" )
+            .def( "type_name", &VertexSet::type_name,
+                "Return the type of the mesh" )
+            .def( "nb_vertices", &VertexSet::nb_vertices,
+                "Return the number of vertices" )
             .def( "vertex_attribute_manager",
                 &VertexSet::vertex_attribute_manager,
-                pybind11::return_value_policy::reference_internal );
+                pybind11::return_value_policy::reference_internal,
+                "Return the manager of the attributes associated with the "
+                "vertices" );
     }
 } // namespace geode

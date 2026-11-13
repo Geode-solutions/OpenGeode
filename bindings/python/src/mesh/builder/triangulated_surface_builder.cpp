@@ -30,13 +30,18 @@
     const auto name##dimension =                                               \
         "TriangulatedSurfaceBuilder" + std::to_string( dimension ) + "D";      \
     pybind11::class_< TriangulatedSurfaceBuilder##dimension##D,                \
-        SurfaceMeshBuilder##dimension##D >( module, name##dimension.c_str() )  \
+        SurfaceMeshBuilder##dimension##D >( module, name##dimension.c_str(),   \
+        "Builder to modify a triangulated surface" )                           \
         .def_static( "create",                                                 \
             geode::builder_creator(                                            \
                 &TriangulatedSurfaceBuilder##dimension##D::create ),           \
-            pybind11::keep_alive< 0, 1 >() )                                   \
+            pybind11::arg( "mesh" ), pybind11::keep_alive< 0, 1 >(),           \
+            "Return the builder to modify the triangulated surface, which "    \
+            "keeps the mesh alive" )                                           \
         .def( "create_triangle",                                               \
-            &TriangulatedSurfaceBuilder##dimension##D::create_triangle )
+            &TriangulatedSurfaceBuilder##dimension##D::create_triangle,        \
+            "Create a triangle from its three vertices and return its index",  \
+            pybind11::arg( "vertices" ) )
 
 namespace geode
 {

@@ -33,30 +33,45 @@
     const auto name##dimension = "CoordinateReferenceSystemManagersBuilder"    \
                                  + std::to_string( dimension ) + "D";          \
     pybind11::class_<                                                          \
-        CoordinateReferenceSystemManagersBuilder##dimension##D >(              \
-        module, name##dimension.c_str() )                                      \
+        CoordinateReferenceSystemManagersBuilder##dimension##D >( module,      \
+        name##dimension.c_str(),                                               \
+        "Builder to modify the coordinate reference system managers of a "     \
+        "mesh" )                                                               \
         .def( pybind11::init<                                                  \
                   CoordinateReferenceSystemManagers< dimension >& >(),         \
-            pybind11::keep_alive< 1, 2 >() )                                   \
+            pybind11::arg( "crs_managers" ), pybind11::keep_alive< 1, 2 >(),   \
+            "Build the builder of coordinate reference system managers, "      \
+            "which is kept alive by the builder" )                             \
         .def( "coordinate_reference_system_manager_builder1D",                 \
             &CoordinateReferenceSystemManagersBuilder##dimension##D::          \
                 coordinate_reference_system_manager_builder1D,                 \
-            pybind11::keep_alive< 0, 1 >() )                                   \
+            pybind11::keep_alive< 0, 1 >(),                                    \
+            "Return the builder of the 1D coordinate reference system "        \
+            "manager, which keeps this builder alive" )                        \
         .def( "coordinate_reference_system_manager_builder2D",                 \
             &CoordinateReferenceSystemManagersBuilder##dimension##D::          \
                 coordinate_reference_system_manager_builder2D,                 \
-            pybind11::keep_alive< 0, 1 >() )                                   \
+            pybind11::keep_alive< 0, 1 >(),                                    \
+            "Return the builder of the 2D coordinate reference system "        \
+            "manager, which keeps this builder alive" )                        \
         .def( "coordinate_reference_system_manager_builder3D",                 \
             &CoordinateReferenceSystemManagersBuilder##dimension##D::          \
                 coordinate_reference_system_manager_builder3D,                 \
-            pybind11::keep_alive< 0, 1 >() )                                   \
+            pybind11::keep_alive< 0, 1 >(),                                    \
+            "Return the builder of the 3D coordinate reference system "        \
+            "manager, which keeps this builder alive" )                        \
         .def( "main_coordinate_reference_system_manager_builder",              \
             &CoordinateReferenceSystemManagersBuilder##dimension##D::          \
                 main_coordinate_reference_system_manager_builder,              \
-            pybind11::keep_alive< 0, 1 >() )                                   \
+            pybind11::keep_alive< 0, 1 >(),                                    \
+            "Return the builder of the coordinate reference system manager "   \
+            "with the dimension of the mesh, which keeps this builder alive" ) \
         .def( "set_point",                                                     \
             &CoordinateReferenceSystemManagersBuilder##dimension##D::          \
-                set_point )
+                set_point,                                                     \
+            "Set the coordinates of a vertex in the active coordinate "        \
+            "reference system; the vertex must have been created before",      \
+            pybind11::arg( "vertex" ), pybind11::arg( "point" ) )
 
 namespace geode
 {

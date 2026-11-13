@@ -32,7 +32,10 @@ namespace geode
     void define_convert_edged_curve( pybind11::module& module )
     {
         module.def( "convert_edged_curve3d_into_2d",
-            &convert_edged_curve3d_into_2d,
-            pybind11::call_guard< pybind11::gil_scoped_release >() );
+            &convert_edged_curve3d_into_2d, pybind11::arg( "curve3d" ),
+            pybind11::arg( "axis_to_remove" ),
+            pybind11::call_guard< pybind11::gil_scoped_release >(),
+            "Return a 2D edged curve built from the 3D one by removing the "
+            "coordinate along the axis axis_to_remove" );
     }
 } // namespace geode

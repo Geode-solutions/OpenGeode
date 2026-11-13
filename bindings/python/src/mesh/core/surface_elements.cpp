@@ -30,32 +30,48 @@ namespace geode
     void define_surface_elements( pybind11::module& module )
     {
         auto vertex = define_string_representation(
-            pybind11::class_< PolygonVertex >( module, "PolygonVertex" ) );
+            pybind11::class_< PolygonVertex >( module, "PolygonVertex",
+                "Local vertex of a polygon: the polygon index and the index "
+                "of the vertex in the polygon" ) );
         auto edge = define_string_representation(
-            pybind11::class_< PolygonEdge >( module, "PolygonEdge" ) );
-
-        vertex.def( pybind11::init<>() )
-            .def( pybind11::init< index_t, index_t >() )
-            .def( pybind11::init< PolygonEdge >() )
-            .def( pybind11::self == pybind11::self )
-            .def( pybind11::self != pybind11::self )
-            .def( "__hash__",
-                []( const PolygonVertex& value ) {
-                    return absl::HashOf( value.polygon_id, value.vertex_id );
-                } )
-            .def_readwrite( "polygon_id", &PolygonVertex::polygon_id )
-            .def_readwrite( "vertex_id", &PolygonVertex::vertex_id );
-
-        edge.def( pybind11::init<>() )
-            .def( pybind11::init< index_t, index_t >() )
-            .def( pybind11::init< PolygonVertex >() )
-            .def( pybind11::self == pybind11::self )
-            .def( pybind11::self != pybind11::self )
-            .def( "__hash__",
-                []( const PolygonEdge& value ) {
-                    return absl::HashOf( value.polygon_id, value.edge_id );
-                } )
-            .def_readwrite( "polygon_id", &PolygonEdge::polygon_id )
-            .def_readwrite( "edge_id", &PolygonEdge::edge_id );
+            pybind11::class_< PolygonEdge >( module, "PolygonEdge",
+                "Local edge of a polygon: the polygon index and the index of "
+                "the edge in the polygon, edge i going from the vertex i to "
+                "the vertex i + 1" ) );
+        vertex
+            .def( pybind11::init<>(),
+                "Build a polygon vertex with invalid indices (NO_ID, NO_LID)" )
+            .def( pybind11::init< index_t, index_t >(),
+                pybind11::arg( "polygon_id" ), pybind11::arg( "vertex_id" ),
+                "Build the local vertex vertex_id of the polygon polygon_id" )
+            .def( pybind11::init< PolygonEdge >(),
+                pybind11::arg( "polygon_edge" ),
+                "Build the polygon vertex at the start of the polygon edge" )
+            .def( pybind11::self == pybind11::self, pybind11::arg( "other" ) )
+            .def( pybind11::self != pybind11::self, pybind11::arg( "other" ) )
+            .def( "__hash__", []( const PolygonVertex& value ) {
+                return absl::HashOf( value.polygon_id, value.vertex_id );
+            } );
+        def_readwrite_named( vertex, "polygon_id", &PolygonVertex::polygon_id,
+            "Index of the polygon" );
+        def_readwrite_named( vertex, "vertex_id", &PolygonVertex::vertex_id,
+            "Index of the vertex in the polygon" );
+        edge.def( pybind11::init<>(),
+                "Build a polygon edge with invalid indices (NO_ID, NO_LID)" )
+            .def( pybind11::init< index_t, index_t >(),
+                pybind11::arg( "polygon_id" ), pybind11::arg( "edge_id" ),
+                "Build the local edge edge_id of the polygon polygon_id" )
+            .def( pybind11::init< PolygonVertex >(),
+                pybind11::arg( "polygon_vertex" ),
+                "Build the polygon edge starting at the polygon vertex" )
+            .def( pybind11::self == pybind11::self, pybind11::arg( "other" ) )
+            .def( pybind11::self != pybind11::self, pybind11::arg( "other" ) )
+            .def( "__hash__", []( const PolygonEdge& value ) {
+                return absl::HashOf( value.polygon_id, value.edge_id );
+            } );
+        def_readwrite_named( edge, "polygon_id", &PolygonEdge::polygon_id,
+            "Index of the polygon" );
+        def_readwrite_named( edge, "edge_id", &PolygonEdge::edge_id,
+            "Index of the edge in the polygon" );
     }
 } // namespace geode

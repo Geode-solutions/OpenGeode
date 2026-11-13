@@ -32,6 +32,9 @@ namespace geode
     void define_convert_point_set( pybind11::module& module )
     {
         module.def( "convert_point_set3d_into_2d", &convert_point_set3d_into_2d,
-            pybind11::call_guard< pybind11::gil_scoped_release >() );
+            pybind11::arg( "point_set3d" ), pybind11::arg( "axis_to_remove" ),
+            pybind11::call_guard< pybind11::gil_scoped_release >(),
+            "Return a 2D point set built from the 3D one by removing the "
+            "coordinate along the axis axis_to_remove" );
     }
 } // namespace geode

@@ -50,31 +50,49 @@ namespace geode
 #define PYTHON_CRS( dimension )                                                \
     const auto name##dimension =                                               \
         "CoordinateReferenceSystem" + std::to_string( dimension ) + "D";       \
-    pybind11::class_< CoordinateReferenceSystem##dimension##D >(               \
-        module, name##dimension.c_str() )                                      \
+    pybind11::class_< CoordinateReferenceSystem##dimension##D >( module,       \
+        name##dimension.c_str(),                                               \
+        "Coordinate reference system of a mesh: it gives the coordinates of "  \
+        "the mesh vertices" )                                                  \
+        .def( "type_name",                                                     \
+            &CoordinateReferenceSystem##dimension##D::type_name,               \
+            "Return the type of the coordinate reference system" )             \
         .def(                                                                  \
-            "type_name", &CoordinateReferenceSystem##dimension##D::type_name ) \
-        .def( "point",                                                         \
+            "point",                                                           \
             []( const CoordinateReferenceSystem< dimension >& crs,             \
                 index_t point_id ) -> const Point< dimension >& {              \
                 check_crs_point( "point", crs, point_id );                     \
                 return crs.point( point_id );                                  \
-            } )                                                                \
-        .def( "set_point", []( CoordinateReferenceSystem< dimension >& crs,    \
-                               index_t point_id, Point< dimension > point ) {  \
-            check_crs_point( "set_point", crs, point_id );                     \
-            crs.set_point( point_id, std::move( point ) );                     \
-        } )
+            },                                                                 \
+            "Return the coordinates of the point of the given index; raise "   \
+            "IndexError if it is out of range for a coordinate reference "     \
+            "system storing one point per vertex",                             \
+            pybind11::arg( "point_id" ) )                                      \
+        .def(                                                                  \
+            "set_point",                                                       \
+            []( CoordinateReferenceSystem< dimension >& crs, index_t point_id, \
+                Point< dimension > point ) {                                   \
+                check_crs_point( "set_point", crs, point_id );                 \
+                crs.set_point( point_id, std::move( point ) );                 \
+            },                                                                 \
+            "Set the coordinates of the point of the given index; raise "      \
+            "IndexError if it is out of range for a coordinate reference "     \
+            "system storing one point per vertex",                             \
+            pybind11::arg( "point_id" ), pybind11::arg( "point" ) )
 
 namespace geode
 {
     void define_crs( pybind11::module& module )
     {
-        pybind11::class_< CRSType >( module, "CRSType" )
-            .def( pybind11::init<>() )
-            .def( pybind11::init< std::string >() )
-            .def( "get", &CRSType::get )
-            .def( "matches", &CRSType::operator== );
+        pybind11::class_< CRSType >( module, "CRSType",
+            "Name identifying the type of a coordinate reference system" )
+            .def( pybind11::init<>(), "Build a type with an empty name" )
+            .def( pybind11::init< std::string >(),
+                "Build a type with the given name", pybind11::arg( "value" ) )
+            .def( "get", &CRSType::get, "Return the name as a string" )
+            .def( "matches", &CRSType::operator==,
+                "Return True if the other type has the same name",
+                pybind11::arg( "other" ) );
 
         PYTHON_CRS( 1 );
         PYTHON_CRS( 2 );
