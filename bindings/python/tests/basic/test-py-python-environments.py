@@ -58,10 +58,12 @@ def run_cmake(directory, body, pythonpath=None):
         'set(PROJECT_NAME "Down")\n'
         'set(PROJECT_BINARY_DIR "%s")\n'
         'set(CMAKE_SOURCE_DIR "%s")\n'
+        'set(PROJECT_SOURCE_DIR "%s")\n'
         'set(PYTHON_EXECUTABLE "%s")\n'
         'include("%s")\n'
         % (
             cmake_path(os.path.join(directory, "build")),
+            cmake_path(os.path.join(directory, "source")),
             cmake_path(os.path.join(directory, "source")),
             cmake_path(sys.executable),
             cmake_path(PYTHON_TARGETS),
@@ -303,6 +305,44 @@ def test_shared_install_prefix():
         )
 
 
+def test_requirements_of_the_project():
+    # In a superbuild, CMAKE_SOURCE_DIR is the superbuild source: the
+    # requirements are read from the source of the project
+    with tempfile.TemporaryDirectory() as directory:
+        write(
+            os.path.join(directory, "source", "bindings", "python", "requirements.in"),
+            "pandas\n",
+        )
+        project = os.path.join(directory, "project")
+        write(os.path.join(project, "bindings", "python", "requirements.in"), "numpy>=2\n")
+        body = (
+            'set(PROJECT_SOURCE_DIR "%s")\n'
+            "geode_python_requirements_file(requirements)\n"
+            'message("REQUIREMENTS=${requirements}")\n'
+        ) % cmake_path(project)
+        values, output = run_cmake(directory, body)
+        with open(values["REQUIREMENTS"]) as file:
+            requirements = file.read().split()
+        expect(
+            requirements == ["numpy>=2"],
+            "requirements of the project: %s" % requirements,
+            output,
+        )
+    with tempfile.TemporaryDirectory() as directory:
+        body = (
+            "geode_python_requirements_file(requirements)\n"
+            'message("REQUIREMENTS=${requirements}")\n'
+        )
+        values, output = run_cmake(directory, body)
+        with open(values["REQUIREMENTS"]) as file:
+            requirements = file.read().split()
+        expect(
+            requirements == [],
+            "requirements without requirements.in: %s" % requirements,
+            output,
+        )
+
+
 def test_distribution_files():
     with tempfile.TemporaryDirectory() as directory:
         source = os.path.join(directory, "source", "bindings", "python")
@@ -337,3 +377,4 @@ if __name__ == "__main__":
     test_distribution_files()
     test_environment_hash()
     test_shared_install_prefix()
+    test_requirements_of_the_project()
