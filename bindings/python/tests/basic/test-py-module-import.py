@@ -20,7 +20,9 @@
 
 
 """Every extension module can be imported alone, in a fresh interpreter: the
-modules it depends on are imported by the module itself."""
+modules it depends on are imported by the module itself. Their signatures then
+name the Python classes: a module which forgets to import the module defining a
+type it uses shows the raw C++ type (geode::Point<3u>) in its signatures."""
 
 import subprocess
 import sys
@@ -36,6 +38,27 @@ MODULES = [
     "opengeode_py_model",
 ]
 
+RAW_CPP_TYPES = """
+import geode_test_env
+import inspect
+import {module} as module
+
+raw = []
+for name in dir(module):
+    member = getattr(module, name)
+    members = [(name, member)]
+    if inspect.isclass(member):
+        members = [
+            (name + "." + attribute, getattr(member, attribute, None))
+            for attribute in dir(member)
+        ]
+    for member_name, function in members:
+        doc = getattr(function, "__doc__", None) or ""
+        if "geode::" in doc or "absl::" in doc:
+            raw.append(member_name)
+assert not raw, "raw C++ types in the signatures of " + ", ".join(raw[:5])
+"""
+
 if __name__ == "__main__":
     failures = []
     for module in MODULES:
@@ -49,6 +72,12 @@ if __name__ == "__main__":
             capture_output=True,
             text=True,
         )
+        if result.returncode == 0:
+            result = subprocess.run(
+                [sys.executable, "-c", RAW_CPP_TYPES.format(module=module)],
+                capture_output=True,
+                text=True,
+            )
         if result.returncode != 0:
             failures.append(
                 f"{module}: {result.stderr.strip().splitlines()[-1] if result.stderr.strip() else result.returncode}"
