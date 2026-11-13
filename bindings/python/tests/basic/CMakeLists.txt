@@ -68,6 +68,10 @@ add_geode_python_test(
         ${PROJECT_NAME}::py_basic
 )
 add_geode_python_test(
+    SOURCE "test-py-package-tools.py"
+    ARGUMENTS "${PROJECT_SOURCE_DIR}/cmake/geode_python_package.py"
+)
+add_geode_python_test(
     SOURCE "test-py-signatures.py"
     DEPENDENCIES
         ${PROJECT_NAME}::py_basic
@@ -98,6 +102,17 @@ add_geode_python_test(
 )
 add_geode_python_test(
     SOURCE "test-py-package-layout.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_geometry
+        ${PROJECT_NAME}::py_image
+        ${PROJECT_NAME}::py_gdal
+        ${PROJECT_NAME}::py_mesh
+        ${PROJECT_NAME}::py_model
+)
+add_geode_python_test(
+    SOURCE "test-py-wheel-layout.py"
+    ARGUMENTS "${PROJECT_BINARY_DIR}/wheel/${project_name}"
     DEPENDENCIES
         ${PROJECT_NAME}::py_basic
         ${PROJECT_NAME}::py_geometry

@@ -101,7 +101,7 @@ namespace geode
     /*!
      * Import the extension module defining the types used by a binding module.
      * In the build tree the modules are top-level modules; in the wheel they
-     * live in a package (opengeode.lib.opengeode_py_basic...): when the
+     * live at the root of a package (opengeode.opengeode_py_basic...): when the
      * top-level module does not exist, the sibling of the module being
      * initialized is imported. Any other error (the dependency is found but
      * fails to import) is not masked.

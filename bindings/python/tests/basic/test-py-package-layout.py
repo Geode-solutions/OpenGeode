@@ -19,10 +19,12 @@
 # SOFTWARE.
 
 
-"""The wheel ships the extension modules inside a package (opengeode.lib.
+"""The wheel ships the extension modules inside a package (opengeode.
 opengeode_py_image...), not as top-level modules: a module which imports another
 one by its top-level name only works from the build tree. Each extension module
-is imported alone, in a fresh interpreter, from such a package."""
+is imported alone, in a fresh interpreter, from a subpackage, so that the
+sibling import does not depend on the package depth (the wheel layout itself is
+tested by test-py-wheel-layout)."""
 
 import importlib.util
 import os

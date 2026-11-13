@@ -108,7 +108,7 @@ namespace geode
         const auto make = [&module]( const char* name,
                               const pybind11::object& base, const char* doc ) {
             // Qualified by the name of the module, which is a package member
-            // in the wheel (opengeode.lib.opengeode_py_basic)
+            // in the wheel (opengeode.opengeode_py_basic)
             const auto qualified =
                 module.attr( "__name__" ).cast< std::string >() + "." + name;
             auto* created = PyErr_NewExceptionWithDoc(

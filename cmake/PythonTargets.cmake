@@ -15,11 +15,22 @@ function(add_geode_python_binding)
     target_link_libraries(${GEODE_BINDING_NAME} 
         PRIVATE "${GEODE_BINDING_DEPENDENCIES}"
     )
+    # The wheel puts the extension modules at the root of the package and the
+    # shared libraries in its ${CMAKE_INSTALL_LIBDIR} subfolder (see
+    # add_geode_python_wheel), the install and build trees next to them.
+    # On Windows, the __init__.py of the wheel adds the DLL directory instead.
+    if(APPLE)
+        set(origin "@loader_path")
+    else()
+        set(origin "$ORIGIN")
+    endif()
     set_target_properties(${GEODE_BINDING_NAME}
         PROPERTIES
             OUTPUT_NAME ${project_name}_${GEODE_BINDING_NAME}
             CXX_VISIBILITY_PRESET "default"
             FOLDER "Bindings/Python"
+            BUILD_RPATH "${origin}/${CMAKE_INSTALL_LIBDIR}"
+            INSTALL_RPATH "${origin};${origin}/${CMAKE_INSTALL_LIBDIR}"
     )
     _export_library(${GEODE_BINDING_NAME} OPTIONAL)
 endfunction()
@@ -227,9 +238,12 @@ function(add_geode_python_wheel)
     set(header "# Copyright (c) 2019 - 2026 Geode-solutions\n\n")
     file(WRITE ${wheel_init} "#${header}")
     file(WRITE ${wheel_import} "${header}")
+    # The extension modules are at the root of the package, whatever the
+    # platform, so that their public path (opengeode.opengeode_py_mesh...) does
+    # not depend on it: the shared libraries stay in ${binary_folder}
     if(WIN32)
         file(APPEND ${wheel_init} "import os, pathlib\n")
-        file(APPEND ${wheel_init} "os.add_dll_directory(pathlib.Path(__file__).parent.resolve().joinpath('bin'))\n\n")
+        file(APPEND ${wheel_init} "os.add_dll_directory(pathlib.Path(__file__).parent.resolve().joinpath('${binary_folder}'))\n\n")
     endif()
     # Build-tree copy of the pure-Python modules, imported by the Python tests
     set(python_modules_directory "${PROJECT_BINARY_DIR}/python_modules")
@@ -243,7 +257,7 @@ function(add_geode_python_wheel)
         configure_file("${module}" "${wheel_build_directory}/${binary_folder}/${module}" COPYONLY)
         configure_file("${module}" "${python_modules_directory}/${module}" COPYONLY)
         file(READ "${module}" FILE_CONTENTS)
-        string(REPLACE "from ${project_name}" "from .${binary_folder}.${project_name}" FILE_CONTENTS "${FILE_CONTENTS}")
+        string(REPLACE "from ${project_name}_" "from .${project_name}_" FILE_CONTENTS "${FILE_CONTENTS}")
         file(WRITE "${wheel_output_directory}/${module}" ${FILE_CONTENTS})
     endforeach()
     configure_file("${wheel_import}" "${python_modules_directory}/${project_name}.py" COPYONLY)
@@ -302,12 +316,13 @@ print(name + version + '-' + name + version + '-' + platform)"
     endif()
     set(check_stubs_script "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/check_python_stubs.py")
     set(stubtest_config "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/stubtest_mypy.ini")
+    set(package_script "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/geode_python_package.py")
     add_custom_target(wheel
         COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/README.md" "${wheel_output_path}"
         COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/bindings/python/requirements.txt" "${wheel_output_path}"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/${binary_folder}/${wheel_config_folder}" "${wheel_output_directory}/${binary_folder}"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/share" "${wheel_output_directory}/share"
-        COMMAND ${CMAKE_COMMAND} -E remove "${wheel_output_directory}/${binary_folder}/*.py"
+        COMMAND ${venv_bin}/python "${package_script}" layout "${wheel_output_directory}" "${binary_folder}"
         COMMAND ${venv_bin}/pip install --no-deps .
         COMMAND ${venv_bin}/pybind11-stubgen --exit-code -o "${wheel_output_path}" "${project_name}"
         COMMAND ${venv_bin}/python "${check_stubs_script}" fix "${wheel_output_directory}"
@@ -315,6 +330,7 @@ print(name + version + '-' + name + version + '-' + platform)"
         COMMAND ${venv_bin}/python "${check_stubs_script}" stubtest
             --mypy-config-file "${stubtest_config}"
             --stubs-from "${wheel_output_directory}" ${project_name}
+        COMMAND ${venv_bin}/python "${package_script}" check "${wheel_output_directory}" "${binary_folder}"
         COMMAND ${venv_bin}/python -m build
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/wheel
     )
