@@ -221,6 +221,45 @@ def test_distribution_version():
         )
 
 
+def fake_interpreter(directory, name, version):
+    """An executable that prints the given version whatever its arguments."""
+    if os.name == "nt":
+        path = os.path.join(directory, name + ".bat")
+        write(path, "@echo off\r\necho %s\r\n" % version)
+    else:
+        path = os.path.join(directory, name)
+        write(path, "#!/bin/sh\necho '%s'\n" % version)
+        os.chmod(path, 0o755)
+    return cmake_path(path)
+
+
+def environment_hash(directory, interpreter, version):
+    path = fake_interpreter(directory, interpreter, version)
+    body = (
+        'set(PYTHON_EXECUTABLE "%s")\n'
+        'set(GEODE_STUBGEN_REQUIREMENT "stubgen")\n'
+        'set(GEODE_MYPY_REQUIREMENT "mypy")\n'
+        '_geode_python_environment_hash(hash "numpy" "" "" "pkg" "")\n'
+        'message("HASH=${hash}")\n' % path
+    )
+    values, output = run_cmake(directory, body)
+    expect(len(values.get("HASH", "")) == 32, "hash of the environment", output)
+    return values["HASH"]
+
+
+def test_environment_hash():
+    # The test environment is rebuilt when the base interpreter changes, even
+    # if it keeps its path (the same file is rewritten with another version)
+    with tempfile.TemporaryDirectory() as directory:
+        first = environment_hash(directory, "python_a", "3.13.1 (fake)")
+        second = environment_hash(directory, "python_a", "3.13.2 (fake)")
+        third = environment_hash(directory, "python_a", "3.13.1 (fake)")
+        fourth = environment_hash(directory, "python_b", "3.13.1 (fake)")
+    expect(first != second, "the interpreter version is in the hash")
+    expect(first == third, "the hash is stable")
+    expect(first != fourth, "the interpreter path is in the hash")
+
+
 def test_distribution_files():
     with tempfile.TemporaryDirectory() as directory:
         source = os.path.join(directory, "source", "bindings", "python")
@@ -253,3 +292,4 @@ if __name__ == "__main__":
     test_found_package_without_mapping(preinstalled=False)
     test_distribution_version()
     test_distribution_files()
+    test_environment_hash()

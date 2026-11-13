@@ -371,6 +371,28 @@ function(_geode_python_test_venv_options options installed without_local_wheel)
     set(${installed} "${installed_in_python}" PARENT_SCOPE)
 endfunction()
 
+# Set ${output} to the hash of everything the Python test environment is built
+# from. It includes the version of the base interpreter (and not only its path)
+# as an interpreter upgraded in place no longer matches its virtual environment.
+function(_geode_python_environment_hash output
+    requirements_content venv_options installed_in_python geode_packages
+    local_wheels_state
+)
+    execute_process(
+        COMMAND ${PYTHON_EXECUTABLE} -c "import sys; print(sys.version)"
+        OUTPUT_VARIABLE python_version
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        RESULT_VARIABLE version_result
+    )
+    if(version_result)
+        set(python_version "unknown")
+    endif()
+    string(MD5 environment_hash
+        "${PYTHON_EXECUTABLE}|${python_version}|${requirements_content}|${GEODE_STUBGEN_REQUIREMENT}|${GEODE_MYPY_REQUIREMENT}|${venv_options}|${installed_in_python}|${geode_packages}|${local_wheels_state}"
+    )
+    set(${output} "${environment_hash}" PARENT_SCOPE)
+endfunction()
+
 # The Python tests run in a virtual environment created from PYTHON_EXECUTABLE
 # in the build directory, with the requirements of the package (numpy...) and
 # the pinned stub tools installed: the Python used to configure does not need
@@ -409,8 +431,9 @@ function(geode_python_test_executable output)
             endforeach()
         endif()
     endforeach()
-    string(MD5 environment_hash
-        "${PYTHON_EXECUTABLE}|${requirements_content}|${GEODE_STUBGEN_REQUIREMENT}|${GEODE_MYPY_REQUIREMENT}|${venv_options}|${installed_in_python}|${geode_packages}|${local_wheels_state}"
+    _geode_python_environment_hash(environment_hash
+        "${requirements_content}" "${venv_options}" "${installed_in_python}"
+        "${geode_packages}" "${local_wheels_state}"
     )
     set(stamp_file "${venv_path}/geode_environment_hash")
     set(stamp "")
