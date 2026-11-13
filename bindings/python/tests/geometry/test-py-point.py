@@ -67,7 +67,60 @@ def test_string():
         raise ValueError("[Test] repr of Point should rebuild the same point")
 
 
+def expect_index_error(function, expected, label):
+    try:
+        function()
+    except IndexError as error:
+        if str(error) != expected:
+            raise ValueError(f"[Test] {label}: unexpected message '{error}'")
+        return
+    raise ValueError(f"[Test] {label}: IndexError not raised")
+
+
+def test_value_index():
+    # value and set_value check the axis against the dimension, for points
+    # and vectors (which inherit them)
+    for dimension in [1, 2, 3]:
+        for prefix in ["Point", "Vector"]:
+            cls = getattr(geom, f"{prefix}{dimension}D")
+            coordinates = [float(axis + 1) for axis in range(dimension)]
+            point = cls(coordinates)
+            label = cls.__name__
+            for axis in range(dimension):
+                if point.value(axis) != coordinates[axis]:
+                    raise ValueError(f"[Test] {label} value({axis})")
+                point.set_value(axis, 10.0 * axis)
+                if point.value(axis) != 10.0 * axis:
+                    raise ValueError(f"[Test] {label} set_value({axis})")
+            for axis in [dimension, dimension + 1, 200, 255]:
+                expect_index_error(
+                    lambda: point.value(axis),
+                    f"[value] axis {axis} out of range [0, {dimension})",
+                    f"{label} value({axis})",
+                )
+                expect_index_error(
+                    lambda: point.set_value(axis, 1.0),
+                    f"[set_value] axis {axis} out of range [0, {dimension})",
+                    f"{label} set_value({axis})",
+                )
+                expect_index_error(
+                    lambda: point.value(index=axis),
+                    f"[value] axis {axis} out of range [0, {dimension})",
+                    f"{label} value(index={axis})",
+                )
+            if point != cls([10.0 * axis for axis in range(dimension)]):
+                raise ValueError(f"[Test] {label} modified by a failed set_value")
+            for bad in [-1, 256, 1.5]:
+                for call in [lambda: point.value(bad), lambda: point.set_value(bad, 1.0)]:
+                    try:
+                        call()
+                    except TypeError:
+                        continue
+                    raise ValueError(f"[Test] {label} accepted the axis {bad}")
+
+
 if __name__ == '__main__':
     test_comparison()
     test_operators()
     test_string()
+    test_value_index()
