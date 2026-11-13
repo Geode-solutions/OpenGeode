@@ -47,9 +47,9 @@ namespace geode
         module.def( "brep_object_priority", &brep_object_priority,
             pybind11::arg( "filename" ),
             pybind11::call_guard< pybind11::gil_scoped_release >(),
-            "Return the priority of the loader chosen for the file, used to "
-            "select the geode object type when several can load it; raise an "
-            "error if no loader handles the file" );
+            "Return the object priority of the input selected from the "
+            "extension of the file; raise an error if no input handles the "
+            "file" );
         module.def( "is_brep_loadable", &is_brep_loadable,
             pybind11::arg( "filename" ),
             pybind11::call_guard< pybind11::gil_scoped_release >(),

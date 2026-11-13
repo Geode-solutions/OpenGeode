@@ -1124,6 +1124,35 @@ def test_model_conversions():
     solid, solid_mappings = model.convert_brep_into_solid(meshed)
     check(solid.nb_polyhedra() == solid_mappings.solid_polyhedra_mapping.size() == 5709, "the solid conversion maps the polyhedra")
     check_raises(lambda: model.convert_brep_into_solid(box), basic.OpenGeodeDataError, "convert_brep_into_solid needs the unique vertices in blocks")
+    # which mappings each conversion fills
+    check(curve_mappings.surface_polygons_mapping.size() == 0 and curve_mappings.solid_polyhedra_mapping.size() == 0, "the curve conversion fills no polygon nor polyhedron mapping")
+    check(curve_mappings.corner_vertices_mapping.size() > 0, "the curve conversion maps the corners on a line")
+    check(surface_mappings.line_edges_mapping.size() > 0 and surface_mappings.corner_vertices_mapping.size() > 0, "the surface conversion maps line edges and corners")
+    # in the solid conversion the surface polygons are mapped to the solid facets
+    first_surface = meshed.surfaces()[0]
+    element = mesh.MeshElement(first_surface.id(), 0)
+    facet = solid_mappings.surface_polygons_mapping.in2out(element)
+    polygon_vertices = model.surface_polygon_unique_vertices(meshed, first_surface, 0)
+    check(
+        sorted(solid.facets().facet_vertices(facet))
+        == sorted(solid_mappings.unique_vertices_mapping.in2out(u) for u in polygon_vertices),
+        "the solid conversion maps a surface polygon to the solid facet with the same vertices",
+    )
+    check(solid_mappings.surface_polygons_mapping.size() == 1716 and solid.facets().nb_facets() > 1716, "the polygons are mapped to facets, not to polygons")
+    check(solid_mappings.line_edges_mapping.size() > 0 and solid_mappings.corner_vertices_mapping.size() > 0, "the solid conversion maps line edges and corners")
+    # without polyhedron the surface, line and corner mappings of the solid stay empty
+    lonely = model.BRep()
+    lonely_builder = model.BRepBuilder(lonely)
+    lonely_block = lonely.block(lonely_builder.add_block())
+    block_builder = lonely_builder.block_mesh_builder(lonely_block)
+    block_builder.create_point(point3(0, 0, 0))
+    block_builder.create_point(point3(1, 0, 0))
+    lonely_builder.create_unique_vertices(2)
+    for vertex in range(2):
+        lonely_builder.set_unique_vertex(model.ComponentMeshVertex(lonely_block.component_id(), vertex), vertex)
+    empty_solid, empty_mappings = model.convert_brep_into_solid(lonely)
+    check(empty_solid.nb_polyhedra() == 0 and empty_mappings.unique_vertices_mapping.size() == 2, "the unique vertices are always mapped in the solid conversion")
+    check(empty_mappings.surface_polygons_mapping.size() == 0 and empty_mappings.line_edges_mapping.size() == 0 and empty_mappings.corner_vertices_mapping.size() == 0 and empty_mappings.solid_polyhedra_mapping.size() == 0, "without polyhedron the other mappings stay empty")
     check(model.convert_section_into_curve(section)[0].nb_edges() == 12 and model.convert_section_into_surface(section)[0].nb_polygons() == 12, "section conversions")
     # an extra corner on no line is not mapped in the curve conversion
     builder = model.BRepBuilder(box)

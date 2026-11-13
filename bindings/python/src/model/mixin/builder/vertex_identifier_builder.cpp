@@ -158,7 +158,7 @@ namespace geode
                 "registered" )
             .def( "create_unique_vertex",
                 &VertexIdentifierBuilder::create_unique_vertex,
-                "Create an unique vertex identified with no component vertex "
+                "Create a unique vertex identified with no component vertex "
                 "and return its index" )
             .def( "create_unique_vertices",
                 &VertexIdentifierBuilder::create_unique_vertices,
@@ -172,8 +172,8 @@ namespace geode
                 "Identify the component vertex with the unique vertex, after "
                 "detaching it from the unique vertex it was identified with, "
                 "if any. The component must be registered, the vertex must "
-                "exist in its mesh and the unique vertex must exist (none of "
-                "this is checked)" )
+                "exist in its mesh and the unique vertex must exist; this is "
+                "only checked in assertion (debug) builds" )
             .def( "update_unique_vertices",
                 &VertexIdentifierBuilder::update_unique_vertices,
                 pybind11::arg( "component_id" ), pybind11::arg( "old2new" ),

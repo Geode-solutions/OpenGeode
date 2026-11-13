@@ -85,8 +85,9 @@ namespace geode
         auto cls_SurfacePolygonEdge =
             pybind11::class_< SurfacePolygonEdge >( module,
                 "SurfacePolygonEdge",
-                "A polygon edge of a Surface mesh, stored in 'facet', together "
-                "with the indices of its two vertices in the Surface mesh" )
+                "A polygon edge of a Surface mesh (field facet) together with "
+                "the indices of its two vertices in the Surface mesh (field "
+                "vertices)" )
                 .def( pybind11::init<>(), "Build an empty SurfacePolygonEdge" )
                 .def( pybind11::init< PolygonEdge >(), pybind11::arg( "edge" ),
                     "Build a SurfacePolygonEdge of the given polygon edge, "
@@ -95,8 +96,7 @@ namespace geode
             ;
         def_readwrite_named( cls_SurfacePolygonEdge, "facet",
             &SurfacePolygonEdge::edge,
-            "Polygon edge: polygon index and edge index in the Surface mesh "
-            "(named facet for historical reasons)" );
+            "Polygon edge: polygon index and edge index in the Surface mesh" );
         def_readwrite_named( cls_SurfacePolygonEdge, "vertices",
             &SurfacePolygonEdge::vertices,
             "Surface mesh vertices of the two ends of the edge; in the results "

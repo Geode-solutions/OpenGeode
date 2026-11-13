@@ -53,9 +53,10 @@ namespace geode
         auto cls_ComponentID =
             define_string_representation(
                 pybind11::class_< ComponentID >( module, "ComponentID",
-                    "Hashable: do not modify type or id of a ComponentID used "
-                    "as a "
-                    "dict key or in a set" ) )
+                    "Identifier of a component of a model: its type "
+                    "(ComponentType) and its uuid. Hashable: do not modify "
+                    "type or id of a ComponentID used as a dict key or in a "
+                    "set" ) )
                 .def( pybind11::init<>(),
                     "Build an undefined ComponentID: type 'undefined' and a "
                     "newly generated uuid" )

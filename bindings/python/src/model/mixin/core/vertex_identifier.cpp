@@ -85,6 +85,6 @@ namespace geode
                 "Return the unique vertex of the component vertex, NO_ID if "
                 "the vertex is not identified with any unique vertex. The "
                 "component must be registered and the vertex must exist in its "
-                "mesh (neither is checked)" );
+                "mesh; the result is undefined otherwise" );
     }
 } // namespace geode

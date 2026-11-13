@@ -33,7 +33,7 @@
         "ModelBoundariesBuilder" + std::to_string( dimension ) + "D";          \
     pybind11::class_< ModelBoundariesBuilder##dimension##D >( module,          \
         name##dimension.c_str(),                                               \
-        "Builder modifying the ModelBoundarys of a model" )                    \
+        "Builder modifying the ModelBoundaries of a model" )                   \
         .def( "set_model_boundary_name",                                       \
             &ModelBoundariesBuilder##dimension##D::set_model_boundary_name,    \
             pybind11::arg( "id" ), pybind11::arg( "name" ),                    \

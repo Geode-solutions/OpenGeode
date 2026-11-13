@@ -37,18 +37,18 @@ namespace geode
                 pybind11::arg( "brep" ),
                 pybind11::call_guard< pybind11::gil_scoped_release >(),
                 "Remove from the BRep the active Surfaces, then Lines, then "
-                "Corners that bound nothing and are internal to nothing (so "
-                "that only what is linked to a Block or kept by another "
-                "component remains), delete the unique vertices left isolated, "
+                "Corners that bound nothing and are internal to nothing (no "
+                "incidence and no embedding), delete the unique vertices left "
+                "isolated, "
                 "and return the list of the removed ComponentIDs" )
             .def( "filter_section_components_with_regards_to_surfaces",
                 &filter_section_components_with_regards_to_surfaces,
                 pybind11::arg( "section" ),
                 pybind11::call_guard< pybind11::gil_scoped_release >(),
                 "Remove from the Section the active Lines, then Corners that "
-                "bound nothing and are internal to nothing (so that only what "
-                "is linked to a Surface or kept by another component remains), "
-                "delete the unique vertices left isolated, and return the list "
+                "bound nothing and are internal to nothing (no incidence and "
+                "no embedding), delete the unique vertices left isolated, and "
+                "return the list "
                 "of the removed ComponentIDs" );
     }
 } // namespace geode

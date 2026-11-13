@@ -58,8 +58,9 @@ namespace geode
                 "Copy the components, relationships, unique vertices, geometry "
                 "and physical properties of brep into the empty BRep, and "
                 "return the ModelCopyMapping from the uuids of brep to the new "
-                "ones; raise an error if the BRep is not empty (use "
-                "BRepConcatener to add to a non-empty BRep)" )
+                "ones. The name of brep is copied too if it has one. Raise an "
+                "error if the BRep is not empty (use BRepConcatener to add to "
+                "a non-empty BRep)" )
             .def( "add_corner",
                 static_cast< const uuid& (BRepBuilder::*) () >(
                     &BRepBuilder::add_corner ),

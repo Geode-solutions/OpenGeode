@@ -37,7 +37,7 @@
             "Return the ComponentID (type and uuid) of the component" )        \
         .def_static( "component_type_static",                                  \
             &ModelBoundary##dimension##D::component_type_static,               \
-            "Return the ComponentType of all the ModelBoundarys, without "     \
+            "Return the ComponentType of all the ModelBoundaries, without "    \
             "needing an instance" )
 
 namespace geode

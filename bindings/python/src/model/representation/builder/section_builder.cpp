@@ -55,8 +55,9 @@ namespace geode
                 "Copy the components, relationships, unique vertices and "
                 "geometry of section into the empty Section, and return the "
                 "ModelCopyMapping from the uuids of section to the new ones; "
-                "raise an error if the Section is not empty (use "
-                "SectionConcatener to add to a non-empty Section)" )
+                "the name of section is copied too if it has one; raise an "
+                "error if the Section is not empty (use SectionConcatener to "
+                "add to a non-empty Section)" )
             .def( "add_corner",
                 static_cast< const uuid& (SectionBuilder::*) () >(
                     &SectionBuilder::add_corner ),

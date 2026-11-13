@@ -45,7 +45,9 @@ namespace geode
 
         auto cls_RayTracingResult =
             pybind11::class_< RayTracingResult >( module, "RayTracingResult",
-                "Result of a point-in-block query, with its position" )
+                "Result of a point-in-block query: its position is outside, "
+                "inside or on_border; the result is True (bool) only when the "
+                "position is inside" )
                 .def( pybind11::init<>(),
                     "Build a result whose position is outside" )
                 .def( "__bool__", &RayTracingResult::operator bool );
