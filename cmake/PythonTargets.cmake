@@ -94,16 +94,75 @@ endfunction()
 set(GEODE_STUBGEN_REQUIREMENT "pybind11-stubgen==3.0.0")
 set(GEODE_MYPY_REQUIREMENT "mypy==2.4.1")
 
-# Python requirements of the package: bindings/python/requirements.in lists the
-# runtime dependencies (numpy...) and exists in every checkout, unlike
-# requirements.txt which is generated. Empty when the project has none.
+# Python requirements of the project, as a file for pip: bindings/python/
+# requirements.in lists the runtime dependencies of a project (numpy...) and
+# exists in every checkout, unlike requirements.txt which is generated. The
+# runtime requirements of the geode projects found by find_package (installed
+# next to their CMake files by add_geode_python_wheel) are added, so that a
+# downstream project gets them without installing its upstream packages. The
+# geode packages (OpenGeode-core, Geode-Common...) are removed: they come from
+# the local build chain, not from PyPI (see geode_python_local_wheel_directories).
+# Their names are stored in the ${PROJECT_NAME}_PYTHON_GEODE_REQUIREMENTS
+# global property.
 function(geode_python_requirements_file output)
-    set(requirements_file "${CMAKE_SOURCE_DIR}/bindings/python/requirements.in")
-    if(EXISTS "${requirements_file}")
+    get_property(requirements_file
+        GLOBAL PROPERTY ${PROJECT_NAME}_PYTHON_REQUIREMENTS_FILE
+    )
+    if(requirements_file)
         set(${output} "${requirements_file}" PARENT_SCOPE)
-    else()
-        set(${output} "" PARENT_SCOPE)
+        return()
     endif()
+    set(files)
+    get_property(packages GLOBAL PROPERTY PACKAGES_FOUND)
+    foreach(package IN LISTS packages)
+        set(file "${${package}_DIR}/python_requirements.in")
+        if(${package}_DIR AND EXISTS "${file}")
+            list(APPEND files "${file}")
+        endif()
+    endforeach()
+    set(project_file "${CMAKE_SOURCE_DIR}/bindings/python/requirements.in")
+    if(EXISTS "${project_file}")
+        list(APPEND files "${project_file}")
+    endif()
+    list(REMOVE_DUPLICATES files)
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${files})
+    set(requirements_file "${PROJECT_BINARY_DIR}/python_requirements.txt")
+    set(geode_file "${PROJECT_BINARY_DIR}/python_geode_requirements.txt")
+    set(command ${PYTHON_EXECUTABLE}
+        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/geode_python_package.py" requirements
+        --output "${requirements_file}" --geode-output "${geode_file}" ${files}
+    )
+    execute_process(COMMAND ${command} RESULT_VARIABLE result)
+    if(result)
+        string(REPLACE ";" " " command_text "${command}")
+        message(FATAL_ERROR
+            "Cannot merge the Python requirements with:\n  ${command_text}"
+        )
+    endif()
+    file(STRINGS "${geode_file}" geode_requirements)
+    set_property(GLOBAL PROPERTY
+        ${PROJECT_NAME}_PYTHON_GEODE_REQUIREMENTS "${geode_requirements}"
+    )
+    set_property(GLOBAL PROPERTY
+        ${PROJECT_NAME}_PYTHON_REQUIREMENTS_FILE "${requirements_file}"
+    )
+    set(${output} "${requirements_file}" PARENT_SCOPE)
+endfunction()
+
+# Directories where the wheels of the geode projects found by find_package are
+# published by their wheel target (next to their CMake files): the wheel target
+# of a downstream project installs them, without their dependencies, instead of
+# the released packages of PyPI which may not match the local build chain.
+function(geode_python_local_wheel_directories output)
+    set(directories)
+    get_property(packages GLOBAL PROPERTY PACKAGES_FOUND)
+    foreach(package IN LISTS packages)
+        if(${package}_DIR)
+            list(APPEND directories "${${package}_DIR}/python_wheels")
+        endif()
+    endforeach()
+    list(REMOVE_DUPLICATES directories)
+    set(${output} "${directories}" PARENT_SCOPE)
 endfunction()
 
 # Install the requirements of the package and the given extra packages in the
@@ -111,11 +170,9 @@ endfunction()
 function(_geode_pip_install venv_bin venv_path)
     cmake_parse_arguments(GEODE_PIP "" "" "PACKAGES" ${ARGN})
     geode_python_requirements_file(requirements_file)
-    set(pip_command ${venv_bin}/python -m pip install)
-    if(requirements_file)
-        list(APPEND pip_command -r "${requirements_file}")
-    endif()
-    list(APPEND pip_command ${GEODE_PIP_PACKAGES})
+    set(pip_command ${venv_bin}/python -m pip install
+        -r "${requirements_file}" ${GEODE_PIP_PACKAGES}
+    )
     execute_process(
         COMMAND ${pip_command}
         RESULT_VARIABLE pip_result
@@ -147,11 +204,7 @@ function(geode_python_test_executable output)
         set(venv_bin "${venv_path}/bin")
     endif()
     geode_python_requirements_file(requirements_file)
-    set(requirements_content "")
-    if(requirements_file)
-        file(READ "${requirements_file}" requirements_content)
-        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${requirements_file}")
-    endif()
+    file(READ "${requirements_file}" requirements_content)
     string(MD5 environment_hash
         "${PYTHON_EXECUTABLE}|${requirements_content}|${GEODE_STUBGEN_REQUIREMENT}|${GEODE_MYPY_REQUIREMENT}"
     )
@@ -261,6 +314,20 @@ function(add_geode_python_wheel)
         file(WRITE "${wheel_output_directory}/${module}" ${FILE_CONTENTS})
     endforeach()
     configure_file("${wheel_import}" "${python_modules_directory}/${project_name}.py" COPYONLY)
+    # The runtime requirements of the project, for the Python environments of
+    # the downstream projects (see geode_python_requirements_file)
+    set(project_requirements "${CMAKE_SOURCE_DIR}/bindings/python/requirements.in")
+    if(EXISTS "${project_requirements}")
+        configure_file("${project_requirements}"
+            "${PROJECT_BINARY_DIR}/${CMAKE_CONFIG_DESTINATION}/python_requirements.in"
+            COPYONLY
+        )
+        install(FILES "${project_requirements}"
+            DESTINATION ${CMAKE_CONFIG_DESTINATION}
+            RENAME python_requirements.in
+            COMPONENT public
+        )
+    endif()
     if(NOT WHEEL_VERSION)
         set(WHEEL_VERSION "0.0.0")
     endif()
@@ -317,12 +384,25 @@ print(name + version + '-' + name + version + '-' + platform)"
     set(check_stubs_script "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/check_python_stubs.py")
     set(stubtest_config "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/stubtest_mypy.ini")
     set(package_script "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/geode_python_package.py")
+    # The upstream geode packages come from the local build chain
+    geode_python_local_wheel_directories(local_wheel_directories)
+    geode_python_requirements_file(requirements_file)
+    get_property(geode_requirements
+        GLOBAL PROPERTY ${PROJECT_NAME}_PYTHON_GEODE_REQUIREMENTS
+    )
+    set(local_wheel_arguments --exclude "${GEODE_WHEEL_NAME}")
+    foreach(requirement IN LISTS geode_requirements)
+        list(APPEND local_wheel_arguments --require "${requirement}")
+    endforeach()
+    # Where the downstream projects find this wheel, next to the CMake files
+    set(publish_directory "${wheel_build_directory}/${CMAKE_CONFIG_DESTINATION}/python_wheels")
     add_custom_target(wheel
         COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/README.md" "${wheel_output_path}"
         COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/bindings/python/requirements.txt" "${wheel_output_path}"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/${binary_folder}/${wheel_config_folder}" "${wheel_output_directory}/${binary_folder}"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/share" "${wheel_output_directory}/share"
         COMMAND ${venv_bin}/python "${package_script}" layout "${wheel_output_directory}" "${binary_folder}"
+        COMMAND ${venv_bin}/python "${package_script}" install-local ${local_wheel_arguments} ${local_wheel_directories}
         COMMAND ${venv_bin}/pip install --no-deps .
         COMMAND ${venv_bin}/pybind11-stubgen --exit-code -o "${wheel_output_path}" "${project_name}"
         COMMAND ${venv_bin}/python "${check_stubs_script}" fix "${wheel_output_directory}"
@@ -332,6 +412,7 @@ print(name + version + '-' + name + version + '-' + platform)"
             --stubs-from "${wheel_output_directory}" ${project_name}
         COMMAND ${venv_bin}/python "${package_script}" check "${wheel_output_directory}" "${binary_folder}"
         COMMAND ${venv_bin}/python -m build
+        COMMAND ${venv_bin}/python "${package_script}" publish "${wheel_file}" "${publish_directory}"
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/wheel
     )
     string(CONCAT import_test "import " "${project_name}")
