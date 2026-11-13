@@ -38,3 +38,9 @@ add_geode_python_test(
     DEPENDENCIES
         ${PROJECT_NAME}::py_basic
 )
+add_geode_python_test(
+    SOURCE "test-py-exception.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_mesh
+)
