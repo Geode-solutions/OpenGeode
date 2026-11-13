@@ -39,6 +39,9 @@ namespace geode
             .def( pybind11::init< PolygonEdge >() )
             .def( pybind11::self == pybind11::self )
             .def( pybind11::self != pybind11::self )
+            .def( "__hash__", []( const PolygonVertex& value ) {
+                return absl::HashOf( value.polygon_id, value.vertex_id );
+            } )
             .def_readwrite( "polygon_id", &PolygonVertex::polygon_id )
             .def_readwrite( "vertex_id", &PolygonVertex::vertex_id );
 
@@ -47,6 +50,9 @@ namespace geode
             .def( pybind11::init< PolygonVertex >() )
             .def( pybind11::self == pybind11::self )
             .def( pybind11::self != pybind11::self )
+            .def( "__hash__", []( const PolygonEdge& value ) {
+                return absl::HashOf( value.polygon_id, value.edge_id );
+            } )
             .def_readwrite( "polygon_id", &PolygonEdge::polygon_id )
             .def_readwrite( "edge_id", &PolygonEdge::edge_id );
     }

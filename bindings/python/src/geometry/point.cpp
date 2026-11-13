@@ -25,6 +25,15 @@
 
 #include <geode/geometry/point.hpp>
 
+namespace
+{
+    template < geode::index_t dimension >
+    size_t point_hash( const geode::Point< dimension >& point )
+    {
+        return absl::HashOf( point );
+    }
+} // namespace
+
 #define PYTHON_POINT( dimension )                                              \
     const auto name##dimension = "Point" + std::to_string( dimension ) + "D";  \
     define_string_representation( pybind11::class_< Point##dimension##D >(     \
@@ -34,6 +43,7 @@
         .def( "inexact_equal", &Point##dimension##D::inexact_equal )           \
         .def( pybind11::self == pybind11::self )                               \
         .def( pybind11::self != pybind11::self )                               \
+        .def( "__hash__", &point_hash< dimension > )                           \
         .def( pybind11::self* double() )                                       \
         .def( pybind11::self / double() )                                      \
         .def( pybind11::self + pybind11::self )                                \

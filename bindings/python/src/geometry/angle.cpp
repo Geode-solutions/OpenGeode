@@ -39,6 +39,9 @@ namespace geode
             .def( "tan", &Angle::tan )
             .def( "inexact_equal", &Angle::inexact_equal )
             .def( pybind11::self == pybind11::self )
+            .def( "__hash__", []( const Angle& value ) {
+                return absl::HashOf( value.radians() );
+            } )
             .def( pybind11::self < pybind11::self )
             .def( pybind11::self > pybind11::self )
             .def( pybind11::self + pybind11::self )

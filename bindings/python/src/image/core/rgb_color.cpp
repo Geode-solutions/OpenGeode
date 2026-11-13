@@ -42,6 +42,9 @@ namespace geode
             .def( "set_blue", &RGBColor::set_blue )
             .def( pybind11::self == pybind11::self )
             .def( pybind11::self != pybind11::self )
+            .def( "__hash__", []( const RGBColor& value ) {
+                return absl::HashOf( value.red(), value.green(), value.blue() );
+            } )
             .def( pybind11::self + pybind11::self )
             .def( pybind11::self += pybind11::self );
     }
