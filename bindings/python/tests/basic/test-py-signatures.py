@@ -192,10 +192,26 @@ def check_class(qualified_name, cls, problems, seen):
             check_python_function(member_name, member, problems)
 
 
+GENERIC_KINDS = [inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD]
+
+
 def check_python_function(qualified_name, function, problems):
     if not (function.__doc__ or "").strip():
         problems.append(f"{qualified_name}: no docstring")
     signature = inspect.signature(function)
+    kinds = [parameter.kind for parameter in signature.parameters.values()]
+    if kinds == GENERIC_KINDS:
+        # Typed overloads written as a pybind11 docstring (read by
+        # pybind11-stubgen), e.g. basic.builder: checked as a binding
+        entries = split_overloads(function.__doc__ or "")
+        names = {SIGNATURE.match(entry[0]).group("name") for entry in entries}
+        if names != {function.__name__}:
+            problems.append(f"{qualified_name}: no signature in the docstring")
+        for entry in entries:
+            if not SIGNATURE.match(entry[0]).group("args"):
+                problems.append(f"{qualified_name}: unannotated {entry[0]}")
+        check_callable(qualified_name, function, problems)
+        return
     for name, parameter in signature.parameters.items():
         if name in ("self", "cls"):
             continue

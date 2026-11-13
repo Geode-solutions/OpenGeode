@@ -107,8 +107,8 @@ endfunction()
 
 # Quality gates on the stubs of the binding modules, run by CTest: generate the
 # stubs of the compiled modules with pybind11-stubgen, then check them with
-# check_python_stubs.py (no unnamed argN parameter, no unresolved or raw C++
-# type, mypy.stubtest unless NO_STUBTEST). The wheel target runs the same gates
+# check_python_stubs.py (fix of the TypeVars, no unnamed argN parameter, no
+# unresolved or raw C++ type, mypy.stubtest unless NO_STUBTEST). The wheel target runs the same gates
 # on the wheel, with stubtest on the whole package.
 # Needs the pinned pybind11-stubgen and mypy in PYTHON_EXECUTABLE, see
 # geode_require_python_stub_tools.
@@ -251,6 +251,7 @@ print(name + version + '-' + name + version + '-' + platform)"
         COMMAND ${CMAKE_COMMAND} -E remove "${wheel_output_directory}/${binary_folder}/*.py"
         COMMAND ${venv_bin}/pip install --no-deps .
         COMMAND ${venv_bin}/pybind11-stubgen --exit-code -o "${wheel_output_path}" "${project_name}"
+        COMMAND ${venv_bin}/python "${check_stubs_script}" fix "${wheel_output_directory}"
         COMMAND ${venv_bin}/python "${check_stubs_script}" stubs "${wheel_output_directory}"
         COMMAND ${venv_bin}/python "${check_stubs_script}" stubtest
             --mypy-config-file "${stubtest_config}"

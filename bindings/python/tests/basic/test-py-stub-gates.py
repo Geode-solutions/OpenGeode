@@ -232,6 +232,94 @@ def test_no_stub_found():
         raise ValueError("[Test] An empty directory should fail:\n" + output)
 
 
+def test_typevar_annotation_is_rejected():
+    # What pybind11-stubgen writes for a module-level TypeVar
+    expect_failure(
+        """
+        import typing
+        _T: typing.TypeVar
+        def load(cls: type[_T]) -> _T: ...
+        """,
+        "TypeVar written as an annotation",
+    )
+    expect_success(
+        """
+        import typing
+        _T = typing.TypeVar("_T")
+        def load(cls: type[_T]) -> _T: ...
+        """
+    )
+
+
+TYPEVAR_RUNTIME = """
+import typing as _typing
+_T = _typing.TypeVar("_T")
+Key = _typing.TypeVar("Key")
+
+
+def load(cls: "type[_T]", filename: str) -> "_T":
+    return cls()
+
+
+def first(keys: "list[Key]") -> "Key":
+    return keys[0]
+"""
+
+
+def test_fix_rewrites_typevars():
+    stub = """
+        from __future__ import annotations
+        import typing
+        import typing as _typing
+        __all__: list[str] = ['Key', 'first', 'load']
+        def first(keys: list[Key]) -> Key:
+            ...
+        def load(cls: type[_T], filename: str) -> _T:
+            ...
+        Key: typing.TypeVar
+        _T: typing.TypeVar
+        """
+    with tempfile.TemporaryDirectory() as directory:
+        path = os.path.join(directory, "synthetic_stub_module.pyi")
+        with open(path, "w") as file:
+            file.write(textwrap.dedent(stub))
+        status, output = run(["fix", directory])
+        if status != 0:
+            raise ValueError("[Test] fix failed:\n" + output)
+        with open(path) as file:
+            fixed = file.read()
+        for expected in ['Key = typing.TypeVar("Key")', '_T = typing.TypeVar("_T")']:
+            if expected not in fixed:
+                raise ValueError("[Test] fix did not write %s:\n%s" % (expected, fixed))
+        if ": typing.TypeVar" in fixed:
+            raise ValueError("[Test] fix left a TypeVar annotation:\n" + fixed)
+        status, output = run(["stubs", directory])
+        if status != 0:
+            raise ValueError("[Test] Fixed stub rejected:\n" + output)
+        # A second fix changes nothing
+        run(["fix", directory])
+        with open(path) as file:
+            if file.read() != fixed:
+                raise ValueError("[Test] fix should be idempotent")
+        with open(os.path.join(directory, "synthetic_stub_module.py"), "w") as file:
+            file.write(TYPEVAR_RUNTIME)
+        environment = dict(os.environ)
+        environment["MYPYPATH"] = directory
+        environment["PYTHONPATH"] = directory + os.pathsep + environment.get(
+            "PYTHONPATH", ""
+        )
+        status, output = run(
+            ["stubtest", "synthetic_stub_module", "--mypy-config-file", MYPY_CONFIG],
+            environment,
+        )
+        if status != 0:
+            raise ValueError("[Test] Fixed stub fails stubtest:\n" + output)
+    with tempfile.TemporaryDirectory() as directory:
+        status, output = run(["fix", directory])
+    if status == 0 or "no .pyi stub found" not in output:
+        raise ValueError("[Test] fix of an empty directory should fail:\n" + output)
+
+
 def test_real_binding_stubs():
     # The stubs of a real binding are accepted ...
     status, output = run(["modules", "opengeode_py_basic", "--mypy-config-file", MYPY_CONFIG])
@@ -340,5 +428,7 @@ if __name__ == "__main__":
     test_bind_vector_members_are_the_only_exception()
     test_explicit_allow()
     test_no_stub_found()
+    test_typevar_annotation_is_rejected()
+    test_fix_rewrites_typevars()
     test_stubtest_detects_a_wrong_stub()
     test_real_binding_stubs()

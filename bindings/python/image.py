@@ -21,3 +21,25 @@
 from opengeode_py_image import *
 
 OpenGeodeImageLibrary.initialize()
+
+# The registry of the generic functions (load, save, builder...) is in basic:
+# a sibling module in the wheel package, a top-level module in the build tree
+try:
+    from .basic import register_type as _register_type
+except ImportError:
+    from basic import register_type as _register_type
+
+
+for _dimension in ("1D", "2D", "3D"):
+    _module = globals()
+    _register_type(
+        _module["RasterImage" + _dimension],
+        load=_module["load_raster_image" + _dimension],
+        save=_module["save_raster_image" + _dimension],
+        is_loadable=_module["is_raster_image_loadable" + _dimension],
+        is_saveable=_module["is_raster_image_saveable" + _dimension],
+        input_extensions=_module["RasterImageInputFactory" + _dimension].list_creators,
+        output_extensions=_module["RasterImageOutputFactory" + _dimension].list_creators,
+        additional_files=_module["raster_image_additional_files" + _dimension],
+    )
+del _dimension, _module
