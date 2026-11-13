@@ -192,8 +192,8 @@ namespace
     {
         geode::LoggerManager::set_console_output( false );
         const auto initial_custom_messages = nb_custom_messages.load();
-        constexpr geode::index_t NB_THREADS{ 4 };
-        constexpr geode::index_t NB_MESSAGES{ 1000 };
+        static constexpr geode::index_t NB_THREADS{ 4 };
+        static constexpr geode::index_t NB_MESSAGES{ 1000 };
         std::vector< std::thread > threads;
         for( const auto thread_id : geode::Range{ NB_THREADS } )
         {
@@ -243,8 +243,8 @@ namespace
         geode::ProgressLoggerManager::register_client(
             std::make_unique< CountingProgressClient >() );
         geode::LoggerManager::set_console_output( false );
-        constexpr geode::index_t NB_THREADS{ 4 };
-        constexpr geode::index_t NB_PROGRESSES{ 200 };
+        static constexpr geode::index_t NB_THREADS{ 4 };
+        static constexpr geode::index_t NB_PROGRESSES{ 200 };
         std::vector< std::thread > threads;
         for( const auto thread_id : geode::Range{ NB_THREADS } )
         {
