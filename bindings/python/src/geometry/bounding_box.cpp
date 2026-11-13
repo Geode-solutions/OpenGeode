@@ -33,31 +33,56 @@
         "BoundingBox" + std::to_string( dimension ) + "D";                     \
     define_string_representation(                                              \
         pybind11::class_< BoundingBox##dimension##D >(                         \
-            module, name##dimension.c_str() ) )                                \
-        .def( pybind11::init<>() )                                             \
-        .def( "add_box", &BoundingBox##dimension##D::add_box )                 \
-        .def( "add_point", &BoundingBox##dimension##D::add_point )             \
-        .def( "extends", &BoundingBox##dimension##D::extends )                 \
+            module, name##dimension.c_str(), "Axis-aligned bounding box" ) )   \
+        .def( pybind11::init<>(), "Build an empty bounding box" )              \
+        .def( "add_box", &BoundingBox##dimension##D::add_box,                  \
+            pybind11::arg( "box" ),                                            \
+            "Extend the bounding box to contain the given box" )               \
+        .def( "add_point", &BoundingBox##dimension##D::add_point,              \
+            pybind11::arg( "point" ),                                          \
+            "Extend the bounding box to contain the given point" )             \
+        .def( "extends", &BoundingBox##dimension##D::extends,                  \
+            pybind11::arg( "length" ),                                         \
+            "Grow the bounding box by length in all the directions" )          \
         .def( "contains_point",                                                \
             static_cast< bool ( BoundingBox##dimension##D::* )(                \
                 const Point< dimension >& ) const >(                           \
-                &BoundingBox##dimension##D::contains ) )                       \
+                &BoundingBox##dimension##D::contains ),                        \
+            pybind11::arg( "point" ),                                          \
+            "Return True if the point is inside the bounding box" )            \
         .def( "contains_bbox",                                                 \
             static_cast< bool ( BoundingBox##dimension##D::* )(                \
                 const BoundingBox< dimension >& ) const >(                     \
-                &BoundingBox##dimension##D::contains ) )                       \
+                &BoundingBox##dimension##D::contains ),                        \
+            pybind11::arg( "bbox" ),                                           \
+            "Return True if the given box is inside the bounding box" )        \
         .def( "intersects_bounding_box",                                       \
             static_cast< bool ( BoundingBox##dimension##D::* )(                \
                 const BoundingBox< dimension >& ) const >(                     \
-                &BoundingBox##dimension##D::intersects ) )                     \
-        .def( "signed_distance", &BoundingBox##dimension##D::signed_distance ) \
-        .def( "min", &BoundingBox##dimension##D::min )                         \
-        .def( "max", &BoundingBox##dimension##D::max )                         \
-        .def( "center", &BoundingBox##dimension##D::center )                   \
-        .def( "diagonal", &BoundingBox##dimension##D::diagonal )               \
-        .def( "smallest_length", &BoundingBox##dimension##D::smallest_length ) \
-        .def( "largest_length", &BoundingBox##dimension##D::largest_length )   \
-        .def( "n_volume", &BoundingBox##dimension##D::n_volume )
+                &BoundingBox##dimension##D::intersects ),                      \
+            pybind11::arg( "bbox" ),                                           \
+            "Return True if the two bounding boxes intersect" )                \
+        .def( "signed_distance", &BoundingBox##dimension##D::signed_distance,  \
+            pybind11::arg( "point" ),                                          \
+            "Return the distance from the point to the bounding box, "         \
+            "negative if the point is inside" )                                \
+        .def( "min", &BoundingBox##dimension##D::min,                          \
+            "Return the corner with the smallest coordinates" )                \
+        .def( "max", &BoundingBox##dimension##D::max,                          \
+            "Return the corner with the largest coordinates" )                 \
+        .def( "center", &BoundingBox##dimension##D::center,                    \
+            "Return the center of the bounding box" )                          \
+        .def( "diagonal", &BoundingBox##dimension##D::diagonal,                \
+            "Return the vector from the min to the max corner" )               \
+        .def( "smallest_length", &BoundingBox##dimension##D::smallest_length,  \
+            "Return the axis and the length of the smallest side of the "      \
+            "bounding box" )                                                   \
+        .def( "largest_length", &BoundingBox##dimension##D::largest_length,    \
+            "Return the axis and the length of the largest side of the "       \
+            "bounding box" )                                                   \
+        .def( "n_volume", &BoundingBox##dimension##D::n_volume,                \
+            "Return the length (1D), area (2D) or volume (3D) of the "         \
+            "bounding box" )
 
 namespace geode
 {

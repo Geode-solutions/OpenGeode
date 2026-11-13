@@ -28,8 +28,8 @@
 #include <tuple>
 #include <utility>
 
-#include <pybind11/operators.h>
 #include <pybind11/native_enum.h>
+#include <pybind11/operators.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
@@ -116,8 +116,11 @@ namespace geode
     pybind11::class_< Class, Options... > define_string_representation(
         pybind11::class_< Class, Options... > python_class, Getter&& getter )
     {
-        python_class.def( "__str__", getter )
-            .def( "__repr__", std::forward< Getter >( getter ) );
+        python_class
+            .def( "__str__", getter,
+                "Return a readable description of the object" )
+            .def( "__repr__", std::forward< Getter >( getter ),
+                "Return a readable description of the object" );
         return python_class;
     }
 
@@ -125,9 +128,38 @@ namespace geode
     pybind11::class_< Class, Options... > define_string_representation(
         pybind11::class_< Class, Options... > python_class )
     {
-        python_class.def( "string", &Class::string );
+        python_class.def( "string", &Class::string,
+            "Return a readable description of the object" );
         return define_string_representation(
             std::move( python_class ), &Class::string );
+    }
+
+    /*!
+     * Same as pybind11::class_::def_readwrite, but the setter argument is
+     * called "value" instead of "arg0" in the Python signatures.
+     */
+    template < typename Class,
+        typename Member,
+        typename Owner,
+        typename... Options >
+    void def_readwrite_named(
+        pybind11::class_< Class, Options... >& python_class,
+        const char* name,
+        Member Owner::* member,
+        const char* doc )
+    {
+        const pybind11::cpp_function getter(
+            [member]( const Class& object ) -> const Member& {
+                return object.*member;
+            },
+            pybind11::is_method( python_class ) );
+        const pybind11::cpp_function setter(
+            [member]( Class& object, const Member& value ) {
+                object.*member = value;
+            },
+            pybind11::is_method( python_class ), pybind11::arg( "value" ) );
+        python_class.def_property( name, getter, setter,
+            pybind11::return_value_policy::reference_internal, doc );
     }
 
     /*!

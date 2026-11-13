@@ -28,6 +28,11 @@
 PYBIND11_MODULE( opengeode_py_gdal, module )
 {
     pybind11::add_ostream_redirect( module );
-    module.doc() = "OpenGeode Python binding for gdal";
-    module.def( "initialize_gdal", &GDALAllRegister );
+    module.doc() =
+        "GDAL support for OpenGeode: registering the GDAL drivers is "
+        "required before loading or saving raster images with the GDAL "
+        "formats";
+    module.def( "initialize_gdal", &GDALAllRegister,
+        "Register all the GDAL drivers: call it once before using GDAL "
+        "file formats" );
 }

@@ -30,12 +30,16 @@ namespace geode
     void define_uuid( pybind11::module& module )
     {
         define_string_representation(
-            pybind11::class_< uuid >( module, "uuid" ) )
-            .def( pybind11::init<>() )
-            .def( pybind11::init< std::string_view >() )
-            .def( pybind11::self == pybind11::self )
-            .def( pybind11::self != pybind11::self )
-            .def( pybind11::self < pybind11::self )
+            pybind11::class_< uuid >(
+                module, "uuid", "Universally unique identifier of an object" ) )
+            .def( pybind11::init<>(), "Generate a new random uuid" )
+            .def( pybind11::init< std::string_view >(),
+                pybind11::arg( "string" ),
+                "Build a uuid from its string representation. Raise an "
+                "error if the string is not a valid uuid" )
+            .def( pybind11::self == pybind11::self, pybind11::arg( "other" ) )
+            .def( pybind11::self != pybind11::self, pybind11::arg( "other" ) )
+            .def( pybind11::self < pybind11::self, pybind11::arg( "other" ) )
             .def( "__hash__", []( const uuid& id ) {
                 return std::hash< uuid >{}( id );
             } );

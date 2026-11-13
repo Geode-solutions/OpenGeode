@@ -295,8 +295,12 @@ namespace geode
     {
         pybind11::class_< Logger,
             std::unique_ptr< Logger, pybind11::nodelete > >
-            logger( module, "Logger" );
-        pybind11::native_enum< Logger::LEVEL >( logger, "LEVEL", "enum.Enum" )
+            logger( module, "Logger",
+                "Static logging functions: messages are sent to the "
+                "registered clients (console by default) when their level is "
+                "enabled" );
+        pybind11::native_enum< Logger::LEVEL >(
+            logger, "LEVEL", "enum.Enum", "Severity of a log message" )
             .value( "trace", Logger::LEVEL::trace )
             .value( "debug", Logger::LEVEL::debug )
             .value( "info", Logger::LEVEL::info )
@@ -305,30 +309,42 @@ namespace geode
             .value( "critical", Logger::LEVEL::critical )
             .value( "off", Logger::LEVEL::off )
             .finalize();
-        logger.def_static( "level", &Logger::level, "Current logging level" )
+        logger
+            .def_static( "level", &Logger::level,
+                "Return the current minimum level of the displayed messages" )
             .def_static( "set_level", &Logger::set_level,
                 pybind11::arg( "level" ),
                 "Set the minimum level of the messages to display, e.g. "
                 "Logger.set_level(Logger.LEVEL.warning) to hide info "
                 "messages" )
-            .def_static(
-                "is_enabled", &Logger::is_enabled, pybind11::arg( "level" ) )
+            .def_static( "is_enabled", &Logger::is_enabled,
+                pybind11::arg( "level" ),
+                "Return True if the messages of the given level are "
+                "displayed" )
             .def_static( "trace", &Logger::trace< std::string >,
-                pybind11::arg( "message" ) )
+                pybind11::arg( "message" ),
+                "Log a message with the trace level" )
             .def_static( "debug", &Logger::debug< std::string >,
-                pybind11::arg( "message" ) )
+                pybind11::arg( "message" ),
+                "Log a message with the debug level" )
             .def_static( "info", &Logger::info< std::string >,
-                pybind11::arg( "message" ) )
+                pybind11::arg( "message" ),
+                "Log a message with the info level" )
             .def_static( "warning", &Logger::warning< std::string >,
-                pybind11::arg( "message" ) )
+                pybind11::arg( "message" ),
+                "Log a message with the warning level" )
             .def_static( "error", &Logger::error< std::string >,
-                pybind11::arg( "message" ) )
+                pybind11::arg( "message" ),
+                "Log a message with the error level" )
             .def_static( "critical", &Logger::critical< std::string >,
-                pybind11::arg( "message" ) )
+                pybind11::arg( "message" ),
+                "Log a message with the critical level" )
             .def_static( "_set_console_output",
-                &LoggerManager::set_console_output, pybind11::arg( "enabled" ) )
+                &LoggerManager::set_console_output, pybind11::arg( "enabled" ),
+                "Internal: enable or disable the console output" )
             .def_static( "_is_console_output_enabled",
-                &LoggerManager::is_console_output_enabled )
+                &LoggerManager::is_console_output_enabled,
+                "Internal: return True if the console output is enabled" )
             .def_static(
                 "_set_bridge",
                 []( bool forward_logs, bool forward_progress ) {
@@ -378,29 +394,41 @@ namespace geode
                 "Wait up to timeout seconds, without the GIL, for log and "
                 "progress events and return them" );
 
-        pybind11::class_< ProgressLogger >( module, "ProgressLogger" )
+        pybind11::class_< ProgressLogger >( module, "ProgressLogger",
+            "Report the progress of a long task to the registered clients" )
             .def(
                 pybind11::init< Logger::LEVEL, const std::string&, index_t >(),
                 pybind11::arg( "level" ), pybind11::arg( "message" ),
-                pybind11::arg( "nb_steps" ) )
-            .def( "increment", static_cast< index_t ( ProgressLogger::* )() >(
-                                   &ProgressLogger::increment ) )
+                pybind11::arg( "nb_steps" ),
+                "Start a progress of nb_steps steps described by message" )
+            .def( "increment",
+                static_cast< index_t ( ProgressLogger::* )() >(
+                    &ProgressLogger::increment ),
+                "Advance the progress by one step and return the current "
+                "step" )
             .def( "increment",
                 static_cast< index_t ( ProgressLogger::* )( index_t ) >(
                     &ProgressLogger::increment ),
-                pybind11::arg( "nb_increments" ) )
+                pybind11::arg( "nb_increments" ),
+                "Advance the progress by nb_increments steps and return the "
+                "current step" )
             .def( "increment_nb_steps",
                 static_cast< index_t ( ProgressLogger::* )() >(
-                    &ProgressLogger::increment_nb_steps ) )
+                    &ProgressLogger::increment_nb_steps ),
+                "Add one step to the total number of steps and return it" )
             .def( "increment_nb_steps",
                 static_cast< index_t ( ProgressLogger::* )( index_t ) >(
                     &ProgressLogger::increment_nb_steps ),
-                pybind11::arg( "nb_steps" ) )
+                pybind11::arg( "nb_steps" ),
+                "Add nb_steps steps to the total number of steps and return "
+                "it" )
             .def(
                 "set_refresh_interval",
                 []( ProgressLogger& progress, double seconds ) {
                     progress.set_refresh_interval( absl::Seconds( seconds ) );
                 },
-                pybind11::arg( "seconds" ) );
+                pybind11::arg( "seconds" ),
+                "Set the minimum duration in seconds between two progress "
+                "updates sent to the clients" );
     }
 } // namespace geode

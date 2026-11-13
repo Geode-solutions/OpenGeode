@@ -23,15 +23,17 @@ import collections as _collections
 import logging as _logging
 import threading as _threading
 import traceback as _traceback
+import typing as _typing
 
 from opengeode_py_basic import *
 OpenGeodeBasicLibrary.initialize()
 
 
-def load_one(objects, filename):
-    """Extract the single object loaded from a file.
+def load_one(objects: list, filename: str) -> _typing.Any:
+    """Return the only object of the list given by a load_* function.
 
-    Raise a RuntimeError if the file does not hold exactly one object.
+    filename is only used in the error message. Raise a RuntimeError if the
+    list does not hold exactly one object.
     """
     if len(objects) != 1:
         raise RuntimeError(
@@ -175,26 +177,26 @@ class _LogBridge:
 _log_bridge = _LogBridge()
 
 
-def _forward_to_python(logger_name="opengeode"):
+def _forward_to_python(logger_name: str = "opengeode") -> None:
     """Send the OpenGeode messages to logging.getLogger(logger_name) instead
     of the console. OpenGeode levels map to the logging ones, trace being
     TRACE (5). Calling it again only changes the target logger."""
     _log_bridge.forward(logger_name)
 
 
-def _stop_forwarding():
+def _stop_forwarding() -> None:
     """Stop sending the OpenGeode messages to Python and restore the console
     output. Does nothing if the messages are not forwarded."""
     _log_bridge.stop_forwarding()
 
 
-def _add_listener(listener):
+def _add_listener(listener: _typing.Callable[[ProgressEvent], None]) -> None:
     """Call listener(ProgressEvent) for each progress event, from a Python
     daemon thread. Adding the same listener twice has no effect."""
     _log_bridge.add_listener(listener)
 
 
-def _remove_listener(listener):
+def _remove_listener(listener: _typing.Callable[[ProgressEvent], None]) -> None:
     """Stop calling listener. Does nothing if it is not a listener."""
     _log_bridge.remove_listener(listener)
 

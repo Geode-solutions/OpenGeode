@@ -27,16 +27,23 @@
 
 #define PYTHON_VECTOR( dimension )                                             \
     const auto name##dimension = "Vector" + std::to_string( dimension ) + "D"; \
-    pybind11::class_< Vector##dimension##D, Point##dimension##D >(             \
-        module, name##dimension.c_str() )                                      \
-        .def( pybind11::init<>() )                                             \
-        .def( pybind11::init< std::array< double, dimension > >() )            \
+    pybind11::class_< Vector##dimension##D, Point##dimension##D >( module,     \
+        name##dimension.c_str(), "Vector of the space, derived from Point" )   \
+        .def( pybind11::init<>(), "Build a null vector" )                      \
+        .def( pybind11::init< std::array< double, dimension > >(),             \
+            pybind11::arg( "values" ), "Build a vector from its coordinates" ) \
         .def( pybind11::init< const Point##dimension##D&,                      \
-            const Point##dimension##D& >() )                                   \
-        .def( "length", &Vector##dimension##D::length )                        \
-        .def( "length2", &Vector##dimension##D::length2 )                      \
-        .def( "normalize", &Vector##dimension##D::normalize )                  \
-        .def( "dot", &Vector##dimension##D::dot )
+                  const Point##dimension##D& >(),                              \
+            pybind11::arg( "from_point" ), pybind11::arg( "to_point" ),        \
+            "Build the vector going from the first point to the second one" )  \
+        .def( "length", &Vector##dimension##D::length,                         \
+            "Return the length of the vector" )                                \
+        .def( "length2", &Vector##dimension##D::length2,                       \
+            "Return the squared length of the vector" )                        \
+        .def( "normalize", &Vector##dimension##D::normalize,                   \
+            "Return the vector divided by its length" )                        \
+        .def( "dot", &Vector##dimension##D::dot, pybind11::arg( "other" ),     \
+            "Return the dot product with the other vector" )
 
 namespace geode
 {
@@ -44,6 +51,8 @@ namespace geode
     {
         PYTHON_VECTOR( 1 );
         PYTHON_VECTOR( 2 );
-        PYTHON_VECTOR( 3 ).def( "cross", &Vector3D::cross );
+        PYTHON_VECTOR( 3 ).def( "cross", &Vector3D::cross,
+            pybind11::arg( "other" ),
+            "Return the cross product with the other vector" );
     }
 } // namespace geode

@@ -31,19 +31,29 @@
     const auto triangle_angle_based_quality##dimension =                       \
         "triangle_angle_based_quality" + std::to_string( dimension ) + "D";    \
     module.def( triangle_angle_based_quality##dimension.c_str(),               \
-        &triangle_angle_based_quality< dimension > )
+        &triangle_angle_based_quality< dimension >,                            \
+        pybind11::arg( "triangle" ),                                           \
+        "Return a quality measure of a triangle based on its angles" )
 
 namespace geode
 {
     void define_quality( pybind11::module& module )
     {
-        module.def( "tetrahedron_aspect_ratio", &tetrahedron_aspect_ratio );
+        module.def( "tetrahedron_aspect_ratio", &tetrahedron_aspect_ratio,
+            pybind11::arg( "tetra" ),
+            "Return the aspect ratio of a tetrahedron (quality measure)" );
         module.def( "tetrahedron_volume_to_edge_ratio",
-            &tetrahedron_volume_to_edge_ratio );
+            &tetrahedron_volume_to_edge_ratio, pybind11::arg( "tetra" ),
+            "Return the volume to edge ratio of a tetrahedron (quality "
+            "measure)" );
         module.def( "tetrahedron_volume_to_facet_ratio",
-            &tetrahedron_volume_to_facet_ratio );
+            &tetrahedron_volume_to_facet_ratio, pybind11::arg( "tetra" ),
+            "Return the volume to facet ratio of a tetrahedron (quality "
+            "measure)" );
         module.def( "tetrahedron_collapse_aspect_ratio",
-            &tetrahedron_collapse_aspect_ratio );
+            &tetrahedron_collapse_aspect_ratio, pybind11::arg( "tetra" ),
+            "Return the collapse aspect ratio of a tetrahedron (quality "
+            "measure)" );
         PYTHON_TRIANGLE_QUALITY( 2 );
         PYTHON_TRIANGLE_QUALITY( 3 );
     }

@@ -30,24 +30,34 @@ namespace geode
     void define_rgb_color( pybind11::module& module )
     {
         define_string_representation(
-            pybind11::class_< RGBColor >( module, "RGBColor" ) )
-            .def( pybind11::init<>() )
-            .def( pybind11::init< local_index_t, local_index_t,
-                local_index_t >() )
-            .def( "red", &RGBColor::red )
-            .def( "green", &RGBColor::green )
-            .def( "blue", &RGBColor::blue )
-            .def( "set_red", &RGBColor::set_red )
-            .def( "set_green", &RGBColor::set_green )
-            .def( "set_blue", &RGBColor::set_blue )
-            .def( pybind11::self == pybind11::self )
-            .def( pybind11::self != pybind11::self )
+            pybind11::class_< RGBColor >( module, "RGBColor",
+                "Color of a pixel given by its red, green and blue levels, "
+                "between 0 and 255" ) )
+            .def( pybind11::init<>(), "Build a black color" )
+            .def(
+                pybind11::init< local_index_t, local_index_t, local_index_t >(),
+                pybind11::arg( "red" ), pybind11::arg( "green" ),
+                pybind11::arg( "blue" ),
+                "Build a color from its red, green and blue levels (0 to 255)" )
+            .def( "red", &RGBColor::red, "Return the red level (0 to 255)" )
+            .def(
+                "green", &RGBColor::green, "Return the green level (0 to 255)" )
+            .def( "blue", &RGBColor::blue, "Return the blue level (0 to 255)" )
+            .def( "set_red", &RGBColor::set_red, pybind11::arg( "red_scale" ),
+                "Set the red level (0 to 255)" )
+            .def( "set_green", &RGBColor::set_green,
+                pybind11::arg( "green_scale" ),
+                "Set the green level (0 to 255)" )
+            .def( "set_blue", &RGBColor::set_blue,
+                pybind11::arg( "blue_scale" ), "Set the blue level (0 to 255)" )
+            .def( pybind11::self == pybind11::self, pybind11::arg( "other" ) )
+            .def( pybind11::self != pybind11::self, pybind11::arg( "other" ) )
             .def( "__hash__",
                 []( const RGBColor& value ) {
                     return absl::HashOf(
                         value.red(), value.green(), value.blue() );
                 } )
-            .def( pybind11::self + pybind11::self )
-            .def( pybind11::self += pybind11::self );
+            .def( pybind11::self + pybind11::self, pybind11::arg( "other" ) )
+            .def( pybind11::self += pybind11::self, pybind11::arg( "other" ) );
     }
 } // namespace geode

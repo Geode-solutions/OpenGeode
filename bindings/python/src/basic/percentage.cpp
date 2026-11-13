@@ -30,9 +30,12 @@ namespace geode
     void define_percentage( pybind11::module& module )
     {
         define_string_representation(
-            pybind11::class_< Percentage >( module, "Percentage" ) )
-            .def( pybind11::init< double >() )
-            .def( "value", &Percentage::value )
-            .def( "set_value", &Percentage::set_value );
+            pybind11::class_< Percentage >( module, "Percentage",
+                "Ratio between 0 and 1 (e.g. how well a file can be loaded)" ) )
+            .def( pybind11::init< double >(), pybind11::arg( "value" ),
+                "Build a percentage from a value in [0, 1]" )
+            .def( "value", &Percentage::value, "Return the value in [0, 1]" )
+            .def( "set_value", &Percentage::set_value, pybind11::arg( "value" ),
+                "Set the value, in [0, 1]" );
     }
 } // namespace geode

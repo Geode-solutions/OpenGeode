@@ -44,13 +44,20 @@ namespace geode
 PYBIND11_MODULE( opengeode_py_basic, module )
 {
     pybind11::add_ostream_redirect( module );
-    module.doc() = "OpenGeode Python binding for basic";
+    module.doc() =
+        "Basic building blocks of OpenGeode: uuid and identifiers, "
+        "attributes (AttributeManager, constant/variable/sparse attributes "
+        "and time series), mappings, cell arrays, additional files, "
+        "logging (Logger, ProgressLogger), the OpenGeode exceptions and the "
+        "constants NO_ID, NO_LID and GLOBAL_EPSILON";
     module.attr( "NO_ID" ) = geode::NO_ID;
     module.attr( "NO_LID" ) = geode::NO_LID;
     module.attr( "GLOBAL_EPSILON" ) = geode::GLOBAL_EPSILON;
-    pybind11::class_< geode::OpenGeodeBasicLibrary >(
-        module, "OpenGeodeBasicLibrary" )
-        .def_static( "initialize", &geode::OpenGeodeBasicLibrary::initialize );
+    pybind11::class_< geode::OpenGeodeBasicLibrary >( module,
+        "OpenGeodeBasicLibrary",
+        "Initialization of the OpenGeode basic library" )
+        .def_static( "initialize", &geode::OpenGeodeBasicLibrary::initialize,
+            "Initialize the library: must be called once before using it" );
     geode::define_exception( module );
     geode::define_cell_array( module );
     geode::define_uuid( module );

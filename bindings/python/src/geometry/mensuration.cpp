@@ -30,7 +30,8 @@
 #define PYTHON_MENSURATION( dimension )                                        \
     const auto triangle_area##dimension =                                      \
         "triangle_area" + std::to_string( dimension ) + "D";                   \
-    module.def( triangle_area##dimension.c_str(), &triangle_area< dimension > )
+    module.def( triangle_area##dimension.c_str(), &triangle_area< dimension >, \
+        pybind11::arg( "triangle" ), "Return the area of a triangle" )
 
 namespace geode
 {
@@ -40,11 +41,20 @@ namespace geode
         PYTHON_MENSURATION( 3 );
         module.def( "triangle_signed_area2D",
             static_cast< double ( * )( const Triangle2D& ) >(
-                &triangle_signed_area ) );
+                &triangle_signed_area ),
+            pybind11::arg( "triangle" ),
+            "Return the signed area of a 2D triangle: positive if its vertices "
+            "are counter-clockwise" );
         module.def( "triangle_signed_area3D",
             static_cast< double ( * )( const Triangle3D&, const Vector3D& ) >(
-                &triangle_signed_area ) );
-        module.def( "tetrahedron_signed_volume", &tetrahedron_signed_volume );
-        module.def( "tetrahedron_volume", &tetrahedron_volume );
+                &triangle_signed_area ),
+            pybind11::arg( "triangle" ), pybind11::arg( "direction" ),
+            "Return the signed area of a 3D triangle, the sign being given by "
+            "the orientation of its normal relative to direction" );
+        module.def( "tetrahedron_signed_volume", &tetrahedron_signed_volume,
+            pybind11::arg( "tetra" ),
+            "Return the signed volume of a tetrahedron" );
+        module.def( "tetrahedron_volume", &tetrahedron_volume,
+            pybind11::arg( "tetra" ), "Return the volume of a tetrahedron" );
     }
 } // namespace geode

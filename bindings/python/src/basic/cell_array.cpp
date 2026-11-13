@@ -30,13 +30,20 @@
     const auto name##dimension =                                               \
         "CellArray" + std::to_string( dimension ) + "D";                       \
     pybind11::class_< CellArray##dimension##D, pybind11::smart_holder >(       \
-        module, name##dimension.c_str() )                                      \
-        .def(                                                                  \
-            "nb_cell_neighbors", &CellArray##dimension##D::nb_cell_neighbors ) \
-        .def( "nb_cells", &CellArray##dimension##D::nb_cells )                 \
+        module, name##dimension.c_str(),                                       \
+        "Regular array of cells indexed by one integer per direction, "        \
+        "also numbered by a single cell index" )                               \
+        .def( "nb_cell_neighbors",                                             \
+            &CellArray##dimension##D::nb_cell_neighbors,                       \
+            "Return the maximum number of neighbors of a cell" )               \
+        .def( "nb_cells", &CellArray##dimension##D::nb_cells,                  \
+            "Return the total number of cells" )                               \
         .def( "nb_cells_in_direction",                                         \
-            &CellArray##dimension##D::nb_cells_in_direction )                  \
-        .def( "cell_index",                                                    \
+            &CellArray##dimension##D::nb_cells_in_direction,                   \
+            pybind11::arg( "direction" ),                                      \
+            "Return the number of cells in the given direction" )              \
+        .def(                                                                  \
+            "cell_index",                                                      \
             []( const CellArray##dimension##D& array,                          \
                 const CellArray##dimension##D::CellIndices& index ) {          \
                 for( const auto d : LRange{ dimension } )                      \
@@ -48,19 +55,34 @@
                         " in direction ", d );                                 \
                 }                                                              \
                 return array.cell_index( index );                              \
-            } )                                                                \
-        .def( "cell_indices",                                                  \
+            },                                                                 \
+            pybind11::arg( "index" ),                                          \
+            "Return the cell index of the cell with the given indices (one "   \
+            "per direction). Raise an error if one is out of range" )          \
+        .def(                                                                  \
+            "cell_indices",                                                    \
             []( const CellArray##dimension##D& array, index_t index ) {        \
                 OpenGeodeBasicException::check_exception(                      \
                     index < array.nb_cells(), nullptr,                         \
                     OpenGeodeException::TYPE::data,                            \
                     "[CellArray::cell_indices] Invalid index ", index );       \
                 return array.cell_indices( index );                            \
-            } )                                                                \
-        .def( "next_cell", &CellArray##dimension##D::next_cell )               \
-        .def( "previous_cell", &CellArray##dimension##D::previous_cell )       \
-        .def(                                                                  \
-            "is_cell_on_border", &CellArray##dimension##D::is_cell_on_border )
+            },                                                                 \
+            pybind11::arg( "index" ),                                          \
+            "Return the indices (one per direction) of the cell with the "     \
+            "given cell index. Raise an error if it is out of range" )         \
+        .def( "next_cell", &CellArray##dimension##D::next_cell,                \
+            pybind11::arg( "index" ), pybind11::arg( "direction" ),            \
+            "Return the indices of the next cell in the direction, or None "   \
+            "if there is none" )                                               \
+        .def( "previous_cell", &CellArray##dimension##D::previous_cell,        \
+            pybind11::arg( "index" ), pybind11::arg( "direction" ),            \
+            "Return the indices of the previous cell in the direction, or "    \
+            "None if there is none" )                                          \
+        .def( "is_cell_on_border",                                             \
+            &CellArray##dimension##D::is_cell_on_border,                       \
+            pybind11::arg( "cell_indices" ),                                   \
+            "Return True if the cell is on the border of the array" )
 
 namespace geode
 {

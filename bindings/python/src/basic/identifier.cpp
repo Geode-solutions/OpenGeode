@@ -31,8 +31,9 @@ namespace geode
     void define_identifier( pybind11::module& module )
     {
         pybind11::class_< Identifier, pybind11::smart_holder >(
-            module, "Identifier" )
-            .def( "id", &Identifier::id )
-            .def( "name", &Identifier::name );
+            module, "Identifier", "Unique id and optional name of an object" )
+            .def( "id", &Identifier::id, "Return the uuid of the object" )
+            .def( "name", &Identifier::name,
+                "Return the name of the object, or None if it has none" );
     }
 } // namespace geode

@@ -30,23 +30,37 @@
     const auto name##dimension =                                               \
         "RasterImage" + std::to_string( dimension ) + "D";                     \
     pybind11::class_< RasterImage##dimension##D, CellArray##dimension##D,      \
-        Identifier, pybind11::smart_holder >(                                  \
-        module, name##dimension.c_str() )                                      \
-        .def( pybind11::init< std::array< index_t, dimension > >() )           \
+        Identifier, pybind11::smart_holder >( module, name##dimension.c_str(), \
+        "Regular grid of colored cells (pixels or voxels)" )                   \
+        .def( pybind11::init< std::array< index_t, dimension > >(),            \
+            pybind11::arg( "cells_number" ),                                   \
+            "Build a raster image with the given number of cells in each "     \
+            "direction" )                                                      \
+        .def( "native_extension",                                              \
+            &RasterImage##dimension##D::native_extension,                      \
+            "Return the extension of the native OpenGeode file format of the " \
+            "raster image" )                                                   \
         .def(                                                                  \
-            "native_extension", &RasterImage##dimension##D::native_extension ) \
-        .def( "color",                                                         \
+            "color",                                                           \
             []( const RasterImage##dimension##D& raster, index_t index ) {     \
                 check_raster_cell( raster, index );                            \
                 return raster.color( index );                                  \
-            } )                                                                \
-        .def( "set_color",                                                     \
+            },                                                                 \
+            pybind11::arg( "index" ),                                          \
+            "Return the color of the cell with the given cell index. Raise "   \
+            "an error if the index is out of range" )                          \
+        .def(                                                                  \
+            "set_color",                                                       \
             []( RasterImage##dimension##D& raster, index_t index,              \
                 RGBColor color ) {                                             \
                 check_raster_cell( raster, index );                            \
                 raster.set_color( index, std::move( color ) );                 \
-            } )                                                                \
-        .def( "clone", &RasterImage##dimension##D::clone )
+            },                                                                 \
+            pybind11::arg( "index" ), pybind11::arg( "color" ),                \
+            "Set the color of the cell with the given cell index. Raise an "   \
+            "error if the index is out of range" )                             \
+        .def( "clone", &RasterImage##dimension##D::clone,                      \
+            "Return a copy of the raster image" )
 
 namespace geode
 {

@@ -54,3 +54,18 @@ add_geode_python_test(
     DEPENDENCIES
         ${PROJECT_NAME}::py_basic
 )
+add_geode_python_test(
+    SOURCE "test-py-signatures.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_geometry
+        ${PROJECT_NAME}::py_image
+        ${PROJECT_NAME}::py_gdal
+)
+add_geode_python_test(
+    SOURCE "test-py-keyword-arguments.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_geometry
+        ${PROJECT_NAME}::py_image
+)
