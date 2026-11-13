@@ -48,8 +48,9 @@ not look for the shared libraries in the binary folder (rpath).
 
 requirements: merges the requirements files of the project and of the geode
 projects it depends on into one file for pip, without the distributions of the
-geode projects found by CMake (--geode): they must match the local build chain,
-see install-geode. The removed ones are written to the geode output file, one
+geode projects found by CMake (--geode) nor any other geode distribution
+(opengeode-*, geode-*: a C++ package without python_distribution.txt): they must
+match the C++ packages of the build, see install-geode; never installed unpinned. The removed ones are written to the geode output file, one
 normalized name per line.
 
 installed: prints the given distributions installed in this Python.
@@ -91,8 +92,11 @@ SUBFOLDER_MODULE = re.compile(r"\b[A-Za-z_]\w*\.(?:lib|lib32|lib64|bin)\.[A-Za-z
 REQUIREMENT_NAME = re.compile(r"^\s*([A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?)")
 # A comment of a requirements file (a # in a URL is not one)
 COMMENT = re.compile(r"(?:^|\s)#.*")
-# Version of a released C++ package: 1.2.3 or 1.2.3-rc.4
-PACKAGE_VERSION = re.compile(r"^v?(\d+\.\d+\.\d+)(?:-rc\.(\d+))?$")
+# Version of a released C++ package: 1.2.3, 1.2.3-rc.4 or 1.2.3rc4
+# Distributions of the geode projects, also when CMake found no
+# python_distribution.txt for them (older C++ packages)
+GEODE_DISTRIBUTION = re.compile(r"^(?:open)?geode-")
+PACKAGE_VERSION = re.compile(r"^v?(\d+\.\d+\.\d+)(?:-rc\.(\d+)|rc(\d+))?$")
 # rpath entries of an ELF file (readelf -d) and of a Mach-O file (otool -l)
 ELF_RPATH = re.compile(r"\((?:RPATH|RUNPATH)\)[^\[]*\[([^\]]*)\]")
 MACHO_RPATH = re.compile(r"^\s*path (\S+) \(offset \d+\)", re.MULTILINE)
@@ -109,8 +113,9 @@ def python_version(version):
     match = PACKAGE_VERSION.match(version or "")
     if not match or match.group(1) == "0.0.0":
         return None
-    if match.group(2):
-        return "%src%s" % (match.group(1), match.group(2))
+    candidate = match.group(2) or match.group(3)
+    if candidate:
+        return "%src%s" % (match.group(1), candidate)
     return match.group(1)
 
 
@@ -264,7 +269,10 @@ def run_requirements(files, output, geode_output, geode_distributions):
                 if not line:
                     continue
                 match = REQUIREMENT_NAME.match(line)
-                if match and normalize(match.group(1)) in geode_names:
+                if match and (
+                    normalize(match.group(1)) in geode_names
+                    or GEODE_DISTRIBUTION.match(normalize(match.group(1)))
+                ):
                     name = normalize(match.group(1))
                     if name not in geode:
                         geode.append(name)
@@ -277,6 +285,7 @@ def run_requirements(files, output, geode_output, geode_distributions):
             with open(path, encoding="utf-8") as file:
                 previous = file.read()
         if previous != text:
+            os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
             with open(path, "w", encoding="utf-8") as file:
                 file.write(text)
     return 0

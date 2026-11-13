@@ -82,6 +82,10 @@ add_geode_python_test(
         "${PROJECT_BINARY_DIR}/python_geode_requirements.txt"
 )
 add_geode_python_test(
+    SOURCE "test-py-python-environments.py"
+    ARGUMENTS "${CMAKE_COMMAND}" "${PROJECT_SOURCE_DIR}/cmake/PythonTargets.cmake"
+)
+add_geode_python_test(
     SOURCE "test-py-signatures.py"
     DEPENDENCIES
         ${PROJECT_NAME}::py_basic

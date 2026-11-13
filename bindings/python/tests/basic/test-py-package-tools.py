@@ -300,24 +300,36 @@ def test_requirements():
             "numpy>=2",
             "pygeode-like",
             "mygeode-tools==1",
-            "geode-not-found-by-cmake>=2",
             "requests @ https://example.com/requests.whl#sha256=abc",
         ],
         "kept requirements: %s" % kept,
     )
     expect(
-        geode == ["opengeode-core", "opengeode-io", "geode-common", "geode-simplex"],
+        geode
+        == [
+            "opengeode-core",
+            "opengeode-io",
+            "geode-common",
+            "geode-simplex",
+            "geode-not-found-by-cmake",
+        ],
         "geode requirements: %s" % geode,
     )
 
 
 def test_requirements_exact_names():
-    # Only the distributions of the projects found by CMake are removed
+    # The distributions of the projects found by CMake are removed by exact
+    # name, whatever their name; the geode ones of projects without
+    # python_distribution.txt too: never installed unpinned from the index
     kept, geode = requirements(
-        "OpenGeode-core\nOpenGeode-IO\n", geode_distributions=["OpenGeode_core"]
+        "OpenGeode-core\nOpenGeode-IO\nmy-chain-package\nnumpy\n",
+        geode_distributions=["OpenGeode_core", "My.Chain_Package"],
     )
-    expect(kept == ["OpenGeode-IO"], "kept: %s" % kept)
-    expect(geode == ["opengeode-core"], "geode: %s" % geode)
+    expect(kept == ["numpy"], "kept: %s" % kept)
+    expect(
+        geode == ["opengeode-core", "opengeode-io", "my-chain-package"],
+        "geode: %s" % geode,
+    )
 
 
 def test_requirements_empty():
@@ -442,7 +454,13 @@ def test_install_geode_preinstalled():
     with tempfile.TemporaryDirectory() as directory:
         site = fake_installed(os.path.join(directory, "site"), "OpenGeode-core", "15.2.0rc3")
         upstream = os.path.join(directory, "OpenGeode")
-        for version, warned in (("unknown", False), ("0.0.0", False), ("15.2.0-rc.3", False), ("15.2.0", True)):
+        for version, warned in (
+            ("unknown", False),
+            ("0.0.0", False),
+            ("15.2.0-rc.3", False),
+            ("15.2.0rc3", False),
+            ("15.2.0", True),
+        ):
             status, output = install_geode(
                 package("OpenGeode-core", version, upstream) + ["--dry-run"],
                 extra_paths=[site],
