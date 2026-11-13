@@ -26,12 +26,12 @@ import opengeode_py_basic as basic
 if __name__ == '__main__':
     Logger = basic.Logger
     initial_level = Logger.level()
-    Logger.set_level(Logger.LEVEL.warning)
-    if Logger.level() != Logger.LEVEL.warning:
+    Logger.set_level(Logger.Level.warning)
+    if Logger.level() != Logger.Level.warning:
         raise ValueError("[Test] Logger level should be warning")
-    if Logger.is_enabled(Logger.LEVEL.info):
+    if Logger.is_enabled(Logger.Level.info):
         raise ValueError("[Test] Info level should be disabled")
-    if not Logger.is_enabled(Logger.LEVEL.error):
+    if not Logger.is_enabled(Logger.Level.error):
         raise ValueError("[Test] Error level should be enabled")
     Logger.info("This message should not be displayed")
     Logger.warning("Logger test warning")

@@ -34,15 +34,6 @@ namespace geode
 {
     void define_model_ray_tracing( pybind11::module& module )
     {
-        pybind11::native_enum< RayTracingResult::POSITION >( module, "POSITION",
-            "enum.Enum",
-            "Position of a point relative to a block: outside, inside or "
-            "on_border (on one of its boundary surfaces)" )
-            .value( "outside", RayTracingResult::POSITION::outside )
-            .value( "inside", RayTracingResult::POSITION::inside )
-            .value( "on_border", RayTracingResult::POSITION::on_border )
-            .finalize();
-
         auto cls_RayTracingResult =
             pybind11::class_< RayTracingResult >( module, "RayTracingResult",
                 "Result of a point-in-block query: its position is outside, "
@@ -51,9 +42,18 @@ namespace geode
                 .def( pybind11::init<>(),
                     "Build a result whose position is outside" )
                 .def( "__bool__", &RayTracingResult::operator bool );
+        pybind11::native_enum< RayTracingResult::POSITION >(
+            cls_RayTracingResult, "Position", "enum.Enum",
+            "Position of a point relative to a block: outside, inside or "
+            "on_border (on one of its boundary surfaces)" )
+            .value( "outside", RayTracingResult::POSITION::outside )
+            .value( "inside", RayTracingResult::POSITION::inside )
+            .value( "on_border", RayTracingResult::POSITION::on_border )
+            .finalize();
+
         def_readwrite_named( cls_RayTracingResult, "position",
             &RayTracingResult::position,
-            "POSITION of the point relative to the block: outside, inside or "
+            "Position of the point relative to the block: outside, inside or "
             "on_border" );
 
         pybind11::class_< BRepRayTracing >( module, "BRepRayTracing",

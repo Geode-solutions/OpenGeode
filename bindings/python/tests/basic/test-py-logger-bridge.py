@@ -70,7 +70,7 @@ def check_log_forwarding(Logger):
     if Logger._is_console_output_enabled():
         raise ValueError("[Test] Console output should be disabled when forwarding")
     initial_level = Logger.level()
-    Logger.set_level(Logger.LEVEL.trace)
+    Logger.set_level(Logger.Level.trace)
     Logger.trace("bridge trace")
     Logger.debug("bridge debug")
     Logger.info("bridge info")
@@ -129,7 +129,7 @@ def check_concurrent_logging(Logger, handler):
 def check_cpp_worker_threads(Logger, handler):
     nb_threads = 4
     nb_messages = 100
-    Logger._log_from_threads(Logger.LEVEL.warning, "worker", nb_threads, nb_messages)
+    Logger._log_from_threads(Logger.Level.warning, "worker", nb_threads, nb_messages)
     for thread_id in range(nb_threads):
         handler.wait_for(f"worker {thread_id} {nb_messages - 1}")
     messages = set(handler.messages())
@@ -162,7 +162,7 @@ def check_progress_listener(Logger):
 
     ProgressLogger.add_listener(listener)
     ProgressLogger.add_listener(listener)
-    progress = ProgressLogger(Logger.LEVEL.info, "bridge progress", 2)
+    progress = ProgressLogger(Logger.Level.info, "bridge progress", 2)
     progress.set_refresh_interval(0)
     # The first update is sent at least one second after the start
     time.sleep(1.1)
@@ -174,18 +174,18 @@ def check_progress_listener(Logger):
     )
     if completed[0].nb_steps != 2 or completed[2].current_step != 2:
         raise ValueError("[Test] Wrong progress steps")
-    if completed[0].level != Logger.LEVEL.info:
+    if completed[0].level != Logger.Level.info:
         raise ValueError("[Test] Wrong progress level")
     if len({event.id for event in completed}) != 1:
         raise ValueError("[Test] Progress events should share the same id")
 
-    failed = ProgressLogger(Logger.LEVEL.info, "bridge failed progress", 2)
+    failed = ProgressLogger(Logger.Level.info, "bridge failed progress", 2)
     del failed
     wait_for_kinds("bridge failed progress", ["start", "failed"])
 
     ProgressLogger.remove_listener(listener)
     ProgressLogger.remove_listener(listener)
-    progress = ProgressLogger(Logger.LEVEL.info, "unheard progress", 1)
+    progress = ProgressLogger(Logger.Level.info, "unheard progress", 1)
     progress.increment()
     del progress
 
@@ -199,7 +199,7 @@ import basic as opengeode
 logging.basicConfig(level=1, stream=sys.stdout, format="%(message)s")
 opengeode.Logger.forward_to_python()
 opengeode.ProgressLogger.add_listener(lambda event: print("listener", event.kind))
-progress = opengeode.ProgressLogger(opengeode.Logger.LEVEL.info, "exit progress", 1)
+progress = opengeode.ProgressLogger(opengeode.Logger.Level.info, "exit progress", 1)
 progress.increment()
 del progress
 opengeode.Logger.info("message before exit")
@@ -300,7 +300,7 @@ def check_raising_listener(Logger):
     ProgressLogger.add_listener(raising_listener)
     ProgressLogger.add_listener(listener)
     for message in ["raising progress", "next raising progress"]:
-        progress = ProgressLogger(Logger.LEVEL.info, message, 1)
+        progress = ProgressLogger(Logger.Level.info, message, 1)
         progress.increment()
         del progress
     with condition:

@@ -522,7 +522,7 @@ def test_helper_claims():
     solid3d = mesh.PointSet3D.create()
     mesh.PointSetBuilder3D.create(solid3d).create_point(point3(1, 2, 3))
     for axis, expected in [(0, (2, 3)), (1, (1, 3)), (2, (1, 2))]:
-        converted = mesh.convert_point_set3d_into_2d(solid3d, axis)
+        converted = mesh.convert_point_set3D_into_2D(solid3d, axis)
         check(
             converted.point(0).inexact_equal(point2(*expected)),
             f"the coordinate of the axis {axis} is removed",
@@ -1053,7 +1053,7 @@ def test_model_vertex_identifier():
 def test_model_physical_properties():
     brep = model.BRep()
     builder = model.PhysicalPropertiesBuilder(brep)
-    porosity, density = model.PHYSICAL_PROPERTY_NAME.porosity, model.PHYSICAL_PROPERTY_NAME.density
+    porosity, density = model.PhysicalPropertyName.porosity, model.PhysicalPropertyName.density
     check(not brep.has_physical_property(porosity), "no property by default")
     check_raises(lambda: brep.physical_property_info(porosity), basic.OpenGeodeDataError, "info of an unset property raises")
     first, second = basic.uuid(), basic.uuid()
@@ -1194,12 +1194,12 @@ def test_model_filter_and_crs_and_tracing():
     inside = tracing.is_point_inside_block(point3(1, 1, 1), block)
     border = tracing.is_point_inside_block(point3(0, 1, 1), block)
     outside = tracing.is_point_inside_block(point3(5, 1, 1), block)
-    check(inside and inside.position == model.POSITION.inside, "a point inside")
-    check(not border and border.position == model.POSITION.on_border, "a point on the border is False")
-    check(not outside and outside.position == model.POSITION.outside, "a point outside")
+    check(inside and inside.position == model.RayTracingResult.Position.inside, "a point inside")
+    check(not border and border.position == model.RayTracingResult.Position.on_border, "a point on the border is False")
+    check(not outside and outside.position == model.RayTracingResult.Position.outside, "a point outside")
     check(tracing.block_containing_point(point3(1, 1, 1)) == block.id(), "block_containing_point")
     check(tracing.block_containing_point(point3(0, 1, 1)) is None and tracing.block_containing_point(point3(9, 9, 9)) is None, "no block for a border or outside point")
-    check(model.RayTracingResult().position == model.POSITION.outside, "default result")
+    check(model.RayTracingResult().position == model.RayTracingResult.Position.outside, "default result")
 
 
 def test_model_polygon_helpers():

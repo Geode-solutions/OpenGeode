@@ -30,7 +30,7 @@ namespace geode
     void define_physical_properties( pybind11::module& module )
     {
         pybind11::native_enum< PHYSICAL_PROPERTY_NAME >( module,
-            "PHYSICAL_PROPERTY_NAME", "enum.Enum",
+            "PhysicalPropertyName", "enum.Enum",
             "Names of the physical properties that can be associated to the "
             "components of a model (porosity, permeability, boundary "
             "conditions, mechanical parameters...)" )

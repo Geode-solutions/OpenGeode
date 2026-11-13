@@ -804,11 +804,11 @@ def test_clone(brep):
 
 
 def test_physical_properties(brep, attribute_id):
-    if not brep.has_physical_property(model.PHYSICAL_PROPERTY_NAME.porosity):
+    if not brep.has_physical_property(model.PhysicalPropertyName.porosity):
         raise ValueError("[Test] BRep should have porosity physical property")
-    if brep.has_physical_property(model.PHYSICAL_PROPERTY_NAME.permeability):
+    if brep.has_physical_property(model.PhysicalPropertyName.permeability):
         raise ValueError("[Test] BRep should not have permeability physical property")
-    info = brep.physical_property_info(model.PHYSICAL_PROPERTY_NAME.porosity)
+    info = brep.physical_property_info(model.PhysicalPropertyName.porosity)
     if info.component_type.get() != model.Block3D.component_type_static().get():
         raise ValueError("[Test] Wrong porosity physical property component type")
     if info.attribute_id.string() != attribute_id.string():
@@ -999,7 +999,7 @@ if __name__ == "__main__":
             "porosity", physical_attribute_id, porosity_values, basic.AttributeProperties()
         )
     builder.set_physical_property(
-        model.PHYSICAL_PROPERTY_NAME.porosity,
+        model.PhysicalPropertyName.porosity,
         model.Block3D.component_type_static(),
         physical_attribute_id,
     )

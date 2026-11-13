@@ -1059,45 +1059,45 @@ def test_mesh_io():
 def test_mesh_helpers():
     # Conversions between dimensions
     surface3d, _ = build_triangle_surface3D()
-    surface2d = mesh.convert_triangulated_surface3d_into_2d(surface3d=surface3d, axis_to_remove=2)
+    surface2d = mesh.convert_triangulated_surface3D_into_2D(surface3d=surface3d, axis_to_remove=2)
     check(surface2d.nb_polygons() == 2 and surface2d.point(vertex_id=3).value(1) == 1, "convert 3D into 2D keywords")
-    back = mesh.convert_triangulated_surface2d_into_3d(surface2d=surface2d, axis_to_add=2, axis_coordinate=5)
+    back = mesh.convert_triangulated_surface2D_into_3D(surface2d=surface2d, axis_to_add=2, axis_coordinate=5)
     check(back.point(vertex_id=3).value(2) == 5, "convert 2D into 3D keywords")
     polygonal = mesh.PolygonalSurface3D.create()
     polygonal_builder = mesh.PolygonalSurfaceBuilder3D.create(mesh=polygonal)
     for x, y in [(0, 0), (1, 0), (1, 1), (0, 1)]:
         polygonal_builder.create_point(point=point3(x, y, 0))
     polygonal_builder.create_polygon(vertices=[0, 1, 2, 3])
-    polygonal2d = mesh.convert_polygonal_surface3d_into_2d(surface3d=polygonal, axis_to_remove=2)
-    check(polygonal2d.nb_polygon_vertices(polygon_id=0) == 4, "convert_polygonal_surface3d_into_2d keywords")
+    polygonal2d = mesh.convert_polygonal_surface3D_into_2D(surface3d=polygonal, axis_to_remove=2)
+    check(polygonal2d.nb_polygon_vertices(polygon_id=0) == 4, "convert_polygonal_surface3D_into_2D keywords")
     check(
-        mesh.convert_polygonal_surface2d_into_3d(surface2d=polygonal2d, axis_to_add=2, axis_coordinate=1)
+        mesh.convert_polygonal_surface2D_into_3D(surface2d=polygonal2d, axis_to_add=2, axis_coordinate=1)
         .point(vertex_id=0)
         .value(2)
         == 1,
-        "convert_polygonal_surface2d_into_3d keywords",
+        "convert_polygonal_surface2D_into_3D keywords",
     )
-    generic2d = mesh.convert_surface_mesh3d_into_2d(surface3d=polygonal, axis_to_remove=0)
-    check(generic2d.point(vertex_id=2).value(0) == 1, "convert_surface_mesh3d_into_2d keywords")
+    generic2d = mesh.convert_surface_mesh3D_into_2D(surface3d=polygonal, axis_to_remove=0)
+    check(generic2d.point(vertex_id=2).value(0) == 1, "convert_surface_mesh3D_into_2D keywords")
     check(
-        mesh.convert_surface_mesh2d_into_3d(surface2d=generic2d, axis_to_add=0, axis_coordinate=7)
+        mesh.convert_surface_mesh2D_into_3D(surface2d=generic2d, axis_to_add=0, axis_coordinate=7)
         .point(vertex_id=2)
         .value(0)
         == 7,
-        "convert_surface_mesh2d_into_3d keywords",
+        "convert_surface_mesh2D_into_3D keywords",
     )
     curve = mesh.EdgedCurve3D.create()
     curve_builder = mesh.EdgedCurveBuilder3D.create(mesh=curve)
     curve_builder.create_point(point=point3(0, 1, 2))
     curve_builder.create_point(point=point3(3, 4, 5))
     curve_builder.create_edge_with_vertices(v0_id=0, v1_id=1)
-    curve2d = mesh.convert_edged_curve3d_into_2d(curve3d=curve, axis_to_remove=0)
-    check(curve2d.point(vertex_id=1).value(0) == 4, "convert_edged_curve3d_into_2d keywords")
+    curve2d = mesh.convert_edged_curve3D_into_2D(curve3d=curve, axis_to_remove=0)
+    check(curve2d.point(vertex_id=1).value(0) == 4, "convert_edged_curve3D_into_2D keywords")
     point_set = mesh.PointSet3D.create()
     mesh.PointSetBuilder3D.create(mesh=point_set).create_point(point=point3(0, 1, 2))
     check(
-        mesh.convert_point_set3d_into_2d(point_set3d=point_set, axis_to_remove=1).point(vertex_id=0).value(1) == 2,
-        "convert_point_set3d_into_2d keywords",
+        mesh.convert_point_set3D_into_2D(point_set3d=point_set, axis_to_remove=1).point(vertex_id=0).value(1) == 2,
+        "convert_point_set3D_into_2D keywords",
     )
     tri = mesh.convert_surface_mesh_into_triangulated_surface3D(surface=surface3d)
     check(tri is not None and tri.nb_polygons() == 2, "convert_surface_mesh_into_triangulated_surface3D keyword")
@@ -1111,7 +1111,7 @@ def test_mesh_helpers():
     )
     mesh.triangulate_surface_mesh3D(surface=polygonal)
     check(all(polygonal.nb_polygon_vertices(polygon_id=p) == 3 for p in range(polygonal.nb_polygons())), "triangulate_surface_mesh3D keyword")
-    quad2d = mesh.convert_polygonal_surface3d_into_2d(surface3d=polygonal, axis_to_remove=2)
+    quad2d = mesh.convert_polygonal_surface3D_into_2D(surface3d=polygonal, axis_to_remove=2)
     mesh.triangulate_surface_mesh2D(surface=quad2d)
     check(quad2d.nb_polygons() == 2, "triangulate_surface_mesh2D keyword")
     grid2d = mesh.RegularGrid2D.create()
@@ -1350,7 +1350,7 @@ def test_model_components():
     info = model.Info(component_type=surface_type, attribute_id=basic.uuid())
     info.component_type = model.ComponentType("Block")
     check(info.component_type.get() == "Block", "Info.component_type setter")
-    check(model.RayTracingResult().position == model.POSITION.outside, "RayTracingResult.position")
+    check(model.RayTracingResult().position == model.RayTracingResult.Position.outside, "RayTracingResult.position")
     options = model.SectionExtruderOptions()
     options.axis_to_extrude = 1
     options.min_coordinate = -1.0
@@ -1580,7 +1580,7 @@ def test_model_vertex_identifier_and_registry():
 def test_model_physical_properties_and_mappings():
     brep = model.BRep()
     builder = model.PhysicalPropertiesBuilder(physical_properties=brep)
-    name = model.PHYSICAL_PROPERTY_NAME.porosity
+    name = model.PhysicalPropertyName.porosity
     attribute_id = basic.uuid()
     builder.set_physical_property(name=name, component_type=model.ComponentType("Block"), attribute_id=attribute_id)
     check(brep.has_physical_property(name=name), "has_physical_property(name=)")
@@ -1654,7 +1654,7 @@ def test_model_helpers():
     tracing = model.BRepRayTracing(brep=brep)
     block = brep.blocks()[0]
     inside = tracing.is_point_inside_block(point=geometry.Point3D([1, 1, 1]), block=block)
-    check(inside and inside.position == model.POSITION.inside, "is_point_inside_block keywords")
+    check(inside and inside.position == model.RayTracingResult.Position.inside, "is_point_inside_block keywords")
     check(tracing.block_containing_point(point=geometry.Point3D([1, 1, 1])) == block.id(), "block_containing_point(point=)")
     # coordinate reference systems
     check(len(model.brep_coordinate_reference_systems(brep=brep)) == 1, "brep_coordinate_reference_systems(brep=)")

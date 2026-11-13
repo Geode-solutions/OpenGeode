@@ -47,12 +47,12 @@ if _logging.getLevelName(TRACE) == f"Level {TRACE}":
     _logging.addLevelName(TRACE, "TRACE")
 
 _PYTHON_LEVELS = {
-    Logger.LEVEL.trace: TRACE,
-    Logger.LEVEL.debug: _logging.DEBUG,
-    Logger.LEVEL.info: _logging.INFO,
-    Logger.LEVEL.warning: _logging.WARNING,
-    Logger.LEVEL.error: _logging.ERROR,
-    Logger.LEVEL.critical: _logging.CRITICAL,
+    Logger.Level.trace: TRACE,
+    Logger.Level.debug: _logging.DEBUG,
+    Logger.Level.info: _logging.INFO,
+    Logger.Level.warning: _logging.WARNING,
+    Logger.Level.error: _logging.ERROR,
+    Logger.Level.critical: _logging.CRITICAL,
 }
 
 ProgressEvent = _collections.namedtuple(

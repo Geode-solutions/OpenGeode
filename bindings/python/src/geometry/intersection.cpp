@@ -73,7 +73,7 @@ namespace geode
 {
     void define_intersection( pybind11::module& module )
     {
-        pybind11::native_enum< INTERSECTION_TYPE >( module, "INTERSECTION_TYPE",
+        pybind11::native_enum< INTERSECTION_TYPE >( module, "IntersectionType",
             "enum.Enum",
             "Outcome of an intersection computation: none (too far), "
             "intersect, parallel (no unique point) or incorrect (computed "

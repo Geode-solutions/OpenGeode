@@ -300,7 +300,7 @@ namespace geode
                 "registered clients (console by default) when their level is "
                 "enabled" );
         pybind11::native_enum< Logger::LEVEL >(
-            logger, "LEVEL", "enum.Enum", "Severity of a log message" )
+            logger, "Level", "enum.Enum", "Severity of a log message" )
             .value( "trace", Logger::LEVEL::trace )
             .value( "debug", Logger::LEVEL::debug )
             .value( "info", Logger::LEVEL::info )
@@ -315,7 +315,7 @@ namespace geode
             .def_static( "set_level", &Logger::set_level,
                 pybind11::arg( "level" ),
                 "Set the minimum level of the messages to display, e.g. "
-                "Logger.set_level(Logger.LEVEL.warning) to hide info "
+                "Logger.set_level(Logger.Level.warning) to hide info "
                 "messages" )
             .def_static( "is_enabled", &Logger::is_enabled,
                 pybind11::arg( "level" ),

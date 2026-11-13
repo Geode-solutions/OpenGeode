@@ -40,15 +40,47 @@ def check_enum(module, enum_class, names):
 
 
 def test_enums():
-    check_enum(geometry, geometry.INTERSECTION_TYPE,
+    check_enum(geometry, geometry.IntersectionType,
                ["none", "intersect", "parallel", "incorrect"])
     check_enum(geometry, geometry.Side, ["positive", "negative", "zero"])
     check_enum(geometry, geometry.Position,
                ["outside", "inside", "vertex0", "edge01", "facet3", "parallel"])
-    check_enum(model, model.POSITION, ["outside", "inside", "on_border"])
-    check_enum(model, model.PHYSICAL_PROPERTY_NAME,
+    check_enum(model, model.RayTracingResult.Position, ["outside", "inside", "on_border"])
+    check_enum(model, model.PhysicalPropertyName,
                ["porosity", "permeability", "density"])
-    check_enum(basic, basic.Logger.LEVEL, ["trace", "info", "off"])
+    check_enum(basic, basic.Logger.Level, ["trace", "info", "off"])
+
+
+def test_enum_names():
+    # CamelCase class names, nested when the C++ enum is nested in a class
+    if geometry.IntersectionType.__name__ != "IntersectionType":
+        raise ValueError("[Test] Wrong name of IntersectionType")
+    if model.PhysicalPropertyName.__name__ != "PhysicalPropertyName":
+        raise ValueError("[Test] Wrong name of PhysicalPropertyName")
+    if model.RayTracingResult.Position.__qualname__ != "RayTracingResult.Position":
+        raise ValueError("[Test] Wrong name of RayTracingResult.Position")
+    if basic.Logger.Level.__qualname__ != "Logger.Level":
+        raise ValueError("[Test] Wrong name of Logger.Level")
+    # the position of the geometry module and the one of the ray tracing
+    # do not collide
+    if model.RayTracingResult.Position is geometry.Position:
+        raise ValueError("[Test] The two positions should be different enums")
+    # the former names do not exist anymore
+    for module, old_name in (
+        (geometry, "INTERSECTION_TYPE"),
+        (model, "PHYSICAL_PROPERTY_NAME"),
+        (model, "POSITION"),
+    ):
+        if hasattr(module, old_name):
+            raise ValueError(f"[Test] {old_name} should have been renamed")
+    if hasattr(basic.Logger, "LEVEL"):
+        raise ValueError("[Test] Logger.LEVEL should have been renamed")
+    # the enums are the ones used by the functions
+    result = model.RayTracingResult()
+    if not isinstance(result.position, model.RayTracingResult.Position):
+        raise ValueError("[Test] RayTracingResult.position should be a Position")
+    if not isinstance(basic.Logger.level(), basic.Logger.Level):
+        raise ValueError("[Test] Logger.level() should be a Logger.Level")
 
 
 def test_enum_results():
@@ -57,12 +89,13 @@ def test_enum_results():
     other = geometry.Segment2D(geometry.Point2D([0.0, 1.0]),
                                geometry.Point2D([1.0, 1.0]))
     result = geometry.segment_segment_intersection2D(segment, other)
-    if result.type != geometry.INTERSECTION_TYPE.parallel:
+    if result.type != geometry.IntersectionType.parallel:
         raise ValueError("[Test] Parallel segments should be parallel")
-    if geometry.INTERSECTION_TYPE.parallel == geometry.Position.parallel:
+    if geometry.IntersectionType.parallel == geometry.Position.parallel:
         raise ValueError("[Test] Different enums must not compare equal")
 
 
 if __name__ == '__main__':
     test_enums()
+    test_enum_names()
     test_enum_results()

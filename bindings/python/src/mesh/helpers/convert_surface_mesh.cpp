@@ -66,7 +66,7 @@ namespace geode
                 pybind11::call_guard< pybind11::gil_scoped_release >(),
                 "Replace, in place, every polygon with more than three "
                 "vertices by triangles" )
-            .def( "convert_surface_mesh2d_into_3d",
+            .def( "convert_surface_mesh2D_into_3D",
                 &convert_surface_mesh2d_into_3d, pybind11::arg( "surface2d" ),
                 pybind11::arg( "axis_to_add" ),
                 pybind11::arg( "axis_coordinate" ),
@@ -74,13 +74,13 @@ namespace geode
                 "Return a 3D surface mesh built from the 2D one by inserting a "
                 "coordinate along the axis axis_to_add, set to "
                 "axis_coordinate" )
-            .def( "convert_surface_mesh3d_into_2d",
+            .def( "convert_surface_mesh3D_into_2D",
                 &convert_surface_mesh3d_into_2d, pybind11::arg( "surface3d" ),
                 pybind11::arg( "axis_to_remove" ),
                 pybind11::call_guard< pybind11::gil_scoped_release >(),
                 "Return a 2D surface mesh built from the 3D one by removing "
                 "the coordinate along the axis axis_to_remove" )
-            .def( "convert_polygonal_surface2d_into_3d",
+            .def( "convert_polygonal_surface2D_into_3D",
                 &convert_polygonal_surface2d_into_3d,
                 pybind11::arg( "surface2d" ), pybind11::arg( "axis_to_add" ),
                 pybind11::arg( "axis_coordinate" ),
@@ -88,13 +88,13 @@ namespace geode
                 "Return a 3D polygonal surface built from the 2D one by "
                 "inserting a coordinate along the axis axis_to_add, set to "
                 "axis_coordinate" )
-            .def( "convert_polygonal_surface3d_into_2d",
+            .def( "convert_polygonal_surface3D_into_2D",
                 &convert_polygonal_surface3d_into_2d,
                 pybind11::arg( "surface3d" ), pybind11::arg( "axis_to_remove" ),
                 pybind11::call_guard< pybind11::gil_scoped_release >(),
                 "Return a 2D polygonal surface built from the 3D one by "
                 "removing the coordinate along the axis axis_to_remove" )
-            .def( "convert_triangulated_surface2d_into_3d",
+            .def( "convert_triangulated_surface2D_into_3D",
                 &convert_triangulated_surface2d_into_3d,
                 pybind11::arg( "surface2d" ), pybind11::arg( "axis_to_add" ),
                 pybind11::arg( "axis_coordinate" ),
@@ -102,7 +102,7 @@ namespace geode
                 "Return a 3D triangulated surface built from the 2D one by "
                 "inserting a coordinate along the axis axis_to_add, set to "
                 "axis_coordinate" )
-            .def( "convert_triangulated_surface3d_into_2d",
+            .def( "convert_triangulated_surface3D_into_2D",
                 &convert_triangulated_surface3d_into_2d,
                 pybind11::arg( "surface3d" ), pybind11::arg( "axis_to_remove" ),
                 pybind11::call_guard< pybind11::gil_scoped_release >(),
