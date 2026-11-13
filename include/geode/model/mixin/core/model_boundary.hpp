@@ -38,7 +38,8 @@ namespace geode
 namespace geode
 {
     /*!
-     * Collection component describing a Boundary.
+     * Collection component grouping the components (Surfaces in a BRep, Lines
+     * in a Section) that form a boundary of the model.
      */
     template < index_t dimension >
     class ModelBoundary : public Component< dimension >

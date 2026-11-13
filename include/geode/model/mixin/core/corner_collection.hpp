@@ -38,7 +38,7 @@ namespace geode
 namespace geode
 {
     /*!
-     * Collection component describing a Boundary.
+     * Collection component grouping Corners of a model.
      */
     template < index_t dimension >
     class CornerCollection : public Component< dimension >
