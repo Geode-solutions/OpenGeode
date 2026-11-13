@@ -353,7 +353,7 @@ namespace geode
                 },
                 pybind11::arg( "forward_logs" ),
                 pybind11::arg( "forward_progress" ),
-                "Use Logger.forward_to_python and ProgressLogger.add_listener "
+                "Use forward_logs_to_python and add_progress_listener "
                 "instead" )
             .def_static(
                 "_log_from_threads",

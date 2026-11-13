@@ -322,7 +322,7 @@ def check_bridge_delivers_during_released_call():
     message = "Compute 3D euclidian distance"
     delivered_during_call = []
 
-    Logger.forward_to_python("opengeode.gil_test")
+    opengeode.forward_logs_to_python("opengeode.gil_test")
     try:
         with HugeSwitchInterval():
             for attempt in range(ATTEMPTS):
@@ -335,7 +335,7 @@ def check_bridge_delivers_during_released_call():
                         seen.append(not finished.is_set())
                         start_received.set()
 
-                ProgressLogger.add_listener(listener)
+                opengeode.add_progress_listener(listener)
                 try:
                     def work():
                         for i in range(5):
@@ -349,12 +349,12 @@ def check_bridge_delivers_during_released_call():
                         raise ValueError("[Test] Progress start event never forwarded")
                     thread.join(TIMEOUT)
                 finally:
-                    ProgressLogger.remove_listener(listener)
+                    opengeode.remove_progress_listener(listener)
                 delivered_during_call.append(seen[0])
                 if seen[0]:
                     break
     finally:
-        Logger.stop_forwarding()
+        opengeode.stop_forwarding_logs()
     if not delivered_during_call[-1]:
         raise ValueError(
             "[Test] The progress event was only delivered after the "

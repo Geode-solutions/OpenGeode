@@ -19,6 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import inspect
 import logging
 import subprocess
 import sys
@@ -65,8 +66,8 @@ def check_log_forwarding(Logger):
     python_logger.addHandler(handler)
     if not Logger._is_console_output_enabled():
         raise ValueError("[Test] Console output should be enabled by default")
-    Logger.forward_to_python("opengeode.test")
-    Logger.forward_to_python("opengeode.test")
+    opengeode.forward_logs_to_python("opengeode.test")
+    opengeode.forward_logs_to_python("opengeode.test")
     if Logger._is_console_output_enabled():
         raise ValueError("[Test] Console output should be disabled when forwarding")
     initial_level = Logger.level()
@@ -160,8 +161,8 @@ def check_progress_listener(Logger):
                 )
             return [event for event in events if event.message == message]
 
-    ProgressLogger.add_listener(listener)
-    ProgressLogger.add_listener(listener)
+    opengeode.add_progress_listener(listener)
+    opengeode.add_progress_listener(listener)
     progress = ProgressLogger(Logger.Level.info, "bridge progress", 2)
     progress.set_refresh_interval(0)
     # The first update is sent at least one second after the start
@@ -183,8 +184,8 @@ def check_progress_listener(Logger):
     del failed
     wait_for_kinds("bridge failed progress", ["start", "failed"])
 
-    ProgressLogger.remove_listener(listener)
-    ProgressLogger.remove_listener(listener)
+    opengeode.remove_progress_listener(listener)
+    opengeode.remove_progress_listener(listener)
     progress = ProgressLogger(Logger.Level.info, "unheard progress", 1)
     progress.increment()
     del progress
@@ -197,8 +198,8 @@ import sys
 import basic as opengeode
 
 logging.basicConfig(level=1, stream=sys.stdout, format="%(message)s")
-opengeode.Logger.forward_to_python()
-opengeode.ProgressLogger.add_listener(lambda event: print("listener", event.kind))
+opengeode.forward_logs_to_python()
+opengeode.add_progress_listener(lambda event: print("listener", event.kind))
 progress = opengeode.ProgressLogger(opengeode.Logger.Level.info, "exit progress", 1)
 progress.increment()
 del progress
@@ -230,6 +231,32 @@ def check_flush_at_exit():
                 )
 
 
+def check_module_functions():
+    # Module functions, typed in the generated stubs (attributes added from
+    # Python to the pybind11 classes were invisible to type checkers)
+    for name in [
+        "forward_logs_to_python",
+        "stop_forwarding_logs",
+        "add_progress_listener",
+        "remove_progress_listener",
+    ]:
+        function = getattr(opengeode, name)
+        signature = inspect.signature(function)
+        if signature.return_annotation is not None or any(
+            parameter.annotation is inspect.Parameter.empty
+            for parameter in signature.parameters.values()
+        ):
+            raise ValueError(f"[Test] {name} should be fully annotated")
+    for owner, name in [
+        (opengeode.Logger, "forward_to_python"),
+        (opengeode.Logger, "stop_forwarding"),
+        (opengeode.ProgressLogger, "add_listener"),
+        (opengeode.ProgressLogger, "remove_listener"),
+    ]:
+        if hasattr(owner, name):
+            raise ValueError(f"[Test] {owner.__name__}.{name} should be removed")
+
+
 def check_namespace():
     for name in ["atexit", "collections", "logging", "threading", "traceback"]:
         if hasattr(opengeode, name):
@@ -247,10 +274,10 @@ def add_test_handler(logger_name):
 
 def check_retarget(Logger, handler):
     _, other_handler = add_test_handler("opengeode.other")
-    Logger.forward_to_python("opengeode.other")
+    opengeode.forward_logs_to_python("opengeode.other")
     Logger.info("bridge retargeted")
     other_handler.wait_for("bridge retargeted")
-    Logger.forward_to_python("opengeode.test")
+    opengeode.forward_logs_to_python("opengeode.test")
     Logger.info("bridge back")
     handler.wait_for("bridge back")
     if "bridge retargeted" in handler.messages():
@@ -297,8 +324,8 @@ def check_raising_listener(Logger):
             events.append(event)
             condition.notify_all()
 
-    ProgressLogger.add_listener(raising_listener)
-    ProgressLogger.add_listener(listener)
+    opengeode.add_progress_listener(raising_listener)
+    opengeode.add_progress_listener(listener)
     for message in ["raising progress", "next raising progress"]:
         progress = ProgressLogger(Logger.Level.info, message, 1)
         progress.increment()
@@ -310,30 +337,30 @@ def check_raising_listener(Logger):
             TIMEOUT,
         ):
             raise ValueError("[Test] Events lost after a raising listener")
-    ProgressLogger.remove_listener(raising_listener)
-    ProgressLogger.remove_listener(listener)
+    opengeode.remove_progress_listener(raising_listener)
+    opengeode.remove_progress_listener(listener)
 
 
 def check_preserved_console_state(Logger):
-    Logger.stop_forwarding()
+    opengeode.stop_forwarding_logs()
     Logger._set_console_output(False)
-    Logger.forward_to_python("opengeode.test")
-    Logger.stop_forwarding()
+    opengeode.forward_logs_to_python("opengeode.test")
+    opengeode.stop_forwarding_logs()
     if Logger._is_console_output_enabled():
         raise ValueError("[Test] Disabled console output should stay disabled")
     Logger._set_console_output(True)
 
 
 def check_stop_forwarding(Logger, handler):
-    Logger.stop_forwarding()
-    Logger.stop_forwarding()
+    opengeode.stop_forwarding_logs()
+    opengeode.stop_forwarding_logs()
     if not Logger._is_console_output_enabled():
         raise ValueError("[Test] Console output should be restored")
     Logger.info("bridge stopped")
     time.sleep(0.5)
     if "bridge stopped" in handler.messages():
         raise ValueError("[Test] Message forwarded after stop_forwarding")
-    Logger.forward_to_python("opengeode.test")
+    opengeode.forward_logs_to_python("opengeode.test")
     Logger.info("bridge restarted")
     handler.wait_for("bridge restarted")
 
@@ -345,6 +372,7 @@ if __name__ == "__main__":
     check_cpp_worker_threads(Logger, handler)
     check_progress_listener(Logger)
     check_namespace()
+    check_module_functions()
     check_retarget(Logger, handler)
     check_python_level_filter(Logger, handler)
     check_raising_filter(Logger, handler)
@@ -352,6 +380,6 @@ if __name__ == "__main__":
     check_flush_at_exit()
     check_stop_forwarding(Logger, handler)
     check_preserved_console_state(Logger)
-    Logger.forward_to_python("opengeode.test")
+    opengeode.forward_logs_to_python("opengeode.test")
     # Forwarding still active: interpreter exit must flush and not hang
     Logger.info("bridge exit")

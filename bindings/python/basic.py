@@ -177,31 +177,25 @@ class _LogBridge:
 _log_bridge = _LogBridge()
 
 
-def _forward_to_python(logger_name: str = "opengeode") -> None:
+def forward_logs_to_python(logger_name: str = "opengeode") -> None:
     """Send the OpenGeode messages to logging.getLogger(logger_name) instead
     of the console. OpenGeode levels map to the logging ones, trace being
     TRACE (5). Calling it again only changes the target logger."""
     _log_bridge.forward(logger_name)
 
 
-def _stop_forwarding() -> None:
+def stop_forwarding_logs() -> None:
     """Stop sending the OpenGeode messages to Python and restore the console
     output. Does nothing if the messages are not forwarded."""
     _log_bridge.stop_forwarding()
 
 
-def _add_listener(listener: _typing.Callable[[ProgressEvent], object]) -> None:
+def add_progress_listener(listener: "_typing.Callable[[ProgressEvent], object]") -> None:
     """Call listener(ProgressEvent) for each progress event, from a Python
     daemon thread. Adding the same listener twice has no effect."""
     _log_bridge.add_listener(listener)
 
 
-def _remove_listener(listener: _typing.Callable[[ProgressEvent], object]) -> None:
+def remove_progress_listener(listener: "_typing.Callable[[ProgressEvent], object]") -> None:
     """Stop calling listener. Does nothing if it is not a listener."""
     _log_bridge.remove_listener(listener)
-
-
-Logger.forward_to_python = staticmethod(_forward_to_python)
-Logger.stop_forwarding = staticmethod(_stop_forwarding)
-ProgressLogger.add_listener = staticmethod(_add_listener)
-ProgressLogger.remove_listener = staticmethod(_remove_listener)
