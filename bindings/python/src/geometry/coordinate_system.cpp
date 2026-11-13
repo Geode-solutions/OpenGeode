@@ -39,12 +39,12 @@
                   Point< dimension > >(),                                      \
             pybind11::arg( "directions" ), pybind11::arg( "origin" ),          \
             "Build a coordinate system from the directions of its axes and "   \
-            "its origin" )                                                     \
+            "its origin. Raise an error if the directions are colinear" )      \
         .def( pybind11::init< Point< dimension >,                              \
                   const std::array< Point< dimension >, dimension >& >(),      \
             pybind11::arg( "origin" ), pybind11::arg( "other_points" ),        \
             "Build a coordinate system from its origin and one point on each " \
-            "axis" )                                                           \
+            "axis. Raise an error if the axes are colinear" )                  \
         .def( "origin", &CoordinateSystem##dimension##D::origin,               \
             "Return the origin of the coordinate system" )                     \
         .def( "set_origin", &CoordinateSystem##dimension##D::set_origin,       \

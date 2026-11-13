@@ -43,7 +43,8 @@
             "Extend the bounding box to contain the given point" )             \
         .def( "extends", &BoundingBox##dimension##D::extends,                  \
             pybind11::arg( "length" ),                                         \
-            "Grow the bounding box by length in all the directions" )          \
+            "Move each face of the bounding box outwards by length, i.e. "     \
+            "grow it by length on both sides in every direction" )             \
         .def( "contains_point",                                                \
             static_cast< bool ( BoundingBox##dimension##D::* )(                \
                 const Point< dimension >& ) const >(                           \
@@ -64,8 +65,8 @@
             "Return True if the two bounding boxes intersect" )                \
         .def( "signed_distance", &BoundingBox##dimension##D::signed_distance,  \
             pybind11::arg( "point" ),                                          \
-            "Return the distance from the point to the bounding box, "         \
-            "negative if the point is inside" )                                \
+            "Return the distance from the point to the bounding box: 0 if "    \
+            "the point is inside" )                                            \
         .def( "min", &BoundingBox##dimension##D::min,                          \
             "Return the corner with the smallest coordinates" )                \
         .def( "max", &BoundingBox##dimension##D::max,                          \

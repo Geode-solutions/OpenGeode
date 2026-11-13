@@ -57,7 +57,12 @@ namespace geode
                     return absl::HashOf(
                         value.red(), value.green(), value.blue() );
                 } )
-            .def( pybind11::self + pybind11::self, pybind11::arg( "other" ) )
-            .def( pybind11::self += pybind11::self, pybind11::arg( "other" ) );
+            .def( pybind11::self + pybind11::self, pybind11::arg( "other" ),
+                "Return the mix of the two colors: each channel is the average "
+                "of the channels of the two colors (rounded down)" )
+            .def( pybind11::self += pybind11::self, pybind11::arg( "other" ),
+                "Replace the color by the mix of the two colors: each channel "
+                "is the average of the channels of the two colors (rounded "
+                "down)" );
     }
 } // namespace geode

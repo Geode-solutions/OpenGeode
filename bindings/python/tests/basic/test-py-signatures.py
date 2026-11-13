@@ -56,7 +56,6 @@ PYBIND11_GENERATED = {
 PYBIND11_CONTAINERS = {"opengeode_py_basic.AdditionalFileList"}
 # Methods whose behavior is fixed by Python and documented there
 EXEMPT_DOC = {
-    "__init__",
     "__eq__",
     "__ne__",
     "__lt__",

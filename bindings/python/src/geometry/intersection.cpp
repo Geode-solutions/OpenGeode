@@ -100,7 +100,7 @@ namespace geode
         module.def( "segment_plane_intersection3D", &segment_plane_intersection,
             pybind11::arg( "segment" ), pybind11::arg( "plane" ),
             "Intersect a segment and a plane and return an IntersectionResult "
-            "holding the point (none if the segment lies in the plane)" );
+            "holding the point (no point if the segment lies in the plane)" );
         module.def( "segment_triangle_intersection3D",
             &segment_triangle_intersection, pybind11::arg( "segment" ),
             pybind11::arg( "triangle" ),

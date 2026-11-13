@@ -35,7 +35,8 @@
         "also numbered by a single cell index" )                               \
         .def( "nb_cell_neighbors",                                             \
             &CellArray##dimension##D::nb_cell_neighbors,                       \
-            "Return the maximum number of neighbors of a cell" )               \
+            "Return the number of neighbors of an inner cell (2 per "          \
+            "direction)" )                                                     \
         .def( "nb_cells", &CellArray##dimension##D::nb_cells,                  \
             "Return the total number of cells" )                               \
         .def( "nb_cells_in_direction",                                         \
@@ -74,11 +75,13 @@
         .def( "next_cell", &CellArray##dimension##D::next_cell,                \
             pybind11::arg( "index" ), pybind11::arg( "direction" ),            \
             "Return the indices of the next cell in the direction, or None "   \
-            "if there is none" )                                               \
+            "if the cell is the last one in this direction. The indices must " \
+            "be valid" )                                                       \
         .def( "previous_cell", &CellArray##dimension##D::previous_cell,        \
             pybind11::arg( "index" ), pybind11::arg( "direction" ),            \
             "Return the indices of the previous cell in the direction, or "    \
-            "None if there is none" )                                          \
+            "None if the cell is the first one in this direction. The "        \
+            "indices must be valid" )                                          \
         .def( "is_cell_on_border",                                             \
             &CellArray##dimension##D::is_cell_on_border,                       \
             pybind11::arg( "cell_indices" ),                                   \

@@ -85,6 +85,7 @@
             pybind11::call_guard< pybind11::gil_scoped_release >(),            \
             pybind11::arg( "epsilon" ),                                        \
             "Return the ColocatedInfo grouping the points closer than "        \
+            "epsilon. Raise an error if epsilon is smaller than the global "   \
             "epsilon" )                                                        \
         .def( "frame_colocated_index_mapping",                                 \
             static_cast< NNSearch##dimension##D::ColocatedInfo (               \
@@ -94,7 +95,8 @@
             pybind11::call_guard< pybind11::gil_scoped_release >(),            \
             pybind11::arg( "epsilon" ),                                        \
             "Return the ColocatedInfo grouping the points colocated within "   \
-            "the ellipse described by the frame epsilon" )
+            "the ellipse described by the frame epsilon. Raise an error if "   \
+            "one direction is shorter than the global epsilon" )
 
 namespace geode
 {

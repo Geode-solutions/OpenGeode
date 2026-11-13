@@ -64,6 +64,7 @@ namespace geode
                 "Return the equivalent angle in ]-pi, pi]" )
             .def( "normalized_between_0_and_pi",
                 &Angle::normalized_between_0_and_pi,
-                "Return the equivalent angle in [0, pi]" );
+                "Return the equivalent angle in [0, pi[ (the angle modulo "
+                "pi)" );
     }
 } // namespace geode

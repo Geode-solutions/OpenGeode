@@ -53,7 +53,7 @@ namespace geode
             std::vector< AdditionalFile > >();
         pybind11::class_< AdditionalFiles > files( module, "AdditionalFiles",
             "Optional and mandatory additional files of a file format" );
-        files.def( pybind11::init<>() )
+        files.def( pybind11::init<>(), "Build empty lists of additional files" )
             .def( "has_additional_files",
                 &AdditionalFiles::has_additional_files,
                 "Return True if at least one additional file, optional or "

@@ -54,8 +54,8 @@
         &raster_image_object_priority< dimension >,                            \
         pybind11::call_guard< pybind11::gil_scoped_release >(),                \
         pybind11::arg( "filename" ),                                           \
-        "Return the priority of the loader for the file: the higher, the "     \
-        "more suited the format is" );                                         \
+        "Return the priority of the loader chosen for the file, used to "      \
+        "select the geode object type when several can load it" );             \
     const auto loadable##dimension =                                           \
         "is_raster_image_loadable" + std::to_string( dimension ) + "D";        \
     module.def( loadable##dimension.c_str(),                                   \

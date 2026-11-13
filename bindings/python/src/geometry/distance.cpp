@@ -109,8 +109,8 @@ namespace geode
             &point_triangle_signed_distance, pybind11::arg( "point" ),
             pybind11::arg( "triangle" ),
             "Return (signed distance, closest point on the triangle) between a "
-            "point and a triangle, the sign being given by the triangle "
-            "normal" );
+            "point and a triangle: the sign is given by the triangle normal, "
+            "positive if the point is in the plane of the triangle" );
         module.def( "line_triangle_distance3D", &line_triangle_distance,
             pybind11::arg( "line" ), pybind11::arg( "triangle" ),
             "Return (distance, closest point on the line, closest point on the "

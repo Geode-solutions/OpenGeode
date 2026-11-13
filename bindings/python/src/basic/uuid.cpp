@@ -32,11 +32,12 @@ namespace geode
         define_string_representation(
             pybind11::class_< uuid >(
                 module, "uuid", "Universally unique identifier of an object" ) )
-            .def( pybind11::init<>(), "Generate a new random uuid" )
+            .def( pybind11::init<>(), "Generate a new unique uuid (version 7, "
+                                      "ordered by creation time)" )
             .def( pybind11::init< std::string_view >(),
                 pybind11::arg( "string" ),
-                "Build a uuid from its string representation. Raise an "
-                "error if the string is not a valid uuid" )
+                "Build a uuid from its 36 characters string representation. "
+                "Raise an error if the string is not a valid uuid" )
             .def( pybind11::self == pybind11::self, pybind11::arg( "other" ) )
             .def( pybind11::self != pybind11::self, pybind11::arg( "other" ) )
             .def( pybind11::self < pybind11::self, pybind11::arg( "other" ) )

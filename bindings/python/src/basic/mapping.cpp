@@ -31,7 +31,7 @@
     pybind11::class_< BijectiveMapping< type > >( module,                      \
         bijective##type.c_str(),                                               \
         "One-to-one mapping between input and output values" )                 \
-        .def( pybind11::init<>() )                                             \
+        .def( pybind11::init<>(), "Build an empty mapping" )                   \
         .def( pybind11::init( []( BijectiveMapping< type >& mapping ) {        \
             return BijectiveMapping< type >{ std::move( mapping ) };           \
         } ),                                                                   \
@@ -57,7 +57,7 @@
     const auto generic##type = absl::StrCat( "GenericMapping", #type );        \
     pybind11::class_< GenericMapping< type > >( module, generic##type.c_str(), \
         "Many-to-many mapping between input and output values" )               \
-        .def( pybind11::init<>() )                                             \
+        .def( pybind11::init<>(), "Build an empty mapping" )                   \
         .def( pybind11::init( []( GenericMapping< type >& mapping ) {          \
             return GenericMapping< type >{ std::move( mapping ) };             \
         } ),                                                                   \

@@ -159,7 +159,9 @@ namespace geode
             "AttributeManager",
             "Container of the attributes of a set of elements (vertices, "
             "polygons...). All the attributes have one value per element" );
-        manager.def( pybind11::init<>() )
+        manager
+            .def( pybind11::init<>(),
+                "Build a manager without attributes nor elements" )
             .def(
                 "find_generic_attribute",
                 // std::optional makes the generated stub return
@@ -182,7 +184,9 @@ namespace geode
                 "Return the ids of all the attributes" )
             .def( "attribute_type", &AttributeManager::attribute_type,
                 pybind11::arg( "attribute_id" ),
-                "Return the C++ type name of the values of the attribute" )
+                "Return the C++ type id name of the values of the attribute "
+                "(for example \"i\" for int), or \"undefined\" if there is no "
+                "such attribute" )
             .def( "attribute_exists", &AttributeManager::attribute_exists,
                 pybind11::arg( "attribute_id" ),
                 "Return True if an attribute has the given id" )
@@ -194,9 +198,11 @@ namespace geode
             .def( "resize", &AttributeManager::resize, pybind11::arg( "size" ),
                 "Set the number of elements of all the attributes" )
             .def( "clear", &AttributeManager::clear,
-                "Remove all the elements (same as resize(0))" )
+                "Delete all the attributes and set the number of elements to "
+                "0" )
             .def( "clear_attributes", &AttributeManager::clear_attributes,
-                "Remove all the attributes" )
+                "Remove all the elements of all the attributes, which are "
+                "kept, and set the number of elements to 0" )
             .def( "delete_attribute", &AttributeManager::delete_attribute,
                 pybind11::arg( "attribute_id" ),
                 "Delete the attribute with the given id, if it exists" )
@@ -204,16 +210,21 @@ namespace geode
                 pybind11::arg( "attribute_id" ),
                 pybind11::arg( "new_attribute_id" ),
                 "Create the attribute new_attribute_id as a copy of the "
-                "attribute attribute_id" )
+                "attribute attribute_id. Raise an error if attribute_id does "
+                "not exist, new_attribute_id already exists or attribute_id is "
+                "a step of a time series" )
             .def( "set_attribute_properties",
                 &AttributeManager::set_attribute_properties,
                 pybind11::arg( "attribute_id" ),
                 pybind11::arg( "new_properties" ),
-                "Replace all the properties of the attribute, time included" )
+                "Replace all the properties of the attribute, time included. "
+                "Raise an error if the attribute does not exist or if the time "
+                "is already used by another step of the same time series" )
             .def( "delete_elements", &AttributeManager::delete_elements,
                 pybind11::arg( "to_delete" ),
-                "Delete the elements e for which to_delete[e] is True. "
-                "to_delete must have nb_elements() items" )
+                "Delete the elements e for which to_delete[e] is True and "
+                "shift the following ones. to_delete must have nb_elements() "
+                "items" )
             .def( "attribute_ids_matching_name",
                 &AttributeManager::attribute_ids_matching_name,
                 pybind11::arg( "name" ),
@@ -222,7 +233,7 @@ namespace geode
             .def( "time_steps", &AttributeManager::time_steps,
                 pybind11::arg( "attribute_name" ),
                 "Return the steps (time and attribute id) of the time series "
-                "called attribute_name" )
+                "called attribute_name, ordered by increasing time" )
             .def( "time_series_names", &AttributeManager::time_series_names,
                 "Return the names of all the time series" );
         python_attribute_class< bool >( manager, "bool" );

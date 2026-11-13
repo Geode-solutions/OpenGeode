@@ -70,7 +70,8 @@ namespace geode
                 pybind11::arg( "value" ),
                 "Set the value shared by all the elements" )
             .def( "default_value", &ConstantAttribute< type >::default_value,
-                "Return the value given at the creation of the attribute" );
+                "Return the value shared by all the elements (same as "
+                "constant_value)" );
         const auto variable_name = absl::StrCat( "VariableAttribute", typestr );
         pybind11::class_< VariableAttribute< type >, ReadOnlyAttribute< type >,
             std::shared_ptr< VariableAttribute< type > > >( module,
@@ -111,7 +112,8 @@ namespace geode
         pybind11::class_< AttributeValues< type > > values( module,
             values_name.c_str(),
             "Default value and no-value marker of an attribute" );
-        values.def( pybind11::init<>() );
+        values.def( pybind11::init<>(),
+            "Build values with the default value of the type and no no-value" );
         def_readwrite_named( values, "default_value",
             &AttributeValues< type >::default_value,
             "Value given to the elements which are not explicitly set" );
@@ -125,7 +127,10 @@ namespace geode
         pybind11::class_< AttributeProperties > properties( module,
             "AttributeProperties",
             "Behavior of an attribute when its elements are modified" );
-        properties.def( pybind11::init<>() );
+        properties.def( pybind11::init<>(),
+            "Build properties: not assignable, not interpolable, transferable "
+            "and "
+            "without time" );
         def_readwrite_named( properties, "assignable",
             &AttributeProperties::assignable,
             "True if the value can be assigned to a new element" );
@@ -167,9 +172,10 @@ namespace geode
             .def( "nb_items", &AttributeBase::nb_items,
                 "Return the number of components of one value" )
             .def( "type", &AttributeBase::type,
-                "Return the C++ type name of the values" )
+                "Return the C++ type id name of the values (for example \"i\" "
+                "for int)" )
             .def( "name", &AttributeBase::name,
-                "Return the name of the attribute" );
+                "Return the name of the attribute, or None if it has none" );
         python_attribute_class< bool >( module, "Bool" );
         python_attribute_class< int >( module, "Int" );
         python_attribute_class< unsigned int >( module, "UInt" );

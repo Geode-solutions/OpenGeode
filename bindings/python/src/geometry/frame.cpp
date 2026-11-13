@@ -44,11 +44,12 @@
             pybind11::arg( "index" ), pybind11::arg( "direction" ),            \
             "Set the direction of the given axis" )                            \
         .def( "inverse", &Frame##dimension##D::inverse,                        \
-            "Return the inverse frame" )                                       \
+            "Return the inverse frame. Raise an error if the frame is not "    \
+            "invertible" )                                                     \
         .def( "rescale", &Frame##dimension##D::rescale,                        \
             pybind11::arg( "length" ),                                         \
-            "Return the frame with all the directions rescaled to the given "  \
-            "length" )
+            "Return the frame whose directions are all multiplied by the "     \
+            "given factor (length)" )
 
 namespace geode
 {
