@@ -55,6 +55,12 @@ add_geode_python_test(
         ${PROJECT_NAME}::py_basic
 )
 add_geode_python_test(
+    SOURCE "test-py-stub-gates.py"
+    ARGUMENTS "${PROJECT_SOURCE_DIR}/cmake/check_python_stubs.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+)
+add_geode_python_test(
     SOURCE "test-py-signatures.py"
     DEPENDENCIES
         ${PROJECT_NAME}::py_basic

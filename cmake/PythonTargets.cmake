@@ -27,18 +27,24 @@ endfunction()
 function(add_geode_python_test)
     cmake_parse_arguments(GEODE_TEST
         ""
-        "SOURCE"
-        "DEPENDENCIES"
+        "SOURCE;NAME"
+        "DEPENDENCIES;ARGUMENTS"
         ${ARGN}
     )
     get_filename_component(absolute_path ${GEODE_TEST_SOURCE} ABSOLUTE)
-    get_filename_component(test_name ${GEODE_TEST_SOURCE} NAME_WE)
+    if(GEODE_TEST_NAME)
+        set(test_name ${GEODE_TEST_NAME})
+    else()
+        get_filename_component(test_name ${GEODE_TEST_SOURCE} NAME_WE)
+    endif()
     add_custom_target(${test_name} SOURCES ${GEODE_TEST_SOURCE})
     set_target_properties(${test_name}
         PROPERTIES
             FOLDER "Bindings/Python/Tests"
     )
-    add_test(NAME ${test_name} COMMAND ${PYTHON_EXECUTABLE} ${absolute_path})
+    add_test(NAME ${test_name}
+        COMMAND ${PYTHON_EXECUTABLE} ${absolute_path} ${GEODE_TEST_ARGUMENTS}
+    )
     set_tests_properties(${test_name} PROPERTIES TIMEOUT 300) 
     _find_dependency_directories(directories ${GEODE_TEST_DEPENDENCIES})
     # Module imported by the tests before any binding, shipped with these CMake files
@@ -68,6 +74,50 @@ function(add_geode_python_test)
                 ENVIRONMENT "LD_LIBRARY_PATH=${directories}:$ENV{LD_LIBRARY_PATH};PYTHONPATH=${test_env_directory}:${directories}:$ENV{PYTHONPATH}"
         )
     endif()
+endfunction()
+
+# Quality gates on the stubs of the binding modules, run by CTest: generate the
+# stubs of the compiled modules with pybind11-stubgen, then check them with
+# check_python_stubs.py (no unnamed argN parameter, no unresolved or raw C++
+# type, mypy.stubtest unless NO_STUBTEST). The wheel target runs the same gates
+# on the wheel, with stubtest on the whole package.
+# Needs pybind11-stubgen and mypy in PYTHON_EXECUTABLE: skipped otherwise.
+function(add_geode_python_stub_test)
+    cmake_parse_arguments(GEODE_STUB_TEST
+        "NO_STUBTEST"
+        "NAME"
+        "MODULES;DEPENDENCIES"
+        ${ARGN}
+    )
+    execute_process(
+        COMMAND ${PYTHON_EXECUTABLE} -c "import pybind11_stubgen, mypy.stubtest"
+        RESULT_VARIABLE stub_tools_missing
+        OUTPUT_QUIET
+        ERROR_QUIET
+    )
+    if(stub_tools_missing)
+        message(STATUS
+            "pybind11-stubgen or mypy not found in ${PYTHON_EXECUTABLE}: "
+            "stub quality gates not tested"
+        )
+        return()
+    endif()
+    if(NOT GEODE_STUB_TEST_NAME)
+        set(GEODE_STUB_TEST_NAME "test-py-stubs")
+    endif()
+    if(GEODE_STUB_TEST_NO_STUBTEST)
+        set(stubtest_arguments --no-stubtest)
+    else()
+        set(stubtest_arguments
+            --mypy-config-file "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/stubtest_mypy.ini"
+        )
+    endif()
+    add_geode_python_test(
+        SOURCE "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/check_python_stubs.py"
+        NAME ${GEODE_STUB_TEST_NAME}
+        ARGUMENTS modules ${GEODE_STUB_TEST_MODULES} ${stubtest_arguments}
+        DEPENDENCIES ${GEODE_STUB_TEST_DEPENDENCIES}
+    )
 endfunction()
 
 function(add_geode_python_wheel)
@@ -135,7 +185,7 @@ function(add_geode_python_wheel)
         COMMAND ${venv_bin}/python -m pip install --upgrade pip
     )
     execute_process(
-        COMMAND ${venv_bin}/pip install --upgrade wheel packaging setuptools build pybind11-stubgen
+        COMMAND ${venv_bin}/pip install --upgrade wheel packaging setuptools build pybind11-stubgen mypy
     )
     execute_process(
         COMMAND ${venv_bin}/python -c 
@@ -163,6 +213,8 @@ print(name + version + '-' + name + version + '-' + platform)"
     else()
         set(wheel_config_folder "$<$<BOOL:${isMultiConfig}>:$<CONFIG>>")
     endif()
+    set(check_stubs_script "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/check_python_stubs.py")
+    set(stubtest_config "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/stubtest_mypy.ini")
     add_custom_target(wheel
         COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/README.md" "${wheel_output_path}"
         COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/bindings/python/requirements.txt" "${wheel_output_path}"
@@ -171,6 +223,10 @@ print(name + version + '-' + name + version + '-' + platform)"
         COMMAND ${CMAKE_COMMAND} -E remove "${wheel_output_directory}/${binary_folder}/*.py"
         COMMAND ${venv_bin}/pip install --no-deps .
         COMMAND ${venv_bin}/pybind11-stubgen --exit-code -o "${wheel_output_path}" "${project_name}"
+        COMMAND ${venv_bin}/python "${check_stubs_script}" stubs "${wheel_output_directory}"
+        COMMAND ${venv_bin}/python "${check_stubs_script}" stubtest
+            --mypy-config-file "${stubtest_config}"
+            --stubs-from "${wheel_output_directory}" ${project_name}
         COMMAND ${venv_bin}/python -m build
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/wheel
     )

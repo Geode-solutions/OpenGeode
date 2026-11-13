@@ -190,13 +190,13 @@ def _stop_forwarding() -> None:
     _log_bridge.stop_forwarding()
 
 
-def _add_listener(listener: _typing.Callable[[ProgressEvent], None]) -> None:
+def _add_listener(listener: _typing.Callable[[ProgressEvent], _typing.Any]) -> None:
     """Call listener(ProgressEvent) for each progress event, from a Python
     daemon thread. Adding the same listener twice has no effect."""
     _log_bridge.add_listener(listener)
 
 
-def _remove_listener(listener: _typing.Callable[[ProgressEvent], None]) -> None:
+def _remove_listener(listener: _typing.Callable[[ProgressEvent], _typing.Any]) -> None:
     """Stop calling listener. Does nothing if it is not a listener."""
     _log_bridge.remove_listener(listener)
 

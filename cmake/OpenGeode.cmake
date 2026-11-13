@@ -94,6 +94,8 @@ install(
         "cmake/CppTargets.cmake"
         "cmake/PythonTargets.cmake"
         "cmake/geode_test_env.py"
+        "cmake/check_python_stubs.py"
+        "cmake/stubtest_mypy.ini"
     DESTINATION 
         ${CMAKE_CONFIG_DESTINATION}
     COMPONENT
