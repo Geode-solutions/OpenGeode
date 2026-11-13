@@ -88,7 +88,9 @@ namespace geode
         /*!
          * Permute vertices to match the given order.
          * @param[in] permutation Vector of size vertex_set_.nb_vertices().
-         * Each value corresponds to the destination position.
+         * permutation[new_index] is the old index of the vertex that is moved
+         * to new_index. It must be a permutation of the indices, otherwise an
+         * OpenGeodeException of type data is thrown.
          * @return  the mapping between old vertex indices to new ones.
          */
         std::vector< index_t > permute_vertices(
