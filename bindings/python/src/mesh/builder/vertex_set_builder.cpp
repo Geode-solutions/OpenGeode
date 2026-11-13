@@ -31,8 +31,9 @@ namespace geode
     void define_vertex_set_builder( pybind11::module& module )
     {
         pybind11::class_< VertexSetBuilder, IdentifierBuilder >(
-            module, "VertexSetBuilder" )
-            .def_static( "create", &VertexSetBuilder::create,
+            module, "VertexSetBuilder", pybind11::dynamic_attr() )
+            .def_static( "create",
+                geode::builder_creator( &VertexSetBuilder::create ),
                 pybind11::keep_alive< 0, 1 >() )
             .def( "create_vertex", &VertexSetBuilder::create_vertex )
             .def( "create_vertices", &VertexSetBuilder::create_vertices )

@@ -25,7 +25,27 @@
 
 #include <geode/geometry/point.hpp>
 
+#include <geode/mesh/core/attribute_coordinate_reference_system.hpp>
 #include <geode/mesh/core/coordinate_reference_system.hpp>
+
+namespace geode
+{
+    /*!
+     * Only the CRS storing one point per attribute element knows its size.
+     */
+    template < index_t dimension >
+    void check_crs_point( std::string_view name,
+        const CoordinateReferenceSystem< dimension >& crs,
+        index_t point_id )
+    {
+        if( const auto* attribute_crs = dynamic_cast<
+                const AttributeCoordinateReferenceSystem< dimension >* >(
+                &crs ) )
+        {
+            check_index( name, "point", point_id, attribute_crs->nb_points() );
+        }
+    }
+} // namespace geode
 
 #define PYTHON_CRS( dimension )                                                \
     const auto name##dimension =                                               \
@@ -34,9 +54,17 @@
         module, name##dimension.c_str() )                                      \
         .def(                                                                  \
             "type_name", &CoordinateReferenceSystem##dimension##D::type_name ) \
-        .def( "point", &CoordinateReferenceSystem##dimension##D::point )       \
-        .def(                                                                  \
-            "set_point", &CoordinateReferenceSystem##dimension##D::set_point )
+        .def( "point",                                                         \
+            []( const CoordinateReferenceSystem< dimension >& crs,             \
+                index_t point_id ) -> const Point< dimension >& {              \
+                check_crs_point( "point", crs, point_id );                     \
+                return crs.point( point_id );                                  \
+            } )                                                                \
+        .def( "set_point", []( CoordinateReferenceSystem< dimension >& crs,    \
+                               index_t point_id, Point< dimension > point ) {  \
+            check_crs_point( "set_point", crs, point_id );                     \
+            crs.set_point( point_id, std::move( point ) );                     \
+        } )
 
 namespace geode
 {

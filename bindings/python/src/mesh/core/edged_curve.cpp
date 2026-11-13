@@ -22,6 +22,7 @@
  */
 
 #include "../../common.hpp"
+#include "../index_check.hpp"
 
 #include <geode/geometry/basic_objects/segment.hpp>
 #include <geode/geometry/bounding_box.hpp>
@@ -39,13 +40,22 @@
                 std::unique_ptr< EdgedCurve##dimension##D > ( * )() >(         \
                 &EdgedCurve##dimension##D::create ) )                          \
         .def( "clone", &EdgedCurve##dimension##D::clone )                      \
-        .def( "edge_length", &EdgedCurve##dimension##D::edge_length )          \
-        .def( "edge_barycenter", &EdgedCurve##dimension##D::edge_barycenter )  \
+        .def( "edge_length",                                                   \
+            geode::checked( "edge_length",                                     \
+                &EdgedCurve##dimension##D::edge_length, geode::EdgeCheck{} ) ) \
+        .def(                                                                  \
+            "edge_barycenter", geode::checked( "edge_barycenter",              \
+                                   &EdgedCurve##dimension##D::edge_barycenter, \
+                                   geode::EdgeCheck{} ) )                      \
         .def( "bounding_box", &EdgedCurve##dimension##D::bounding_box )        \
-        .def( "segment", &EdgedCurve##dimension##D::segment,                   \
+        .def( "segment",                                                       \
+            geode::checked( "segment", &EdgedCurve##dimension##D::segment,     \
+                geode::EdgeCheck{} ),                                          \
             pybind11::keep_alive< 0, 1 >() )                                   \
         .def( "vertices_around_vertex",                                        \
-            &EdgedCurve##dimension##D::vertices_around_vertex )                \
+            geode::checked( "vertices_around_vertex",                          \
+                &EdgedCurve##dimension##D::vertices_around_vertex,             \
+                geode::VertexCheck{} ) )                                       \
         .def( "texture_manager", &EdgedCurve##dimension##D::texture_manager,   \
             pybind11::keep_alive< 0, 1 >() )
 

@@ -22,6 +22,7 @@
  */
 
 #include "../../common.hpp"
+#include "../index_check.hpp"
 
 #include <geode/basic/attribute_manager.hpp>
 
@@ -50,74 +51,134 @@
             pybind11::return_value_policy::reference_internal )                \
         .def( "nb_polygons", &SurfaceMesh##dimension##D::nb_polygons )         \
         .def( "nb_polygon_vertices",                                           \
-            &SurfaceMesh##dimension##D::nb_polygon_vertices )                  \
+            geode::checked( "nb_polygon_vertices",                             \
+                &SurfaceMesh##dimension##D::nb_polygon_vertices,               \
+                geode::PolygonCheck{} ) )                                      \
+        .def( "nb_polygon_edges",                                              \
+            geode::checked( "nb_polygon_edges",                                \
+                &SurfaceMesh##dimension##D::nb_polygon_edges,                  \
+                geode::PolygonCheck{} ) )                                      \
         .def(                                                                  \
-            "nb_polygon_edges", &SurfaceMesh##dimension##D::nb_polygon_edges ) \
-        .def( "polygon_vertex", &SurfaceMesh##dimension##D::polygon_vertex )   \
-        .def(                                                                  \
-            "polygon_vertices", &SurfaceMesh##dimension##D::polygon_vertices ) \
+            "polygon_vertex", geode::checked( "polygon_vertex",                \
+                                  &SurfaceMesh##dimension##D::polygon_vertex,  \
+                                  geode::PolygonVertexCheck{} ) )              \
+        .def( "polygon_vertices",                                              \
+            geode::checked( "polygon_vertices",                                \
+                &SurfaceMesh##dimension##D::polygon_vertices,                  \
+                geode::PolygonCheck{} ) )                                      \
         .def( "polygon_edge_vertex",                                           \
-            &SurfaceMesh##dimension##D::polygon_edge_vertex )                  \
+            geode::checked( "polygon_edge_vertex",                             \
+                &SurfaceMesh##dimension##D::polygon_edge_vertex,               \
+                geode::PolygonEdgeCheck{} ) )                                  \
         .def( "next_polygon_vertex",                                           \
-            &SurfaceMesh##dimension##D::next_polygon_vertex )                  \
+            geode::checked( "next_polygon_vertex",                             \
+                &SurfaceMesh##dimension##D::next_polygon_vertex,               \
+                geode::PolygonVertexCheck{} ) )                                \
         .def( "previous_polygon_vertex",                                       \
-            &SurfaceMesh##dimension##D::previous_polygon_vertex )              \
+            geode::checked( "previous_polygon_vertex",                         \
+                &SurfaceMesh##dimension##D::previous_polygon_vertex,           \
+                geode::PolygonVertexCheck{} ) )                                \
         .def( "next_polygon_edge",                                             \
-            &SurfaceMesh##dimension##D::next_polygon_edge )                    \
-        .def(                                                                  \
-            "polygon_adjacent", &SurfaceMesh##dimension##D::polygon_adjacent ) \
+            geode::checked( "next_polygon_edge",                               \
+                &SurfaceMesh##dimension##D::next_polygon_edge,                 \
+                geode::PolygonEdgeCheck{} ) )                                  \
+        .def( "polygon_adjacent",                                              \
+            geode::checked( "polygon_adjacent",                                \
+                &SurfaceMesh##dimension##D::polygon_adjacent,                  \
+                geode::PolygonEdgeCheck{} ) )                                  \
         .def( "polygon_adjacent_edge",                                         \
-            &SurfaceMesh##dimension##D::polygon_adjacent_edge )                \
+            geode::checked( "polygon_adjacent_edge",                           \
+                &SurfaceMesh##dimension##D::polygon_adjacent_edge,             \
+                geode::PolygonEdgeCheck{} ) )                                  \
         .def( "is_edge_on_border",                                             \
-            &SurfaceMesh##dimension##D::is_edge_on_border )                    \
+            geode::checked( "is_edge_on_border",                               \
+                &SurfaceMesh##dimension##D::is_edge_on_border,                 \
+                geode::PolygonEdgeCheck{} ) )                                  \
         .def( "polygon_edges_on_border",                                       \
-            &SurfaceMesh##dimension##D::polygon_edges_on_border )              \
-        .def( "next_on_border", &SurfaceMesh##dimension##D::next_on_border )   \
+            geode::checked( "polygon_edges_on_border",                         \
+                &SurfaceMesh##dimension##D::polygon_edges_on_border,           \
+                geode::PolygonCheck{} ) )                                      \
+        .def(                                                                  \
+            "next_on_border", geode::checked( "next_on_border",                \
+                                  &SurfaceMesh##dimension##D::next_on_border,  \
+                                  geode::PolygonEdgeCheck{} ) )                \
         .def( "previous_on_border",                                            \
-            &SurfaceMesh##dimension##D::previous_on_border )                   \
+            geode::checked( "previous_on_border",                              \
+                &SurfaceMesh##dimension##D::previous_on_border,                \
+                geode::PolygonEdgeCheck{} ) )                                  \
         .def( "polygon_edge_length",                                           \
-            static_cast< double ( SurfaceMesh##dimension##D::* )(              \
-                const PolygonEdge& ) const >(                                  \
-                &SurfaceMesh##dimension##D::edge_length ) )                    \
+            geode::checked( "polygon_edge_length",                             \
+                static_cast< double ( SurfaceMesh##dimension##D::* )(          \
+                    const PolygonEdge& ) const >(                              \
+                    &SurfaceMesh##dimension##D::edge_length ),                 \
+                geode::PolygonEdgeCheck{} ) )                                  \
         .def( "edge_length",                                                   \
-            static_cast< double ( SurfaceMesh##dimension##D::* )(              \
-                const std::array< index_t, 2 >& ) const >(                     \
-                &SurfaceMesh##dimension##D::edge_length ) )                    \
+            geode::checked( "edge_length",                                     \
+                static_cast< double ( SurfaceMesh##dimension##D::* )(          \
+                    const std::array< index_t, 2 >& ) const >(                 \
+                    &SurfaceMesh##dimension##D::edge_length ),                 \
+                geode::VertexCheck{} ) )                                       \
         .def( "polygon_edge_barycenter",                                       \
-            static_cast< Point< dimension > ( SurfaceMesh##dimension##D::* )(  \
-                const PolygonEdge& ) const >(                                  \
-                &SurfaceMesh##dimension##D::edge_barycenter ) )                \
+            geode::checked( "polygon_edge_barycenter",                         \
+                static_cast< Point< dimension > (                              \
+                    SurfaceMesh##dimension##D::* )( const PolygonEdge& )       \
+                        const >(                                               \
+                    &SurfaceMesh##dimension##D::edge_barycenter ),             \
+                geode::PolygonEdgeCheck{} ) )                                  \
         .def( "edge_barycenter",                                               \
-            static_cast< Point< dimension > ( SurfaceMesh##dimension##D::* )(  \
-                const std::array< index_t, 2 >& ) const >(                     \
-                &SurfaceMesh##dimension##D::edge_barycenter ) )                \
+            geode::checked( "edge_barycenter",                                 \
+                static_cast< Point< dimension > (                              \
+                    SurfaceMesh##dimension##D::* )(                            \
+                    const std::array< index_t, 2 >& ) const >(                 \
+                    &SurfaceMesh##dimension##D::edge_barycenter ),             \
+                geode::VertexCheck{} ) )                                       \
         .def( "polygon_barycenter",                                            \
-            &SurfaceMesh##dimension##D::polygon_barycenter )                   \
-        .def( "polygon_area", &SurfaceMesh##dimension##D::polygon_area )       \
+            geode::checked( "polygon_barycenter",                              \
+                &SurfaceMesh##dimension##D::polygon_barycenter,                \
+                geode::PolygonCheck{} ) )                                      \
+        .def( "polygon_area", geode::checked( "polygon_area",                  \
+                                  &SurfaceMesh##dimension##D::polygon_area,    \
+                                  geode::PolygonCheck{} ) )                    \
         .def( "vertices_around_vertex",                                        \
-            &SurfaceMesh##dimension##D::vertices_around_vertex )               \
+            geode::checked( "vertices_around_vertex",                          \
+                &SurfaceMesh##dimension##D::vertices_around_vertex,            \
+                geode::VertexCheck{} ) )                                       \
         .def( "polygon_around_vertex",                                         \
-            &SurfaceMesh##dimension##D::polygon_around_vertex )                \
+            geode::checked( "polygon_around_vertex",                           \
+                &SurfaceMesh##dimension##D::polygon_around_vertex,             \
+                geode::VertexCheck{} ) )                                       \
         .def( "polygons_around_vertex",                                        \
-            static_cast< const PolygonsAroundVertex& (                         \
-                SurfaceMesh##dimension##D::*) ( index_t ) const >(             \
-                &SurfaceMesh##dimension##D::polygons_around_vertex ) )         \
+            geode::checked( "polygons_around_vertex",                          \
+                static_cast< const PolygonsAroundVertex& (                     \
+                    SurfaceMesh##dimension##D::*) ( index_t ) const >(         \
+                    &SurfaceMesh##dimension##D::polygons_around_vertex ),      \
+                geode::VertexCheck{} ) )                                       \
         .def( "polygons_around_polygon_vertex",                                \
-            static_cast< const PolygonsAroundVertex& (                         \
-                SurfaceMesh##dimension##D::*) ( const PolygonVertex& )         \
-                    const >(                                                   \
-                &SurfaceMesh##dimension##D::polygons_around_vertex ) )         \
+            geode::checked( "polygons_around_polygon_vertex",                  \
+                static_cast< const PolygonsAroundVertex& (                     \
+                    SurfaceMesh##dimension##D::*) ( const PolygonVertex& )     \
+                        const >(                                               \
+                    &SurfaceMesh##dimension##D::polygons_around_vertex ),      \
+                geode::PolygonVertexCheck{} ) )                                \
         .def( "polygon_edge_from_vertices",                                    \
-            &SurfaceMesh##dimension##D::polygon_edge_from_vertices )           \
+            geode::checked( "polygon_edge_from_vertices",                      \
+                &SurfaceMesh##dimension##D::polygon_edge_from_vertices,        \
+                geode::VertexCheck{}, geode::VertexCheck{} ) )                 \
         .def( "polygon_edge_from_edge_vertices",                               \
-            &SurfaceMesh##dimension##D::polygon_edge_from_edge_vertices )      \
+            geode::checked( "polygon_edge_from_edge_vertices",                 \
+                &SurfaceMesh##dimension##D::polygon_edge_from_edge_vertices,   \
+                geode::VertexCheck{} ) )                                       \
         .def( "polygons_from_edge_vertices",                                   \
-            &SurfaceMesh##dimension##D::polygons_from_edge_vertices )          \
+            geode::checked( "polygons_from_edge_vertices",                     \
+                &SurfaceMesh##dimension##D::polygons_from_edge_vertices,       \
+                geode::VertexCheck{} ) )                                       \
         .def( "polygon_attribute_manager",                                     \
             &SurfaceMesh##dimension##D::polygon_attribute_manager,             \
             pybind11::return_value_policy::reference_internal )                \
         .def( "is_vertex_on_border",                                           \
-            &SurfaceMesh##dimension##D::is_vertex_on_border )                  \
+            geode::checked( "is_vertex_on_border",                             \
+                &SurfaceMesh##dimension##D::is_vertex_on_border,               \
+                geode::VertexCheck{} ) )                                       \
         .def( "texture_manager", &SurfaceMesh##dimension##D::texture_manager,  \
             pybind11::keep_alive< 0, 1 >() )                                   \
         .def( "bounding_box", &SurfaceMesh##dimension##D::bounding_box )       \
@@ -144,8 +205,12 @@ namespace geode
     {
         PYTHON_SURFACE_MESH( 2 );
         PYTHON_SURFACE_MESH( 3 )
-            .def( "polygon_normal", &SurfaceMesh3D::polygon_normal< 3 > )
+            .def( "polygon_normal", geode::checked( "polygon_normal",
+                                        &SurfaceMesh3D::polygon_normal< 3 >,
+                                        geode::PolygonCheck{} ) )
             .def( "polygon_vertex_normal",
-                &SurfaceMesh3D::polygon_vertex_normal< 3 > );
+                geode::checked( "polygon_vertex_normal",
+                    &SurfaceMesh3D::polygon_vertex_normal< 3 >,
+                    geode::VertexCheck{} ) );
     }
 } // namespace geode

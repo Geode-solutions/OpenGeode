@@ -22,6 +22,7 @@
  */
 
 #include "../../common.hpp"
+#include "../index_check.hpp"
 
 #include <geode/geometry/point.hpp>
 
@@ -35,15 +36,22 @@
     pybind11::class_< SolidMeshBuilder##dimension##D, VertexSetBuilder,        \
         CoordinateReferenceSystemManagersBuilder##dimension##D >(              \
         module, name##dimension.c_str() )                                      \
-        .def_static( "create", &SolidMeshBuilder##dimension##D::create,        \
+        .def_static( "create",                                                 \
+            geode::builder_creator( &SolidMeshBuilder##dimension##D::create ), \
             pybind11::keep_alive< 0, 1 >() )                                   \
         .def( "create_point", &SolidMeshBuilder##dimension##D::create_point )  \
         .def( "create_polyhedron",                                             \
             &SolidMeshBuilder##dimension##D::create_polyhedron )               \
         .def( "set_polyhedron_vertex",                                         \
-            &SolidMeshBuilder##dimension##D::set_polyhedron_vertex )           \
+            geode::checked_with_self< SolidMesh< dimension > >(                \
+                "set_polyhedron_vertex",                                       \
+                &SolidMeshBuilder##dimension##D::set_polyhedron_vertex,        \
+                geode::PolyhedronVertexCheck{}, geode::VertexOrNoIdCheck{} ) ) \
         .def( "set_polyhedron_adjacent",                                       \
-            &SolidMeshBuilder##dimension##D::set_polyhedron_adjacent )         \
+            geode::checked_with_self< SolidMesh< dimension > >(                \
+                "set_polyhedron_adjacent",                                     \
+                &SolidMeshBuilder##dimension##D::set_polyhedron_adjacent,      \
+                geode::PolyhedronFacetCheck{}, geode::PolyhedronCheck{} ) )    \
         .def( "compute_polyhedron_adjacencies",                                \
             static_cast< void ( SolidMeshBuilder##dimension##D::* )() >(       \
                 &SolidMeshBuilder##dimension##D::                              \

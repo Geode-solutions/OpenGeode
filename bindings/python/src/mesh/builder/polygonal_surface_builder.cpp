@@ -31,7 +31,9 @@
         "PolygonalSurfaceBuilder" + std::to_string( dimension ) + "D";         \
     pybind11::class_< PolygonalSurfaceBuilder##dimension##D,                   \
         SurfaceMeshBuilder##dimension##D >( module, name##dimension.c_str() )  \
-        .def_static( "create", &PolygonalSurfaceBuilder##dimension##D::create, \
+        .def_static( "create",                                                 \
+            geode::builder_creator(                                            \
+                &PolygonalSurfaceBuilder##dimension##D::create ),              \
             pybind11::keep_alive< 0, 1 >() )
 
 namespace geode

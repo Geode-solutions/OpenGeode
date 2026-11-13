@@ -22,6 +22,7 @@
  */
 
 #include "../../common.hpp"
+#include "../index_check.hpp"
 
 #include <geode/mesh/builder/graph_builder.hpp>
 
@@ -31,7 +32,8 @@ namespace geode
     {
         pybind11::class_< GraphBuilder, VertexSetBuilder >(
             module, "GraphBuilder" )
-            .def_static( "create", &GraphBuilder::create,
+            .def_static( "create",
+                geode::builder_creator( &GraphBuilder::create ),
                 pybind11::keep_alive< 0, 1 >() )
             .def( "create_edge", static_cast< index_t ( GraphBuilder::* )() >(
                                      &GraphBuilder::create_edge ) )
@@ -39,7 +41,10 @@ namespace geode
                 static_cast< index_t ( GraphBuilder::* )( index_t, index_t ) >(
                     &GraphBuilder::create_edge ) )
             .def( "create_edges", &GraphBuilder::create_edges )
-            .def( "set_edge_vertex", &GraphBuilder::set_edge_vertex )
+            .def( "set_edge_vertex",
+                geode::checked_with_self< Graph >( "set_edge_vertex",
+                    &GraphBuilder::set_edge_vertex, geode::EdgeVertexCheck{},
+                    geode::VertexCheck{} ) )
             .def( "delete_edges", &GraphBuilder::delete_edges )
             .def( "permute_edges", &GraphBuilder::permute_edges )
             .def( "delete_isolated_vertices",

@@ -31,7 +31,9 @@
         "TetrahedralSolidBuilder" + std::to_string( dimension ) + "D";         \
     pybind11::class_< TetrahedralSolidBuilder##dimension##D,                   \
         SolidMeshBuilder##dimension##D >( module, name##dimension.c_str() )    \
-        .def_static( "create", &TetrahedralSolidBuilder##dimension##D::create, \
+        .def_static( "create",                                                 \
+            geode::builder_creator(                                            \
+                &TetrahedralSolidBuilder##dimension##D::create ),              \
             pybind11::keep_alive< 0, 1 >() )                                   \
         .def( "create_tetrahedron",                                            \
             &TetrahedralSolidBuilder##dimension##D::create_tetrahedron )

@@ -22,6 +22,7 @@
  */
 
 #include "../../common.hpp"
+#include "../index_check.hpp"
 
 #include <geode/basic/attribute_manager.hpp>
 
@@ -65,59 +66,111 @@
                 &SolidMesh##dimension##D::facets ),                            \
             pybind11::return_value_policy::reference_internal )                \
         .def( "nb_polyhedron_vertices",                                        \
-            &SolidMesh##dimension##D::nb_polyhedron_vertices )                 \
+            geode::checked( "nb_polyhedron_vertices",                          \
+                &SolidMesh##dimension##D::nb_polyhedron_vertices,              \
+                geode::PolyhedronCheck{} ) )                                   \
         .def( "nb_polyhedron_facets",                                          \
-            &SolidMesh##dimension##D::nb_polyhedron_facets )                   \
+            geode::checked( "nb_polyhedron_facets",                            \
+                &SolidMesh##dimension##D::nb_polyhedron_facets,                \
+                geode::PolyhedronCheck{} ) )                                   \
         .def( "nb_polyhedron_facet_vertices",                                  \
-            &SolidMesh##dimension##D::nb_polyhedron_facet_vertices )           \
-        .def(                                                                  \
-            "polyhedron_vertex", &SolidMesh##dimension##D::polyhedron_vertex ) \
+            geode::checked( "nb_polyhedron_facet_vertices",                    \
+                &SolidMesh##dimension##D::nb_polyhedron_facet_vertices,        \
+                geode::PolyhedronFacetCheck{} ) )                              \
+        .def( "polyhedron_vertex",                                             \
+            geode::checked( "polyhedron_vertex",                               \
+                &SolidMesh##dimension##D::polyhedron_vertex,                   \
+                geode::PolyhedronVertexCheck{} ) )                             \
         .def( "polyhedron_vertices",                                           \
-            &SolidMesh##dimension##D::polyhedron_vertices )                    \
+            geode::checked( "polyhedron_vertices",                             \
+                &SolidMesh##dimension##D::polyhedron_vertices,                 \
+                geode::PolyhedronCheck{} ) )                                   \
         .def( "polyhedron_facet_vertex",                                       \
-            &SolidMesh##dimension##D::polyhedron_facet_vertex )                \
+            geode::checked( "polyhedron_facet_vertex",                         \
+                &SolidMesh##dimension##D::polyhedron_facet_vertex,             \
+                geode::PolyhedronFacetVertexCheck{} ) )                        \
         .def( "polyhedron_facet_vertices",                                     \
-            &SolidMesh##dimension##D::polyhedron_facet_vertices )              \
+            geode::checked( "polyhedron_facet_vertices",                       \
+                &SolidMesh##dimension##D::polyhedron_facet_vertices,           \
+                geode::PolyhedronFacetCheck{} ) )                              \
         .def( "polyhedron_adjacent",                                           \
-            &SolidMesh##dimension##D::polyhedron_adjacent )                    \
+            geode::checked( "polyhedron_adjacent",                             \
+                &SolidMesh##dimension##D::polyhedron_adjacent,                 \
+                geode::PolyhedronFacetCheck{} ) )                              \
         .def( "polyhedron_adjacent_facet",                                     \
-            &SolidMesh##dimension##D::polyhedron_adjacent_facet )              \
+            geode::checked( "polyhedron_adjacent_facet",                       \
+                &SolidMesh##dimension##D::polyhedron_adjacent_facet,           \
+                geode::PolyhedronFacetCheck{} ) )                              \
         .def( "is_polyhedron_facet_on_border",                                 \
-            &SolidMesh##dimension##D::is_polyhedron_facet_on_border )          \
+            geode::checked( "is_polyhedron_facet_on_border",                   \
+                &SolidMesh##dimension##D::is_polyhedron_facet_on_border,       \
+                geode::PolyhedronFacetCheck{} ) )                              \
         .def( "polyhedron_facets_on_border",                                   \
-            &SolidMesh##dimension##D::polyhedron_facets_on_border )            \
-        .def( "edge_length", &SolidMesh##dimension##D::edge_length )           \
+            geode::checked( "polyhedron_facets_on_border",                     \
+                &SolidMesh##dimension##D::polyhedron_facets_on_border,         \
+                geode::PolyhedronCheck{} ) )                                   \
+        .def( "edge_length", geode::checked( "edge_length",                    \
+                                 &SolidMesh##dimension##D::edge_length,        \
+                                 geode::VertexCheck{} ) )                      \
         .def( "polyhedron_barycenter",                                         \
-            &SolidMesh##dimension##D::polyhedron_barycenter )                  \
-        .def( "facet_barycenter", &SolidMesh##dimension##D::facet_barycenter ) \
-        .def( "edge_barycenter", &SolidMesh##dimension##D::edge_barycenter )   \
+            geode::checked( "polyhedron_barycenter",                           \
+                &SolidMesh##dimension##D::polyhedron_barycenter,               \
+                geode::PolyhedronCheck{} ) )                                   \
+        .def( "facet_barycenter",                                              \
+            geode::checked( "facet_barycenter",                                \
+                &SolidMesh##dimension##D::facet_barycenter,                    \
+                geode::VertexCheck{} ) )                                       \
         .def(                                                                  \
-            "polyhedron_volume", &SolidMesh##dimension##D::polyhedron_volume ) \
+            "edge_barycenter", geode::checked( "edge_barycenter",              \
+                                   &SolidMesh##dimension##D::edge_barycenter,  \
+                                   geode::VertexCheck{} ) )                    \
+        .def( "polyhedron_volume",                                             \
+            geode::checked( "polyhedron_volume",                               \
+                &SolidMesh##dimension##D::polyhedron_volume,                   \
+                geode::PolyhedronCheck{} ) )                                   \
         .def( "polyhedron_facet_normal",                                       \
-            &SolidMesh##dimension##D::polyhedron_facet_normal )                \
+            geode::checked( "polyhedron_facet_normal",                         \
+                &SolidMesh##dimension##D::polyhedron_facet_normal,             \
+                geode::PolyhedronFacetCheck{} ) )                              \
         .def( "vertices_around_vertex",                                        \
-            &SolidMesh##dimension##D::vertices_around_vertex )                 \
+            geode::checked( "vertices_around_vertex",                          \
+                &SolidMesh##dimension##D::vertices_around_vertex,              \
+                geode::VertexCheck{} ) )                                       \
         .def( "polyhedron_around_vertex",                                      \
-            &SolidMesh##dimension##D::polyhedron_around_vertex )               \
+            geode::checked( "polyhedron_around_vertex",                        \
+                &SolidMesh##dimension##D::polyhedron_around_vertex,            \
+                geode::VertexCheck{} ) )                                       \
         .def( "polyhedra_around_vertex",                                       \
-            static_cast< const PolyhedraAroundVertex& (                        \
-                SolidMesh##dimension##D::*) ( index_t ) const >(               \
-                &SolidMesh##dimension##D::polyhedra_around_vertex ) )          \
+            geode::checked( "polyhedra_around_vertex",                         \
+                static_cast< const PolyhedraAroundVertex& (                    \
+                    SolidMesh##dimension##D::*) ( index_t ) const >(           \
+                    &SolidMesh##dimension##D::polyhedra_around_vertex ),       \
+                geode::VertexCheck{} ) )                                       \
         .def( "polyhedra_around_polyhedron_vertex",                            \
-            static_cast< const PolyhedraAroundVertex& (                        \
-                SolidMesh##dimension##D::*) ( const PolyhedronVertex& )        \
-                    const >(                                                   \
-                &SolidMesh##dimension##D::polyhedra_around_vertex ) )          \
+            geode::checked( "polyhedra_around_polyhedron_vertex",              \
+                static_cast< const PolyhedraAroundVertex& (                    \
+                    SolidMesh##dimension##D::*) ( const PolyhedronVertex& )    \
+                        const >(                                               \
+                    &SolidMesh##dimension##D::polyhedra_around_vertex ),       \
+                geode::PolyhedronVertexCheck{} ) )                             \
         .def( "polyhedra_around_edge",                                         \
-            static_cast< PolyhedraAroundEdge ( SolidMesh##dimension##D::* )(   \
-                const std::array< index_t, 2 >& ) const >(                     \
-                &SolidMesh##dimension##D::polyhedra_around_edge ) )            \
+            geode::checked( "polyhedra_around_edge",                           \
+                static_cast< PolyhedraAroundEdge (                             \
+                    SolidMesh##dimension##D::* )(                              \
+                    const std::array< index_t, 2 >& ) const >(                 \
+                    &SolidMesh##dimension##D::polyhedra_around_edge ),         \
+                geode::VertexCheck{} ) )                                       \
         .def( "polyhedra_around_edge_with_hint",                               \
-            static_cast< PolyhedraAroundEdge ( SolidMesh##dimension##D::* )(   \
-                const std::array< index_t, 2 >&, index_t ) const >(            \
-                &SolidMesh##dimension##D::polyhedra_around_edge ) )            \
+            geode::checked( "polyhedra_around_edge_with_hint",                 \
+                static_cast< PolyhedraAroundEdge (                             \
+                    SolidMesh##dimension##D::* )(                              \
+                    const std::array< index_t, 2 >&, index_t ) const >(        \
+                    &SolidMesh##dimension##D::polyhedra_around_edge ),         \
+                geode::VertexCheck{} ) )                                       \
         .def( "polyhedra_from_facet_vertices",                                 \
-            &SolidMesh##dimension##D::polyhedra_from_facet_vertices )          \
+            geode::checked( "polyhedra_from_facet_vertices",                   \
+                &SolidMesh##dimension##D::polyhedra_from_facet_vertices,       \
+                geode::VertexCheck{} ) )                                       \
         .def( "polyhedron_attribute_manager",                                  \
             &SolidMesh##dimension##D::polyhedron_attribute_manager,            \
             pybind11::return_value_policy::reference_internal )                \
@@ -125,9 +178,13 @@
         .def( "texture_manager", &SolidMesh##dimension##D::texture_manager,    \
             pybind11::keep_alive< 0, 1 >() )                                   \
         .def( "edge_vertices_in_polyhedron",                                   \
-            &SolidMesh##dimension##D::edge_vertices_in_polyhedron )            \
+            geode::checked( "edge_vertices_in_polyhedron",                     \
+                &SolidMesh##dimension##D::edge_vertices_in_polyhedron,         \
+                geode::PolyhedronCheck{}, geode::VertexCheck{} ) )             \
         .def( "is_vertex_on_border",                                           \
-            &SolidMesh##dimension##D::is_vertex_on_border )                    \
+            geode::checked( "is_vertex_on_border",                             \
+                &SolidMesh##dimension##D::is_vertex_on_border,                 \
+                geode::VertexCheck{} ) )                                       \
         .def( "is_tetrahedral_type",                                           \
             []( const SolidMesh< dimension >& solid ) {                        \
                 return solid.type_name()                                       \

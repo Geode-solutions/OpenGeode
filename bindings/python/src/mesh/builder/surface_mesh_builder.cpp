@@ -22,6 +22,7 @@
  */
 
 #include "../../common.hpp"
+#include "../index_check.hpp"
 
 #include <geode/geometry/point.hpp>
 
@@ -35,16 +36,24 @@
     pybind11::class_< SurfaceMeshBuilder##dimension##D, VertexSetBuilder,      \
         CoordinateReferenceSystemManagersBuilder##dimension##D >(              \
         module, name##dimension.c_str() )                                      \
-        .def_static( "create", &SurfaceMeshBuilder##dimension##D::create,      \
+        .def_static( "create",                                                 \
+            geode::builder_creator(                                            \
+                &SurfaceMeshBuilder##dimension##D::create ),                   \
             pybind11::keep_alive< 0, 1 >() )                                   \
         .def(                                                                  \
             "create_point", &SurfaceMeshBuilder##dimension##D::create_point )  \
         .def( "create_polygon",                                                \
             &SurfaceMeshBuilder##dimension##D::create_polygon )                \
         .def( "set_polygon_vertex",                                            \
-            &SurfaceMeshBuilder##dimension##D::set_polygon_vertex )            \
+            geode::checked_with_self< SurfaceMesh< dimension > >(              \
+                "set_polygon_vertex",                                          \
+                &SurfaceMeshBuilder##dimension##D::set_polygon_vertex,         \
+                geode::PolygonVertexCheck{}, geode::VertexOrNoIdCheck{} ) )    \
         .def( "set_polygon_adjacent",                                          \
-            &SurfaceMeshBuilder##dimension##D::set_polygon_adjacent )          \
+            geode::checked_with_self< SurfaceMesh< dimension > >(              \
+                "set_polygon_adjacent",                                        \
+                &SurfaceMeshBuilder##dimension##D::set_polygon_adjacent,       \
+                geode::PolygonEdgeCheck{}, geode::PolygonCheck{} ) )           \
         .def( "compute_polygon_adjacencies",                                   \
             static_cast< void ( SurfaceMeshBuilder##dimension##D::* )() >(     \
                 &SurfaceMeshBuilder##dimension##D::                            \

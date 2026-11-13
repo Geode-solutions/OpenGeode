@@ -32,7 +32,8 @@
     pybind11::class_< TriangulatedSurfaceBuilder##dimension##D,                \
         SurfaceMeshBuilder##dimension##D >( module, name##dimension.c_str() )  \
         .def_static( "create",                                                 \
-            &TriangulatedSurfaceBuilder##dimension##D::create,                 \
+            geode::builder_creator(                                            \
+                &TriangulatedSurfaceBuilder##dimension##D::create ),           \
             pybind11::keep_alive< 0, 1 >() )                                   \
         .def( "create_triangle",                                               \
             &TriangulatedSurfaceBuilder##dimension##D::create_triangle )

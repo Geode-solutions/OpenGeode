@@ -22,6 +22,7 @@
  */
 
 #include "../../common.hpp"
+#include "../index_check.hpp"
 
 #include <geode/basic/attribute_manager.hpp>
 
@@ -37,12 +38,20 @@ namespace geode
                 "create", static_cast< std::unique_ptr< Graph > ( * )() >(
                               &Graph::create ) )
             .def( "clone", &Graph::clone )
-            .def( "edge_vertex", &Graph::edge_vertex )
-            .def( "edge_vertices", &Graph::edge_vertices )
+            .def( "edge_vertex",
+                geode::checked( "edge_vertex", &Graph::edge_vertex,
+                    geode::EdgeVertexCheck{} ) )
+            .def( "edge_vertices",
+                geode::checked( "edge_vertices", &Graph::edge_vertices,
+                    geode::EdgeCheck{} ) )
             .def( "nb_edges", &Graph::nb_edges )
             .def( "edge_attribute_manager", &Graph::edge_attribute_manager,
                 pybind11::return_value_policy::reference_internal )
-            .def( "edges_around_vertex", &Graph::edges_around_vertex )
-            .def( "is_vertex_isolated", &Graph::is_vertex_isolated );
+            .def( "edges_around_vertex",
+                geode::checked( "edges_around_vertex",
+                    &Graph::edges_around_vertex, geode::VertexCheck{} ) )
+            .def( "is_vertex_isolated",
+                geode::checked( "is_vertex_isolated",
+                    &Graph::is_vertex_isolated, geode::VertexCheck{} ) );
     }
 } // namespace geode

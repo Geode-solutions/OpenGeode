@@ -38,7 +38,21 @@ namespace geode
         pybind11::class_< ReadOnlyAttribute< type >, AttributeBase,
             std::shared_ptr< ReadOnlyAttribute< type > > >(
             module, read_name.c_str() )
-            .def( "value", &ReadOnlyAttribute< type >::value );
+            .def( "value",
+                []( const ReadOnlyAttribute< type >& attribute,
+                    index_t element ) -> const type& {
+                    // Only the variable attributes have a size: constant
+                    // attributes have the same value for all elements and
+                    // sparse attributes return their default value.
+                    if( const auto* variable =
+                            dynamic_cast< const VariableAttribute< type >* >(
+                                &attribute ) )
+                    {
+                        check_index(
+                            "value", "element", element, variable->size() );
+                    }
+                    return attribute.value( element );
+                } );
         const auto constant_name = absl::StrCat( "ConstantAttribute", typestr );
         pybind11::class_< ConstantAttribute< type >, ReadOnlyAttribute< type >,
             std::shared_ptr< ConstantAttribute< type > > >(
@@ -52,7 +66,13 @@ namespace geode
         pybind11::class_< VariableAttribute< type >, ReadOnlyAttribute< type >,
             std::shared_ptr< VariableAttribute< type > > >(
             module, variable_name.c_str() )
-            .def( "set_value", &VariableAttribute< type >::set_value )
+            .def( "set_value",
+                []( VariableAttribute< type >& attribute, index_t element,
+                    type value ) {
+                    check_index(
+                        "set_value", "element", element, attribute.size() );
+                    attribute.set_value( element, std::move( value ) );
+                } )
             .def(
                 "default_values", &VariableAttribute< type >::default_values );
         const auto sparse_name = absl::StrCat( "SparseAttribute", typestr );
