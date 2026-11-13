@@ -101,10 +101,25 @@ PYBIND11_MODULE( opengeode_py_model, module )
     pybind11::module::import( "opengeode_py_geometry" );
     pybind11::module::import( "opengeode_py_mesh" );
     pybind11::add_ostream_redirect( module );
-    module.doc() = "OpenGeode Python binding for model";
+    module.doc() =
+        "Models of OpenGeode: BRep (3D) and Section (2D), the boundary "
+        "representations made of Corners, Lines, Surfaces and Blocks, with "
+        "their ModelBoundaries and collections, the relationships between "
+        "components (boundary/incidence, internal/embedding, "
+        "item/collection) and the unique vertices identifying the vertices "
+        "of the component meshes. A model is modified only through its "
+        "builder (BRepBuilder, SectionBuilder). The module also provides the "
+        "functions loading and saving models (load_brep, save_section...), "
+        "converting them (convert_brep_into_section, convert_brep_into_solid, "
+        "...), measuring components (block_volume, surface_area3D...), "
+        "locating points (BRepRayTracing) and the helpers on the coordinate "
+        "reference systems. Call OpenGeodeModelLibrary.initialize() before "
+        "using the module.";
     pybind11::class_< geode::OpenGeodeModelLibrary >(
-        module, "OpenGeodeModelLibrary" )
-        .def_static( "initialize", &geode::OpenGeodeModelLibrary::initialize );
+        module, "OpenGeodeModelLibrary", "Initialization of the model module" )
+        .def_static( "initialize", &geode::OpenGeodeModelLibrary::initialize,
+            "Initialize the model module and the modules it depends on; call "
+            "it before using models" );
     geode::define_component_type( module );
     geode::define_component( module );
     geode::define_component_mesh_element( module );

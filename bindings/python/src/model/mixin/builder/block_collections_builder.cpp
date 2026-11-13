@@ -31,11 +31,13 @@
 #define PYTHON_BLOCK_COLLECTIONS_BUILDER( dimension )                          \
     const auto name##dimension =                                               \
         "BlockCollectionsBuilder" + std::to_string( dimension ) + "D";         \
-    pybind11::class_< BlockCollectionsBuilder##dimension##D >(                 \
-        module, name##dimension.c_str() )                                      \
+    pybind11::class_< BlockCollectionsBuilder##dimension##D >( module,         \
+        name##dimension.c_str(),                                               \
+        "Builder modifying the BlockCollections of a model" )                  \
         .def( "set_block_collection_name",                                     \
-            &BlockCollectionsBuilder##dimension##D::                           \
-                set_block_collection_name )
+            &BlockCollectionsBuilder##dimension##D::set_block_collection_name, \
+            pybind11::arg( "block_collection" ), pybind11::arg( "name" ),      \
+            "Set the name of the block collection" )
 
 namespace geode
 {

@@ -40,14 +40,25 @@ namespace geode
                     SectionBuilder builder{ model };
                     triangulate_surface_meshes( model, builder );
                 },
-                pybind11::call_guard< pybind11::gil_scoped_release >() )
+                pybind11::arg( "model" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Split in place each polygon of the mesh of each Surface of "
+                "the Section into triangles; the type of the meshes is "
+                "unchanged (use "
+                "convert_section_surface_meshes_into_triangulated_surfaces to "
+                "change it)" )
             .def(
                 "triangulate_brep_surface_meshes",
                 []( BRep& model ) {
                     BRepBuilder builder{ model };
                     triangulate_surface_meshes( model, builder );
                 },
-                pybind11::call_guard< pybind11::gil_scoped_release >() )
+                pybind11::arg( "model" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Split in place each polygon of the mesh of each Surface of "
+                "the BRep into triangles; the type of the meshes is unchanged "
+                "(use convert_brep_surface_meshes_into_triangulated_surfaces "
+                "to change it)" )
             .def(
                 "convert_section_surface_meshes_into_triangulated_surfaces",
                 []( Section& model ) {
@@ -55,7 +66,12 @@ namespace geode
                     convert_surface_meshes_into_triangulated_surfaces(
                         model, builder );
                 },
-                pybind11::call_guard< pybind11::gil_scoped_release >() )
+                pybind11::arg( "model" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Replace in place the mesh of each Surface of the Section by a "
+                "TriangulatedSurface, keeping the unique vertices; the meshes "
+                "already triangulated are left untouched and an error is "
+                "raised for a mesh with a polygon that is not a triangle" )
             .def(
                 "convert_brep_surface_meshes_into_triangulated_surfaces",
                 []( BRep& model ) {
@@ -63,7 +79,12 @@ namespace geode
                     convert_surface_meshes_into_triangulated_surfaces(
                         model, builder );
                 },
-                pybind11::call_guard< pybind11::gil_scoped_release >() )
+                pybind11::arg( "model" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Replace in place the mesh of each Surface of the BRep by a "
+                "TriangulatedSurface, keeping the unique vertices; the meshes "
+                "already triangulated are left untouched and an error is "
+                "raised for a mesh with a polygon that is not a triangle" )
             .def(
                 "convert_brep_block_meshes_into_tetrahedral_solids",
                 []( BRep& model ) {
@@ -71,6 +92,11 @@ namespace geode
                     convert_block_meshes_into_tetrahedral_solids(
                         model, builder );
                 },
-                pybind11::call_guard< pybind11::gil_scoped_release >() );
+                pybind11::arg( "model" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Replace in place the mesh of each Block of the BRep by a "
+                "TetrahedralSolid, keeping the unique vertices; the meshes "
+                "already tetrahedral are left untouched and an error is raised "
+                "for a mesh with a polyhedron that is not a tetrahedron" );
     }
 } // namespace geode

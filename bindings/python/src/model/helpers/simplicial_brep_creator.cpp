@@ -33,7 +33,13 @@ namespace geode
     void define_simplicial_brep_creator( pybind11::module& module )
     {
         module.def( "create_brep_from_bounding_box",
-            &create_model_from_bounding_box,
-            pybind11::call_guard< pybind11::gil_scoped_release >() );
+            &create_model_from_bounding_box, pybind11::arg( "box" ),
+            pybind11::call_guard< pybind11::gil_scoped_release >(),
+            "Return a BRep describing the box: 8 Corners, 12 Lines (one edge "
+            "each), 6 Surfaces (two triangles each, TriangulatedSurface "
+            "meshes) and 1 Block bounded by the 6 Surfaces, with one unique "
+            "vertex per box corner. The Block mesh is an empty "
+            "TetrahedralSolid (no polyhedron): its volume comes from its "
+            "boundary Surfaces" );
     }
 } // namespace geode

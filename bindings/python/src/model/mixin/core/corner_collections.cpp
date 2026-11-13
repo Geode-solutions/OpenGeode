@@ -30,12 +30,18 @@
     const auto name##dimension =                                               \
         "CornerCollections" + std::to_string( dimension ) + "D";               \
     pybind11::class_< CornerCollections##dimension##D,                         \
-        pybind11::smart_holder >( module, name##dimension.c_str() )            \
+        pybind11::smart_holder >( module, name##dimension.c_str(),             \
+        "Storage of the CornerCollection components of a model, read through " \
+        "the model class" )                                                    \
         .def( "nb_corner_collections",                                         \
-            &CornerCollections##dimension##D::nb_corner_collections )          \
+            &CornerCollections##dimension##D::nb_corner_collections,           \
+            "Return the number of CornerCollection components of the model" )  \
         .def( "corner_collection",                                             \
             &CornerCollections##dimension##D::corner_collection,               \
-            pybind11::return_value_policy::reference_internal )                \
+            pybind11::arg( "id" ),                                             \
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the CornerCollection with the given uuid; raise an error " \
+            "if the model has none" )                                          \
         .def(                                                                  \
             "corner_collections",                                              \
             []( const CornerCollections##dimension##D& self ) {                \
@@ -47,7 +53,9 @@
                 }                                                              \
                 return components;                                             \
             },                                                                 \
-            pybind11::return_value_policy::reference_internal )
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the list of the CornerCollection components of the "       \
+            "model" )
 
 namespace geode
 {

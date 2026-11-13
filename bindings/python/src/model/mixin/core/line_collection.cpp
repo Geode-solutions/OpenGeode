@@ -29,10 +29,15 @@
     const auto name##dimension =                                               \
         "LineCollection" + std::to_string( dimension ) + "D";                  \
     pybind11::class_< LineCollection##dimension##D, Component##dimension##D,   \
-        pybind11::smart_holder >( module, name##dimension.c_str() )            \
-        .def( "component_id", &LineCollection##dimension##D::component_id )    \
+        pybind11::smart_holder >( module, name##dimension.c_str(),             \
+        "Collection component grouping Lines; its items are given by "         \
+        "line_collection_items()" )                                            \
+        .def( "component_id", &LineCollection##dimension##D::component_id,     \
+            "Return the ComponentID (type and uuid) of the component" )        \
         .def_static( "component_type_static",                                  \
-            &LineCollection##dimension##D::component_type_static )
+            &LineCollection##dimension##D::component_type_static,              \
+            "Return the ComponentType of all the LineCollections, without "    \
+            "needing an instance" )
 
 namespace geode
 {

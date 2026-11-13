@@ -28,11 +28,16 @@
 
 #define PYTHON_BLOCKS( dimension )                                             \
     const auto name##dimension = "Blocks" + std::to_string( dimension ) + "D"; \
-    pybind11::class_< Blocks##dimension##D, pybind11::smart_holder >(          \
-        module, name##dimension.c_str() )                                      \
-        .def( "nb_blocks", &Blocks##dimension##D::nb_blocks )                  \
-        .def( "block", &Blocks##dimension##D::block,                           \
-            pybind11::return_value_policy::reference_internal )                \
+    pybind11::class_< Blocks##dimension##D, pybind11::smart_holder >( module,  \
+        name##dimension.c_str(),                                               \
+        "Storage of the Block components of a model, read through the model "  \
+        "class" )                                                              \
+        .def( "nb_blocks", &Blocks##dimension##D::nb_blocks,                   \
+            "Return the number of Block components of the model" )             \
+        .def( "block", &Blocks##dimension##D::block, pybind11::arg( "id" ),    \
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the Block with the given uuid; raise an error if the "     \
+            "model has none" )                                                 \
         .def(                                                                  \
             "blocks",                                                          \
             []( const Blocks##dimension##D& self ) {                           \
@@ -43,7 +48,8 @@
                 }                                                              \
                 return components;                                             \
             },                                                                 \
-            pybind11::return_value_policy::reference_internal )
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the list of the Block components of the model" )
 
 namespace geode
 {

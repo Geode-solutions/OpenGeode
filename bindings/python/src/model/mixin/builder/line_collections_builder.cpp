@@ -31,10 +31,13 @@
 #define PYTHON_LINE_COLLECTIONS_BUILDER( dimension )                           \
     const auto name##dimension =                                               \
         "LineCollectionsBuilder" + std::to_string( dimension ) + "D";          \
-    pybind11::class_< LineCollectionsBuilder##dimension##D >(                  \
-        module, name##dimension.c_str() )                                      \
+    pybind11::class_< LineCollectionsBuilder##dimension##D >( module,          \
+        name##dimension.c_str(),                                               \
+        "Builder modifying the LineCollections of a model" )                   \
         .def( "set_line_collection_name",                                      \
-            &LineCollectionsBuilder##dimension##D::set_line_collection_name )
+            &LineCollectionsBuilder##dimension##D::set_line_collection_name,   \
+            pybind11::arg( "line_collection" ), pybind11::arg( "name" ),       \
+            "Set the name of the line collection" )
 
 namespace geode
 {

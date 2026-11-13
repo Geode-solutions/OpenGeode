@@ -30,12 +30,18 @@
     const auto name##dimension =                                               \
         "ModelBoundaries" + std::to_string( dimension ) + "D";                 \
     pybind11::class_< ModelBoundaries##dimension##D, pybind11::smart_holder >( \
-        module, name##dimension.c_str() )                                      \
+        module, name##dimension.c_str(),                                       \
+        "Storage of the ModelBoundary components of a model, read through "    \
+        "the model class" )                                                    \
         .def( "nb_model_boundaries",                                           \
-            &ModelBoundaries##dimension##D::nb_model_boundaries )              \
+            &ModelBoundaries##dimension##D::nb_model_boundaries,               \
+            "Return the number of ModelBoundary components of the model" )     \
         .def( "model_boundary",                                                \
             &ModelBoundaries##dimension##D::model_boundary,                    \
-            pybind11::return_value_policy::reference_internal )                \
+            pybind11::arg( "id" ),                                             \
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the ModelBoundary with the given uuid; raise an error if " \
+            "the model has none" )                                             \
         .def(                                                                  \
             "model_boundaries",                                                \
             []( const ModelBoundaries##dimension##D& self ) {                  \
@@ -46,7 +52,8 @@
                 }                                                              \
                 return components;                                             \
             },                                                                 \
-            pybind11::return_value_policy::reference_internal )
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the list of the ModelBoundary components of the model" )
 
 namespace geode
 {

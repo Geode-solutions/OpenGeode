@@ -32,19 +32,30 @@
     const auto name##dimension =                                               \
         "Surface" + std::to_string( dimension ) + "D";                         \
     pybind11::class_< Surface##dimension##D, Component##dimension##D,          \
-        pybind11::smart_holder >( module, name##dimension.c_str() )            \
+        pybind11::smart_holder >( module, name##dimension.c_str(),             \
+        "Geometric component of a model described by a SurfaceMesh" )          \
         .def( "mesh",                                                          \
             &Surface##dimension##D::mesh< SurfaceMesh##dimension##D >,         \
-            pybind11::return_value_policy::reference_internal )                \
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the mesh of the surface as a SurfaceMesh; modify it "      \
+            "through the mesh builder given by the model builder "             \
+            "(surface_mesh_builder)" )                                         \
         .def( "polygonal_mesh",                                                \
             &Surface##dimension##D::mesh< PolygonalSurface##dimension##D >,    \
-            pybind11::return_value_policy::reference_internal )                \
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the mesh of the surface as a PolygonalSurface; raise a "   \
+            "RuntimeError (bad cast) if the mesh is of another type" )         \
         .def( "triangulated_mesh",                                             \
             &Surface##dimension##D::mesh< TriangulatedSurface##dimension##D >, \
-            pybind11::return_value_policy::reference_internal )                \
-        .def( "component_id", &Surface##dimension##D::component_id )           \
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the mesh of the surface as a TriangulatedSurface; raise "  \
+            "a RuntimeError (bad cast) if the mesh is of another type" )       \
+        .def( "component_id", &Surface##dimension##D::component_id,            \
+            "Return the ComponentID (type and uuid) of the component" )        \
         .def_static( "component_type_static",                                  \
-            &Surface##dimension##D::component_type_static )
+            &Surface##dimension##D::component_type_static,                     \
+            "Return the ComponentType of all the Surfaces, without needing "   \
+            "an instance" )
 
 namespace geode
 {

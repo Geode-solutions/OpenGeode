@@ -29,28 +29,47 @@ namespace geode
 {
     void define_copy_mapping( pybind11::module& module )
     {
-        pybind11::class_< ModelCopyMapping >( module, "ModelCopyMapping" )
-            .def( pybind11::init<>() )
+        pybind11::class_< ModelCopyMapping >( module, "ModelCopyMapping",
+            "Mapping, for each component type, between the uuids of the "
+            "components of a source model and the uuids of their copies" )
+            .def( pybind11::init<>(), "Build an empty mapping" )
             .def( pybind11::init( []( ModelCopyMapping& mapping ) {
                 return ModelCopyMapping{ std::move( mapping ) };
-            } ) )
+            } ),
+                pybind11::arg( "mapping" ),
+                "Build a mapping by taking over the content of mapping, which "
+                "is emptied" )
             .def( "at",
                 static_cast< ModelCopyMapping::Mapping& (
                     ModelCopyMapping::*) ( const ComponentType& ) >(
                     &ModelCopyMapping::at ),
-                pybind11::return_value_policy::reference_internal );
+                pybind11::arg( "type" ),
+                pybind11::return_value_policy::reference_internal,
+                "Return the BijectiveMapping of the components of the given "
+                "type, modifiable; raise an IndexError if there is none for "
+                "this type" );
     }
     void define_generic_mapping( pybind11::module& module )
     {
-        pybind11::class_< ModelGenericMapping >( module, "ModelGenericMapping" )
-            .def( pybind11::init<>() )
+        pybind11::class_< ModelGenericMapping >( module, "ModelGenericMapping",
+            "Mapping, for each component type, between the uuids of the "
+            "components of a model before and after an operation, a component "
+            "possibly corresponding to several others" )
+            .def( pybind11::init<>(), "Build an empty mapping" )
             .def( pybind11::init( []( ModelGenericMapping& mapping ) {
                 return ModelGenericMapping{ std::move( mapping ) };
-            } ) )
+            } ),
+                pybind11::arg( "mapping" ),
+                "Build a mapping by taking over the content of mapping, which "
+                "is emptied" )
             .def( "at",
                 static_cast< ModelGenericMapping::Mapping& (
                     ModelGenericMapping::*) ( const ComponentType& ) >(
                     &ModelGenericMapping::at ),
-                pybind11::return_value_policy::reference_internal );
+                pybind11::arg( "type" ),
+                pybind11::return_value_policy::reference_internal,
+                "Return the GenericMapping of the components of the given "
+                "type, modifiable; raise an IndexError if there is none for "
+                "this type" );
     }
 } // namespace geode

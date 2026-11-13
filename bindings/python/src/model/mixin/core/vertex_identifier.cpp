@@ -29,25 +29,62 @@ namespace geode
 {
     void define_vertex_identifier( pybind11::module& module )
     {
-        define_string_representation( pybind11::class_< ComponentMeshVertex >(
-                                          module, "ComponentMeshVertex" ) )
-            .def( pybind11::init< ComponentID, index_t >() )
-            .def( pybind11::self == pybind11::self )
-            .def( "__hash__",
-                []( const ComponentMeshVertex& value ) {
-                    return absl::HashOf(
-                        std::hash< ComponentID >{}( value.component_id ),
-                        value.vertex );
-                } )
-            .def_readwrite( "component_id", &ComponentMeshVertex::component_id )
-            .def_readwrite( "vertex", &ComponentMeshVertex::vertex );
+        auto cls_ComponentMeshVertex =
+            define_string_representation(
+                pybind11::class_< ComponentMeshVertex >( module,
+                    "ComponentMeshVertex",
+                    "Identify a vertex of the mesh of a model component by the "
+                    "component and the vertex index in its mesh" ) )
+                .def( pybind11::init< ComponentID, index_t >(),
+                    pybind11::arg( "component_id" ),
+                    pybind11::arg( "vertex_id" ),
+                    "Build the identifier of the vertex vertex_id of the mesh "
+                    "of the component" )
+                .def(
+                    pybind11::self == pybind11::self, pybind11::arg( "other" ) )
+                .def( "__hash__",
+                    []( const ComponentMeshVertex& value ) {
+                        return absl::HashOf(
+                            std::hash< ComponentID >{}( value.component_id ),
+                            value.vertex );
+                    } )
 
-        pybind11::class_< VertexIdentifier, pybind11::smart_holder >(
-            module, "VertexIdentifier" )
-            .def( pybind11::init<>() )
-            .def( "nb_unique_vertices", &VertexIdentifier::nb_unique_vertices )
-            .def( "component_mesh_vertices",
-                &VertexIdentifier::component_mesh_vertices )
-            .def( "unique_vertex", &VertexIdentifier::unique_vertex );
+            ;
+        def_readwrite_named( cls_ComponentMeshVertex, "component_id",
+            &ComponentMeshVertex::component_id,
+            "Component whose mesh holds the vertex" );
+        def_readwrite_named( cls_ComponentMeshVertex, "vertex",
+            &ComponentMeshVertex::vertex,
+            "Index of the vertex in the mesh of the component" );
+
+        pybind11::class_< VertexIdentifier, pybind11::smart_holder >( module,
+            "VertexIdentifier",
+            "Identification of the vertices of the component meshes as unique "
+            "vertices: component vertices at the same location of the model "
+            "(for instance the end of a Line and its Corner, or the vertices "
+            "shared by two Surfaces) share one unique vertex. This is purely "
+            "topological" )
+            .def( pybind11::init<>(), "Build an empty VertexIdentifier" )
+            .def( "nb_unique_vertices", &VertexIdentifier::nb_unique_vertices,
+                "Return the number of unique vertices" )
+            .def(
+                "component_mesh_vertices",
+                []( const VertexIdentifier& identifier,
+                    index_t unique_vertex_id ) {
+                    check_index( "component_mesh_vertices", "unique vertex",
+                        unique_vertex_id, identifier.nb_unique_vertices() );
+                    return identifier.component_mesh_vertices(
+                        unique_vertex_id );
+                },
+                pybind11::arg( "unique_vertex_id" ),
+                "Return the list of ComponentMeshVertex identified with the "
+                "unique vertex; raise an IndexError if unique_vertex_id is not "
+                "in [0, nb_unique_vertices)" )
+            .def( "unique_vertex", &VertexIdentifier::unique_vertex,
+                pybind11::arg( "component_vertex" ),
+                "Return the unique vertex of the component vertex, NO_ID if "
+                "the vertex is not identified with any unique vertex. The "
+                "component must be registered and the vertex must exist in its "
+                "mesh (neither is checked)" );
     }
 } // namespace geode

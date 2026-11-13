@@ -32,18 +32,38 @@ namespace geode
 {
     void define_section_io( pybind11::module& module )
     {
-        module.def( "save_section", &save_section,
-            pybind11::call_guard< pybind11::gil_scoped_release >() );
-        module.def( "load_section", &load_section,
-            pybind11::call_guard< pybind11::gil_scoped_release >() );
+        module.def( "save_section", &save_section, pybind11::arg( "section" ),
+            pybind11::arg( "filename" ),
+            pybind11::call_guard< pybind11::gil_scoped_release >(),
+            "Save the Section in the file, whose extension selects the format, "
+            "and return the list of the written files; raise an error if the "
+            "format is not supported" );
+        module.def( "load_section", &load_section, pybind11::arg( "filename" ),
+            pybind11::call_guard< pybind11::gil_scoped_release >(),
+            "Load the Section objects of the file, with the default data "
+            "structure, and return them as a list; raise an error if the file "
+            "cannot be read" );
         module.def( "section_object_priority", &section_object_priority,
-            pybind11::call_guard< pybind11::gil_scoped_release >() );
+            pybind11::arg( "filename" ),
+            pybind11::call_guard< pybind11::gil_scoped_release >(),
+            "Return the priority of the loader chosen for the file, used to "
+            "select the geode object type when several can load it; raise an "
+            "error if no loader handles the file" );
         module.def( "is_section_loadable", &is_section_loadable,
-            pybind11::call_guard< pybind11::gil_scoped_release >() );
+            pybind11::arg( "filename" ),
+            pybind11::call_guard< pybind11::gil_scoped_release >(),
+            "Return a Percentage of how well the file can be loaded as a "
+            "Section, 0 if it cannot" );
         module.def( "is_section_saveable", &is_section_saveable,
-            pybind11::call_guard< pybind11::gil_scoped_release >() );
+            pybind11::arg( "section" ), pybind11::arg( "filename" ),
+            pybind11::call_guard< pybind11::gil_scoped_release >(),
+            "Return True if the Section can be saved in the file format given "
+            "by the filename" );
         module.def( "section_additional_files", &section_additional_files,
-            pybind11::call_guard< pybind11::gil_scoped_release >() );
+            pybind11::arg( "filename" ),
+            pybind11::call_guard< pybind11::gil_scoped_release >(),
+            "Return the AdditionalFiles (mandatory and optional) used when "
+            "loading the file; raise an error if no loader handles the file" );
         PYTHON_FACTORY_CLASS( SectionInputFactory );
         PYTHON_FACTORY_CLASS( SectionOutputFactory );
     }

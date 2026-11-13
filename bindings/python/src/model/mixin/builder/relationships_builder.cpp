@@ -29,18 +29,46 @@ namespace geode
 {
     void define_relationships_builder( pybind11::module& module )
     {
-        pybind11::class_< RelationshipsBuilder >(
-            module, "RelationshipsBuilder" )
+        pybind11::class_< RelationshipsBuilder >( module,
+            "RelationshipsBuilder",
+            "Builder modifying the Relationships of a model" )
             .def( pybind11::init< Relationships& >(),
-                pybind11::keep_alive< 1, 2 >() )
+                pybind11::arg( "relationships" ),
+                pybind11::keep_alive< 1, 2 >(),
+                "Build a builder of the given Relationships, kept alive by the "
+                "builder" )
             .def( "unregister_component",
-                &RelationshipsBuilder::unregister_component )
+                &RelationshipsBuilder::unregister_component,
+                pybind11::arg( "component_id" ),
+                "Remove the uuid from the Relationships together with all its "
+                "relations; nothing happens if it has none. The component "
+                "itself is not deleted" )
             .def( "add_boundary_relation",
-                &RelationshipsBuilder::add_boundary_relation )
+                &RelationshipsBuilder::add_boundary_relation,
+                pybind11::arg( "boundary" ), pybind11::arg( "incidence" ),
+                "Add a boundary-incidence relation: boundary bounds incidence. "
+                "Return the index of the relation; if the two components are "
+                "already related, log a warning and return the index of the "
+                "existing relation, left unchanged" )
             .def( "add_internal_relation",
-                &RelationshipsBuilder::add_internal_relation )
+                &RelationshipsBuilder::add_internal_relation,
+                pybind11::arg( "internal" ), pybind11::arg( "embedding" ),
+                "Add an internal-embedding relation: internal lies inside "
+                "embedding. Return the index of the relation; if the two "
+                "components are already related, log a warning and return the "
+                "index of the existing relation, left unchanged" )
             .def( "add_item_in_collection",
-                &RelationshipsBuilder::add_item_in_collection )
-            .def( "remove_relation", &RelationshipsBuilder::remove_relation );
+                &RelationshipsBuilder::add_item_in_collection,
+                pybind11::arg( "item" ), pybind11::arg( "collection" ),
+                "Add an item-collection relation: item belongs to collection. "
+                "Return the index of the relation; if the two components are "
+                "already related, log a warning and return the index of the "
+                "existing relation, left unchanged" )
+            .def( "remove_relation", &RelationshipsBuilder::remove_relation,
+                pybind11::arg( "component_id1" ),
+                pybind11::arg( "component_id2" ),
+                "Remove the relation between the two components, whatever its "
+                "type and the order of the arguments; nothing happens if they "
+                "are not related" );
     }
 } // namespace geode

@@ -29,8 +29,11 @@ namespace geode
 {
     void define_physical_properties( pybind11::module& module )
     {
-        pybind11::native_enum< PHYSICAL_PROPERTY_NAME >(
-            module, "PHYSICAL_PROPERTY_NAME", "enum.Enum" )
+        pybind11::native_enum< PHYSICAL_PROPERTY_NAME >( module,
+            "PHYSICAL_PROPERTY_NAME", "enum.Enum",
+            "Names of the physical properties that can be associated to the "
+            "components of a model (porosity, permeability, boundary "
+            "conditions, mechanical parameters...)" )
             .value( "porosity", PHYSICAL_PROPERTY_NAME::porosity )
             .value( "permeability", PHYSICAL_PROPERTY_NAME::permeability )
             .value(
@@ -62,19 +65,40 @@ namespace geode
                 PHYSICAL_PROPERTY_NAME::boundary_normal_traction )
             .finalize();
 
-        pybind11::class_< PhysicalProperties::Info >( module, "Info" )
-            .def( pybind11::init< ComponentType, uuid >() )
-            .def_readwrite(
-                "component_type", &PhysicalProperties::Info::component_type )
-            .def_readwrite(
-                "attribute_id", &PhysicalProperties::Info::attribute_id );
+        auto cls_Info =
+            pybind11::class_< PhysicalProperties::Info >( module, "Info",
+                "Where the values of a physical property are stored: the type "
+                "of the components carrying them and the uuid of the attribute "
+                "holding the values inside the component meshes" )
+                .def( pybind11::init< ComponentType, uuid >(),
+                    pybind11::arg( "component_type" ),
+                    pybind11::arg( "attribute_id" ),
+                    "Build the description of a physical property stored in "
+                    "the attribute attribute_id of the meshes of the "
+                    "components of the given type" )
 
-        pybind11::class_< PhysicalProperties, pybind11::smart_holder >(
-            module, "PhysicalProperties" )
+            ;
+        def_readwrite_named( cls_Info, "component_type",
+            &PhysicalProperties::Info::component_type,
+            "Type of the components carrying the physical property values" );
+        def_readwrite_named( cls_Info, "attribute_id",
+            &PhysicalProperties::Info::attribute_id,
+            "Uuid of the attribute storing the physical property values inside "
+            "the component meshes" );
+
+        pybind11::class_< PhysicalProperties, pybind11::smart_holder >( module,
+            "PhysicalProperties",
+            "Association between physical property names and the attributes of "
+            "the model component meshes holding their values" )
             .def( "has_physical_property",
-                &PhysicalProperties::has_physical_property )
+                &PhysicalProperties::has_physical_property,
+                pybind11::arg( "name" ),
+                "Return True if the physical property has been set" )
             .def( "physical_property_info",
                 &PhysicalProperties::physical_property_info,
-                pybind11::return_value_policy::reference_internal );
+                pybind11::arg( "name" ),
+                pybind11::return_value_policy::reference_internal,
+                "Return the Info of the physical property; raise an error if "
+                "it has not been set (check with has_physical_property)" );
     }
 } // namespace geode

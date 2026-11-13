@@ -30,6 +30,7 @@ import opengeode_py_basic as basic
 import opengeode_py_geometry as geometry
 import opengeode_py_image as image
 import opengeode_py_mesh as mesh
+import opengeode_py_model as model
 
 
 def check(condition, message):
@@ -1324,8 +1325,420 @@ def test_mesh():
     test_mesh_debug_helpers()
 
 
+def unit_box_brep():
+    box = geometry.BoundingBox3D()
+    box.add_point(geometry.Point3D([0, 0, 0]))
+    box.add_point(geometry.Point3D([2, 3, 4]))
+    return model.create_brep_from_bounding_box(box=box)
+
+
+def test_model_components():
+    model.OpenGeodeModelLibrary.initialize()
+    surface_type = model.ComponentType(value="Surface")
+    check(surface_type.get() == "Surface", "ComponentType(value=)")
+    check(surface_type.matches(other=model.ComponentType("Surface")), "ComponentType.matches(other=)")
+    identifier = model.ComponentID(component_type=surface_type, input_id=basic.uuid())
+    check(identifier.type.get() == "Surface", "ComponentID(component_type=, input_id=)")
+    identifier.type = model.ComponentType("Line")
+    check(identifier.type.get() == "Line", "ComponentID.type setter")
+    element = model.ComponentMeshElement(component_id=identifier, element_id=3)
+    check(element.string().endswith(" 3]"), "ComponentMeshElement(component_id=, element_id=)")
+    vertex = model.ComponentMeshVertex(component_id=identifier, vertex_id=2)
+    check(vertex.vertex == 2, "ComponentMeshVertex(component_id=, vertex_id=)")
+    vertex.vertex = 5
+    check(vertex.vertex == 5, "ComponentMeshVertex.vertex setter")
+    info = model.Info(component_type=surface_type, attribute_id=basic.uuid())
+    info.component_type = model.ComponentType("Block")
+    check(info.component_type.get() == "Block", "Info.component_type setter")
+    check(model.RayTracingResult().position == model.POSITION.outside, "RayTracingResult.position")
+    options = model.SectionExtruderOptions()
+    options.axis_to_extrude = 1
+    options.min_coordinate = -1.0
+    options.max_coordinate = 2.0
+    check((options.axis_to_extrude, options.min_coordinate, options.max_coordinate) == (1, -1.0, 2.0), "SectionExtruderOptions setters")
+
+
+def test_model_brep_topology():
+    brep = model.BRep()
+    builder = model.BRepBuilder(brep=brep)
+    impl = mesh.MeshImpl("OpenGeodePointSet3D")
+    corner = builder.add_corner(impl=impl)
+    corners = [corner] + [builder.add_corner() for _ in range(5)]
+    line = builder.add_line(impl=mesh.MeshImpl("OpenGeodeEdgedCurve3D"))
+    other_line = builder.add_line()
+    surface = builder.add_surface(impl=mesh.MeshImpl("OpenGeodeTriangulatedSurface3D"))
+    other_surface = builder.add_surface()
+    block = builder.add_block(impl=mesh.MeshImpl("OpenGeodeTetrahedralSolid3D"))
+    boundary = builder.add_model_boundary()
+    corner_collection = builder.add_corner_collection()
+    line_collection = builder.add_line_collection()
+    surface_collection = builder.add_surface_collection()
+    block_collection = builder.add_block_collection()
+    c = lambda index: brep.corner(id=corners[index])
+    builder.add_corner_line_boundary_relationship(corner=c(0), line=brep.line(id=line))
+    builder.add_corner_line_boundary_relationship(corner=c(1), line=brep.line(id=line))
+    builder.add_line_surface_boundary_relationship(line=brep.line(id=line), surface=brep.surface(id=surface))
+    builder.add_surface_block_boundary_relationship(surface=brep.surface(id=surface), block=brep.block(id=block))
+    builder.add_corner_line_internal_relationship(corner=c(2), line=brep.line(id=line))
+    builder.add_corner_surface_internal_relationship(corner=c(3), surface=brep.surface(id=surface))
+    builder.add_line_surface_internal_relationship(line=brep.line(id=other_line), surface=brep.surface(id=surface))
+    builder.add_corner_block_internal_relationship(corner=c(4), block=brep.block(id=block))
+    builder.add_line_block_internal_relationship(line=brep.line(id=other_line), block=brep.block(id=block))
+    builder.add_surface_block_internal_relationship(surface=brep.surface(id=other_surface), block=brep.block(id=block))
+    builder.add_surface_in_model_boundary(surface=brep.surface(id=surface), boundary=brep.model_boundary(id=boundary))
+    builder.add_corner_in_corner_collection(corner=c(0), collection=brep.corner_collection(id=corner_collection))
+    builder.add_line_in_line_collection(line=brep.line(id=line), collection=brep.line_collection(id=line_collection))
+    builder.add_surface_in_surface_collection(surface=brep.surface(id=surface), collection=brep.surface_collection(id=surface_collection))
+    builder.add_block_in_block_collection(block=brep.block(id=block), collection=brep.block_collection(id=block_collection))
+    line_object = brep.line(id=line)
+    surface_object = brep.surface(id=surface)
+    block_object = brep.block(id=block)
+    check(len(brep.boundary_corners(line=line_object)) == 2, "BRep.boundary_corners(line=)")
+    check(len(brep.boundary_lines(surface=surface_object)) == 1, "BRep.boundary_lines(surface=)")
+    check(len(brep.boundary_surfaces(block=block_object)) == 1, "BRep.boundary_surfaces(block=)")
+    check(len(brep.incident_lines(corner=c(0))) == 1, "BRep.incident_lines(corner=)")
+    check(len(brep.incident_surfaces(line=line_object)) == 1, "BRep.incident_surfaces(line=)")
+    check(len(brep.incident_blocks(surface=surface_object)) == 1, "BRep.incident_blocks(surface=)")
+    check(brep.nb_internal_corners_of_line(line=line_object) == 1, "nb_internal_corners_of_line(line=)")
+    check(len(brep.internal_corners_of_line(line=line_object)) == 1, "internal_corners_of_line(line=)")
+    check(brep.nb_internal_corners_of_surface(surface=surface_object) == 1, "nb_internal_corners_of_surface(surface=)")
+    check(len(brep.internal_corners_of_surface(surface=surface_object)) == 1, "internal_corners_of_surface(surface=)")
+    check(brep.nb_internal_lines_of_surface(surface=surface_object) == 1, "nb_internal_lines_of_surface(surface=)")
+    check(len(brep.internal_lines_of_surface(surface=surface_object)) == 1, "internal_lines_of_surface(surface=)")
+    check(brep.nb_internal_corners_of_block(block=block_object) == 1, "nb_internal_corners_of_block(block=)")
+    check(len(brep.internal_corners_of_block(block=block_object)) == 1, "internal_corners_of_block(block=)")
+    check(brep.nb_internal_lines_of_block(block=block_object) == 1, "nb_internal_lines_of_block(block=)")
+    check(len(brep.internal_lines_of_block(block=block_object)) == 1, "internal_lines_of_block(block=)")
+    check(brep.nb_internal_surfaces_of_block(block=block_object) == 1, "nb_internal_surfaces_of_block(block=)")
+    check(len(brep.internal_surfaces_of_block(block=block_object)) == 1, "internal_surfaces_of_block(block=)")
+    check(brep.nb_embedding_lines_of_corner(corner=c(2)) == 1, "nb_embedding_lines_of_corner(corner=)")
+    check(len(brep.embedding_lines_of_corner(corner=c(2))) == 1, "embedding_lines_of_corner(corner=)")
+    check(brep.nb_embedding_surfaces_of_corner(corner=c(3)) == 1, "nb_embedding_surfaces_of_corner(corner=)")
+    check(len(brep.embedding_surfaces_of_corner(corner=c(3))) == 1, "embedding_surfaces_of_corner(corner=)")
+    check(brep.nb_embedding_surfaces_of_line(line=brep.line(id=other_line)) == 1, "nb_embedding_surfaces_of_line(line=)")
+    check(len(brep.embedding_surfaces_of_line(line=brep.line(id=other_line))) == 1, "embedding_surfaces_of_line(line=)")
+    check(brep.nb_embedding_blocks_of_corner(corner=c(4)) == 1, "nb_embedding_blocks_of_corner(corner=)")
+    check(len(brep.embedding_blocks_of_corner(corner=c(4))) == 1, "embedding_blocks_of_corner(corner=)")
+    check(brep.nb_embedding_blocks_of_line(line=brep.line(id=other_line)) == 1, "nb_embedding_blocks_of_line(line=)")
+    check(len(brep.embedding_blocks_of_line(line=brep.line(id=other_line))) == 1, "embedding_blocks_of_line(line=)")
+    check(brep.nb_embedding_blocks_of_surface(surface=brep.surface(id=other_surface)) == 1, "nb_embedding_blocks_of_surface(surface=)")
+    check(len(brep.embedding_blocks_of_surface(surface=brep.surface(id=other_surface))) == 1, "embedding_blocks_of_surface(surface=)")
+    check(len(brep.model_boundary_items(boundary=brep.model_boundary(id=boundary))) == 1, "model_boundary_items(boundary=)")
+    check(len(brep.corner_collection_items(collection=brep.corner_collection(id=corner_collection))) == 1, "corner_collection_items(collection=)")
+    check(len(brep.line_collection_items(collection=brep.line_collection(id=line_collection))) == 1, "line_collection_items(collection=)")
+    check(len(brep.surface_collection_items(collection=brep.surface_collection(id=surface_collection))) == 1, "surface_collection_items(collection=)")
+    check(len(brep.block_collection_items(collection=brep.block_collection(id=block_collection))) == 1, "block_collection_items(collection=)")
+    check(brep.is_line_closed(line=line_object) is False, "is_line_closed(line=)")
+    check(brep.is_surface_closed(surface=brep.surface(id=other_surface)), "is_surface_closed(surface=)")
+    check(brep.is_line_boundary(corner=c(0), line=line_object), "is_line_boundary")
+    check(brep.is_surface_boundary(line=line_object, surface=surface_object), "is_surface_boundary")
+    check(brep.is_block_boundary(surface=surface_object, block=block_object), "is_block_boundary")
+    check(brep.is_corner_in_line_internals(corner=c(2), line=line_object), "is_corner_in_line_internals")
+    check(brep.is_corner_in_surface_internals(corner=c(3), surface=surface_object), "is_corner_in_surface_internals")
+    check(brep.is_line_in_surface_internals(line=brep.line(id=other_line), surface=surface_object), "is_line_in_surface_internals")
+    check(brep.is_corner_in_block_internals(corner=c(4), block=block_object), "is_corner_in_block_internals")
+    check(brep.is_line_in_block_internals(line=brep.line(id=other_line), block=block_object), "is_line_in_block_internals")
+    check(brep.is_surface_in_block_internals(surface=brep.surface(id=other_surface), block=block_object), "is_surface_in_block_internals")
+    check(brep.is_model_boundary_item(surface=surface_object, boundary=brep.model_boundary(id=boundary)), "is_model_boundary_item")
+    check(brep.is_corner_collection_item(corner=c(0), corner_collection=brep.corner_collection(id=corner_collection)), "is_corner_collection_item")
+    check(brep.is_line_collection_item(line=line_object, line_collection=brep.line_collection(id=line_collection)), "is_line_collection_item")
+    check(brep.is_surface_collection_item(surface=surface_object, surface_collection=brep.surface_collection(id=surface_collection)), "is_surface_collection_item")
+    check(brep.is_block_collection_item(block=block_object, block_collection=brep.block_collection(id=block_collection)), "is_block_collection_item")
+    check(brep.brep_component(component_id=surface).id() == surface, "brep_component(component_id=)")
+    # Relationships API on the uuids
+    check(brep.nb_boundaries(component_id=line) == 2, "Relationships.nb_boundaries(component_id=)")
+    check(len(brep.boundaries(component_id=line)) == 2, "Relationships.boundaries(component_id=)")
+    check(brep.nb_incidences(component_id=line) == 1, "Relationships.nb_incidences")
+    check(len(brep.incidences(component_id=line)) == 1, "Relationships.incidences")
+    check(brep.nb_internals(component_id=line) == 1, "Relationships.nb_internals")
+    check(len(brep.internals(component_id=line)) == 1, "Relationships.internals")
+    check(brep.nb_embeddings(component_id=corners[2]) == 1, "Relationships.nb_embeddings")
+    check(len(brep.embeddings(component_id=corners[2])) == 1, "Relationships.embeddings")
+    check(brep.nb_items(component_id=boundary) == 1, "Relationships.nb_items")
+    check(len(brep.items(component_id=boundary)) == 1, "Relationships.items")
+    check(brep.nb_collections(id=surface) == 2, "Relationships.nb_collections(id=)")
+    check(len(brep.collections(id=surface)) == 2, "Relationships.collections(id=)")
+    check(brep.is_boundary(boundary=corners[0], incidence=line), "Relationships.is_boundary")
+    check(brep.is_internal(internal=corners[2], embedding=line), "Relationships.is_internal")
+    check(brep.is_item(item=surface, collection=boundary), "Relationships.is_item")
+    # relationship builder
+    relationships_builder = model.RelationshipsBuilder(relationships=brep)
+    surface_id = surface_object.component_id()
+    first = relationships_builder.add_item_in_collection(item=model.ComponentID(model.ComponentType("Corner"), corners[5]), collection=model.ComponentID(model.ComponentType("CornerCollection"), corner_collection))
+    check(brep.is_item(item=corners[5], collection=corner_collection), "RelationshipsBuilder.add_item_in_collection")
+    check(isinstance(first, int), "add_item_in_collection returns an index")
+    relationships_builder.add_boundary_relation(boundary=model.ComponentID(model.ComponentType("Corner"), corners[5]), incidence=line_object.component_id())
+    check(brep.is_boundary(corners[5], line), "RelationshipsBuilder.add_boundary_relation")
+    relationships_builder.add_internal_relation(internal=model.ComponentID(model.ComponentType("Line"), line), embedding=block_object.component_id())
+    check(brep.is_internal(line, block), "RelationshipsBuilder.add_internal_relation")
+    relationships_builder.remove_relation(component_id1=corners[5], component_id2=line)
+    check(not brep.is_boundary(corners[5], line), "RelationshipsBuilder.remove_relation")
+    relationships_builder.unregister_component(component_id=corners[5])
+    check(brep.nb_collections(id=corners[5]) == 0, "RelationshipsBuilder.unregister_component")
+    # names
+    builder.set_corner_name(corner=c(0), name="c0")
+    builder.set_line_name(line=line_object, name="l")
+    builder.set_surface_name(surface=surface_object, name="s")
+    builder.set_block_name(block=block_object, name="b")
+    builder.set_model_boundary_name(id=brep.model_boundary(id=boundary), name="mb")
+    builder.set_corner_collection_name(corner_collection=brep.corner_collection(id=corner_collection), name="cc")
+    builder.set_line_collection_name(line_collection=brep.line_collection(id=line_collection), name="lc")
+    builder.set_surface_collection_name(surface_collection=brep.surface_collection(id=surface_collection), name="sc")
+    builder.set_block_collection_name(block_collection=brep.block_collection(id=block_collection), name="bc")
+    check([c(0).name(), line_object.name(), surface_object.name(), block_object.name()] == ["c0", "l", "s", "b"], "set_xxx_name keywords")
+    # mesh builders
+    check(builder.corner_mesh_builder(corner=c(0)).create_point(point=geometry.Point3D([0, 0, 0])) == 0, "corner_mesh_builder(corner=)")
+    line_builder = builder.line_mesh_builder(line=line_object)
+    line_builder.create_point(point=geometry.Point3D([0, 0, 0]))
+    check(brep.line(id=line).mesh().nb_vertices() == 1, "line_mesh_builder(line=)")
+    builder.surface_mesh_builder(surface=surface_object).create_point(point=geometry.Point3D([0, 0, 0]))
+    check(surface_object.mesh().nb_vertices() == 1, "surface_mesh_builder(surface=)")
+    builder.block_mesh_builder(block=block_object).create_point(point=geometry.Point3D([0, 0, 0]))
+    check(block_object.mesh().nb_vertices() == 1, "block_mesh_builder(block=)")
+    # removal
+    builder.remove_corner(corner=c(1))
+    builder.remove_line(line=brep.line(id=other_line))
+    builder.remove_surface(surface=brep.surface(id=other_surface))
+    builder.remove_model_boundary(boundary=brep.model_boundary(id=boundary))
+    builder.remove_corner_collection(collection=brep.corner_collection(id=corner_collection))
+    builder.remove_line_collection(collection=brep.line_collection(id=line_collection))
+    builder.remove_surface_collection(collection=brep.surface_collection(id=surface_collection))
+    builder.remove_block_collection(collection=brep.block_collection(id=block_collection))
+    builder.remove_block(block=block_object)
+    check((brep.nb_blocks(), brep.nb_surfaces(), brep.nb_lines(), brep.nb_corners()) == (0, 1, 1, 5), "remove_xxx keywords")
+    check_raises(lambda: brep.line(idd=line), TypeError, "an unknown keyword raises TypeError")
+
+
+def test_model_vertex_identifier_and_registry():
+    brep = model.BRep()
+    builder = model.BRepBuilder(brep=brep)
+    corner = builder.add_corner()
+    line = builder.add_line()
+    builder.corner_mesh_builder(corner=brep.corner(corner)).create_point(point=geometry.Point3D([0, 0, 0]))
+    line_builder = builder.line_mesh_builder(line=brep.line(line))
+    for x in range(3):
+        line_builder.create_point(point=geometry.Point3D([x, 0, 0]))
+    first = builder.create_unique_vertices(nb=2)
+    check(first == 0 and brep.nb_unique_vertices() == 2, "create_unique_vertices(nb=)")
+    corner_id = brep.corner(corner).component_id()
+    line_id = brep.line(line).component_id()
+    builder.set_unique_vertex(component_vertex_id=model.ComponentMeshVertex(component_id=corner_id, vertex_id=0), unique_vertex_id=0)
+    builder.set_unique_vertex(component_vertex_id=model.ComponentMeshVertex(component_id=line_id, vertex_id=0), unique_vertex_id=0)
+    builder.set_unique_vertex(component_vertex_id=model.ComponentMeshVertex(component_id=line_id, vertex_id=2), unique_vertex_id=1)
+    check(len(brep.component_mesh_vertices(unique_vertex_id=0)) == 2, "component_mesh_vertices(unique_vertex_id=)")
+    check(brep.unique_vertex(component_vertex=model.ComponentMeshVertex(component_id=line_id, vertex_id=2)) == 1, "unique_vertex(component_vertex=)")
+    check_raises(lambda: brep.component_mesh_vertices(unique_vertex_id=2), IndexError, "an unknown unique vertex raises IndexError")
+    builder.update_unique_vertices(component_id=line_id, old2new=[basic.NO_ID, 0, 1])
+    check(
+        [v.vertex for v in brep.component_mesh_vertices(0) if v.component_id == line_id] == [],
+        "update_unique_vertices(component_id=, old2new=) detaches the deleted vertex",
+    )
+    check(
+        [v.vertex for v in brep.component_mesh_vertices(1)] == [1],
+        "update_unique_vertices(component_id=, old2new=) renumbers the vertex",
+    )
+    mapping = builder.delete_isolated_vertices()
+    check(len(mapping) == 2, "delete_isolated_vertices returns the mapping")
+    # specific registration of each component kind with keywords
+    other = model.BRep()
+    other_builder = model.BRepBuilder(brep=other)
+    identifier_builder = model.VertexIdentifierBuilder(vertex_identifier=other)
+    registry_builder = model.ComponentRegistryBuilder(component_registry=other)
+    registry_builder.add_mesh_component(type=model.ComponentType("Corner"), id=basic.uuid())
+    registry_builder.add_collection_component(type=model.ComponentType("ModelBoundary"), id=basic.uuid())
+    check(len(other.mesh_components()) == 1 and len(other.collection_components()) == 1, "ComponentRegistryBuilder.add_xxx_component(type=, id=)")
+    mesh_id = list(other.mesh_components().values())[0][0]
+    registry_builder.remove_mesh_component(type=model.ComponentType("Corner"), id=mesh_id)
+    collection_id = list(other.collection_components().values())[0][0]
+    registry_builder.remove_collection_component(type=model.ComponentType("ModelBoundary"), id=collection_id)
+    check(sum(len(v) for v in other.mesh_components().values()) == 0, "ComponentRegistryBuilder.remove_xxx_component")
+    for kind, adder in (
+        ("corner3D", other_builder.add_corner),
+        ("line3D", other_builder.add_line),
+        ("surface3D", other_builder.add_surface),
+        ("block3D", other_builder.add_block),
+    ):
+        uuid = adder()
+        component = getattr(other, kind[:-2])(uuid)
+        getattr(identifier_builder, f"unregister_{kind}_component")(component=component)
+        getattr(identifier_builder, f"register_{kind}_component")(component=component)
+    section = model.Section()
+    section_builder = model.SectionBuilder(section=section)
+    section_identifier = model.VertexIdentifierBuilder(vertex_identifier=section)
+    for kind, adder in (
+        ("corner2D", section_builder.add_corner),
+        ("line2D", section_builder.add_line),
+        ("surface2D", section_builder.add_surface),
+    ):
+        component = getattr(section, kind[:-2])(adder())
+        getattr(section_identifier, f"unregister_{kind}_component")(component=component)
+        getattr(section_identifier, f"register_{kind}_component")(component=component)
+    unique = model.VertexIdentifierBuilder(vertex_identifier=other)
+    check(unique.create_unique_vertex() == 0, "create_unique_vertex")
+
+
+def test_model_physical_properties_and_mappings():
+    brep = model.BRep()
+    builder = model.PhysicalPropertiesBuilder(physical_properties=brep)
+    name = model.PHYSICAL_PROPERTY_NAME.porosity
+    attribute_id = basic.uuid()
+    builder.set_physical_property(name=name, component_type=model.ComponentType("Block"), attribute_id=attribute_id)
+    check(brep.has_physical_property(name=name), "has_physical_property(name=)")
+    check(brep.physical_property_info(name=name).attribute_id == attribute_id, "physical_property_info(name=)")
+    other = model.BRep()
+    model.PhysicalPropertiesBuilder(physical_properties=other).copy_physical_properties(other=brep)
+    check(other.has_physical_property(name), "copy_physical_properties(other=)")
+    source = unit_box_brep()
+    copy = model.BRep()
+    mapping = model.BRepBuilder(brep=copy).copy(brep=source)
+    corner_type = model.Corner3D.component_type_static()
+    check(mapping.at(type=corner_type).has_mapping_input(source.corners()[0].id()), "ModelCopyMapping.at(type=)")
+    moved = model.ModelCopyMapping(mapping=mapping)
+    check(moved.at(type=corner_type).has_mapping_input(source.corners()[0].id()), "ModelCopyMapping(mapping=)")
+    check_raises(lambda: mapping.at(type=corner_type), IndexError, "a moved mapping is empty")
+    generic = model.ModelGenericMapping()
+    check_raises(lambda: generic.at(type=corner_type), IndexError, "no GenericMapping for an unknown type")
+    model.ModelGenericMapping(mapping=generic)
+    section = model.Section()
+    section_mapping = model.SectionBuilder(section=section).copy(section=model.convert_brep_into_section(brep=source, axis_to_remove=2)[0])
+    check(section.nb_corners() == 8, "SectionBuilder.copy(section=)")
+    check(
+        section_mapping.at(type=model.Corner2D.component_type_static()).has_mapping_output(section.corners()[0].id()),
+        "SectionBuilder.copy maps the corners",
+    )
+    concatener = model.BRepConcatener(model=copy)
+    concatener.concatenate(other_model=source)
+    check(copy.nb_corners() == 16, "BRepConcatener(model=).concatenate(other_model=)")
+    section_concatener = model.SectionConcatener(model=section)
+    section_concatener.concatenate(other_model=model.convert_brep_into_section(brep=source, axis_to_remove=2)[0])
+    check(section.nb_corners() == 16, "SectionConcatener(model=).concatenate(other_model=)")
+
+
+def test_model_helpers():
+    # opengeode registers the file formats of the other modules: import it
+    # after the checks assuming that no format is registered
+    import opengeode
+
+    brep = unit_box_brep()
+    block = brep.blocks()[0]
+    check(abs(model.block_volume(brep=brep, block=block) - 24) < 1e-9, "block_volume(brep=, block=)")
+    box = model.block_bounding_box(brep=brep, block=block)
+    check(box.max().value(2) == 4, "block_bounding_box(brep=, block=)")
+    first_surface = brep.surfaces()[0]
+    polygon_areas = sum(first_surface.mesh().polygon_area(p) for p in range(first_surface.mesh().nb_polygons()))
+    check(abs(model.surface_area3D(surface=first_surface) - polygon_areas) < 1e-9, "surface_area3D(surface=)")
+    section, _ = model.convert_brep_into_section(brep=brep, axis_to_remove=2)
+    check(model.surface_area2D(surface=section.surfaces()[0]) > 0, "surface_area2D(surface=)")
+    check(model.convert_section_into_brep(section=section, axis_to_add=2, axis_coordinate=1.0)[0].nb_corners() == 8, "convert_section_into_brep keywords")
+    options = model.SectionExtruderOptions()
+    options.axis_to_extrude = 2
+    options.max_coordinate = 1.0
+    check(model.extrude_section_to_brep(section=section, options=options).nb_blocks() == 6, "extrude_section_to_brep keywords")
+    model.triangulate_brep_surface_meshes(model=brep)
+    model.triangulate_section_surface_meshes(model=section)
+    model.convert_brep_surface_meshes_into_triangulated_surfaces(model=brep)
+    model.convert_section_surface_meshes_into_triangulated_surfaces(model=section)
+    model.convert_brep_block_meshes_into_tetrahedral_solids(model=brep)
+    check(model.convert_brep_into_curve(brep=brep)[0].nb_edges() == 12, "convert_brep_into_curve(brep=)")
+    check(model.convert_brep_into_surface(brep=brep)[0].nb_polygons() == 12, "convert_brep_into_surface(brep=)")
+    check_raises(
+        lambda: model.convert_brep_into_solid(brep=brep),
+        basic.OpenGeodeDataError,
+        "convert_brep_into_solid(brep=) needs the unique vertices in Blocks",
+    )
+    check(model.convert_section_into_curve(section=section)[0].nb_edges() == 12, "convert_section_into_curve(section=)")
+    check(model.convert_section_into_surface(section=section)[0].nb_polygons() == 12, "convert_section_into_surface(section=)")
+    check(model.filter_brep_components_with_regards_to_blocks(brep=brep) == [], "filter_brep_components_with_regards_to_blocks(brep=)")
+    check(model.filter_section_components_with_regards_to_surfaces(section=section) == [], "filter_section_components_with_regards_to_surfaces(section=)")
+    # ray tracing
+    tracing = model.BRepRayTracing(brep=brep)
+    block = brep.blocks()[0]
+    inside = tracing.is_point_inside_block(point=geometry.Point3D([1, 1, 1]), block=block)
+    check(inside and inside.position == model.POSITION.inside, "is_point_inside_block keywords")
+    check(tracing.block_containing_point(point=geometry.Point3D([1, 1, 1])) == block.id(), "block_containing_point(point=)")
+    # coordinate reference systems
+    check(len(model.brep_coordinate_reference_systems(brep=brep)) == 1, "brep_coordinate_reference_systems(brep=)")
+    check(len(model.section_coordinate_reference_systems(section=section)) == 1, "section_coordinate_reference_systems(section=)")
+    check(len(model.brep_active_coordinate_reference_systems(brep=brep)) == 1, "brep_active_coordinate_reference_systems(brep=)")
+    check(len(model.section_active_coordinate_reference_systems(section=section)) == 1, "section_active_coordinate_reference_systems(section=)")
+    system = geometry.CoordinateSystem2D()
+    shifted = geometry.CoordinateSystem2D(directions=[geometry.Vector2D([1, 0]), geometry.Vector2D([0, 1])], origin=geometry.Point2D([1, 1]))
+    builder = model.BRepBuilder(brep=brep)
+    model.create_brep_coordinate_system(model=brep, builder=builder, new_coordinate_system_name="shifted", input=system, output=shifted)
+    model.set_brep_active_coordinate_system(model=brep, builder=builder, coordinate_system_name="shifted")
+    check(model.brep_active_coordinate_reference_systems(brep)[0][1] == "shifted", "set_brep_active_coordinate_system keywords")
+    section_builder = model.SectionBuilder(section=section)
+    model.create_section_coordinate_system(model=section, builder=section_builder, new_coordinate_system_name="shifted", input=system, output=shifted)
+    model.set_section_active_coordinate_system(model=section, builder=section_builder, coordinate_system_name="shifted")
+    check(model.section_active_coordinate_reference_systems(section)[0][1] == "shifted", "set_section_active_coordinate_system keywords")
+    # polygon helpers on a meshed BRep
+    data_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../tests/data"))
+    filename = os.path.join(data_dir, "test_mesh3.og_brep")
+    meshed = opengeode.load_one(model.load_brep(filename=filename), filename)
+    block = meshed.blocks()[0]
+    surface = meshed.boundary_surfaces(block=block)[0]
+    facet = mesh.PolyhedronFacet(0, 0)
+    check(len(model.block_polygon_unique_vertices(model=meshed, block=block, facet=facet)) == 3, "block_polygon_unique_vertices keywords")
+    check(len(model.surface_polygon_unique_vertices(model=meshed, surface=surface, polygon_id=0)) in (3, 4), "surface_polygon_unique_vertices keywords")
+    check(len(model.block_mesh_polyhedra_from_surface_polygon(model=meshed, block=block, surface=surface, polygon_id=0)) <= 2, "block_mesh_polyhedra_from_surface_polygon keywords")
+    check(len(model.block_vertices_from_surface_polygon(model=meshed, block=block, surface=surface, polygon_id=0)) <= 2, "block_vertices_from_surface_polygon keywords")
+    check(model.oriented_block_vertices_from_surface_polygon(model=meshed, block=block, surface=surface, polygon_id=0).nb_facets() <= 2, "oriented_block_vertices_from_surface_polygon keywords")
+    line = meshed.boundary_lines(surface=surface)[0]
+    check(len(model.brep_surface_vertices_from_line_edge(model=meshed, surface=surface, line=line, edge_id=0)) <= 2, "brep_surface_vertices_from_line_edge keywords")
+    check(model.brep_oriented_surface_vertices_from_line_edge(model=meshed, surface=surface, line=line, edge_id=0).nb_edges() <= 2, "brep_oriented_surface_vertices_from_line_edge keywords")
+    section_filename = os.path.join(data_dir, "fractures.og_sctn")
+    fractures = opengeode.load_one(model.load_section(filename=section_filename), section_filename)
+    fracture = fractures.surfaces()[0]
+    fracture_line = fractures.boundary_lines(surface=fracture)[0]
+    check(len(model.section_surface_vertices_from_line_edge(model=fractures, surface=fracture, line=fracture_line, edge_id=0)) <= 2, "section_surface_vertices_from_line_edge keywords")
+    check(model.section_oriented_surface_vertices_from_line_edge(model=fractures, surface=fracture, line=fracture_line, edge_id=0).nb_edges() <= 2, "section_oriented_surface_vertices_from_line_edge keywords")
+
+
+def test_model_io():
+    brep = unit_box_brep()
+    section, _ = model.convert_brep_into_section(brep=brep, axis_to_remove=2)
+    with tempfile.TemporaryDirectory() as directory:
+        brep_file = os.path.join(directory, "box.og_brep")
+        section_file = os.path.join(directory, "box.og_sctn")
+        check(len(model.save_brep(brep=brep, filename=brep_file)) >= 1, "save_brep keywords")
+        check(len(model.save_section(section=section, filename=section_file)) >= 1, "save_section keywords")
+        check(len(model.load_brep(filename=brep_file)) == 1, "load_brep(filename=)")
+        check(len(model.load_section(filename=section_file)) == 1, "load_section(filename=)")
+        check(str(model.is_brep_loadable(filename=brep_file)) == "100%", "is_brep_loadable(filename=)")
+        check(str(model.is_section_loadable(filename=section_file)) == "100%", "is_section_loadable(filename=)")
+        check(model.is_brep_saveable(brep=brep, filename=brep_file), "is_brep_saveable keywords")
+        check(model.is_section_saveable(section=section, filename=section_file), "is_section_saveable keywords")
+        check(model.brep_object_priority(filename=brep_file) >= 0, "brep_object_priority(filename=)")
+        check(model.section_object_priority(filename=section_file) >= 0, "section_object_priority(filename=)")
+        model.brep_additional_files(filename=brep_file)
+        model.section_additional_files(filename=section_file)
+        check(str(model.is_brep_time_series_loadable(filename=brep_file)) == "0%", "is_brep_time_series_loadable(filename=)")
+        check_raises(lambda: model.brep_time_series_additional_files(filename=brep_file), basic.OpenGeodeDataError, "brep_time_series_additional_files(filename=)")
+        series = model.ExternalTimeSeries()
+        check_raises(lambda: model.load_brep_time_series(brep=brep, filename=os.path.join(directory, "none.og_ets")), basic.OpenGeodeError, "load_brep_time_series keywords, missing file")
+        check_raises(lambda: model.load_external_time_series(filename=os.path.join(directory, "none.txt")), basic.OpenGeodeError, "load_external_time_series(filename=), wrong extension")
+        check_raises(lambda: model.save_external_time_series(time_series=series, filename=os.path.join(directory, "none.txt")), basic.OpenGeodeError, "save_external_time_series keywords, wrong extension")
+        check_raises(lambda: model.load_brep(filename=os.path.join(directory, "none.og_brep")), basic.OpenGeodeError, "load_brep of a missing file raises")
+        check_raises(lambda: model.load_section(filename=os.path.join(directory, "none.og_sctn")), basic.OpenGeodeError, "load_section of a missing file raises")
+    points = mesh.PointSet3D.create()
+    series = model.ExternalTimeSeries()
+    series.set_unique_vertices(vertices=points)
+    series.set_cell_barycenters(barycenters=mesh.PointSet3D.create())
+    series.apply_to(model=brep)  # no point to match: the Blocks are left untouched
+
+
+def test_model():
+    test_model_components()
+    test_model_brep_topology()
+    test_model_vertex_identifier_and_registry()
+    test_model_physical_properties_and_mappings()
+    test_model_helpers()
+    test_model_io()
+
+
 if __name__ == "__main__":
     test_geometry()
     test_basic()
     test_image()
     test_mesh()
+    test_model()

@@ -35,8 +35,10 @@
 #define PYTHON_SURFACES_BUILDER( dimension )                                   \
     const auto name##dimension =                                               \
         "SurfacesBuilder" + std::to_string( dimension ) + "D";                 \
-    pybind11::class_< SurfacesBuilder##dimension##D >(                         \
-        module, name##dimension.c_str() )                                      \
+    pybind11::class_< SurfacesBuilder##dimension##D >( module,                 \
+        name##dimension.c_str(),                                               \
+        "Builder modifying the Surfaces of a model, in particular their "      \
+        "meshes" )                                                             \
         .def(                                                                  \
             "surface_mesh_builder",                                            \
             []( SurfacesBuilder##dimension##D& builder,                        \
@@ -46,9 +48,13 @@
                         component ),                                           \
                     component.mesh() );                                        \
             },                                                                 \
-            pybind11::keep_alive< 0, 1 >() )                                   \
+            pybind11::arg( "surface" ), pybind11::keep_alive< 0, 1 >(),        \
+            "Return the SurfaceMeshBuilder modifying the mesh of the "         \
+            "surface; it keeps the model builder alive" )                      \
         .def( "set_surface_name",                                              \
-            &SurfacesBuilder##dimension##D::set_surface_name )
+            &SurfacesBuilder##dimension##D::set_surface_name,                  \
+            pybind11::arg( "surface" ), pybind11::arg( "name" ),               \
+            "Set the name of the surface and of its mesh" )
 
 namespace geode
 {

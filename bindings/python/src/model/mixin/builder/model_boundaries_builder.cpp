@@ -31,10 +31,13 @@
 #define PYTHON_MODEL_BOUNDARIES_BUILDER( dimension )                           \
     const auto name##dimension =                                               \
         "ModelBoundariesBuilder" + std::to_string( dimension ) + "D";          \
-    pybind11::class_< ModelBoundariesBuilder##dimension##D >(                  \
-        module, name##dimension.c_str() )                                      \
+    pybind11::class_< ModelBoundariesBuilder##dimension##D >( module,          \
+        name##dimension.c_str(),                                               \
+        "Builder modifying the ModelBoundarys of a model" )                    \
         .def( "set_model_boundary_name",                                       \
-            &ModelBoundariesBuilder##dimension##D::set_model_boundary_name )
+            &ModelBoundariesBuilder##dimension##D::set_model_boundary_name,    \
+            pybind11::arg( "id" ), pybind11::arg( "name" ),                    \
+            "Set the name of the model boundary" )
 
 namespace geode
 {

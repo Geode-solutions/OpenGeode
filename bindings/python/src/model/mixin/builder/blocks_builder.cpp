@@ -35,8 +35,10 @@
 #define PYTHON_BLOCKS_BUILDER( dimension )                                     \
     const auto name##dimension =                                               \
         "BlocksBuilder" + std::to_string( dimension ) + "D";                   \
-    pybind11::class_< BlocksBuilder##dimension##D >(                           \
-        module, name##dimension.c_str() )                                      \
+    pybind11::class_< BlocksBuilder##dimension##D >( module,                   \
+        name##dimension.c_str(),                                               \
+        "Builder modifying the Blocks of a model, in particular their "        \
+        "meshes" )                                                             \
         .def(                                                                  \
             "block_mesh_builder",                                              \
             []( BlocksBuilder##dimension##D& builder,                          \
@@ -46,8 +48,12 @@
                         component ),                                           \
                     component.mesh() );                                        \
             },                                                                 \
-            pybind11::keep_alive< 0, 1 >() )                                   \
-        .def( "set_block_name", &BlocksBuilder##dimension##D::set_block_name )
+            pybind11::arg( "block" ), pybind11::keep_alive< 0, 1 >(),          \
+            "Return the SolidMeshBuilder modifying the mesh of the block; it " \
+            "keeps the model builder alive" )                                  \
+        .def( "set_block_name", &BlocksBuilder##dimension##D::set_block_name,  \
+            pybind11::arg( "block" ), pybind11::arg( "name" ),                 \
+            "Set the name of the block and of its mesh" )
 
 namespace geode
 {

@@ -34,8 +34,9 @@
 #define PYTHON_LINES_BUILDER( dimension )                                      \
     const auto name##dimension =                                               \
         "LinesBuilder" + std::to_string( dimension ) + "D";                    \
-    pybind11::class_< LinesBuilder##dimension##D >(                            \
-        module, name##dimension.c_str() )                                      \
+    pybind11::class_< LinesBuilder##dimension##D >( module,                    \
+        name##dimension.c_str(),                                               \
+        "Builder modifying the Lines of a model, in particular their meshes" ) \
         .def(                                                                  \
             "line_mesh_builder",                                               \
             []( LinesBuilder##dimension##D& builder,                           \
@@ -44,8 +45,12 @@
                     builder.line_mesh_builder( component ),                    \
                     component.mesh() );                                        \
             },                                                                 \
-            pybind11::keep_alive< 0, 1 >() )                                   \
-        .def( "set_line_name", &LinesBuilder##dimension##D::set_line_name )
+            pybind11::arg( "line" ), pybind11::keep_alive< 0, 1 >(),           \
+            "Return the EdgedCurveBuilder modifying the mesh of the line; it " \
+            "keeps the model builder alive" )                                  \
+        .def( "set_line_name", &LinesBuilder##dimension##D::set_line_name,     \
+            pybind11::arg( "line" ), pybind11::arg( "name" ),                  \
+            "Set the name of the line and of its mesh" )
 
 namespace geode
 {
