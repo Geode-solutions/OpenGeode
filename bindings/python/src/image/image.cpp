@@ -37,7 +37,7 @@ namespace geode
 PYBIND11_MODULE( opengeode_py_image, module )
 {
     // The classes of this module derive from the ones of opengeode_py_basic
-    pybind11::module_::import( "opengeode_py_basic" );
+    geode::import_binding_dependency( module, "opengeode_py_basic" );
     pybind11::add_ostream_redirect( module );
     module.doc() =
         "Raster images of OpenGeode: RasterImage1D/2D/3D (regular grid of "

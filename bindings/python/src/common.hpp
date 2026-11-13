@@ -93,6 +93,40 @@ namespace pybind11
 
 namespace geode
 {
+    /*!
+     * Import the extension module defining the types used by a binding module.
+     * In the build tree the modules are top-level modules; in the wheel they
+     * live in a package (opengeode.lib.opengeode_py_basic...): when the
+     * top-level module does not exist, the sibling of the module being
+     * initialized is imported. Any other error (the dependency is found but
+     * fails to import) is not masked.
+     */
+    inline void import_binding_dependency(
+        const pybind11::module_& module, const std::string& name )
+    {
+        try
+        {
+            pybind11::module_::import( name.c_str() );
+        }
+        catch( pybind11::error_already_set& error )
+        {
+            const auto package =
+                module.attr( "__name__" ).cast< std::string >();
+            const auto dot = package.rfind( '.' );
+            if( dot == std::string::npos
+                || !error.matches( PyExc_ModuleNotFoundError )
+                || error.value().attr( "name" ).cast< std::string >() != name )
+            {
+                throw;
+            }
+            pybind11::module_::import(
+                ( package.substr( 0, dot + 1 ) + name ).c_str() );
+        }
+    }
+} // namespace geode
+
+namespace geode
+{
     template < typename Type >
     class TypedObject;
 }

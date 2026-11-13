@@ -83,3 +83,13 @@ add_geode_python_test(
         ${PROJECT_NAME}::py_mesh
         ${PROJECT_NAME}::py_model
 )
+add_geode_python_test(
+    SOURCE "test-py-package-layout.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_geometry
+        ${PROJECT_NAME}::py_image
+        ${PROJECT_NAME}::py_gdal
+        ${PROJECT_NAME}::py_mesh
+        ${PROJECT_NAME}::py_model
+)

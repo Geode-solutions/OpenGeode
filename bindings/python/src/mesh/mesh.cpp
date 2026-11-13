@@ -105,9 +105,9 @@ namespace geode
 
 PYBIND11_MODULE( opengeode_py_mesh, module )
 {
-    pybind11::module::import( "opengeode_py_basic" );
-    pybind11::module::import( "opengeode_py_geometry" );
-    pybind11::module::import( "opengeode_py_image" );
+    geode::import_binding_dependency( module, "opengeode_py_basic" );
+    geode::import_binding_dependency( module, "opengeode_py_geometry" );
+    geode::import_binding_dependency( module, "opengeode_py_image" );
     pybind11::add_ostream_redirect( module );
     module.doc() =
         "Meshes of OpenGeode: VertexSet, Graph, EdgedCurve, PointSet, "
