@@ -42,8 +42,11 @@ namespace geode
                     &GraphBuilder::create_edge ),
                 "Create an edge without vertices and return its index" )
             .def( "create_edge_with_vertices",
-                static_cast< index_t ( GraphBuilder::* )( index_t, index_t ) >(
-                    &GraphBuilder::create_edge ),
+                geode::checked_builder< GraphBuilder, Graph >(
+                    "create_edge_with_vertices",
+                    static_cast< index_t ( GraphBuilder::* )(
+                        index_t, index_t ) >( &GraphBuilder::create_edge ),
+                    geode::VertexCheck{}, geode::VertexCheck{} ),
                 "Create an edge between two vertices and return its index",
                 pybind11::arg( "v0_id" ), pybind11::arg( "v1_id" ) )
             .def( "create_edges", &GraphBuilder::create_edges,

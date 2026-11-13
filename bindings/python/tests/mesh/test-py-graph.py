@@ -125,6 +125,42 @@ def test_delete_isolated_vertices(graph, builder):
         raise ValueError("[Test] Graph2 should have 2 edges")
 
 
+def expect_index_error(function, message):
+    try:
+        function()
+    except IndexError:
+        return
+    raise ValueError(f"[Test] {message} should raise an IndexError")
+
+
+def test_create_edge_with_invalid_vertices():
+    graph = mesh.Graph.create()
+    builder = mesh.GraphBuilder.create(graph)
+    builder.create_vertices(2)
+    for v0, v1 in [(0, 2), (2, 0), (5, 7), (0, opengeode.NO_ID), (opengeode.NO_ID, 1)]:
+        expect_index_error(
+            lambda: builder.create_edge_with_vertices(v0, v1),
+            f"create_edge_with_vertices({v0}, {v1})",
+        )
+        if graph.nb_edges() != 0:
+            raise ValueError("[Test] A rejected edge should not be created")
+    if builder.create_edge_with_vertices(1, 0) != 0 or graph.edge_vertices(0) != [1, 0]:
+        raise ValueError("[Test] A valid edge should still be created")
+    # Same check through an edged curve builder (derived from GraphBuilder)
+    curve = mesh.EdgedCurve2D.create()
+    curve_builder = mesh.EdgedCurveBuilder2D.create(curve)
+    curve_builder.create_vertices(2)
+    expect_index_error(
+        lambda: curve_builder.create_edge_with_vertices(0, 2),
+        "EdgedCurve create_edge_with_vertices",
+    )
+    if curve.nb_edges() != 0:
+        raise ValueError("[Test] A rejected curve edge should not be created")
+    curve_builder.create_edge_with_vertices(0, 1)
+    if curve.nb_edges() != 1:
+        raise ValueError("[Test] A valid curve edge should be created")
+
+
 def expect_data_error(function, message):
     try:
         function()
@@ -184,3 +220,4 @@ if __name__ == '__main__':
     test_clone(graph)
     test_delete_isolated_vertices(graph, builder)
     test_invalid_edge_operations()
+    test_create_edge_with_invalid_vertices()
