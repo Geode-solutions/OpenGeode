@@ -98,6 +98,22 @@ namespace geode::numpy_bindings
     }
 
     /*!
+     * Raise a ValueError if the array has more rows than indices, before
+     * any copy of the array
+     */
+    void check_nb_rows( std::string_view context,
+        std::string_view name,
+        const geode::ArrayLike& array )
+    {
+        if( static_cast< size_t >( array.shape( 0 ) )
+            >= static_cast< size_t >( std::numeric_limits< Index >::max() ) )
+        {
+            throw pybind11::value_error(
+                absl::StrCat( "[", context, "] too many ", name ) );
+        }
+    }
+
+    /*!
      * Create the vertices of the given coordinates, (n, dimension), and
      * return the index of the first one.
      */
@@ -114,15 +130,10 @@ namespace geode::numpy_bindings
         }
         geode::check_array_shape( context, "points", points,
             { -1, static_cast< ssize >( dimension ) } );
+        check_nb_rows( context, "points", points );
         const auto coordinates =
             geode::copy_reals< double >( context, "points", points );
         const auto nb_points = static_cast< size_t >( points.shape( 0 ) );
-        if( nb_points
-            >= static_cast< size_t >( std::numeric_limits< Index >::max() ) )
-        {
-            throw pybind11::value_error(
-                absl::StrCat( "[", context, "] too many points" ) );
-        }
         auto& builder = self.template cast< Builder& >();
         auto& crs_builder = static_cast<
             geode::CoordinateReferenceSystemManagersBuilder< dimension >& >(
@@ -193,6 +204,7 @@ namespace geode::numpy_bindings
         }
         geode::check_array_shape( context, name, elements,
             { -1, static_cast< ssize >( nb_vertices ) } );
+        check_nb_rows( context, name, elements );
         const auto vertices = geode::copy_indices(
             context, name, "vertex", elements, mesh.nb_vertices() );
         const auto nb_elements = static_cast< Index >( elements.shape( 0 ) );
@@ -328,7 +340,8 @@ namespace geode::numpy_bindings
         "the first new vertex (the number of vertices before the call). An "
         "empty array, whatever its dtype and shape (for example []), creates "
         "nothing. Raise ValueError if the array does not have this shape or "
-        "dtype, in which case the mesh is not modified";
+        "dtype or has 2**32 - 1 rows or more, in which case the mesh is not "
+        "modified";
 
     std::string create_elements_doc(
         std::string_view singular, std::string_view plural, Index nb_vertices )
@@ -341,7 +354,8 @@ namespace geode::numpy_bindings
             " before the call). An empty array, whatever its dtype and shape "
             "(for "
             "example []), creates nothing. Raise ValueError if the array does "
-            "not have this shape or dtype, IndexError if a vertex is negative "
+            "not have this shape or dtype or has 2**32 - 1 rows or more, "
+            "IndexError if a vertex is negative "
             "or not in [0, nb_vertices), in which case the mesh is not "
             "modified, and RuntimeError if the builder does not know its mesh "
             "(it was not given by Builder.create(mesh))" );

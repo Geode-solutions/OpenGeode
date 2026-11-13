@@ -982,6 +982,83 @@ def test_gil_released():
     assert_gil_released("polygons_array", lambda: surface.polygons_array())
 
 
+def test_too_many_rows():
+    # More rows than vertex or element indices: rejected before any copy (the
+    # arrays are broadcast views, they hold one row) and nothing is created
+    for nb_rows in [2**32 - 1, 2**32, 2**40]:
+        for dimension, builder_class, mesh_class in [
+            (2, mesh.PointSetBuilder2D, mesh.PointSet2D),
+            (3, mesh.PointSetBuilder3D, mesh.PointSet3D),
+            (2, mesh.EdgedCurveBuilder2D, mesh.EdgedCurve2D),
+            (3, mesh.TriangulatedSurfaceBuilder3D, mesh.TriangulatedSurface3D),
+            (2, mesh.PolygonalSurfaceBuilder2D, mesh.PolygonalSurface2D),
+            (3, mesh.TetrahedralSolidBuilder3D, mesh.TetrahedralSolid3D),
+        ]:
+            target = mesh_class.create()
+            builder = builder_class.create(target)
+            builder.create_points(random_points(4, dimension))
+            check_raises(
+                ValueError,
+                "[create_points] too many points",
+                lambda: builder.create_points(
+                    numpy.broadcast_to(numpy.zeros((1, dimension)), (nb_rows, dimension))
+                ),
+                f"{builder_class.__name__} {nb_rows} points",
+            )
+            check(target.nb_vertices() == 4, "too many points create nothing")
+        for dimension, builder_class, mesh_class in [
+            (2, mesh.TriangulatedSurfaceBuilder2D, mesh.TriangulatedSurface2D),
+            (3, mesh.TriangulatedSurfaceBuilder3D, mesh.TriangulatedSurface3D),
+        ]:
+            surface = mesh_class.create()
+            builder = builder_class.create(surface)
+            builder.create_points(random_points(3, dimension))
+            builder.create_triangles([[0, 1, 2]])
+            for dtype in [numpy.uint32, numpy.int64]:
+                check_raises(
+                    ValueError,
+                    "[create_triangles] too many triangles",
+                    lambda: builder.create_triangles(
+                        numpy.broadcast_to(numpy.array([[0, 1, 2]], dtype=dtype), (nb_rows, 3))
+                    ),
+                    f"{builder_class.__name__} {nb_rows} triangles",
+                )
+            check(surface.nb_polygons() == 1, "too many triangles create nothing")
+        solid = mesh.TetrahedralSolid3D.create()
+        solid_builder = mesh.TetrahedralSolidBuilder3D.create(solid)
+        solid_builder.create_points(random_points(4, 3))
+        check_raises(
+            ValueError,
+            "[create_tetrahedra] too many tetrahedra",
+            lambda: solid_builder.create_tetrahedra(
+                numpy.broadcast_to(numpy.array([[0, 1, 2, 3]]), (nb_rows, 4))
+            ),
+            f"{nb_rows} tetrahedra",
+        )
+        check(solid.nb_polyhedra() == 0, "too many tetrahedra create nothing")
+        for curve_class, builder_class, dimension in [
+            (mesh.EdgedCurve2D, mesh.EdgedCurveBuilder2D, 2),
+            (mesh.EdgedCurve3D, mesh.EdgedCurveBuilder3D, 3),
+            (mesh.Graph, mesh.GraphBuilder, 0),
+        ]:
+            curve = curve_class.create()
+            builder = builder_class.create(curve)
+            if dimension:
+                builder.create_points(random_points(2, dimension))
+            else:
+                builder.create_vertices(2)
+            # An invalid vertex is not reported: the shape is checked first
+            check_raises(
+                ValueError,
+                "[create_edges_with_vertices] too many edges",
+                lambda: builder.create_edges_with_vertices(
+                    numpy.broadcast_to(numpy.array([[0, 7]]), (nb_rows, 2))
+                ),
+                f"{builder_class.__name__} {nb_rows} edges",
+            )
+            check(curve.nb_edges() == 0, "too many edges create nothing")
+
+
 if __name__ == "__main__":
     mesh.OpenGeodeMeshLibrary.initialize()
     test_points_round_trip()
@@ -996,6 +1073,7 @@ if __name__ == "__main__":
     test_triangles_atomic_with_late_invalid_row()
     test_polygons()
     test_empty_inputs()
+    test_too_many_rows()
     test_empty_columns_are_not_empty_inputs()
     test_builder_without_mesh()
     test_keyword_arguments()
