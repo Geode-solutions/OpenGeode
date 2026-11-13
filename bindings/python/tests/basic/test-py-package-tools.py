@@ -207,7 +207,10 @@ def test_check_type_in_subfolder_module():
         )
 
 
-def requirements(*contents):
+GEODE = ["opengeode-core", "opengeode-io", "geode-common", "geode-simplex"]
+
+
+def requirements(*contents, geode_distributions=GEODE):
     with tempfile.TemporaryDirectory() as directory:
         files = []
         for index, content in enumerate(contents):
@@ -219,6 +222,7 @@ def requirements(*contents):
         os.makedirs(os.path.dirname(output))
         status, log = run(
             ["requirements", "--output", output, "--geode-output", geode_output]
+            + ["--geode=" + name for name in geode_distributions]
             + files
         )
         expect(status == 0, "requirements should succeed", log)
@@ -230,6 +234,7 @@ def requirements(*contents):
         stamp = os.stat(output).st_mtime_ns
         status, log = run(
             ["requirements", "--output", output, "--geode-output", geode_output]
+            + ["--geode=" + name for name in geode_distributions]
             + files
         )
         expect(os.stat(output).st_mtime_ns == stamp, "unchanged output rewritten", log)
@@ -252,6 +257,7 @@ def test_requirements():
         numpy>=2
         pygeode-like
         mygeode-tools==1
+        geode-not-found-by-cmake>=2
         requests @ https://example.com/requests.whl#sha256=abc
         """,
     )
@@ -261,6 +267,7 @@ def test_requirements():
             "numpy>=2",
             "pygeode-like",
             "mygeode-tools==1",
+            "geode-not-found-by-cmake>=2",
             "requests @ https://example.com/requests.whl#sha256=abc",
         ],
         "kept requirements: %s" % kept,
@@ -269,6 +276,15 @@ def test_requirements():
         geode == ["opengeode-core", "opengeode-io", "geode-common", "geode-simplex"],
         "geode requirements: %s" % geode,
     )
+
+
+def test_requirements_exact_names():
+    # Only the distributions of the projects found by CMake are removed
+    kept, geode = requirements(
+        "OpenGeode-core\nOpenGeode-IO\n", geode_distributions=["OpenGeode_core"]
+    )
+    expect(kept == ["OpenGeode-IO"], "kept: %s" % kept)
+    expect(geode == ["opengeode-core"], "geode: %s" % geode)
 
 
 def test_requirements_empty():
@@ -303,13 +319,18 @@ def make_wheel(directory, distribution, module, tags="py3-none-any"):
     return path
 
 
-def install_local(arguments, target):
+def install_geode(arguments, target=None, extra_paths=()):
     environment = dict(os.environ)
-    # Installed in a directory, not in the Python running the tests
-    environment["PIP_TARGET"] = target
+    if target:
+        # Installed in a directory, not in the Python running the tests
+        environment["PIP_TARGET"] = target
     environment["PIP_DISABLE_PIP_VERSION_CHECK"] = "1"
+    # Distributions visible as installed in the Python of the script
+    environment["PYTHONPATH"] = os.pathsep.join(
+        list(extra_paths) + [environment.get("PYTHONPATH", "")]
+    )
     result = subprocess.run(
-        [sys.executable, SCRIPT, "install-local"] + arguments,
+        [sys.executable, SCRIPT, "install-geode"] + arguments,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
@@ -318,72 +339,156 @@ def install_local(arguments, target):
     return result.returncode, result.stdout
 
 
-def test_install_local():
+def package(name, version, directory):
+    return ["--package", name, version, os.path.join(directory, "python_wheels"), directory]
+
+
+def fake_installed(directory, distribution, version):
+    """A distribution installed in a site directory (its metadata only)."""
+    info = os.path.join(
+        directory, "%s-%s.dist-info" % (distribution.replace("-", "_"), version)
+    )
+    write(
+        os.path.join(info, "METADATA"),
+        "Metadata-Version: 2.1\nName: %s\nVersion: %s\n" % (distribution, version),
+    )
+    return directory
+
+
+def test_install_geode_local_wheels():
     with tempfile.TemporaryDirectory() as directory:
-        upstream = os.path.join(directory, "OpenGeode", "python_wheels")
-        common = os.path.join(directory, "GeodeCommon", "python_wheels")
-        own = os.path.join(directory, "Self", "python_wheels")
-        make_wheel(upstream, "OpenGeode-core", "fake_opengeode")
-        make_wheel(common, "Geode-Common", "fake_geode_common")
-        # Not a geode package: never installed from these directories
-        make_wheel(common, "numpy", "fake_numpy")
+        upstream = os.path.join(directory, "OpenGeode")
+        common = os.path.join(directory, "GeodeCommon")
+        own = os.path.join(directory, "Self")
+        make_wheel(os.path.join(upstream, "python_wheels"), "OpenGeode-core", "fake_opengeode")
+        make_wheel(os.path.join(common, "python_wheels"), "Geode-Common", "fake_geode_common")
+        # Not required: never installed from these directories
+        make_wheel(os.path.join(common, "python_wheels"), "numpy", "fake_numpy")
         # The package being built
-        make_wheel(own, "Geode-Self", "fake_geode_self")
+        make_wheel(os.path.join(own, "python_wheels"), "Geode-Self", "fake_geode_self")
         target = os.path.join(directory, "target")
-        status, output = install_local(
-            [
-                "--exclude",
-                "Geode_Self",
-                "--require",
-                "OpenGeode-core",
-                upstream,
-                common,
-                own,
-                os.path.join(directory, "missing"),
-            ],
+        status, output = install_geode(
+            ["--exclude", "Geode_Self"]
+            + package("OpenGeode-core", "unknown", upstream)
+            + package("geode-common", "2.0.0", common)
+            + package("geode-self", "unknown", own),
             target,
         )
-        expect(status == 0, "install-local should succeed", output)
-        expect(
-            "Installing the local geode wheels: geode-common, opengeode-core" in output,
-            "installed wheels",
-            output,
-        )
+        expect(status == 0, "install-geode should succeed", output)
+        expect("opengeode-core: local wheel of" in output, "local wheel used", output)
+        expect("--no-index" in output and "--no-deps" in output, "pip options", output)
         for module in ("fake_opengeode", "fake_geode_common"):
             expect(os.path.isfile(os.path.join(target, module + ".py")), module, output)
         for module in ("fake_numpy", "fake_geode_self"):
             expect(not os.path.exists(os.path.join(target, module + ".py")), module, output)
+        expect("warning" not in output, "no warning", output)
 
 
-def test_install_local_missing_requirement():
+def test_install_geode_stale_local_wheel():
     with tempfile.TemporaryDirectory() as directory:
-        upstream = os.path.join(directory, "OpenGeode", "python_wheels")
-        make_wheel(upstream, "OpenGeode-core", "fake_opengeode")
+        upstream = os.path.join(directory, "OpenGeode")
+        wheel = make_wheel(os.path.join(upstream, "python_wheels"), "OpenGeode-core", "fake")
+        config = os.path.join(upstream, "OpenGeodeConfig.cmake")
+        write(config)
+        os.utime(wheel, (1000, 1000))
+        status, output = install_geode(
+            package("OpenGeode-core", "unknown", upstream) + ["--dry-run"]
+        )
+        expect(status == 0, "a stale wheel is still installed", output)
+        expect("is older than the CMake files" in output, "stale warning", output)
+        os.utime(wheel, None)
+        os.utime(config, (1000, 1000))
+        status, output = install_geode(
+            package("OpenGeode-core", "unknown", upstream) + ["--dry-run"]
+        )
+        expect("older" not in output, "fresh wheel without warning", output)
+
+
+def test_install_geode_preinstalled():
+    # CI: the matching wheel is installed before the build, no local wheel
+    with tempfile.TemporaryDirectory() as directory:
+        site = fake_installed(os.path.join(directory, "site"), "OpenGeode-core", "15.2.0rc3")
+        upstream = os.path.join(directory, "OpenGeode")
+        for version, warned in (("unknown", False), ("0.0.0", False), ("15.2.0-rc.3", False), ("15.2.0", True)):
+            status, output = install_geode(
+                package("OpenGeode-core", version, upstream) + ["--dry-run"],
+                extra_paths=[site],
+            )
+            expect(status == 0, "a preinstalled package satisfies " + version, output)
+            expect("installed version 15.2.0rc3 kept" in output, "kept", output)
+            expect("Would run" not in output, "nothing installed", output)
+            expect(("warning" in output) == warned, "version warning " + version, output)
+
+
+def test_install_geode_pinned_index():
+    # No local wheel, nothing installed, known version: exact pin from the index
+    with tempfile.TemporaryDirectory() as directory:
+        upstream = os.path.join(directory, "OpenGeode")
+        common = os.path.join(directory, "GeodeCommon")
+        status, output = install_geode(
+            package("OpenGeode-core", "15.2.0-rc.3", upstream)
+            + package("Geode_Common", "v3.1.0", common)
+            + ["--dry-run"]
+        )
+        expect(status == 0, "pinned install should be planned", output)
+        expect(
+            "-m pip install --no-deps opengeode-core==15.2.0rc3 geode-common==3.1.0" in output,
+            "pinned command",
+            output,
+        )
+        expect("--no-index" not in output, "from the index", output)
+
+
+def test_install_geode_missing():
+    with tempfile.TemporaryDirectory() as directory:
+        upstream = os.path.join(directory, "OpenGeode")
         target = os.path.join(directory, "target")
-        status, output = install_local(
-            ["--require", "OpenGeode-core", "--require", "OpenGeode_IO", upstream],
-            target,
+        for version in ("unknown", "0.0.0", "master", "1.2"):
+            status, output = install_geode(
+                package("OpenGeode-core", version, upstream), target
+            )
+            expect(status == 1, "unknown version should fail: " + version, output)
+            expect(
+                "error: no local wheel of opengeode-core in " in output
+                and "no released version to install" in output,
+                "message",
+                output,
+            )
+            expect("pip" not in output.split("error:")[0], "nothing installed", output)
+            expect(not os.path.exists(target), "nothing installed", output)
+        # Test environments only warn
+        status, output = install_geode(
+            package("OpenGeode-core", "unknown", upstream) + ["--missing", "warn"], target
         )
-        expect(status == 1, "missing local wheel should fail", output)
-        expect("no local wheel of opengeode-io in " + upstream in output, "message", output)
-        expect(not os.path.exists(target), "nothing installed", output)
-        # The excluded package (the one being built) is not a local wheel
-        status, output = install_local(
-            ["--exclude", "OpenGeode-core", "--require", "OpenGeode-core", upstream],
-            target,
-        )
-        expect(status == 1, "excluded package should not satisfy", output)
+        expect(status == 0, "warn mode succeeds", output)
+        expect("warning: no local wheel of opengeode-core" in output, "warning", output)
 
 
-def test_install_local_nothing():
+def test_install_geode_excluded():
     with tempfile.TemporaryDirectory() as directory:
-        status, output = install_local(
-            [os.path.join(directory, "missing")], os.path.join(directory, "target")
+        own = os.path.join(directory, "Self")
+        make_wheel(os.path.join(own, "python_wheels"), "OpenGeode-core", "fake")
+        status, output = install_geode(
+            ["--exclude", "opengeode_core"] + package("OpenGeode-core", "unknown", own)
         )
-        expect(status == 0, "no wheel directory should succeed", output)
-        expect("No local geode wheel to install" in output, "message", output)
-        status, output = install_local([], os.path.join(directory, "target"))
-        expect(status == 0, "no argument should succeed", output)
+        expect(status == 0, "excluded package is skipped", output)
+        expect("No geode wheel to install" in output, "nothing to install", output)
+
+
+def test_installed():
+    with tempfile.TemporaryDirectory() as directory:
+        site = fake_installed(os.path.join(directory, "site"), "OpenGeode-core", "1.0.0")
+        environment = dict(os.environ)
+        environment["PYTHONPATH"] = site
+        result = subprocess.run(
+            [sys.executable, SCRIPT, "installed", "OpenGeode_core", "geode-missing"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            env=environment,
+        )
+        expect(result.returncode == 0, "installed should succeed", result.stdout)
+        expect(result.stdout.strip() == "opengeode-core==1.0.0", "output", result.stdout)
 
 
 def test_publish():
@@ -435,10 +540,15 @@ def test_layout_removes_published_wheels():
 
 if __name__ == "__main__":
     test_requirements()
+    test_requirements_exact_names()
     test_requirements_empty()
-    test_install_local()
-    test_install_local_missing_requirement()
-    test_install_local_nothing()
+    test_install_geode_local_wheels()
+    test_install_geode_stale_local_wheel()
+    test_install_geode_preinstalled()
+    test_install_geode_pinned_index()
+    test_install_geode_missing()
+    test_install_geode_excluded()
+    test_installed()
     test_publish()
     test_layout_removes_published_wheels()
     test_layout()

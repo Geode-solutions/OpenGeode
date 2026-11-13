@@ -19,14 +19,18 @@
 # SOFTWARE.
 
 
-"""Steps of the wheel target of add_geode_python_wheel (cmake/PythonTargets.cmake).
+"""Steps of the Python environments and of the wheel target of the geode
+projects (cmake/PythonTargets.cmake).
 
     geode_python_package.py layout <package directory> <binary folder>
     geode_python_package.py check <package directory> <binary folder>
     geode_python_package.py requirements --output <file> --geode-output <file>
-                            <requirements file>...
-    geode_python_package.py install-local [--exclude <distribution>]
-                            [--require <distribution>]... <wheel directory>...
+                            [--geode <distribution>]... <requirements file>...
+    geode_python_package.py installed <distribution>...
+    geode_python_package.py install-geode [--exclude <distribution>]
+                            [--package <distribution> <version> <wheel directory>
+                                       <CMake directory>]...
+                            [--missing error|warn] [--dry-run]
     geode_python_package.py publish <wheel> <wheel directory>
 
 layout: moves the extension modules of the package (<package>_py_*) copied in the
@@ -42,18 +46,26 @@ package), or if a public type of the package is not defined in a module at the
 root of the package.
 
 requirements: merges the requirements files of the project and of the geode
-projects it depends on into one file for pip, without the geode packages
-(OpenGeode-core, Geode-Common...): they are built by the local build chain, the
-released ones on PyPI may not match it. Their names are written to the
-geode output file, one per line.
+projects it depends on into one file for pip, without the distributions of the
+geode projects found by CMake (--geode): they must match the local build chain,
+see install-geode. The removed ones are written to the geode output file, one
+normalized name per line.
 
-install-local: installs, without their dependencies and from the given
-directories only (never from PyPI), the latest local wheel of every geode
-package found there, except the excluded one (the package being built), and
-fails if a required package has no local wheel.
+installed: prints the given distributions installed in this Python.
+
+install-geode: makes each geode distribution (--package: name, version of the
+C++ package found by CMake, directory of its published wheels, directory of its
+CMake files) importable by this Python, without its dependencies, in this order:
+  1. a local wheel published next to the CMake files (publish) is installed;
+  2. a distribution already installed is kept (the CI installs the wheels
+     matching the C++ packages before building), with a warning if its version
+     is not the one of the C++ package;
+  3. with a known version (not 0.0.0), that exact version is installed from the
+     package index (1.2.3-rc.4 is published as 1.2.3rc4); never an unpinned one;
+  4. otherwise it fails (--missing error) or warns (--missing warn).
 
 publish: copies the wheel in the directory where the downstream projects look
-for it (install-local), replacing the previous wheel of the same package for
+for it (install-geode), replacing the previous wheel of the same package for
 the same platform.
 """
 
@@ -61,6 +73,7 @@ import argparse
 import glob
 import importlib
 import importlib.machinery
+import importlib.metadata
 import inspect
 import os
 import re
@@ -72,13 +85,12 @@ import sys
 # its package: opengeode.lib64.opengeode_py_mesh
 SUBFOLDER_MODULE = re.compile(r"\b[A-Za-z_]\w*\.(?:lib|lib32|lib64|bin)\.[A-Za-z_]\w*_py_\w+")
 
-
 # PEP 508 name at the start of a requirement line
 REQUIREMENT_NAME = re.compile(r"^\s*([A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?)")
 # A comment of a requirements file (a # in a URL is not one)
 COMMENT = re.compile(r"(?:^|\s)#.*")
-# Packages of the geode build chain (normalized names)
-GEODE_DISTRIBUTION = re.compile(r"^(?:open)?geode-")
+# Version of a released C++ package: 1.2.3 or 1.2.3-rc.4
+PACKAGE_VERSION = re.compile(r"^v?(\d+\.\d+\.\d+)(?:-rc\.(\d+))?$")
 
 
 def normalize(name):
@@ -86,8 +98,31 @@ def normalize(name):
     return re.sub(r"[-_.]+", "-", name).lower()
 
 
-def is_geode_distribution(name):
-    return GEODE_DISTRIBUTION.match(normalize(name)) is not None
+def python_version(version):
+    """PEP 440 version of a released C++ package version, None when unknown
+    (0.0.0 is the version of the development builds)."""
+    match = PACKAGE_VERSION.match(version or "")
+    if not match or match.group(1) == "0.0.0":
+        return None
+    if match.group(2):
+        return "%src%s" % (match.group(1), match.group(2))
+    return match.group(1)
+
+
+def same_version(first, second):
+    try:
+        from packaging.version import Version
+
+        return Version(first) == Version(second)
+    except Exception:
+        return first.lower() == second.lower()
+
+
+def installed_version(distribution):
+    try:
+        return importlib.metadata.version(distribution)
+    except importlib.metadata.PackageNotFoundError:
+        return None
 
 
 def package_name(package):
@@ -169,7 +204,8 @@ def run_check(package, binary_folder):
     return 1 if errors else 0
 
 
-def run_requirements(files, output, geode_output):
+def run_requirements(files, output, geode_output, geode_distributions):
+    geode_names = {normalize(name) for name in geode_distributions}
     lines = []
     geode = []
     for path in files:
@@ -179,7 +215,7 @@ def run_requirements(files, output, geode_output):
                 if not line:
                     continue
                 match = REQUIREMENT_NAME.match(line)
-                if match and is_geode_distribution(match.group(1)):
+                if match and normalize(match.group(1)) in geode_names:
                     name = normalize(match.group(1))
                     if name not in geode:
                         geode.append(name)
@@ -197,6 +233,14 @@ def run_requirements(files, output, geode_output):
     return 0
 
 
+def run_installed(distributions):
+    for distribution in distributions:
+        version = installed_version(distribution)
+        if version is not None:
+            print("%s==%s" % (normalize(distribution), version))
+    return 0
+
+
 def wheel_distribution(path):
     """Normalized distribution name of a wheel file (name-version-...whl)."""
     return normalize(os.path.basename(path).split("-", 1)[0])
@@ -207,38 +251,97 @@ def wheel_tags(path):
     return os.path.basename(path).split("-", 2)[2]
 
 
-def run_install_local(directories, exclude, required):
-    excluded = normalize(exclude) if exclude else None
-    found = {}
-    searched = []
-    for directory in directories:
-        if not os.path.isdir(directory):
-            continue
-        searched.append(directory)
-        for wheel in glob.glob(os.path.join(directory, "*.whl")):
-            name = wheel_distribution(wheel)
-            if name != excluded and is_geode_distribution(name):
-                found.setdefault(name, []).append(wheel)
-    missing = sorted({normalize(name) for name in required} - set(found))
-    if missing:
+def local_wheels(distribution, directory):
+    if not os.path.isdir(directory):
+        return []
+    return [
+        wheel
+        for wheel in glob.glob(os.path.join(directory, "*.whl"))
+        if wheel_distribution(wheel) == distribution
+    ]
+
+
+def warn_stale(distribution, wheels, cmake_directory):
+    """A wheel older than the CMake files of its project was not rebuilt after
+    the last install of the project."""
+    configs = glob.glob(os.path.join(cmake_directory, "*Config*.cmake"))
+    if not configs:
+        return
+    newest_wheel = max(os.path.getmtime(wheel) for wheel in wheels)
+    newest_config = max(os.path.getmtime(config) for config in configs)
+    if newest_wheel < newest_config:
         print(
-            "error: no local wheel of %s in %s: build the wheel target of the "
-            "geode project providing it first (the released package is not "
-            "installed, it may not match the local build chain)"
-            % (", ".join(missing), ", ".join(searched) or "any wheel directory")
+            "warning: the local wheel of %s in %s is older than the CMake files "
+            "of its project: run its wheel target again if its bindings changed"
+            % (distribution, os.path.dirname(wheels[0]))
         )
-        return 1
-    if not found:
-        print("No local geode wheel to install")
+
+
+def pip_command(arguments):
+    return [sys.executable, "-m", "pip", "install", "--no-deps"] + arguments
+
+
+def run_command(command, dry_run):
+    print(("Would run: " if dry_run else "Running: ") + " ".join(command))
+    if dry_run:
         return 0
-    # pip chooses the wheel compatible with this Python among the local ones
-    command = [sys.executable, "-m", "pip", "install", "--no-index", "--no-deps"]
-    command.append("--force-reinstall")
-    for directory in searched:
-        command.extend(["--find-links", directory])
-    command.extend(sorted(found))
-    print("Installing the local geode wheels: " + ", ".join(sorted(found)))
     return subprocess.call(command)
+
+
+def run_install_geode(packages, exclude, missing, dry_run):
+    excluded = normalize(exclude) if exclude else None
+    local = {}
+    pinned = []
+    failures = []
+    for name, version, wheel_directory, cmake_directory in packages:
+        distribution = normalize(name)
+        if distribution == excluded:
+            continue
+        expected = python_version(version)
+        wheels = local_wheels(distribution, wheel_directory)
+        if wheels:
+            warn_stale(distribution, wheels, cmake_directory)
+            local.setdefault(distribution, set()).add(wheel_directory)
+            print("%s: local wheel of %s" % (distribution, wheel_directory))
+            continue
+        installed = installed_version(distribution)
+        if installed is not None:
+            print("%s: installed version %s kept" % (distribution, installed))
+            if expected and not same_version(installed, expected):
+                print(
+                    "warning: %s %s is installed, the C++ package found by CMake "
+                    "is %s" % (distribution, installed, expected)
+                )
+            continue
+        if expected:
+            print("%s: version %s from the package index" % (distribution, expected))
+            pinned.append("%s==%s" % (distribution, expected))
+            continue
+        failures.append(
+            "no local wheel of %s in %s, not installed in %s and no released "
+            "version to install: build the wheel target of the geode project "
+            "providing it first (an unpinned package from the index may not "
+            "match the local build chain)" % (distribution, wheel_directory, sys.prefix)
+        )
+    for failure in failures:
+        print(("error: " if missing == "error" else "warning: ") + failure)
+    if failures and missing == "error":
+        return 1
+    if local:
+        # pip chooses the wheel compatible with this Python among the local ones
+        arguments = ["--no-index", "--force-reinstall"]
+        for directory in sorted({d for ds in local.values() for d in ds}):
+            arguments.extend(["--find-links", directory])
+        status = run_command(pip_command(arguments + sorted(local)), dry_run)
+        if status:
+            return status
+    if pinned:
+        status = run_command(pip_command(pinned), dry_run)
+        if status:
+            return status
+    if not local and not pinned:
+        print("No geode wheel to install")
+    return 0
 
 
 def run_publish(wheel, directory):
@@ -264,10 +367,20 @@ def main():
     requirements.add_argument("files", nargs="*")
     requirements.add_argument("--output", required=True)
     requirements.add_argument("--geode-output", required=True)
-    install_local = sub.add_parser("install-local")
-    install_local.add_argument("directories", nargs="*")
-    install_local.add_argument("--exclude")
-    install_local.add_argument("--require", action="append", default=[])
+    requirements.add_argument("--geode", action="append", default=[])
+    installed = sub.add_parser("installed")
+    installed.add_argument("distributions", nargs="*")
+    install_geode = sub.add_parser("install-geode")
+    install_geode.add_argument("--exclude")
+    install_geode.add_argument(
+        "--package",
+        nargs=4,
+        action="append",
+        default=[],
+        metavar=("NAME", "VERSION", "WHEEL_DIRECTORY", "CMAKE_DIRECTORY"),
+    )
+    install_geode.add_argument("--missing", choices=("error", "warn"), default="error")
+    install_geode.add_argument("--dry-run", action="store_true")
     publish = sub.add_parser("publish")
     publish.add_argument("wheel")
     publish.add_argument("directory")
@@ -278,14 +391,15 @@ def main():
         return run_check(arguments.package, arguments.binary_folder)
     if arguments.command == "requirements":
         return run_requirements(
-            arguments.files, arguments.output, arguments.geode_output
+            arguments.files, arguments.output, arguments.geode_output, arguments.geode
         )
-    if arguments.command == "install-local":
-        return run_install_local(
-            arguments.directories, arguments.exclude, arguments.require
+    if arguments.command == "installed":
+        return run_installed(arguments.distributions)
+    if arguments.command == "install-geode":
+        return run_install_geode(
+            arguments.package, arguments.exclude, arguments.missing, arguments.dry_run
         )
     return run_publish(arguments.wheel, arguments.directory)
-
 
 if __name__ == "__main__":
     sys.exit(main())
