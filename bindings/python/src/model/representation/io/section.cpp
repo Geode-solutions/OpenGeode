@@ -32,12 +32,18 @@ namespace geode
 {
     void define_section_io( pybind11::module& module )
     {
-        module.def( "save_section", &save_section );
-        module.def( "load_section", &load_section );
-        module.def( "section_object_priority", &section_object_priority );
-        module.def( "is_section_loadable", &is_section_loadable );
-        module.def( "is_section_saveable", &is_section_saveable );
-        module.def( "section_additional_files", &section_additional_files );
+        module.def( "save_section", &save_section,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
+        module.def( "load_section", &load_section,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
+        module.def( "section_object_priority", &section_object_priority,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
+        module.def( "is_section_loadable", &is_section_loadable,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
+        module.def( "is_section_saveable", &is_section_saveable,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
+        module.def( "section_additional_files", &section_additional_files,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
         PYTHON_FACTORY_CLASS( SectionInputFactory );
         PYTHON_FACTORY_CLASS( SectionOutputFactory );
     }

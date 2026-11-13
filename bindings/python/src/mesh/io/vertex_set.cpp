@@ -32,15 +32,20 @@ namespace geode
 {
     void define_vertex_set_io( pybind11::module& module )
     {
-        module.def( "save_vertex_set", &save_vertex_set );
+        module.def( "save_vertex_set", &save_vertex_set,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
         module.def( "load_vertex_set",
             static_cast< std::vector< std::unique_ptr< VertexSet > > ( * )(
-                std::string_view ) >( &load_vertex_set ) );
-        module.def( "vertex_set_object_priority", &vertex_set_object_priority );
-        module.def( "is_vertex_set_loadable", &is_vertex_set_loadable );
-        module.def( "is_vertex_set_saveable", &is_vertex_set_saveable );
-        module.def(
-            "vertex_set_additional_files", &vertex_set_additional_files );
+                std::string_view ) >( &load_vertex_set ),
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
+        module.def( "vertex_set_object_priority", &vertex_set_object_priority,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
+        module.def( "is_vertex_set_loadable", &is_vertex_set_loadable,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
+        module.def( "is_vertex_set_saveable", &is_vertex_set_saveable,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
+        module.def( "vertex_set_additional_files", &vertex_set_additional_files,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
         PYTHON_FACTORY_CLASS( VertexSetInputFactory );
         PYTHON_FACTORY_CLASS( VertexSetOutputFactory );
     }

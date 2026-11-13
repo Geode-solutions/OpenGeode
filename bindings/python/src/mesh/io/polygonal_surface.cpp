@@ -33,30 +33,35 @@
 #define PYTHON_POLYGONAL_SURFACE_IO( dimension )                               \
     const auto save##dimension =                                               \
         "save_polygonal_surface" + std::to_string( dimension ) + "D";          \
-    module.def(                                                                \
-        save##dimension.c_str(), &save_polygonal_surface< dimension > );       \
+    module.def( save##dimension.c_str(), &save_polygonal_surface< dimension >, \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto load##dimension =                                               \
         "load_polygonal_surface" + std::to_string( dimension ) + "D";          \
     module.def( load##dimension.c_str(),                                       \
         static_cast< std::vector< std::unique_ptr<                             \
             PolygonalSurface< dimension > > > ( * )( std::string_view ) >(     \
-            &load_polygonal_surface< dimension > ) );                          \
+            &load_polygonal_surface< dimension > ),                            \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto priority##dimension = "polygonal_surface_object_priority"       \
                                      + std::to_string( dimension ) + "D";      \
     module.def( priority##dimension.c_str(),                                   \
-        &polygonal_surface_object_priority< dimension > );                     \
+        &polygonal_surface_object_priority< dimension >,                       \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto loadable##dimension =                                           \
         "is_polygonal_surface_loadable" + std::to_string( dimension ) + "D";   \
     module.def( loadable##dimension.c_str(),                                   \
-        &is_polygonal_surface_loadable< dimension > );                         \
+        &is_polygonal_surface_loadable< dimension >,                           \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto check##dimension = "polygonal_surface_additional_files"         \
                                   + std::to_string( dimension ) + "D";         \
     module.def( check##dimension.c_str(),                                      \
-        &polygonal_surface_additional_files< dimension > );                    \
+        &polygonal_surface_additional_files< dimension >,                      \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto saveable##dimension =                                           \
         "is_polygonal_surface_saveable" + std::to_string( dimension ) + "D";   \
     module.def( saveable##dimension.c_str(),                                   \
-        &is_polygonal_surface_saveable< dimension > );                         \
+        &is_polygonal_surface_saveable< dimension >,                           \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     PYTHON_FACTORY_CLASS( PolygonalSurfaceInputFactory##dimension##D );        \
     PYTHON_FACTORY_CLASS( PolygonalSurfaceOutputFactory##dimension##D )
 

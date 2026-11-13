@@ -31,7 +31,9 @@ namespace geode
 {
     void define_external_time_series_io( pybind11::module& module )
     {
-        module.def( "save_external_time_series", &save_external_time_series );
-        module.def( "load_external_time_series", &load_external_time_series );
+        module.def( "save_external_time_series", &save_external_time_series,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
+        module.def( "load_external_time_series", &load_external_time_series,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
     }
 } // namespace geode

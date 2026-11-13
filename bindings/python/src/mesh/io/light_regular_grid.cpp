@@ -33,29 +33,35 @@
 #define PYTHON_LIGHT_REGULAR_GRID_IO( dimension )                              \
     const auto save##dimension =                                               \
         "save_light_regular_grid" + std::to_string( dimension ) + "D";         \
-    module.def(                                                                \
-        save##dimension.c_str(), &save_light_regular_grid< dimension > );      \
+    module.def( save##dimension.c_str(),                                       \
+        &save_light_regular_grid< dimension >,                                 \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto load##dimension =                                               \
         "load_light_regular_grid" + std::to_string( dimension ) + "D";         \
     module.def( load##dimension.c_str(),                                       \
         static_cast< std::vector< LightRegularGrid< dimension > > ( * )(       \
-            std::string_view ) >( &load_light_regular_grid< dimension > ) );   \
+            std::string_view ) >( &load_light_regular_grid< dimension > ),     \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto priority##dimension = "light_regular_grid_object_priority"      \
                                      + std::to_string( dimension ) + "D";      \
     module.def( priority##dimension.c_str(),                                   \
-        &light_regular_grid_object_priority< dimension > );                    \
+        &light_regular_grid_object_priority< dimension >,                      \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto loadable##dimension =                                           \
         "is_light_regular_grid_loadable" + std::to_string( dimension ) + "D";  \
     module.def( loadable##dimension.c_str(),                                   \
-        &is_light_regular_grid_loadable< dimension > );                        \
+        &is_light_regular_grid_loadable< dimension >,                          \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto check##dimension = "light_regular_grid_additional_files"        \
                                   + std::to_string( dimension ) + "D";         \
     module.def( check##dimension.c_str(),                                      \
-        &light_regular_grid_additional_files< dimension > );                   \
+        &light_regular_grid_additional_files< dimension >,                     \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto saveable##dimension =                                           \
         "is_light_regular_grid_saveable" + std::to_string( dimension ) + "D";  \
     module.def( saveable##dimension.c_str(),                                   \
-        &is_light_regular_grid_saveable< dimension > );                        \
+        &is_light_regular_grid_saveable< dimension >,                          \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     PYTHON_FACTORY_CLASS( LightRegularGridInputFactory##dimension##D );        \
     PYTHON_FACTORY_CLASS( LightRegularGridOutputFactory##dimension##D )
 

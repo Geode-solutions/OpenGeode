@@ -34,8 +34,10 @@ namespace geode
     {
         module
             .def( "convert_solid_mesh_into_tetrahedral_solid",
-                &convert_solid_mesh_into_tetrahedral_solid )
+                &convert_solid_mesh_into_tetrahedral_solid,
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
             .def( "convert_grid_into_tetrahedral_solid",
-                &convert_grid_into_tetrahedral_solid );
+                &convert_grid_into_tetrahedral_solid,
+                pybind11::call_guard< pybind11::gil_scoped_release >() );
     }
 } // namespace geode

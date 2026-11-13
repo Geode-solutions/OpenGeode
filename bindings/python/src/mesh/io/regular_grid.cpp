@@ -34,29 +34,35 @@
 #define PYTHON_REGULAR_GRID_IO( dimension )                                    \
     const auto save##dimension =                                               \
         "save_regular_grid" + std::to_string( dimension ) + "D";               \
-    module.def( save##dimension.c_str(), &save_regular_grid< dimension > );    \
+    module.def( save##dimension.c_str(), &save_regular_grid< dimension >,      \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto load##dimension =                                               \
         "load_regular_grid" + std::to_string( dimension ) + "D";               \
     module.def( load##dimension.c_str(),                                       \
         static_cast<                                                           \
             std::vector< std::unique_ptr< RegularGrid< dimension > > > ( * )(  \
-                std::string_view ) >( &load_regular_grid< dimension > ) );     \
+                std::string_view ) >( &load_regular_grid< dimension > ),       \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto priority##dimension =                                           \
         "regular_grid_object_priority" + std::to_string( dimension ) + "D";    \
     module.def( priority##dimension.c_str(),                                   \
-        &regular_grid_object_priority< dimension > );                          \
+        &regular_grid_object_priority< dimension >,                            \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto loadable##dimension =                                           \
         "is_regular_grid_loadable" + std::to_string( dimension ) + "D";        \
-    module.def(                                                                \
-        loadable##dimension.c_str(), &is_regular_grid_loadable< dimension > ); \
+    module.def( loadable##dimension.c_str(),                                   \
+        &is_regular_grid_loadable< dimension >,                                \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto check##dimension =                                              \
         "regular_grid_additional_files" + std::to_string( dimension ) + "D";   \
     module.def( check##dimension.c_str(),                                      \
-        &regular_grid_additional_files< dimension > );                         \
+        &regular_grid_additional_files< dimension >,                           \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto saveable##dimension =                                           \
         "is_regular_grid_saveable" + std::to_string( dimension ) + "D";        \
-    module.def(                                                                \
-        saveable##dimension.c_str(), &is_regular_grid_saveable< dimension > ); \
+    module.def( saveable##dimension.c_str(),                                   \
+        &is_regular_grid_saveable< dimension >,                                \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     PYTHON_FACTORY_CLASS( RegularGridInputFactory##dimension##D );             \
     PYTHON_FACTORY_CLASS( RegularGridOutputFactory##dimension##D )
 

@@ -63,7 +63,8 @@
         .def( "compute_polygon_adjacencies",                                   \
             static_cast< void ( SurfaceMeshBuilder##dimension##D::* )() >(     \
                 &SurfaceMeshBuilder##dimension##D::                            \
-                    compute_polygon_adjacencies ) )                            \
+                    compute_polygon_adjacencies ),                             \
+            pybind11::call_guard< pybind11::gil_scoped_release >() )           \
         .def( "delete_polygons",                                               \
             &SurfaceMeshBuilder##dimension##D::delete_polygons )               \
         .def( "permute_polygons",                                              \

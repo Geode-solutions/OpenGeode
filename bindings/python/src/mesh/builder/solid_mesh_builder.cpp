@@ -61,7 +61,8 @@
         .def( "compute_polyhedron_adjacencies",                                \
             static_cast< void ( SolidMeshBuilder##dimension##D::* )() >(       \
                 &SolidMeshBuilder##dimension##D::                              \
-                    compute_polyhedron_adjacencies ) )                         \
+                    compute_polyhedron_adjacencies ),                          \
+            pybind11::call_guard< pybind11::gil_scoped_release >() )           \
         .def( "delete_polyhedra",                                              \
             &SolidMeshBuilder##dimension##D::delete_polyhedra )                \
         .def( "permute_polyhedra",                                             \

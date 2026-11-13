@@ -33,30 +33,35 @@
 #define PYTHON_TETRAHEDRAL_SOLID_IO( dimension )                               \
     const auto save##dimension =                                               \
         "save_tetrahedral_solid" + std::to_string( dimension ) + "D";          \
-    module.def(                                                                \
-        save##dimension.c_str(), &save_tetrahedral_solid< dimension > );       \
+    module.def( save##dimension.c_str(), &save_tetrahedral_solid< dimension >, \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto load##dimension =                                               \
         "load_tetrahedral_solid" + std::to_string( dimension ) + "D";          \
     module.def( load##dimension.c_str(),                                       \
         static_cast< std::vector< std::unique_ptr<                             \
             TetrahedralSolid< dimension > > > ( * )( std::string_view ) >(     \
-            &load_tetrahedral_solid< dimension > ) );                          \
+            &load_tetrahedral_solid< dimension > ),                            \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto priority##dimension = "tetrahedral_solid_object_priority"       \
                                      + std::to_string( dimension ) + "D";      \
     module.def( priority##dimension.c_str(),                                   \
-        &tetrahedral_solid_object_priority< dimension > );                     \
+        &tetrahedral_solid_object_priority< dimension >,                       \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto loadable##dimension =                                           \
         "is_tetrahedral_solid_loadable" + std::to_string( dimension ) + "D";   \
     module.def( loadable##dimension.c_str(),                                   \
-        &is_tetrahedral_solid_loadable< dimension > );                         \
+        &is_tetrahedral_solid_loadable< dimension >,                           \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto check##dimension = "tetrahedral_solid_additional_files"         \
                                   + std::to_string( dimension ) + "D";         \
     module.def( check##dimension.c_str(),                                      \
-        &tetrahedral_solid_additional_files< dimension > );                    \
+        &tetrahedral_solid_additional_files< dimension >,                      \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto saveable##dimension =                                           \
         "is_tetrahedral_solid_saveable" + std::to_string( dimension ) + "D";   \
     module.def( saveable##dimension.c_str(),                                   \
-        &is_tetrahedral_solid_saveable< dimension > );                         \
+        &is_tetrahedral_solid_saveable< dimension >,                           \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     PYTHON_FACTORY_CLASS( TetrahedralSolidInputFactory##dimension##D );        \
     PYTHON_FACTORY_CLASS( TetrahedralSolidOutputFactory##dimension##D )
 

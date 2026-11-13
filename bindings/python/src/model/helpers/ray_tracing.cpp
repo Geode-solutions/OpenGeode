@@ -50,8 +50,10 @@ namespace geode
             .def( pybind11::init< const BRep& >(),
                 pybind11::keep_alive< 1, 2 >() )
             .def( "is_point_inside_block",
-                &BRepRayTracing::is_point_inside_block )
+                &BRepRayTracing::is_point_inside_block,
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
             .def( "block_containing_point",
-                &BRepRayTracing::block_containing_point );
+                &BRepRayTracing::block_containing_point,
+                pybind11::call_guard< pybind11::gil_scoped_release >() );
     }
 } // namespace geode

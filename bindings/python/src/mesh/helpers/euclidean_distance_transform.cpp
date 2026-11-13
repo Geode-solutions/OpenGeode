@@ -30,8 +30,10 @@ namespace geode
     void define_euclidean_distance_transform( pybind11::module& module )
     {
         module.def( "euclidean_distance_transform2D",
-            &euclidean_distance_transform< 2 > );
+            &euclidean_distance_transform< 2 >,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
         module.def( "euclidean_distance_transform3D",
-            &euclidean_distance_transform< 3 > );
+            &euclidean_distance_transform< 3 >,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
     }
 } // namespace geode

@@ -33,30 +33,36 @@
 #define PYTHON_TRIANGULATED_SURFACE_IO( dimension )                            \
     const auto save##dimension =                                               \
         "save_triangulated_surface" + std::to_string( dimension ) + "D";       \
-    module.def(                                                                \
-        save##dimension.c_str(), &save_triangulated_surface< dimension > );    \
+    module.def( save##dimension.c_str(),                                       \
+        &save_triangulated_surface< dimension >,                               \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto load##dimension =                                               \
         "load_triangulated_surface" + std::to_string( dimension ) + "D";       \
     module.def( load##dimension.c_str(),                                       \
         static_cast< std::vector< std::unique_ptr<                             \
             TriangulatedSurface< dimension > > > ( * )( std::string_view ) >(  \
-            &load_triangulated_surface< dimension > ) );                       \
+            &load_triangulated_surface< dimension > ),                         \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto priority##dimension = "triangulated_surface_object_priority"    \
                                      + std::to_string( dimension ) + "D";      \
     module.def( priority##dimension.c_str(),                                   \
-        &triangulated_surface_object_priority< dimension > );                  \
+        &triangulated_surface_object_priority< dimension >,                    \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto loadable##dimension = "is_triangulated_surface_loadable"        \
                                      + std::to_string( dimension ) + "D";      \
     module.def( loadable##dimension.c_str(),                                   \
-        &is_triangulated_surface_loadable< dimension > );                      \
+        &is_triangulated_surface_loadable< dimension >,                        \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto check##dimension = "triangulated_surface_additional_files"      \
                                   + std::to_string( dimension ) + "D";         \
     module.def( check##dimension.c_str(),                                      \
-        &triangulated_surface_additional_files< dimension > );                 \
+        &triangulated_surface_additional_files< dimension >,                   \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto saveable##dimension = "is_triangulated_surface_saveable"        \
                                      + std::to_string( dimension ) + "D";      \
     module.def( saveable##dimension.c_str(),                                   \
-        &is_triangulated_surface_saveable< dimension > );                      \
+        &is_triangulated_surface_saveable< dimension >,                        \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     PYTHON_FACTORY_CLASS( TriangulatedSurfaceInputFactory##dimension##D );     \
     PYTHON_FACTORY_CLASS( TriangulatedSurfaceOutputFactory##dimension##D )
 

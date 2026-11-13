@@ -37,9 +37,14 @@ namespace geode
 {
     void define_component_mensurations( pybind11::module& module )
     {
-        module.def( "block_volume", &block_volume )
-            .def( "block_bounding_box", &block_bounding_box )
-            .def( "surface_area2D", &surface_area< 2 > )
-            .def( "surface_area3D", &surface_area< 3 > );
+        module
+            .def( "block_volume", &block_volume,
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
+            .def( "block_bounding_box", &block_bounding_box,
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
+            .def( "surface_area2D", &surface_area< 2 >,
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
+            .def( "surface_area3D", &surface_area< 3 >,
+                pybind11::call_guard< pybind11::gil_scoped_release >() );
     }
 } // namespace geode

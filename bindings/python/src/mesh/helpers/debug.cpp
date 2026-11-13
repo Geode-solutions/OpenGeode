@@ -35,13 +35,22 @@ namespace geode
 {
     void define_debug( pybind11::module& module )
     {
-        module.def( "save_segment2D", &detail::save_segment< 2 > )
-            .def( "save_segment3D", &detail::save_segment< 3 > )
-            .def( "save_triangle2D", &detail::save_triangle< 2 > )
-            .def( "save_triangle3D", &detail::save_triangle< 3 > )
-            .def( "save_triangle2D", &detail::save_triangles< 2 > )
-            .def( "save_triangle3D", &detail::save_triangles< 3 > )
-            .def( "save_tetrahedron", &detail::save_tetrahedron )
-            .def( "save_tetrahedra", &detail::save_tetrahedra );
+        module
+            .def( "save_segment2D", &detail::save_segment< 2 >,
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
+            .def( "save_segment3D", &detail::save_segment< 3 >,
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
+            .def( "save_triangle2D", &detail::save_triangle< 2 >,
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
+            .def( "save_triangle3D", &detail::save_triangle< 3 >,
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
+            .def( "save_triangle2D", &detail::save_triangles< 2 >,
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
+            .def( "save_triangle3D", &detail::save_triangles< 3 >,
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
+            .def( "save_tetrahedron", &detail::save_tetrahedron,
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
+            .def( "save_tetrahedra", &detail::save_tetrahedra,
+                pybind11::call_guard< pybind11::gil_scoped_release >() );
     }
 } // namespace geode

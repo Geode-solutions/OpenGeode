@@ -124,3 +124,11 @@ add_geode_python_test(
         ${PROJECT_NAME}::py_mesh
         ${PROJECT_NAME}::py_model
 )
+
+add_geode_python_test(
+    SOURCE "test-py-gil-release.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_geometry
+        ${PROJECT_NAME}::py_mesh
+)

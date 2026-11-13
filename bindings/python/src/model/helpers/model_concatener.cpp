@@ -34,10 +34,12 @@ namespace geode
     {
         pybind11::class_< BRepConcatener >( module, "BRepConcatener" )
             .def( pybind11::init< BRep& >(), pybind11::keep_alive< 1, 2 >() )
-            .def( "concatenate", &BRepConcatener::concatenate );
+            .def( "concatenate", &BRepConcatener::concatenate,
+                pybind11::call_guard< pybind11::gil_scoped_release >() );
 
         pybind11::class_< SectionConcatener >( module, "SectionConcatener" )
             .def( pybind11::init< Section& >(), pybind11::keep_alive< 1, 2 >() )
-            .def( "concatenate", &SectionConcatener::concatenate );
+            .def( "concatenate", &SectionConcatener::concatenate,
+                pybind11::call_guard< pybind11::gil_scoped_release >() );
     }
 } // namespace geode

@@ -33,17 +33,26 @@ namespace geode
 {
     void define_brep_io( pybind11::module& module )
     {
-        module.def( "save_brep", &save_brep );
-        module.def( "load_brep", &load_brep );
-        module.def( "brep_object_priority", &brep_object_priority );
-        module.def( "is_brep_loadable", &is_brep_loadable );
-        module.def( "is_brep_saveable", &is_brep_saveable );
-        module.def( "brep_additional_files", &brep_additional_files );
-        module.def( "load_brep_time_series", &load_brep_time_series );
-        module.def(
-            "is_brep_time_series_loadable", &is_brep_time_series_loadable );
+        module.def( "save_brep", &save_brep,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
+        module.def( "load_brep", &load_brep,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
+        module.def( "brep_object_priority", &brep_object_priority,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
+        module.def( "is_brep_loadable", &is_brep_loadable,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
+        module.def( "is_brep_saveable", &is_brep_saveable,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
+        module.def( "brep_additional_files", &brep_additional_files,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
+        module.def( "load_brep_time_series", &load_brep_time_series,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
+        module.def( "is_brep_time_series_loadable",
+            &is_brep_time_series_loadable,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
         module.def( "brep_time_series_additional_files",
-            &brep_time_series_additional_files );
+            &brep_time_series_additional_files,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
         PYTHON_FACTORY_CLASS( BRepInputFactory );
         PYTHON_FACTORY_CLASS( BRepOutputFactory );
         PYTHON_FACTORY_CLASS( BRepTimeSeriesInputFactory );

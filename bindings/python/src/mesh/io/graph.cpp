@@ -32,14 +32,20 @@ namespace geode
 {
     void define_graph_io( pybind11::module& module )
     {
-        module.def( "save_graph", &save_graph );
+        module.def( "save_graph", &save_graph,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
         module.def( "load_graph",
             static_cast< std::vector< std::unique_ptr< Graph > > ( * )(
-                std::string_view ) >( &load_graph ) );
-        module.def( "graph_object_priority", &graph_object_priority );
-        module.def( "is_graph_loadable", &is_graph_loadable );
-        module.def( "is_graph_saveable", &is_graph_saveable );
-        module.def( "graph_additional_files", &graph_additional_files );
+                std::string_view ) >( &load_graph ),
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
+        module.def( "graph_object_priority", &graph_object_priority,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
+        module.def( "is_graph_loadable", &is_graph_loadable,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
+        module.def( "is_graph_saveable", &is_graph_saveable,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
+        module.def( "graph_additional_files", &graph_additional_files,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
         PYTHON_FACTORY_CLASS( GraphInputFactory );
         PYTHON_FACTORY_CLASS( GraphOutputFactory );
     }

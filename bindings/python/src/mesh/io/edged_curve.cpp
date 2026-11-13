@@ -33,29 +33,35 @@
 #define PYTHON_EDGED_CURVE_IO( dimension )                                     \
     const auto save##dimension =                                               \
         "save_edged_curve" + std::to_string( dimension ) + "D";                \
-    module.def( save##dimension.c_str(), &save_edged_curve< dimension > );     \
+    module.def( save##dimension.c_str(), &save_edged_curve< dimension >,       \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto load##dimension =                                               \
         "load_edged_curve" + std::to_string( dimension ) + "D";                \
     module.def( load##dimension.c_str(),                                       \
         static_cast<                                                           \
             std::vector< std::unique_ptr< EdgedCurve< dimension > > > ( * )(   \
-                std::string_view ) >( &load_edged_curve< dimension > ) );      \
+                std::string_view ) >( &load_edged_curve< dimension > ),        \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto priority##dimension =                                           \
         "edged_curve_object_priority" + std::to_string( dimension ) + "D";     \
     module.def( priority##dimension.c_str(),                                   \
-        &edged_curve_object_priority< dimension > );                           \
+        &edged_curve_object_priority< dimension >,                             \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto loadable##dimension =                                           \
         "is_edged_curve_loadable" + std::to_string( dimension ) + "D";         \
-    module.def(                                                                \
-        loadable##dimension.c_str(), &is_edged_curve_loadable< dimension > );  \
+    module.def( loadable##dimension.c_str(),                                   \
+        &is_edged_curve_loadable< dimension >,                                 \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto check##dimension =                                              \
         "edged_curve_additional_files" + std::to_string( dimension ) + "D";    \
     module.def( check##dimension.c_str(),                                      \
-        &edged_curve_additional_files< dimension > );                          \
+        &edged_curve_additional_files< dimension >,                            \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     const auto saveable##dimension =                                           \
         "is_edged_curve_saveable" + std::to_string( dimension ) + "D";         \
-    module.def(                                                                \
-        saveable##dimension.c_str(), &is_edged_curve_saveable< dimension > );  \
+    module.def( saveable##dimension.c_str(),                                   \
+        &is_edged_curve_saveable< dimension >,                                 \
+        pybind11::call_guard< pybind11::gil_scoped_release >() );              \
     PYTHON_FACTORY_CLASS( EdgedCurveInputFactory##dimension##D );              \
     PYTHON_FACTORY_CLASS( EdgedCurveOutputFactory##dimension##D )
 

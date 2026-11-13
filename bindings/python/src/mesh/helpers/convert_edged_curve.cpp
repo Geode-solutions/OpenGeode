@@ -31,7 +31,8 @@ namespace geode
 {
     void define_convert_edged_curve( pybind11::module& module )
     {
-        module.def(
-            "convert_edged_curve3d_into_2d", &convert_edged_curve3d_into_2d );
+        module.def( "convert_edged_curve3d_into_2d",
+            &convert_edged_curve3d_into_2d,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
     }
 } // namespace geode

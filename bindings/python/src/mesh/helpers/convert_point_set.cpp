@@ -31,7 +31,7 @@ namespace geode
 {
     void define_convert_point_set( pybind11::module& module )
     {
-        module.def(
-            "convert_point_set3d_into_2d", &convert_point_set3d_into_2d );
+        module.def( "convert_point_set3d_into_2d", &convert_point_set3d_into_2d,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
     }
 } // namespace geode

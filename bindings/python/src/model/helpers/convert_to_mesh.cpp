@@ -71,11 +71,16 @@ namespace geode
             .def_readonly( "unique_vertices_mapping",
                 &ModelToMeshMappings::unique_vertices_mapping );
 
-        module.def( "convert_section_into_curve", &convert_section_into_curve )
-            .def(
-                "convert_section_into_surface", &convert_section_into_surface )
-            .def( "convert_brep_into_curve", &convert_brep_into_curve )
-            .def( "convert_brep_into_surface", &convert_brep_into_surface )
-            .def( "convert_brep_into_solid", &convert_brep_into_solid );
+        module
+            .def( "convert_section_into_curve", &convert_section_into_curve,
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
+            .def( "convert_section_into_surface", &convert_section_into_surface,
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
+            .def( "convert_brep_into_curve", &convert_brep_into_curve,
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
+            .def( "convert_brep_into_surface", &convert_brep_into_surface,
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
+            .def( "convert_brep_into_solid", &convert_brep_into_solid,
+                pybind11::call_guard< pybind11::gil_scoped_release >() );
     }
 } // namespace geode

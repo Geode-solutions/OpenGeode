@@ -35,28 +35,39 @@ namespace geode
     {
         module
             .def( "convert_surface_mesh_into_triangulated_surface2D",
-                &convert_surface_mesh_into_triangulated_surface< 2 > )
+                &convert_surface_mesh_into_triangulated_surface< 2 >,
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
             .def( "convert_surface_mesh_into_triangulated_surface3D",
-                &convert_surface_mesh_into_triangulated_surface< 3 > )
+                &convert_surface_mesh_into_triangulated_surface< 3 >,
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
             .def( "convert_grid_into_triangulated_surface",
-                &convert_grid_into_triangulated_surface )
+                &convert_grid_into_triangulated_surface,
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
             .def( "triangulate_surface_mesh2D",
                 static_cast< void ( * )( SurfaceMesh< 2 >& ) >(
-                    &triangulate_surface_mesh< 2 > ) )
+                    &triangulate_surface_mesh< 2 > ),
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
             .def( "triangulate_surface_mesh3D",
                 static_cast< void ( * )( SurfaceMesh< 3 >& ) >(
-                    &triangulate_surface_mesh< 3 > ) )
+                    &triangulate_surface_mesh< 3 > ),
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
             .def( "convert_surface_mesh2d_into_3d",
-                &convert_surface_mesh2d_into_3d )
+                &convert_surface_mesh2d_into_3d,
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
             .def( "convert_surface_mesh3d_into_2d",
-                &convert_surface_mesh3d_into_2d )
+                &convert_surface_mesh3d_into_2d,
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
             .def( "convert_polygonal_surface2d_into_3d",
-                &convert_polygonal_surface2d_into_3d )
+                &convert_polygonal_surface2d_into_3d,
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
             .def( "convert_polygonal_surface3d_into_2d",
-                &convert_polygonal_surface3d_into_2d )
+                &convert_polygonal_surface3d_into_2d,
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
             .def( "convert_triangulated_surface2d_into_3d",
-                &convert_triangulated_surface2d_into_3d )
+                &convert_triangulated_surface2d_into_3d,
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
             .def( "convert_triangulated_surface3d_into_2d",
-                &convert_triangulated_surface3d_into_2d );
+                &convert_triangulated_surface3d_into_2d,
+                pybind11::call_guard< pybind11::gil_scoped_release >() );
     }
 } // namespace geode

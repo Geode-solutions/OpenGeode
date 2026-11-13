@@ -34,33 +34,43 @@ namespace geode
     void define_convert_model_meshes( pybind11::module& module )
     {
         module
-            .def( "triangulate_section_surface_meshes",
+            .def(
+                "triangulate_section_surface_meshes",
                 []( Section& model ) {
                     SectionBuilder builder{ model };
                     triangulate_surface_meshes( model, builder );
-                } )
-            .def( "triangulate_brep_surface_meshes",
+                },
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
+            .def(
+                "triangulate_brep_surface_meshes",
                 []( BRep& model ) {
                     BRepBuilder builder{ model };
                     triangulate_surface_meshes( model, builder );
-                } )
-            .def( "convert_section_surface_meshes_into_triangulated_surfaces",
+                },
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
+            .def(
+                "convert_section_surface_meshes_into_triangulated_surfaces",
                 []( Section& model ) {
                     SectionBuilder builder{ model };
                     convert_surface_meshes_into_triangulated_surfaces(
                         model, builder );
-                } )
-            .def( "convert_brep_surface_meshes_into_triangulated_surfaces",
+                },
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
+            .def(
+                "convert_brep_surface_meshes_into_triangulated_surfaces",
                 []( BRep& model ) {
                     BRepBuilder builder{ model };
                     convert_surface_meshes_into_triangulated_surfaces(
                         model, builder );
-                } )
-            .def( "convert_brep_block_meshes_into_tetrahedral_solids",
+                },
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
+            .def(
+                "convert_brep_block_meshes_into_tetrahedral_solids",
                 []( BRep& model ) {
                     BRepBuilder builder{ model };
                     convert_block_meshes_into_tetrahedral_solids(
                         model, builder );
-                } );
+                },
+                pybind11::call_guard< pybind11::gil_scoped_release >() );
     }
 } // namespace geode

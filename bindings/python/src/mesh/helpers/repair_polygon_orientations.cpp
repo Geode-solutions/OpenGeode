@@ -32,8 +32,10 @@ namespace geode
     void define_repair_polygon_orientations( pybind11::module& module )
     {
         module.def( "repair_polygon_orientations2D",
-            &repair_polygon_orientations< 2 > );
+            &repair_polygon_orientations< 2 >,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
         module.def( "repair_polygon_orientations3D",
-            &repair_polygon_orientations< 3 > );
+            &repair_polygon_orientations< 3 >,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
     }
 } // namespace geode

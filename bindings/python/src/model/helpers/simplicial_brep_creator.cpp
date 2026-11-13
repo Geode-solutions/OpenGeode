@@ -32,7 +32,8 @@ namespace geode
 {
     void define_simplicial_brep_creator( pybind11::module& module )
     {
-        module.def(
-            "create_brep_from_bounding_box", &create_model_from_bounding_box );
+        module.def( "create_brep_from_bounding_box",
+            &create_model_from_bounding_box,
+            pybind11::call_guard< pybind11::gil_scoped_release >() );
     }
 } // namespace geode
