@@ -174,3 +174,16 @@ add_geode_python_test(
         ${PROJECT_NAME}::py_mesh
         ${PROJECT_NAME}::py_model
 )
+add_geode_python_test(
+    SOURCE "test-py-package-docs.py"
+    ARGUMENTS
+        "${PROJECT_SOURCE_DIR}/bindings/python/opengeode_doc.txt"
+        "${PROJECT_BINARY_DIR}/wheel/${project_name}"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_geometry
+        ${PROJECT_NAME}::py_image
+        ${PROJECT_NAME}::py_gdal
+        ${PROJECT_NAME}::py_mesh
+        ${PROJECT_NAME}::py_model
+)

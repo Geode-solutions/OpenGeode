@@ -34,9 +34,19 @@ import opengeode
 
 def find_uuid_in_list(uuids, uuid):
     for cur_uuid in uuids:
-        if cur_uuid.string() != uuid.string():
+        if cur_uuid.string() == uuid.string():
             return True
     return False
+
+
+def check_find_uuid_in_list():
+    uuids = [basic.uuid() for _ in range(3)]
+    if not find_uuid_in_list(uuids, uuids[1]):
+        raise ValueError("[Test] A uuid of the list should be found")
+    if find_uuid_in_list(uuids, basic.uuid()):
+        raise ValueError("[Test] A uuid not in the list should not be found")
+    if find_uuid_in_list([], uuids[0]):
+        raise ValueError("[Test] Nothing is found in an empty list")
 
 
 def add_corners(brep, builder):
@@ -943,6 +953,7 @@ def test_components_keep_brep_alive():
 
 if __name__ == "__main__":
     model.OpenGeodeModelLibrary.initialize()
+    check_find_uuid_in_list()
     brep = model.BRep()
     builder = model.BRepBuilder(brep)
 

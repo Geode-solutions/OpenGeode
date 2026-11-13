@@ -34,6 +34,7 @@ add_geode_python_wheel(
         "mesh.py"
         "model.py"
         "gdal.py"
+    DOCUMENTATION "${CMAKE_CURRENT_SOURCE_DIR}/opengeode_doc.txt"
     SUPERBUILD
     LICENSE "MIT"
 )

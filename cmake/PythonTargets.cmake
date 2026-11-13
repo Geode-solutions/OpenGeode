@@ -486,7 +486,7 @@ endfunction()
 function(add_geode_python_wheel)
     cmake_parse_arguments(GEODE_WHEEL
         "SUPERBUILD"
-        "NAME;DESCRIPTION;LICENSE"
+        "NAME;DESCRIPTION;LICENSE;DOCUMENTATION"
         "MODULES"
         ${ARGN}
     )
@@ -508,6 +508,21 @@ function(add_geode_python_wheel)
     set(header "# Copyright (c) 2019 - 2026 Geode-solutions\n\n")
     file(WRITE ${wheel_init} "#${header}")
     file(WRITE ${wheel_import} "${header}")
+    # Text of the package docstring (help(opengeode), opengeode.__doc__): the
+    # first statement of both the __init__.py of the wheel and the flat module
+    # imported from the build and install trees
+    if(GEODE_WHEEL_DOCUMENTATION)
+        # Regenerated when the text changes
+        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${GEODE_WHEEL_DOCUMENTATION}")
+        file(READ "${GEODE_WHEEL_DOCUMENTATION}" documentation)
+        string(FIND "${documentation}" "\"\"\"" triple_quote)
+        string(FIND "${documentation}" "\\" backslash)
+        if(NOT triple_quote EQUAL -1 OR NOT backslash EQUAL -1)
+            message(FATAL_ERROR "${GEODE_WHEEL_DOCUMENTATION} cannot contain triple quotes or backslashes")
+        endif()
+        file(APPEND ${wheel_init} "\"\"\"${documentation}\"\"\"\n\n")
+        file(APPEND ${wheel_import} "\"\"\"${documentation}\"\"\"\n\n")
+    endif()
     # The extension modules are at the root of the package, whatever the
     # platform, so that their public path (opengeode.opengeode_py_mesh...) does
     # not depend on it: the shared libraries stay in ${binary_folder}

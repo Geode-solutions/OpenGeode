@@ -1,0 +1,209 @@
+OpenGeode: load, inspect, build and save geometric models.
+
+The package gathers the bindings of the C++ OpenGeode library: basic tools
+(attributes, uuid, logger), geometry (Point3D, Segment3D, ...), meshes
+(PointSet, EdgedCurve, TriangulatedSurface, TetrahedralSolid, RegularGrid, ...),
+rasters and boundary representations (BRep, Section). Everything is imported
+at the top level: `import opengeode` is all that is needed.
+
+The examples below are executed by the tests of the package. They assume:
+
+    >>> import os, tempfile
+    >>> import numpy as np
+    >>> import opengeode
+    >>> directory = tempfile.mkdtemp()
+
+Five workflows
+==============
+
+1. Build a mesh
+---------------
+A mesh is created empty, then modified through its builder. builder() returns
+the builder matching the type of the object (builder_type gives its class).
+The numpy functions create many elements in one call:
+
+    >>> surface = opengeode.TriangulatedSurface3D.create()
+    >>> builder = opengeode.builder(surface)
+    >>> builder.create_points(np.array([[0, 0, 0], [1, 0, 0], [0, 1, 0], [1, 1, 0]]))
+    0
+    >>> builder.create_triangles(np.array([[0, 1, 2], [1, 3, 2]]))
+    0
+    >>> surface.nb_vertices(), surface.nb_polygons()
+    (4, 2)
+
+The return value of create_points and create_triangles is the index of the
+first element created. A builder checks its indices: an unknown vertex raises
+an IndexError and leaves the mesh unchanged.
+
+2. Save
+-------
+save() selects the writer from the extension of the file and returns the list
+of the files written (some formats write several). output_extensions(cls) and
+is_saveable(obj, filename) tell what can be written:
+
+    >>> filename = os.path.join(directory, "surface.og_tsf3d")
+    >>> opengeode.save(surface, filename) == [filename]
+    True
+    >>> "og_tsf3d" in opengeode.output_extensions(opengeode.TriangulatedSurface3D)
+    True
+    >>> opengeode.is_saveable(surface, filename)
+    True
+
+3. Load and inspect
+-------------------
+load(cls, filename) returns the cls object of the file (an OpenGeodeDataError
+if the file does not hold exactly one: use load_all, which returns the list).
+is_loadable(cls, filename) gives a Percentage of how well the file can be
+loaded as a cls, input_extensions(cls) lists the readers:
+
+    >>> loaded = opengeode.load(opengeode.TriangulatedSurface3D, filename)
+    >>> loaded.nb_polygons()
+    2
+    >>> loaded.point(3).value(0)
+    1.0
+    >>> opengeode.input_extensions(opengeode.TriangulatedSurface3D)
+    ['og_tsf3d']
+
+Other formats (obj, vtk, msh...) are added by the OpenGeode-IO package once it
+is imported (`import opengeode_io`): load and save then handle them.
+
+4. Attributes
+-------------
+Every mesh element set (vertices, polygons, edges, cells...) has an attribute
+manager storing named values. find_attribute() returns an attribute as its
+typed class (VariableAttributeDouble...) whatever its value type and kind:
+
+    >>> manager = loaded.vertex_attribute_manager()
+    >>> _ = manager.create_attribute_variable_double("height", 0.0)
+    >>> attribute = opengeode.find_attribute(manager, "height")
+    >>> attribute.set_value(3, 12.5)
+    >>> attribute.value(3)
+    12.5
+    >>> attribute.set_values_array(np.array([1, 2, 3, 4]))
+    >>> attribute.values_array().tolist()
+    [1.0, 2.0, 3.0, 4.0]
+
+Attributes are saved with the mesh in the native formats.
+
+5. Numpy bulk access
+--------------------
+Reading or writing element by element from Python is slow for large meshes.
+The *_array functions return numpy copies of whole tables, the builder
+functions create or fill many elements at once (the GIL is released while
+they run). Indices are uint32, offsets uint64:
+
+    >>> loaded.points_array().shape
+    (4, 3)
+    >>> loaded.triangles_array().tolist()
+    [[0, 1, 2], [1, 3, 2]]
+
+points_array() works for every mesh with points (not a VertexSet or a Graph),
+triangles_array() for triangulated surfaces, tetrahedra_array() for tetrahedral
+solids, edges_array() for edged curves and graphs, polygons_array() for any
+surface as a CSR pair (vertices, offsets) with polygon i being
+vertices[offsets[i]:offsets[i + 1]], and values_array() / set_values_array()
+for the attributes. The matching builder functions are create_points (meshes
+with points), create_triangles (triangulated surfaces), create_tetrahedra
+(tetrahedral solids), create_polygons (polygonal surfaces) and
+create_edges_with_vertices (edged curves and graphs). The arrays are copies: later
+changes of the mesh do not modify them. Each docstring states the exact
+dtypes and errors (help(opengeode.TriangulatedSurface3D.triangles_array)).
+
+Boundary representations (BRep, Section) follow the same pattern, their
+builder creating components and relations:
+
+    >>> brep = opengeode.BRep()
+    >>> brep_builder = opengeode.builder(brep)
+    >>> corner = brep_builder.add_corner()
+    >>> brep.nb_corners()
+    1
+    >>> brep.corner(corner).id() == corner
+    True
+
+Generic functions
+=================
+The functions taking a class work for every registered type (meshes, BRep,
+Section, raster images, ...): load, load_all, save, is_loadable, is_saveable,
+input_extensions, output_extensions, additional_files, builder, builder_type,
+find_attribute. registered_types() lists the types handled. A downstream
+package registers its own with register_type(cls, load=..., save=...,
+builder=...) and adds operations to an existing type with extend_type; the
+operations are read back with type_operation(cls, name) and
+object_operation(obj, name). A function raises a TypeError for a type or an
+operation that is not registered.
+
+Errors
+======
+Errors of the C++ library are Python exceptions, all deriving OpenGeodeError
+(itself a RuntimeError):
+
+    OpenGeodeDataError      the data is invalid or unsupported (unknown file
+                            extension, corrupted file, no attribute of that name)
+    OpenGeodeInternalError  an unexpected failure (std::exception)
+    OpenGeodeResultError    a Result holding an error was accessed
+
+They carry type, project, library, message and details, and the underlying
+error, if any, is chained in __cause__:
+
+    >>> try:
+    ...     opengeode.load(opengeode.TriangulatedSurface3D, "mesh.unknown_extension")
+    ... except opengeode.OpenGeodeDataError as error:
+    ...     print(error.type, error.project, "unknown_extension" in error.message)
+    data OpenGeode True
+
+An index out of range raises the standard IndexError, a wrong type a TypeError
+or a ValueError:
+
+    >>> try:
+    ...     loaded.point(99)
+    ... except IndexError as error:
+    ...     print(error)
+    [point] vertex 99 out of range [0, 4)
+
+Logging and progress
+====================
+By default OpenGeode logs on the console. forward_logs_to_python() sends the
+messages to the standard logging module instead (logger "opengeode" unless
+another name is given; trace is the level opengeode.TRACE = 5) until
+stop_forwarding_logs() is called. add_progress_listener(listener) calls
+listener(ProgressEvent) from a Python daemon thread for the progress of long
+operations (remove_progress_listener stops it):
+
+    >>> import logging
+    >>> records = []
+    >>> class Collect(logging.Handler):
+    ...     def emit(self, record):
+    ...         records.append(record.getMessage())
+    >>> handler = Collect()
+    >>> logger = logging.getLogger("opengeode")
+    >>> logger.addHandler(handler)
+    >>> logger.setLevel(logging.INFO)
+    >>> opengeode.forward_logs_to_python()
+    >>> _ = opengeode.load(opengeode.TriangulatedSurface3D, filename)
+    >>> opengeode.stop_forwarding_logs()
+    >>> logger.removeHandler(handler)
+    >>> any("loaded from" in message for message in records)
+    True
+
+Good to know
+============
+- Enums are native Python enums with CamelCase names whose members are used
+  through the class (opengeode.Logger.Level.info), not at module level.
+- Geometry objects (Segment3D, Triangle3D, ...) built from Point objects keep
+  those very Python Point objects: mutating a point mutates the geometry.
+  Geometry returned by a mesh (e.g. surface.triangle(0)) describes the mesh at
+  the time of the call: a later topology change of the mesh (removing vertices
+  or polygons, compressing) can invalidate it, so do not keep it across edits.
+- Value classes (Point3D, Vector3D, uuid, ...) are mutable but hashable by
+  value: do not mutate an object that is used as a dict key or a set member.
+- An object returned by a mesh (an attribute manager, an attribute, a builder)
+  keeps its mesh alive; concurrent reads and modifications of the same mesh
+  from several threads are not supported.
+- Long operations (loading, saving, the numpy functions, nearest neighbor searches) release the GIL, so
+  other Python threads keep running while they work.
+- The stubs shipped with the package (.pyi, py.typed) give the signatures and
+  docstrings of every function to editors and type checkers. They are used
+  silently from site-packages; putting the stub directory of the compiled
+  modules on MYPYPATH may report mypy errors.
+- Every function documents its exceptions: help(opengeode.<name>) or
+  help(opengeode.<Class>.<method>) is the reference.
