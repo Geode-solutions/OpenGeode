@@ -107,7 +107,10 @@ namespace geode
         auto& exceptions = python_exceptions();
         const auto make = [&module]( const char* name,
                               const pybind11::object& base, const char* doc ) {
-            const auto qualified = std::string{ "opengeode_py_basic." } + name;
+            // Qualified by the name of the module, which is a package member
+            // in the wheel (opengeode.lib.opengeode_py_basic)
+            const auto qualified =
+                module.attr( "__name__" ).cast< std::string >() + "." + name;
             auto* created = PyErr_NewExceptionWithDoc(
                 qualified.c_str(), doc, base.ptr(), nullptr );
             if( created == nullptr )

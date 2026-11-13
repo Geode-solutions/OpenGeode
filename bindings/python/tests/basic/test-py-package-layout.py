@@ -80,3 +80,25 @@ if __name__ == "__main__":
                 "[Test] Modules not importable from a package:\n"
                 + "\n".join(failures)
             )
+        # The exceptions are qualified by the module, so that the stubs and the
+        # pickles name an importable module
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                "import geode_test_env; import package.lib.opengeode_py_basic as m; "
+                "names = ['OpenGeodeError', 'OpenGeodeDataError', "
+                "'OpenGeodeInternalError', 'OpenGeodeResultError']; "
+                "modules = {getattr(m, n).__module__ for n in names}; "
+                "assert modules == {m.__name__}, modules",
+            ],
+            cwd=directory,
+            env=environment,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
+        if result.returncode != 0:
+            raise ValueError(
+                "[Test] Exceptions not qualified by their module:\n" + result.stdout
+            )
