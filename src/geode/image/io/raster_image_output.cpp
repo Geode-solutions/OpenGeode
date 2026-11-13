@@ -59,9 +59,16 @@ namespace geode
     bool is_raster_image_saveable(
         const RasterImage< dimension >& raster, std::string_view filename )
     {
-        const auto output = detail::geode_object_output_writer<
-            RasterImageOutputFactory< dimension > >( filename );
-        return output->is_saveable( raster );
+        try
+        {
+            const auto output = detail::geode_object_output_writer<
+                RasterImageOutputFactory< dimension > >( filename );
+            return output->is_saveable( raster );
+        }
+        catch( ... )
+        {
+            return false;
+        }
     }
 
     template std::vector< std::string > opengeode_image_api save_raster_image(

@@ -63,7 +63,7 @@
         pybind11::call_guard< pybind11::gil_scoped_release >(),                \
         pybind11::arg( "filename" ),                                           \
         "Return a Percentage of how well the file can be loaded as a raster "  \
-        "image" );                                                             \
+        "image, 0 if it cannot" );                                             \
     const auto check##dimension =                                              \
         "raster_image_additional_files" + std::to_string( dimension ) + "D";   \
     module.def( check##dimension.c_str(),                                      \

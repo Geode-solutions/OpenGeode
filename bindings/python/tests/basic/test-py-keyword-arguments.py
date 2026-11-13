@@ -183,12 +183,9 @@ def test_image():
     grey.set_value(greyscale=4)
     check(grey.value() == 4, "GreyscaleColor keywords")
     # No file format is registered in this module: the keywords are accepted
-    # and the unknown extension is reported
-    check_raises(
-        lambda: image.is_raster_image_saveable2D(
-            raster=raster, filename="a.og_img2d"
-        ),
-        basic.OpenGeodeDataError,
+    # and the unknown extension is not saveable
+    check(
+        not image.is_raster_image_saveable2D(raster=raster, filename="a.og_img2d"),
         "is_raster_image_saveable2D keywords",
     )
     check_raises(
