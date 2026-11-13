@@ -32,7 +32,8 @@ namespace geode
     void define_identifier_builder( pybind11::module& module )
     {
         pybind11::class_< IdentifierBuilder >( module, "IdentifierBuilder" )
-            .def( pybind11::init< Identifier& >() )
+            .def( pybind11::init< Identifier& >(),
+                pybind11::keep_alive< 1, 2 >() )
             .def( "set_id", &IdentifierBuilder::set_id )
             .def( "set_name", &IdentifierBuilder::set_name );
     }

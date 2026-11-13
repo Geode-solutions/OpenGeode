@@ -39,7 +39,8 @@
         module, name##dimension.c_str() )                                      \
         .def( "block_mesh_builder",                                            \
             &BlocksBuilder##dimension##D::block_mesh_builder<                  \
-                SolidMesh< dimension > > )                                     \
+                SolidMesh< dimension > >,                                      \
+            pybind11::keep_alive< 0, 1 >() )                                   \
         .def( "set_block_name", &BlocksBuilder##dimension##D::set_block_name )
 
 namespace geode

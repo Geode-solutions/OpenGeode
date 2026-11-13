@@ -36,7 +36,8 @@ namespace geode
     {
         pybind11::class_< VertexIdentifierBuilder >(
             module, "VertexIdentifierBuilder" )
-            .def( pybind11::init< VertexIdentifier& >() )
+            .def( pybind11::init< VertexIdentifier& >(),
+                pybind11::keep_alive< 1, 2 >() )
             .def( "register_block3D_component",
                 &VertexIdentifierBuilder::register_mesh_component< Block3D > )
             .def( "register_corner2D_component",

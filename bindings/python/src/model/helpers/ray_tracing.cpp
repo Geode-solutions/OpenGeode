@@ -48,7 +48,8 @@ namespace geode
             .def( "__bool__", &RayTracingResult::operator bool );
 
         pybind11::class_< BRepRayTracing >( module, "BRepRayTracing" )
-            .def( pybind11::init< const BRep& >() )
+            .def( pybind11::init< const BRep& >(),
+                pybind11::keep_alive< 1, 2 >() )
             .def( "is_point_inside_block",
                 &BRepRayTracing::is_point_inside_block )
             .def( "block_containing_point",

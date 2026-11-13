@@ -23,6 +23,8 @@
 
 #include "../common.hpp"
 
+#include <geode/basic/range.hpp>
+
 #include <geode/geometry/basic_objects/circle.hpp>
 #include <geode/geometry/basic_objects/cylinder.hpp>
 #include <geode/geometry/basic_objects/infinite_line.hpp>
@@ -33,6 +35,27 @@
 #include <geode/geometry/basic_objects/triangle.hpp>
 #include <geode/geometry/bounding_box.hpp>
 #include <geode/geometry/information.hpp>
+#include <geode/geometry/point.hpp>
+
+namespace
+{
+    // RefPoint-based objects (Segment, Triangle...) only reference their
+    // points: return copies so the Python points do not alias the object
+    // storage (which may live in a mesh).
+    template < typename Object >
+    auto owned_vertices( const Object& object )
+    {
+        const auto& vertices = object.vertices();
+        std::array< geode::Point< Object::dim >,
+            std::tuple_size_v< std::decay_t< decltype( vertices ) > > >
+            result;
+        for( const auto vertex : geode::LIndices{ vertices } )
+        {
+            result[vertex] = vertices[vertex];
+        }
+        return result;
+    }
+} // namespace
 
 #define PYTHON_SEGMENT( dimension )                                            \
     const auto segment##dimension =                                            \
@@ -40,11 +63,12 @@
     pybind11::class_< Segment##dimension##D >(                                 \
         module, segment##dimension.c_str() )                                   \
         .def( pybind11::init< const Point< dimension >&,                       \
-            const Point< dimension >& >() )                                    \
+                  const Point< dimension >& >(),                               \
+            pybind11::keep_alive< 1, 2 >(), pybind11::keep_alive< 1, 3 >() )   \
         .def( "direction", &Segment##dimension##D::direction )                 \
         .def( "barycenter", &Segment##dimension##D::barycenter )               \
         .def( "length", &Segment##dimension##D::length )                       \
-        .def( "vertices", &Segment##dimension##D::vertices )                   \
+        .def( "vertices", &owned_vertices< Segment##dimension##D > )           \
         .def( "bounding_box", &Segment##dimension##D::bounding_box )
 
 #define PYTHON_INFINITE_LINE( dimension )                                      \
@@ -53,8 +77,10 @@
     pybind11::class_< InfiniteLine##dimension##D >(                            \
         module, line##dimension.c_str() )                                      \
         .def( pybind11::init< const Vector< dimension >&,                      \
-            const Point< dimension >& >() )                                    \
-        .def( pybind11::init< const Segment< dimension >& >() )                \
+                  const Point< dimension >& >(),                               \
+            pybind11::keep_alive< 1, 3 >() )                                   \
+        .def( pybind11::init< const Segment< dimension >& >(),                 \
+            pybind11::keep_alive< 1, 2 >() )                                   \
         .def( "origin", &InfiniteLine##dimension##D::origin )                  \
         .def( "direction", &InfiniteLine##dimension##D::direction )
 
@@ -64,8 +90,10 @@
     define_string_representation( pybind11::class_< Triangle##dimension##D >(  \
                                       module, triangle##dimension.c_str() ) )  \
         .def( pybind11::init< const Point< dimension >&,                       \
-            const Point< dimension >&, const Point< dimension >& >() )         \
-        .def( "vertices", &Triangle##dimension##D::vertices )                  \
+                  const Point< dimension >&, const Point< dimension >& >(),    \
+            pybind11::keep_alive< 1, 2 >(), pybind11::keep_alive< 1, 3 >(),    \
+            pybind11::keep_alive< 1, 4 >() )                                   \
+        .def( "vertices", &owned_vertices< Triangle##dimension##D > )          \
         .def( "bounding_box", &Triangle##dimension##D::bounding_box )          \
         .def( "minimum_height", &Triangle##dimension##D::minimum_height )      \
         .def( "is_degenerated", &Triangle##dimension##D::is_degenerated )      \
@@ -80,7 +108,8 @@
         "Sphere" + std::to_string( dimension ) + "D";                          \
     pybind11::class_< Sphere##dimension##D >(                                  \
         module, sphere##dimension.c_str() )                                    \
-        .def( pybind11::init< const Point< dimension >&, double >() )          \
+        .def( pybind11::init< const Point< dimension >&, double >(),           \
+            pybind11::keep_alive< 1, 2 >() )                                   \
         .def( "origin", &Sphere##dimension##D::origin )                        \
         .def( "radius", &Sphere##dimension##D::radius )                        \
         .def( "bounding_box", &Sphere##dimension##D::bounding_box )
@@ -89,8 +118,10 @@
     const auto ray##dimension = "Ray" + std::to_string( dimension ) + "D";     \
     pybind11::class_< Ray##dimension##D >( module, ray##dimension.c_str() )    \
         .def( pybind11::init< const Vector< dimension >&,                      \
-            const Point< dimension >& >() )                                    \
-        .def( pybind11::init< const Segment< dimension >& >() )                \
+                  const Point< dimension >& >(),                               \
+            pybind11::keep_alive< 1, 3 >() )                                   \
+        .def( pybind11::init< const Segment< dimension >& >(),                 \
+            pybind11::keep_alive< 1, 2 >() )                                   \
         .def( "origin", &Ray##dimension##D::origin )                           \
         .def( "direction", &Ray##dimension##D::direction )
 
@@ -118,20 +149,24 @@ namespace geode
     void define_basic_objects( pybind11::module& module )
     {
         pybind11::class_< Plane >( module, "Plane" )
-            .def( pybind11::init< const Vector3D&, const Point3D& >() )
+            .def( pybind11::init< const Vector3D&, const Point3D& >(),
+                pybind11::keep_alive< 1, 3 >() )
             .def( "plane_constant", &Plane::plane_constant )
             .def( "origin", &Plane::origin )
             .def( "normal", &Plane::normal );
 
         pybind11::class_< Tetrahedron >( module, "Tetrahedron" )
             .def( pybind11::init< const Point3D&, const Point3D&,
-                const Point3D&, const Point3D& >() )
-            .def( "vertices", &Tetrahedron::vertices )
+                      const Point3D&, const Point3D& >(),
+                pybind11::keep_alive< 1, 2 >(), pybind11::keep_alive< 1, 3 >(),
+                pybind11::keep_alive< 1, 4 >(), pybind11::keep_alive< 1, 5 >() )
+            .def( "vertices", &owned_vertices< Tetrahedron > )
             .def( "bounding_box", &Tetrahedron::bounding_box );
 
         pybind11::class_< Circle >( module, "Circle" )
-            .def( pybind11::init< const Plane&, double >() )
-            .def( "plane", &Circle::plane )
+            .def( pybind11::init< const Plane&, double >(),
+                pybind11::keep_alive< 1, 2 >() )
+            .def( "plane", &Circle::plane, pybind11::keep_alive< 0, 1 >() )
             .def( "radius", &Circle::radius )
             .def( "bounding_box", &Circle::bounding_box );
 
@@ -179,11 +214,13 @@ namespace geode
                         const >( &Triangle3D::normal ) )
             .def( "plane",
                 static_cast< std::optional< Plane > ( Triangle< 3 >::* )()
-                        const >( &Triangle3D::plane ) );
+                        const >( &Triangle3D::plane ),
+                pybind11::keep_alive< 0, 1 >() );
 
         pybind11::class_< Cylinder >( module, "Cylinder" )
-            .def( pybind11::init< Segment3D, double >() )
-            .def( "axis", &Cylinder::axis )
+            .def( pybind11::init< Segment3D, double >(),
+                pybind11::keep_alive< 1, 2 >() )
+            .def( "axis", &Cylinder::axis, pybind11::keep_alive< 0, 1 >() )
             .def( "radius", &Cylinder::radius );
         PYTHON_BOUNDING_BOX_AND_BASIC_OBJECTS( 2 );
         PYTHON_BOUNDING_BOX_AND_BASIC_OBJECTS( 3 );

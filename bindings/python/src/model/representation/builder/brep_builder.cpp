@@ -47,7 +47,7 @@ namespace geode
             LineCollectionsBuilder3D, SurfaceCollectionsBuilder3D,
             BlockCollectionsBuilder3D, PhysicalPropertiesBuilder,
             IdentifierBuilder >( module, "BRepBuilder" )
-            .def( pybind11::init< BRep& >() )
+            .def( pybind11::init< BRep& >(), pybind11::keep_alive< 1, 2 >() )
             .def( "copy", &BRepBuilder::copy )
             .def( "add_corner", static_cast< const uuid& (BRepBuilder::*) () >(
                                     &BRepBuilder::add_corner ) )

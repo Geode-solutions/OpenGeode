@@ -37,7 +37,8 @@
                           TriangulatedSurface##dimension##D > ( * )() >(       \
                           &TriangulatedSurface##dimension##D::create ) )       \
         .def( "clone", &TriangulatedSurface##dimension##D::clone )             \
-        .def( "triangle", &TriangulatedSurface##dimension##D::triangle )
+        .def( "triangle", &TriangulatedSurface##dimension##D::triangle,        \
+            pybind11::keep_alive< 0, 1 >() )
 
 namespace geode
 {

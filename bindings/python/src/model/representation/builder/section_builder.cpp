@@ -44,7 +44,7 @@ namespace geode
             CornerCollectionsBuilder2D, LineCollectionsBuilder2D,
             SurfaceCollectionsBuilder2D, IdentifierBuilder >(
             module, "SectionBuilder" )
-            .def( pybind11::init< Section& >() )
+            .def( pybind11::init< Section& >(), pybind11::keep_alive< 1, 2 >() )
             .def( "copy", &SectionBuilder::copy )
             .def(
                 "add_corner", static_cast< const uuid& (SectionBuilder::*) () >(

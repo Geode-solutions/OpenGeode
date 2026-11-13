@@ -33,11 +33,11 @@ namespace geode
     void define_model_concatener( pybind11::module& module )
     {
         pybind11::class_< BRepConcatener >( module, "BRepConcatener" )
-            .def( pybind11::init< BRep& >() )
+            .def( pybind11::init< BRep& >(), pybind11::keep_alive< 1, 2 >() )
             .def( "concatenate", &BRepConcatener::concatenate );
 
         pybind11::class_< SectionConcatener >( module, "SectionConcatener" )
-            .def( pybind11::init< Section& >() )
+            .def( pybind11::init< Section& >(), pybind11::keep_alive< 1, 2 >() )
             .def( "concatenate", &SectionConcatener::concatenate );
     }
 } // namespace geode

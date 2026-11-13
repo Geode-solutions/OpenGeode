@@ -35,7 +35,8 @@
     pybind11::class_< SolidMeshBuilder##dimension##D, VertexSetBuilder,        \
         CoordinateReferenceSystemManagersBuilder##dimension##D >(              \
         module, name##dimension.c_str() )                                      \
-        .def_static( "create", &SolidMeshBuilder##dimension##D::create )       \
+        .def_static( "create", &SolidMeshBuilder##dimension##D::create,        \
+            pybind11::keep_alive< 0, 1 >() )                                   \
         .def( "create_point", &SolidMeshBuilder##dimension##D::create_point )  \
         .def( "create_polyhedron",                                             \
             &SolidMeshBuilder##dimension##D::create_polyhedron )               \
@@ -53,10 +54,11 @@
             &SolidMeshBuilder##dimension##D::permute_polyhedra )               \
         .def( "delete_isolated_vertices",                                      \
             &SolidMeshBuilder##dimension##D::delete_isolated_vertices )        \
-        .def(                                                                  \
-            "edges_builder", &SolidMeshBuilder##dimension##D::edges_builder )  \
+        .def( "edges_builder", &SolidMeshBuilder##dimension##D::edges_builder, \
+            pybind11::keep_alive< 0, 1 >() )                                   \
         .def( "facets_builder",                                                \
-            &SolidMeshBuilder##dimension##D::facets_builder )                  \
+            &SolidMeshBuilder##dimension##D::facets_builder,                   \
+            pybind11::keep_alive< 0, 1 >() )                                   \
         .def( "associate_polyhedron_vertex_to_vertex",                         \
             &SolidMeshBuilder##dimension##D::                                  \
                 associate_polyhedron_vertex_to_vertex )

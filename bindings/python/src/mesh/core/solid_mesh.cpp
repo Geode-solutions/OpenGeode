@@ -123,7 +123,7 @@
             pybind11::return_value_policy::reference_internal )                \
         .def( "bounding_box", &SolidMesh##dimension##D::bounding_box )         \
         .def( "texture_manager", &SolidMesh##dimension##D::texture_manager,    \
-            pybind11::return_value_policy::reference_internal )                \
+            pybind11::keep_alive< 0, 1 >() )                                   \
         .def( "edge_vertices_in_polyhedron",                                   \
             &SolidMesh##dimension##D::edge_vertices_in_polyhedron )            \
         .def( "is_vertex_on_border",                                           \

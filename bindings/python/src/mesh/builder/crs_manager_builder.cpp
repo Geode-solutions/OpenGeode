@@ -33,7 +33,8 @@
     pybind11::class_< CoordinateReferenceSystemManagerBuilder##dimension##D >( \
         module, name##dimension.c_str() )                                      \
         .def( pybind11::init<                                                  \
-            CoordinateReferenceSystemManager< dimension >& >() )               \
+                  CoordinateReferenceSystemManager< dimension >& >(),          \
+            pybind11::keep_alive< 1, 2 >() )                                   \
         .def( "register_coordinate_reference_system",                          \
             []( CoordinateReferenceSystemManagerBuilder< dimension >& manager, \
                 std::string_view name,                                         \

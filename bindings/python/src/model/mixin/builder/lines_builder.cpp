@@ -36,7 +36,8 @@
     pybind11::class_< LinesBuilder##dimension##D >(                            \
         module, name##dimension.c_str() )                                      \
         .def( "line_mesh_builder",                                             \
-            &LinesBuilder##dimension##D::line_mesh_builder )                   \
+            &LinesBuilder##dimension##D::line_mesh_builder,                    \
+            pybind11::keep_alive< 0, 1 >() )                                   \
         .def( "set_line_name", &LinesBuilder##dimension##D::set_line_name )
 
 namespace geode

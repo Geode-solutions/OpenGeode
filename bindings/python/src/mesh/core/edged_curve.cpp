@@ -42,11 +42,12 @@
         .def( "edge_length", &EdgedCurve##dimension##D::edge_length )          \
         .def( "edge_barycenter", &EdgedCurve##dimension##D::edge_barycenter )  \
         .def( "bounding_box", &EdgedCurve##dimension##D::bounding_box )        \
-        .def( "segment", &EdgedCurve##dimension##D::segment )                  \
+        .def( "segment", &EdgedCurve##dimension##D::segment,                   \
+            pybind11::keep_alive< 0, 1 >() )                                   \
         .def( "vertices_around_vertex",                                        \
             &EdgedCurve##dimension##D::vertices_around_vertex )                \
         .def( "texture_manager", &EdgedCurve##dimension##D::texture_manager,   \
-            pybind11::return_value_policy::reference_internal )
+            pybind11::keep_alive< 0, 1 >() )
 
 namespace geode
 {

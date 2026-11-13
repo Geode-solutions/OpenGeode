@@ -33,7 +33,8 @@ namespace geode
     {
         pybind11::class_< PhysicalPropertiesBuilder >(
             module, "PhysicalPropertiesBuilder" )
-            .def( pybind11::init< PhysicalProperties& >() )
+            .def( pybind11::init< PhysicalProperties& >(),
+                pybind11::keep_alive< 1, 2 >() )
             .def( "set_physical_property",
                 &PhysicalPropertiesBuilder::set_physical_property )
             .def( "copy_physical_properties",

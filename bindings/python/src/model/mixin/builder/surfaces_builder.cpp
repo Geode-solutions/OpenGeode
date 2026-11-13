@@ -39,7 +39,8 @@
         module, name##dimension.c_str() )                                      \
         .def( "surface_mesh_builder",                                          \
             &SurfacesBuilder##dimension##D::surface_mesh_builder<              \
-                SurfaceMesh< dimension > > )                                   \
+                SurfaceMesh< dimension > >,                                    \
+            pybind11::keep_alive< 0, 1 >() )                                   \
         .def( "set_surface_name",                                              \
             &SurfacesBuilder##dimension##D::set_surface_name )
 

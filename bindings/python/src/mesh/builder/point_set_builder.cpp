@@ -34,7 +34,8 @@
     pybind11::class_< PointSetBuilder##dimension##D, VertexSetBuilder,         \
         CoordinateReferenceSystemManagersBuilder##dimension##D >(              \
         module, name##dimension.c_str() )                                      \
-        .def_static( "create", &PointSetBuilder##dimension##D::create )        \
+        .def_static( "create", &PointSetBuilder##dimension##D::create,         \
+            pybind11::keep_alive< 0, 1 >() )                                   \
         .def( "create_point", &PointSetBuilder##dimension##D::create_point )
 
 namespace geode

@@ -35,7 +35,8 @@
         "RegularGridBuilder" + std::to_string( dimension ) + "D";              \
     pybind11::class_< RegularGridBuilder##dimension##D,                        \
         Base##Builder##dimension##D >( module, name##dimension.c_str() )       \
-        .def_static( "create", &RegularGridBuilder##dimension##D::create )     \
+        .def_static( "create", &RegularGridBuilder##dimension##D::create,      \
+            pybind11::keep_alive< 0, 1 >() )                                   \
         .def( "initialize_grid",                                               \
             static_cast< void ( RegularGridBuilder##dimension##D::* )(         \
                 const Point##dimension##D&, std::array< index_t, dimension >,  \

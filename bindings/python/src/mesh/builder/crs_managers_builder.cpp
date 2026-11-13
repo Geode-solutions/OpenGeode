@@ -36,19 +36,24 @@
         CoordinateReferenceSystemManagersBuilder##dimension##D >(              \
         module, name##dimension.c_str() )                                      \
         .def( pybind11::init<                                                  \
-            CoordinateReferenceSystemManagers< dimension >& >() )              \
+                  CoordinateReferenceSystemManagers< dimension >& >(),         \
+            pybind11::keep_alive< 1, 2 >() )                                   \
         .def( "coordinate_reference_system_manager_builder1D",                 \
             &CoordinateReferenceSystemManagersBuilder##dimension##D::          \
-                coordinate_reference_system_manager_builder1D )                \
+                coordinate_reference_system_manager_builder1D,                 \
+            pybind11::keep_alive< 0, 1 >() )                                   \
         .def( "coordinate_reference_system_manager_builder2D",                 \
             &CoordinateReferenceSystemManagersBuilder##dimension##D::          \
-                coordinate_reference_system_manager_builder2D )                \
+                coordinate_reference_system_manager_builder2D,                 \
+            pybind11::keep_alive< 0, 1 >() )                                   \
         .def( "coordinate_reference_system_manager_builder3D",                 \
             &CoordinateReferenceSystemManagersBuilder##dimension##D::          \
-                coordinate_reference_system_manager_builder3D )                \
+                coordinate_reference_system_manager_builder3D,                 \
+            pybind11::keep_alive< 0, 1 >() )                                   \
         .def( "main_coordinate_reference_system_manager_builder",              \
             &CoordinateReferenceSystemManagersBuilder##dimension##D::          \
-                main_coordinate_reference_system_manager_builder )             \
+                main_coordinate_reference_system_manager_builder,              \
+            pybind11::keep_alive< 0, 1 >() )                                   \
         .def( "set_point",                                                     \
             &CoordinateReferenceSystemManagersBuilder##dimension##D::          \
                 set_point )

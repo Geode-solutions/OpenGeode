@@ -35,7 +35,8 @@
     pybind11::class_< SurfaceMeshBuilder##dimension##D, VertexSetBuilder,      \
         CoordinateReferenceSystemManagersBuilder##dimension##D >(              \
         module, name##dimension.c_str() )                                      \
-        .def_static( "create", &SurfaceMeshBuilder##dimension##D::create )     \
+        .def_static( "create", &SurfaceMeshBuilder##dimension##D::create,      \
+            pybind11::keep_alive< 0, 1 >() )                                   \
         .def(                                                                  \
             "create_point", &SurfaceMeshBuilder##dimension##D::create_point )  \
         .def( "create_polygon",                                                \
@@ -55,7 +56,8 @@
         .def( "delete_isolated_vertices",                                      \
             &SurfaceMeshBuilder##dimension##D::delete_isolated_vertices )      \
         .def( "edges_builder",                                                 \
-            &SurfaceMeshBuilder##dimension##D::edges_builder )
+            &SurfaceMeshBuilder##dimension##D::edges_builder,                  \
+            pybind11::keep_alive< 0, 1 >() )
 
 namespace geode
 {

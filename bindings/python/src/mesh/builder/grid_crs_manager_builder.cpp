@@ -37,7 +37,8 @@ namespace
         const auto name = absl::StrCat(
             "GridCoordinateReferenceSystemManagerBuilder", dimension, "D" );
         pybind11::class_< Builder >( module, name.c_str() )
-            .def( pybind11::init< geode::LightRegularGrid< dimension >& >() )
+            .def( pybind11::init< geode::LightRegularGrid< dimension >& >(),
+                pybind11::keep_alive< 1, 2 >() )
             .def( "register_coordinate_reference_system",
                 []( Builder& builder, std::string_view crs_name,
                     std::shared_ptr< geode::GridCoordinateReferenceSystem<

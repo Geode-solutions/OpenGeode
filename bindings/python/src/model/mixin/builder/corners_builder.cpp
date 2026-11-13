@@ -36,7 +36,8 @@
     pybind11::class_< CornersBuilder##dimension##D >(                          \
         module, name##dimension.c_str() )                                      \
         .def( "corner_mesh_builder",                                           \
-            &CornersBuilder##dimension##D::corner_mesh_builder )               \
+            &CornersBuilder##dimension##D::corner_mesh_builder,                \
+            pybind11::keep_alive< 0, 1 >() )                                   \
         .def( "set_corner_name",                                               \
             &CornersBuilder##dimension##D::set_corner_name )
 
