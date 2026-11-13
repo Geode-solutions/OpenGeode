@@ -37,9 +37,10 @@ namespace geode
             .def( "set_value", &GreyscaleColor::set_value )
             .def( pybind11::self == pybind11::self )
             .def( pybind11::self != pybind11::self )
-            .def( "__hash__", []( const GreyscaleColor& value ) {
-                return absl::HashOf( value.value() );
-            } )
+            .def( "__hash__",
+                []( const GreyscaleColor& value ) {
+                    return absl::HashOf( value.value() );
+                } )
             .def( pybind11::self + pybind11::self )
             .def( pybind11::self += pybind11::self );
     }

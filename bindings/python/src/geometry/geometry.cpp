@@ -56,7 +56,8 @@ PYBIND11_MODULE( opengeode_py_geometry, module )
     module.doc() = "OpenGeode Python binding for geometry";
     pybind11::class_< geode::OpenGeodeGeometryLibrary >(
         module, "OpenGeodeGeometryLibrary" )
-        .def( "initialize", &geode::OpenGeodeGeometryLibrary::initialize );
+        .def_static(
+            "initialize", &geode::OpenGeodeGeometryLibrary::initialize );
     geode::define_point( module );
     geode::define_vector( module );
     geode::define_frame( module );

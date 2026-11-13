@@ -25,5 +25,5 @@
 
 #define PYTHON_FACTORY_CLASS( type )                                           \
     pybind11::class_< type >( module, #type )                                  \
-        .def( "list_creators", &type::list_creators )                          \
-        .def( "has_creator", &type::has_creator )
+        .def_static( "list_creators", &type::list_creators )                   \
+        .def_static( "has_creator", &type::has_creator )

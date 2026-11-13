@@ -33,10 +33,12 @@ namespace geode
                                           module, "ComponentMeshVertex" ) )
             .def( pybind11::init< ComponentID, index_t >() )
             .def( pybind11::self == pybind11::self )
-            .def( "__hash__", []( const ComponentMeshVertex& value ) {
-                return absl::HashOf( std::hash< ComponentID >{}( value.component_id ),
-                    value.vertex );
-            } )
+            .def( "__hash__",
+                []( const ComponentMeshVertex& value ) {
+                    return absl::HashOf(
+                        std::hash< ComponentID >{}( value.component_id ),
+                        value.vertex );
+                } )
             .def_readwrite( "component_id", &ComponentMeshVertex::component_id )
             .def_readwrite( "vertex", &ComponentMeshVertex::vertex );
 

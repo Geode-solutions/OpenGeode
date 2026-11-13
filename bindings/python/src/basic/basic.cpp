@@ -50,7 +50,7 @@ PYBIND11_MODULE( opengeode_py_basic, module )
     module.attr( "GLOBAL_EPSILON" ) = geode::GLOBAL_EPSILON;
     pybind11::class_< geode::OpenGeodeBasicLibrary >(
         module, "OpenGeodeBasicLibrary" )
-        .def( "initialize", &geode::OpenGeodeBasicLibrary::initialize );
+        .def_static( "initialize", &geode::OpenGeodeBasicLibrary::initialize );
     geode::define_exception( module );
     geode::define_cell_array( module );
     geode::define_uuid( module );

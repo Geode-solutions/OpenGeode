@@ -30,8 +30,8 @@ namespace geode
     void define_angle( pybind11::module& module )
     {
         pybind11::class_< Angle >( module, "Angle" )
-            .def( "create_from_radians", &Angle::create_from_radians )
-            .def( "create_from_degrees", &Angle::create_from_degrees )
+            .def_static( "create_from_radians", &Angle::create_from_radians )
+            .def_static( "create_from_degrees", &Angle::create_from_degrees )
             .def( "radians", &Angle::radians )
             .def( "degrees", &Angle::degrees )
             .def( "sin", &Angle::sin )
@@ -39,9 +39,10 @@ namespace geode
             .def( "tan", &Angle::tan )
             .def( "inexact_equal", &Angle::inexact_equal )
             .def( pybind11::self == pybind11::self )
-            .def( "__hash__", []( const Angle& value ) {
-                return absl::HashOf( value.radians() );
-            } )
+            .def( "__hash__",
+                []( const Angle& value ) {
+                    return absl::HashOf( value.radians() );
+                } )
             .def( pybind11::self < pybind11::self )
             .def( pybind11::self > pybind11::self )
             .def( pybind11::self + pybind11::self )

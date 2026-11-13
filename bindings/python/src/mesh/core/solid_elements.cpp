@@ -35,9 +35,10 @@ namespace geode
             .def( pybind11::init< index_t, index_t >() )
             .def( pybind11::self == pybind11::self )
             .def( pybind11::self != pybind11::self )
-            .def( "__hash__", []( const PolyhedronVertex& value ) {
-                return absl::HashOf( value.polyhedron_id, value.vertex_id );
-            } )
+            .def( "__hash__",
+                []( const PolyhedronVertex& value ) {
+                    return absl::HashOf( value.polyhedron_id, value.vertex_id );
+                } )
             .def_readwrite( "polyhedron_id", &PolyhedronVertex::polyhedron_id )
             .def_readwrite( "vertex_id", &PolyhedronVertex::vertex_id );
 
@@ -47,9 +48,10 @@ namespace geode
             .def( pybind11::init< index_t, index_t >() )
             .def( pybind11::self == pybind11::self )
             .def( pybind11::self != pybind11::self )
-            .def( "__hash__", []( const PolyhedronFacet& value ) {
-                return absl::HashOf( value.polyhedron_id, value.facet_id );
-            } )
+            .def( "__hash__",
+                []( const PolyhedronFacet& value ) {
+                    return absl::HashOf( value.polyhedron_id, value.facet_id );
+                } )
             .def_readwrite( "polyhedron_id", &PolyhedronFacet::polyhedron_id )
             .def_readwrite( "facet_id", &PolyhedronFacet::facet_id );
 
@@ -59,10 +61,11 @@ namespace geode
             .def( pybind11::init< PolyhedronFacet, index_t >() )
             .def( pybind11::self == pybind11::self )
             .def( pybind11::self != pybind11::self )
-            .def( "__hash__", []( const PolyhedronFacetVertex& value ) {
-                return absl::HashOf( value.polyhedron_facet.polyhedron_id,
-                    value.polyhedron_facet.facet_id, value.vertex_id );
-            } )
+            .def( "__hash__",
+                []( const PolyhedronFacetVertex& value ) {
+                    return absl::HashOf( value.polyhedron_facet.polyhedron_id,
+                        value.polyhedron_facet.facet_id, value.vertex_id );
+                } )
             .def_readwrite(
                 "polyhedron_facet", &PolyhedronFacetVertex::polyhedron_facet )
             .def_readwrite( "vertex_id", &PolyhedronFacetVertex::vertex_id );
@@ -73,10 +76,11 @@ namespace geode
             .def( pybind11::init< PolyhedronFacet, local_index_t >() )
             .def( pybind11::self == pybind11::self )
             .def( pybind11::self != pybind11::self )
-            .def( "__hash__", []( const PolyhedronFacetEdge& value ) {
-                return absl::HashOf( value.polyhedron_facet.polyhedron_id,
-                    value.polyhedron_facet.facet_id, value.edge_id );
-            } )
+            .def( "__hash__",
+                []( const PolyhedronFacetEdge& value ) {
+                    return absl::HashOf( value.polyhedron_facet.polyhedron_id,
+                        value.polyhedron_facet.facet_id, value.edge_id );
+                } )
             .def_readwrite(
                 "polyhedron_facet", &PolyhedronFacetEdge::polyhedron_facet )
             .def_readwrite( "edge_id", &PolyhedronFacetEdge::edge_id );

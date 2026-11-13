@@ -110,7 +110,7 @@ PYBIND11_MODULE( opengeode_py_model, module )
     module.doc() = "OpenGeode Python binding for model";
     pybind11::class_< geode::OpenGeodeModelLibrary >(
         module, "OpenGeodeModelLibrary" )
-        .def( "initialize", &geode::OpenGeodeModelLibrary::initialize );
+        .def_static( "initialize", &geode::OpenGeodeModelLibrary::initialize );
     geode::define_component_type( module );
     geode::define_component( module );
     geode::define_component_mesh_element( module );

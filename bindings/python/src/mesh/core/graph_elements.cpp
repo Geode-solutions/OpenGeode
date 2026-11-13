@@ -37,9 +37,10 @@ namespace geode
             .def( pybind11::init< index_t, index_t >() )
             .def( pybind11::self == pybind11::self )
             .def( pybind11::self != pybind11::self )
-            .def( "__hash__", []( const EdgeVertex& value ) {
-                return absl::HashOf( value.edge_id, value.vertex_id );
-            } )
+            .def( "__hash__",
+                []( const EdgeVertex& value ) {
+                    return absl::HashOf( value.edge_id, value.vertex_id );
+                } )
             .def_readwrite( "edge_id", &EdgeVertex::edge_id )
             .def_readwrite( "vertex_id", &EdgeVertex::vertex_id );
     }

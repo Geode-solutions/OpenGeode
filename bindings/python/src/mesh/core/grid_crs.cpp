@@ -40,7 +40,7 @@ namespace
             module, crs_name.c_str() )
             .def( pybind11::init< geode::CoordinateSystem< dimension > >() )
             .def( "type_name", &CRS::type_name )
-            .def( "type_name_static", &CRS::type_name_static )
+            .def_static( "type_name_static", &CRS::type_name_static )
             .def( "coordinate_system", &CRS::coordinate_system,
                 pybind11::return_value_policy::reference_internal );
 
