@@ -51,10 +51,12 @@
                 dimension >::set_active_coordinate_reference_system )          \
         .def( "active_coordinate_reference_system",                            \
             &CoordinateReferenceSystemManagerBuilder<                          \
-                dimension >::active_coordinate_reference_system )              \
+                dimension >::active_coordinate_reference_system,               \
+            pybind11::return_value_policy::reference_internal )                \
         .def( "coordinate_reference_system",                                   \
             &CoordinateReferenceSystemManagerBuilder<                          \
-                dimension >::coordinate_reference_system )
+                dimension >::coordinate_reference_system,                      \
+            pybind11::return_value_policy::reference_internal )
 
 namespace geode
 {

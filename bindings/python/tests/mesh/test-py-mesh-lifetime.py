@@ -25,7 +25,9 @@ import weakref
 
 import geode_test_env
 
+import opengeode_py_basic
 import opengeode_py_geometry as geom
+import opengeode_py_image as image
 import opengeode_py_mesh as mesh
 
 
@@ -143,9 +145,57 @@ def test_texture_manager_keeps_mesh_alive():
     check(manager.texture_exists("texture"), "Texture should exist")
 
 
+def test_crs_builder_returns_reference():
+    curve = create_curve()
+    curve_ref = weakref.ref(curve)
+    crs = (
+        mesh.EdgedCurveBuilder3D.create(curve)
+        .main_coordinate_reference_system_manager_builder()
+        .active_coordinate_reference_system()
+    )
+    crs.set_point(0, geom.Point3D([5, 5, 5]))
+    check(
+        curve.point(0) == geom.Point3D([5, 5, 5]),
+        "Active CRS from builder should modify the mesh",
+    )
+    crs_name = (
+        curve.main_coordinate_reference_system_manager()
+        .active_coordinate_reference_system_name()
+    )
+    named_crs = (
+        mesh.EdgedCurveBuilder3D.create(curve)
+        .main_coordinate_reference_system_manager_builder()
+        .coordinate_reference_system(crs_name)
+    )
+    named_crs.set_point(1, geom.Point3D([6, 6, 6]))
+    check(
+        curve.point(1) == geom.Point3D([6, 6, 6]),
+        "Named CRS from builder should modify the mesh",
+    )
+    del curve
+    gc.collect()
+    check(curve_ref() is not None, "CRS from builder should keep its mesh alive")
+    check(crs.point(0) == geom.Point3D([5, 5, 5]), "Wrong CRS point")
+
+
+def test_texture_image_reference():
+    surface = create_surface()
+    surface_ref = weakref.ref(surface)
+    texture = surface.texture_manager().find_or_create_texture("texture")
+    texture.set_image(image.RasterImage2D([2, 2]))
+    raster = texture.image()
+    del surface
+    del texture
+    gc.collect()
+    check(surface_ref() is not None, "Texture image should keep its mesh alive")
+    check(raster.nb_cells() == 4, "Texture image should have 4 cells")
+
+
 if __name__ == "__main__":
     mesh.OpenGeodeMeshLibrary.initialize()
     test_builder_keeps_mesh_alive()
     test_solid_sub_builders_keep_mesh_alive()
     test_mesh_elements_keep_mesh_alive()
     test_texture_manager_keeps_mesh_alive()
+    test_crs_builder_returns_reference()
+    test_texture_image_reference()

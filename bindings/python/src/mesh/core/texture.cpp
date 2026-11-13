@@ -36,7 +36,8 @@
         "Texture" + std::to_string( dimension ) + "D";                         \
     pybind11::class_< Texture< dimension > >(                                  \
         module, name##dimension.c_str() )                                      \
-        .def( "image", &Texture< dimension >::image )                          \
+        .def( "image", &Texture< dimension >::image,                           \
+            pybind11::return_value_policy::reference_internal )                \
         .def( "set_image",                                                     \
             []( Texture< dimension >& texture,                                 \
                 RasterImage< dimension >& image ) {                            \
