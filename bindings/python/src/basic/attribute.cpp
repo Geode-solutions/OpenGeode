@@ -74,6 +74,10 @@ namespace geode
     {
         using Scalar = typename AttributeArrayTraits< Type >::Scalar;
         constexpr auto context = "set_values_array";
+        if( values.size() == 0 )
+        {
+            return {};
+        }
         if constexpr( std::is_same_v< Scalar, bool > )
         {
             const auto copy = copy_booleans( context, "values", values );
@@ -82,6 +86,25 @@ namespace geode
         else if constexpr( std::is_integral_v< Scalar > )
         {
             return copy_integers< Scalar >( context, "values", values );
+        }
+        else if constexpr( std::is_same_v< Scalar, float > )
+        {
+            // Finite values that are too large for a float would become
+            // infinite: reject them instead
+            const auto doubles =
+                copy_reals< double >( context, "values", values );
+            std::vector< float > result( doubles.size() );
+            for( size_t i = 0; i < doubles.size(); ++i )
+            {
+                result[i] = static_cast< float >( doubles[i] );
+                if( std::isfinite( doubles[i] ) && !std::isfinite( result[i] ) )
+                {
+                    throw pybind11::value_error( absl::StrCat( "[", context,
+                        "] value ", doubles[i], " at position ", i,
+                        " of values is too large for a float attribute" ) );
+                }
+            }
+            return result;
         }
         else
         {
@@ -123,6 +146,11 @@ namespace geode
     {
         using Traits = AttributeArrayTraits< Type >;
         const auto nb_elements = attribute.size();
+        if( nb_elements == 0 && values.size() == 0 )
+        {
+            // Nothing to set, whatever the dtype and shape (e.g. [])
+            return;
+        }
         if constexpr( Traits::nb_items == 0 )
         {
             check_array_shape( "set_values_array", "values", values,
@@ -223,10 +251,17 @@ namespace geode
                 "elements of the attribute): booleans for a boolean "
                 "attribute, integers of any dtype that fit the type of the "
                 "attribute for an integer one and floats or integers of any "
-                "dtype for a float one (float values are converted to the "
-                "type of the attribute). Raise ValueError if the array has "
-                "another shape, dtype, or an integer value that does not "
-                "fit, in which case the attribute is not modified" );
+                "dtype for a float one. Values are converted to the type of "
+                "the "
+                "attribute: they are rounded to the nearest float32 for a "
+                "float attribute (integers above 2**24 lose precision, a "
+                "finite value too large for a float32 is rejected, infinities "
+                "and NaN are kept) and integers above 2**53 lose precision "
+                "in a double attribute. An empty array, whatever its dtype "
+                "and shape (for example []), is accepted if the attribute has "
+                "no element. Raise ValueError if the array has another shape "
+                "or dtype, or a value that does not fit the type, in which "
+                "case the attribute is not modified" );
         const auto sparse_name = absl::StrCat( "SparseAttribute", typestr );
         pybind11::class_< SparseAttribute< type >, ReadOnlyAttribute< type >,
             std::shared_ptr< SparseAttribute< type > > >( module,

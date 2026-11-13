@@ -31,7 +31,7 @@ import opengeode_py_basic as basic
 import opengeode_py_geometry as geom
 import opengeode_py_mesh as mesh
 
-PERFORMANCE_BOUND_SECONDS = 5.0
+PERFORMANCE_BOUND_SECONDS = 1.0
 NB_PERFORMANCE_POINTS = 100000
 TIMEOUT = 60
 
@@ -485,6 +485,84 @@ def test_polygons():
         )
 
 
+def test_empty_inputs():
+    # An empty array of any dtype and shape creates nothing and returns the
+    # index the first element would have
+    for empty in [[], numpy.empty(0), numpy.empty((0, 3)), numpy.empty((0, 7), dtype=bool),
+                  numpy.empty(0, dtype=object), numpy.empty((0, 3), dtype=numpy.float32)]:
+        point_set = mesh.PointSet3D.create()
+        builder = mesh.PointSetBuilder3D.create(point_set)
+        builder.create_points(random_points(2, 3))
+        check(builder.create_points(empty) == 2, "empty points")
+        check(point_set.nb_vertices() == 2, "empty points create nothing")
+        surface, surface_builder = square_surface()
+        surface_builder.create_triangles([[0, 1, 2]])
+        check(surface_builder.create_triangles(empty) == 1, "empty triangles")
+        check(surface.nb_polygons() == 1, "empty triangles create nothing")
+        solid = mesh.TetrahedralSolid3D.create()
+        solid_builder = mesh.TetrahedralSolidBuilder3D.create(solid)
+        check(solid_builder.create_tetrahedra(empty) == 0, "empty tetrahedra")
+        curve = mesh.EdgedCurve3D.create()
+        curve_builder = mesh.EdgedCurveBuilder3D.create(curve)
+        check(curve_builder.create_edges_with_vertices(empty) == 0, "empty edges")
+        polygonal, polygonal_builder = square_surface(
+            mesh.PolygonalSurfaceBuilder3D, mesh.PolygonalSurface3D, 3
+        )
+        polygonal_builder.create_polygons([0, 1, 2], [0, 3])
+        check(polygonal_builder.create_polygons(empty, [0]) == 1, "empty polygons")
+        check(polygonal.nb_polygons() == 1, "empty polygons create nothing")
+    # Offsets are still checked
+    check_raises(
+        ValueError,
+        "offsets must start at 0",
+        lambda: polygonal_builder.create_polygons([], [1]),
+        "empty vertices with bad offsets",
+    )
+
+
+def test_builder_without_mesh():
+    # A builder that does not know its mesh cannot check the vertices
+    surface, builder = square_surface()
+    del builder._mesh
+    check_raises(
+        RuntimeError,
+        "[create_triangles] the builder does not know its mesh",
+        lambda: builder.create_triangles([[0, 1, 2]]),
+        "triangles",
+    )
+    check(surface.nb_polygons() == 0, "nothing created without mesh")
+    polygonal, polygonal_builder = square_surface(
+        mesh.PolygonalSurfaceBuilder3D, mesh.PolygonalSurface3D, 3
+    )
+    del polygonal_builder._mesh
+    check_raises(
+        RuntimeError,
+        "[create_polygons] the builder does not know its mesh",
+        lambda: polygonal_builder.create_polygons([0, 1, 2], [0, 3]),
+        "polygons",
+    )
+    solid = mesh.TetrahedralSolid3D.create()
+    solid_builder = mesh.TetrahedralSolidBuilder3D.create(solid)
+    del solid_builder._mesh
+    check_raises(
+        RuntimeError,
+        "[create_tetrahedra] the builder does not know its mesh",
+        lambda: solid_builder.create_tetrahedra([[0, 1, 2, 3]]),
+        "tetrahedra",
+    )
+    curve = mesh.EdgedCurve3D.create()
+    curve_builder = mesh.EdgedCurveBuilder3D.create(curve)
+    del curve_builder._mesh
+    check_raises(
+        RuntimeError,
+        "[create_edges_with_vertices] the builder does not know its mesh",
+        lambda: curve_builder.create_edges_with_vertices([[0, 1]]),
+        "edges",
+    )
+    # Points do not need the mesh
+    check(curve_builder.create_points(random_points(2, 3)) == 0, "points without mesh")
+
+
 def test_keyword_arguments():
     surface, builder = square_surface(
         mesh.PolygonalSurfaceBuilder3D, mesh.PolygonalSurface3D, 3
@@ -881,6 +959,8 @@ if __name__ == "__main__":
     test_triangles_errors()
     test_triangles_atomic_with_late_invalid_row()
     test_polygons()
+    test_empty_inputs()
+    test_builder_without_mesh()
     test_keyword_arguments()
     test_polygons_of_a_triangulated_surface()
     test_polygons_errors()

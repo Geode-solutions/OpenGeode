@@ -106,6 +106,12 @@ namespace geode::numpy_bindings
         geode::TypedObject< Builder > self, const geode::ArrayLike& points )
     {
         constexpr auto context = "create_points";
+        if( points.size() == 0 )
+        {
+            // An empty array, whatever its dtype and shape (e.g. []), creates
+            // nothing
+            return self.template cast< Builder& >().create_vertices( 0 );
+        }
         geode::check_array_shape( context, "points", points,
             { -1, static_cast< ssize >( dimension ) } );
         const auto coordinates =
@@ -178,9 +184,15 @@ namespace geode::numpy_bindings
         Count count,
         Create create )
     {
+        const auto& mesh = builder_mesh< Mesh >( context, self );
+        if( elements.size() == 0 )
+        {
+            // An empty array, whatever its dtype and shape (e.g. []), creates
+            // nothing
+            return count( mesh );
+        }
         geode::check_array_shape( context, name, elements,
             { -1, static_cast< ssize >( nb_vertices ) } );
-        const auto& mesh = builder_mesh< Mesh >( context, self );
         const auto vertices = geode::copy_indices(
             context, name, "vertex", elements, mesh.nb_vertices() );
         const auto nb_elements = static_cast< Index >( elements.shape( 0 ) );
@@ -247,7 +259,6 @@ namespace geode::numpy_bindings
         const geode::ArrayLike& offsets )
     {
         constexpr auto context = "create_polygons";
-        geode::check_array_shape( context, "vertices", vertices, { -1 } );
         geode::check_array_shape( context, "offsets", offsets, { -1 } );
         if( offsets.shape( 0 ) == 0 )
         {
@@ -256,8 +267,14 @@ namespace geode::numpy_bindings
         }
         const auto& mesh = builder_mesh< geode::PolygonalSurface< dimension > >(
             context, self );
-        const auto ids = geode::copy_indices(
-            context, "vertices", "vertex", vertices, mesh.nb_vertices() );
+        std::vector< Index > ids;
+        // No vertex, whatever the dtype and shape of the array (e.g. [])
+        if( vertices.size() != 0 )
+        {
+            geode::check_array_shape( context, "vertices", vertices, { -1 } );
+            ids = geode::copy_indices(
+                context, "vertices", "vertex", vertices, mesh.nb_vertices() );
+        }
         const auto limits =
             geode::copy_integers< uint64_t >( context, "offsets", offsets );
         if( limits.front() != 0 || limits.back() != ids.size() )
@@ -308,10 +325,10 @@ namespace geode::numpy_bindings
         "Create one vertex per row of points, an array of shape (n, "
         "dimension) of floats or integers of any dtype, set its coordinates "
         "in the active coordinate reference system and return the index of "
-        "the first new vertex (the number of vertices before the call; "
-        "nothing is created if n is 0). Raise ValueError if the array does "
-        "not have this shape or dtype, in which case the mesh is not "
-        "modified";
+        "the first new vertex (the number of vertices before the call). An "
+        "empty array, whatever its dtype and shape (for example []), creates "
+        "nothing. Raise ValueError if the array does not have this shape or "
+        "dtype, in which case the mesh is not modified";
 
     std::string create_elements_doc(
         std::string_view singular, std::string_view plural, Index nb_vertices )
@@ -321,10 +338,13 @@ namespace geode::numpy_bindings
             ") of integers of any dtype holding the indices of existing "
             "vertices, and return the index of the first new ",
             singular, " (the number of ", plural,
-            " before the call; nothing is created if n is 0). Raise "
-            "ValueError if the array does not have this shape or dtype and "
-            "IndexError if a vertex is negative or not in [0, nb_vertices), "
-            "in which case the mesh is not modified" );
+            " before the call). An empty array, whatever its dtype and shape "
+            "(for "
+            "example []), creates nothing. Raise ValueError if the array does "
+            "not have this shape or dtype, IndexError if a vertex is negative "
+            "or not in [0, nb_vertices), in which case the mesh is not "
+            "modified, and RuntimeError if the builder does not know its mesh "
+            "(it was not given by Builder.create(mesh))" );
     }
 
     template < Index dimension >
@@ -419,7 +439,9 @@ namespace geode::numpy_bindings
                 "Create one polygon per interval of offsets and return the "
                 "index of the first new polygon (the number of polygons "
                 "before the call; nothing is created if there is no "
-                "polygon). vertices is a 1D array of integers of any dtype "
+                "polygon, and vertices may then be an empty array of any "
+                "dtype such as []). vertices is a 1D array of integers of any "
+                "dtype "
                 "holding the indices of existing vertices, the concatenation "
                 "of the vertices of all the polygons; offsets is a 1D array "
                 "of integers of any dtype with nb_polygons + 1 values, the "
@@ -429,7 +451,9 @@ namespace geode::numpy_bindings
                 "not start at 0 or does not end at len(vertices), or if a "
                 "polygon would have fewer than 3 vertices or NO_LID or more "
                 "vertices, and IndexError if a vertex is negative or not in "
-                "[0, nb_vertices), in which case the mesh is not modified" );
+                "[0, nb_vertices), in which case the mesh is not modified, and "
+                "RuntimeError if the builder does not know its mesh (it was "
+                "not given by Builder.create(mesh))" );
     }
 
     void define_numpy_access_3d( pybind11::module& module )

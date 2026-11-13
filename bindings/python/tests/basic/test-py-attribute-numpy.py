@@ -314,6 +314,67 @@ def test_input_dtypes():
     check(attribute.values_array().tolist() == [True, False, True], "bool list")
 
 
+def test_float_conversions():
+    manager = basic.AttributeManager()
+    manager.resize(4)
+    attribute = create_attribute(manager, "float", 0.0)
+    # Rounded to the nearest float32
+    attribute.set_values_array(numpy.array([2.0 ** 24 + 1, 0.1, 1e-50, -3.5]))
+    check(
+        attribute.values_array().tolist()
+        == numpy.array([2.0 ** 24, 0.1, 1e-50, -3.5], dtype=numpy.float32).tolist(),
+        "float32 rounding",
+    )
+    attribute.set_values_array(numpy.array([2 ** 24 + 1, 1, 2, 3], dtype=numpy.int64))
+    check(attribute.values_array()[0] == 2.0 ** 24, "integers above 2**24 lose precision")
+    # Infinities and NaN are kept
+    attribute.set_values_array(numpy.array([numpy.inf, -numpy.inf, numpy.nan, 0.0]))
+    result = attribute.values_array()
+    check(result[0] == numpy.inf and result[1] == -numpy.inf, "infinities kept")
+    check(numpy.isnan(result[2]), "NaN kept")
+    # Finite values too large for a float32 are rejected, nothing is modified
+    attribute.set_values_array(numpy.array([1.0, 2.0, 3.0, 4.0]))
+    for bad in [1e300, -1e39, 3.5e38]:
+        check_raises(
+            ValueError,
+            "at position 1 of values is too large for a float attribute",
+            lambda bad=bad: attribute.set_values_array(
+                numpy.array([5.0, bad, 7.0, 8.0])
+            ),
+            f"float overflow {bad}",
+        )
+    check(attribute.values_array().tolist() == [1.0, 2.0, 3.0, 4.0], "overflow atomic")
+    attribute.set_values_array(numpy.array([3.4e38] * 4))
+    check(numpy.isfinite(attribute.values_array()).all(), "largest floats accepted")
+    # A double attribute keeps every float64, and loses precision above 2**53
+    double = create_attribute(manager, "double", 0.0)
+    double.set_values_array(numpy.array([1e300, 1.0, 2.0, 3.0]))
+    check(double.values_array()[0] == 1e300, "double keeps 1e300")
+    double.set_values_array(numpy.array([2 ** 53 + 1, 0, 0, 0], dtype=numpy.int64))
+    check(double.values_array()[0] == 2.0 ** 53, "integers above 2**53 lose precision")
+
+
+def test_empty_values():
+    manager = basic.AttributeManager()
+    for suffix, default in [("bool", False), ("int", 0), ("uint", 0),
+                            ("float", 0.0), ("double", 0.0)]:
+        attribute = create_attribute(manager, suffix, default)
+        attribute.set_values_array([])
+        attribute.set_values_array(numpy.empty(0, dtype=object))
+        check(attribute.values_array().shape == (0,), suffix + " empty")
+    vectors = create_vector_attribute(manager, "arraydouble2")
+    vectors.set_values_array([])
+    check(vectors.values_array().shape == (0, 2), "empty vectors")
+    # A list that is empty does not hide a size mismatch
+    manager.resize(2)
+    check_raises(
+        ValueError,
+        "values must have shape (2,), got (0,)",
+        lambda: create_attribute(manager, "double", 0.0).set_values_array([]),
+        "empty values for a non empty attribute",
+    )
+
+
 def test_attribute_of_a_mesh():
     point_set = mesh.PointSet3D.create()
     builder = mesh.PointSetBuilder3D.create(point_set)
@@ -357,4 +418,6 @@ if __name__ == "__main__":
     test_empty_attribute()
     test_vector_attributes()
     test_input_dtypes()
+    test_float_conversions()
+    test_empty_values()
     test_attribute_of_a_mesh()
