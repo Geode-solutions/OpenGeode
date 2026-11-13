@@ -44,3 +44,8 @@ add_geode_python_test(
         ${PROJECT_NAME}::py_basic
         ${PROJECT_NAME}::py_mesh
 )
+add_geode_python_test(
+    SOURCE "test-py-additional-files.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+)

@@ -23,16 +23,29 @@
 
 #include "../common.hpp"
 
+#include <pybind11/stl_bind.h>
+
 #include <geode/basic/input.hpp>
+
+PYBIND11_MAKE_OPAQUE( std::vector< geode::AdditionalFile > )
 
 namespace geode
 {
     void define_input( pybind11::module& module )
     {
         pybind11::class_< AdditionalFile >( module, "AdditionalFile" )
+            .def( pybind11::init< std::string, bool >() )
             .def_readwrite( "filename", &AdditionalFile::filename )
             .def_readwrite( "is_missing", &AdditionalFile::is_missing );
+        // The file lists are bound as opaque containers (not converted to
+        // Python lists) so that in-place modifications, like
+        // files.optional_files.append(...), act on the actual object.
+        pybind11::bind_vector< std::vector< AdditionalFile > >(
+            module, "AdditionalFileList" );
+        pybind11::implicitly_convertible< pybind11::list,
+            std::vector< AdditionalFile > >();
         pybind11::class_< AdditionalFiles >( module, "AdditionalFiles" )
+            .def( pybind11::init<>() )
             .def(
                 "has_additional_files", &AdditionalFiles::has_additional_files )
             .def_readwrite( "optional_files", &AdditionalFiles::optional_files )
