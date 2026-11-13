@@ -77,7 +77,7 @@ add_geode_python_test(
     SOURCE "test-py-python-requirements.py"
     ARGUMENTS
         "${PROJECT_SOURCE_DIR}/bindings/python/requirements.in"
-        "${PROJECT_BINARY_DIR}/${CMAKE_CONFIG_DESTINATION}/python_requirements.in"
+        "${PROJECT_BINARY_DIR}/${CMAKE_CONFIG_DESTINATION}/${PROJECT_NAME}_python_requirements.in"
         "${PROJECT_BINARY_DIR}/python_requirements.txt"
         "${PROJECT_BINARY_DIR}/python_geode_requirements.txt"
 )

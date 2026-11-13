@@ -124,10 +124,12 @@ function(geode_python_distribution_version output)
 endfunction()
 
 # Files of the Python distribution of the project, next to its CMake files, for
-# the Python environments of the downstream projects: python_distribution.txt
-# (name of the wheel and version of the C++ package, see
-# _geode_python_found_distributions) and python_requirements.in (runtime
-# requirements, see geode_python_requirements_file). Provided by every
+# the Python environments of the downstream projects:
+# ${PROJECT_NAME}_python_distribution.txt (name of the wheel and version of the
+# C++ package, see _geode_python_found_distributions) and
+# ${PROJECT_NAME}_python_requirements.in (runtime requirements, see
+# geode_python_requirements_file). The names carry the project because the
+# projects can share one install prefix (and its CMake directory). Provided by every
 # configuration of a project with Python bindings, with or without them, so
 # that the C++ packages carry them.
 function(geode_python_distribution_files name)
@@ -137,22 +139,22 @@ function(geode_python_distribution_files name)
     endif()
     geode_python_distribution_version(version)
     set(directory "${PROJECT_BINARY_DIR}/${CMAKE_CONFIG_DESTINATION}")
-    file(CONFIGURE OUTPUT "${directory}/python_distribution.txt"
+    file(CONFIGURE OUTPUT "${directory}/${PROJECT_NAME}_python_distribution.txt"
         CONTENT "${name}\n${version}\n"
     )
     set(requirements "${PROJECT_SOURCE_DIR}/bindings/python/requirements.in")
     if(EXISTS "${requirements}")
         configure_file("${requirements}"
-            "${directory}/python_requirements.in" COPYONLY
+            "${directory}/${PROJECT_NAME}_python_requirements.in" COPYONLY
         )
     endif()
     if(NOT written)
-        install(FILES "${directory}/python_distribution.txt"
+        install(FILES "${directory}/${PROJECT_NAME}_python_distribution.txt"
             DESTINATION ${CMAKE_CONFIG_DESTINATION}
             COMPONENT public
         )
         if(EXISTS "${requirements}")
-            install(FILES "${directory}/python_requirements.in"
+            install(FILES "${directory}/${PROJECT_NAME}_python_requirements.in"
                 DESTINATION ${CMAKE_CONFIG_DESTINATION}
                 COMPONENT public
             )
@@ -178,7 +180,7 @@ function(_geode_python_wheel_name output)
 endfunction()
 
 # Python distributions of the geode projects found by find_package: each one
-# provides, next to its CMake files, python_distribution.txt (written by
+# provides, next to its CMake files, <Package>_python_distribution.txt (written by
 # add_geode_python_wheel) with the name of its wheel and the version of its C++
 # package. ${<Package>_VERSION} is used instead when defined (not 0.0.0).
 # Stores the normalized names, versions ("unknown" when not known), directories
@@ -194,7 +196,7 @@ function(_geode_python_found_distributions)
     set(cmake_directories)
     get_property(packages GLOBAL PROPERTY PACKAGES_FOUND)
     foreach(package IN LISTS packages)
-        set(file "${${package}_DIR}/python_distribution.txt")
+        set(file "${${package}_DIR}/${package}_python_distribution.txt")
         if(NOT ${package}_DIR OR NOT EXISTS "${file}")
             continue()
         endif()
@@ -252,7 +254,7 @@ function(geode_python_requirements_file output)
     set(files)
     get_property(packages GLOBAL PROPERTY PACKAGES_FOUND)
     foreach(package IN LISTS packages)
-        set(file "${${package}_DIR}/python_requirements.in")
+        set(file "${${package}_DIR}/${package}_python_requirements.in")
         if(${package}_DIR AND EXISTS "${file}")
             list(APPEND files "${file}")
         endif()
@@ -306,7 +308,7 @@ function(geode_python_geode_packages output without_local_wheel)
     foreach(name IN LISTS required)
         list(FIND names "${name}" index)
         if(index EQUAL -1)
-            # A geode package without python_distribution.txt (an older C++
+            # A geode package without <Package>_python_distribution.txt (an older C++
             # package): never installed unpinned, only an installed one is used
             set(version "unknown")
             set(wheel_directory "${PROJECT_BINARY_DIR}/no_python_wheels")

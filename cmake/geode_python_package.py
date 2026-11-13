@@ -49,9 +49,10 @@ not look for the shared libraries in the binary folder (rpath).
 requirements: merges the requirements files of the project and of the geode
 projects it depends on into one file for pip, without the distributions of the
 geode projects found by CMake (--geode) nor any other geode distribution
-(opengeode-*, geode-*: a C++ package without python_distribution.txt): they must
-match the C++ packages of the build, see install-geode; never installed unpinned. The removed ones are written to the geode output file, one
-normalized name per line.
+(opengeode-*, geode-*: a C++ package without its python distribution file): they
+must match the C++ packages of the build, see install-geode; never installed
+unpinned. The removed ones are written to the geode output file, one normalized
+name per line.
 
 installed: prints the given distributions installed in this Python.
 
@@ -94,7 +95,7 @@ REQUIREMENT_NAME = re.compile(r"^\s*([A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?)
 COMMENT = re.compile(r"(?:^|\s)#.*")
 # Version of a released C++ package: 1.2.3, 1.2.3-rc.4 or 1.2.3rc4
 # Distributions of the geode projects, also when CMake found no
-# python_distribution.txt for them (older C++ packages)
+# <Package>_python_distribution.txt for them (older C++ packages)
 GEODE_DISTRIBUTION = re.compile(r"^(?:open)?geode-")
 PACKAGE_VERSION = re.compile(r"^v?(\d+\.\d+\.\d+)(?:-rc\.(\d+)|rc(\d+))?$")
 # rpath entries of an ELF file (readelf -d) and of a Mach-O file (otool -l)

@@ -20,7 +20,7 @@
 
 """Decisions of cmake/PythonTargets.cmake for the Python environments of a
 downstream project, run in CMake script mode on synthetic found packages:
-a geode package with python_distribution.txt and one without (C++ package
+a geode package with <Package>_python_distribution.txt and one without (C++ package
 built before them or without Python), installed or not in the Python used to
 configure, and the version recorded for the distribution.
 Arguments: the cmake executable and cmake/PythonTargets.cmake."""
@@ -116,8 +116,8 @@ def make_packages(directory):
     core = os.path.join(directory, "OpenGeode", "lib", "cmake", "OpenGeode")
     io = os.path.join(directory, "OpenGeode-IO", "lib", "cmake", "OpenGeode-IO")
     write(os.path.join(core, "OpenGeodeConfig.cmake"))
-    write(os.path.join(io, "python_distribution.txt"), "OpenGeode-IO\n2.0.0-rc.1\n")
-    write(os.path.join(io, "python_requirements.in"), "OpenGeode-core\nscipy\n")
+    write(os.path.join(io, "OpenGeode-IO_python_distribution.txt"), "OpenGeode-IO\n2.0.0-rc.1\n")
+    write(os.path.join(io, "OpenGeode-IO_python_requirements.in"), "OpenGeode-core\nscipy\n")
     write(
         os.path.join(directory, "source", "bindings", "python", "requirements.in"),
         "OpenGeode-IO\nOpenGeode-core>=15\nnumpy>=2\n",
@@ -260,6 +260,49 @@ def test_environment_hash():
     expect(first != fourth, "the interpreter path is in the hash")
 
 
+def test_shared_install_prefix():
+    # Projects installed in the same prefix share its CMake directory (on
+    # Windows): their distribution files are named after the project
+    with tempfile.TemporaryDirectory() as directory:
+        shared = os.path.join(directory, "cmake")
+        write(os.path.join(shared, "First_python_distribution.txt"), "Geode-First\n1.0.0\n")
+        write(os.path.join(shared, "Second_python_distribution.txt"), "Geode-Second\n2.0.0\n")
+        write(os.path.join(shared, "First_python_requirements.in"), "numpy\n")
+        write(os.path.join(shared, "Second_python_requirements.in"), "scipy\n")
+        write(
+            os.path.join(directory, "source", "bindings", "python", "requirements.in"),
+            "pandas\n",
+        )
+        body = (
+            'set_property(GLOBAL PROPERTY PACKAGES_FOUND "First;Second")\n'
+            'set(First_DIR "%s")\nset(Second_DIR "%s")\n'
+            "_geode_python_found_distributions()\n"
+            "get_property(names GLOBAL PROPERTY Down_PYTHON_FOUND_NAMES)\n"
+            "get_property(versions GLOBAL PROPERTY Down_PYTHON_FOUND_VERSIONS)\n"
+            "geode_python_requirements_file(requirements)\n"
+            'message("NAMES=${names}")\nmessage("VERSIONS=${versions}")\n'
+            'message("REQUIREMENTS=${requirements}")\n'
+        ) % (cmake_path(shared), cmake_path(shared))
+        values, output = run_cmake(directory, body)
+        expect(
+            values.get("NAMES") == "geode-first;geode-second",
+            "distributions of a shared prefix: %s" % values.get("NAMES"),
+            output,
+        )
+        expect(
+            values.get("VERSIONS") == "1.0.0;2.0.0",
+            "versions of a shared prefix: %s" % values.get("VERSIONS"),
+            output,
+        )
+        with open(values["REQUIREMENTS"]) as file:
+            requirements = file.read().split()
+        expect(
+            sorted(requirements) == ["numpy", "pandas", "scipy"],
+            "requirements of a shared prefix: %s" % requirements,
+            output,
+        )
+
+
 def test_distribution_files():
     with tempfile.TemporaryDirectory() as directory:
         source = os.path.join(directory, "source", "bindings", "python")
@@ -281,9 +324,9 @@ def test_distribution_files():
         values, output = run_cmake(directory, body)
         expect(values.get("NAME") == "Geode-Fake", "wheel name", output)
         provided = os.path.join(directory, "build", "lib", "cmake", "Down")
-        with open(os.path.join(provided, "python_distribution.txt")) as file:
+        with open(os.path.join(provided, "Down_python_distribution.txt")) as file:
             expect(file.read() == "Geode-Fake\n3.0.0\n", "distribution file", output)
-        with open(os.path.join(provided, "python_requirements.in")) as file:
+        with open(os.path.join(provided, "Down_python_requirements.in")) as file:
             expect(file.read() == "numpy>=2\n", "requirements file", output)
 
 
@@ -293,3 +336,4 @@ if __name__ == "__main__":
     test_distribution_version()
     test_distribution_files()
     test_environment_hash()
+    test_shared_install_prefix()

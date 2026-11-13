@@ -320,7 +320,7 @@ def test_requirements():
 def test_requirements_exact_names():
     # The distributions of the projects found by CMake are removed by exact
     # name, whatever their name; the geode ones of projects without
-    # python_distribution.txt too: never installed unpinned from the index
+    # a distribution file too: never installed unpinned from the index
     kept, geode = requirements(
         "OpenGeode-core\nOpenGeode-IO\nmy-chain-package\nnumpy\n",
         geode_distributions=["OpenGeode_core", "My.Chain_Package"],
