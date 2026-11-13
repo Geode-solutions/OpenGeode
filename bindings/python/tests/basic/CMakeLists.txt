@@ -49,3 +49,8 @@ add_geode_python_test(
     DEPENDENCIES
         ${PROJECT_NAME}::py_basic
 )
+add_geode_python_test(
+    SOURCE "test-py-logger-bridge.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+)
