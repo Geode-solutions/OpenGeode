@@ -22,6 +22,7 @@
  */
 
 #include "../../../common.hpp"
+#include "../../model_vertex_check.hpp"
 
 #include <geode/mesh/core/mesh_id.hpp>
 
@@ -47,6 +48,7 @@ namespace geode
             LineCollectionsBuilder3D, SurfaceCollectionsBuilder3D,
             BlockCollectionsBuilder3D, PhysicalPropertiesBuilder,
             IdentifierBuilder >( module, "BRepBuilder",
+            pybind11::dynamic_attr(),
             "Builder of a BRep: the only way to modify it. It also gives the "
             "builders of the component meshes and inherits the methods of the "
             "topology, component, collection and physical properties builders" )
@@ -242,5 +244,9 @@ namespace geode
                 &BRepBuilder::add_block_in_block_collection,
                 pybind11::arg( "block" ), pybind11::arg( "collection" ),
                 "Add the Block to the BlockCollection" );
+        remember_model_in_constructor< BRepBuilder, BRep >(
+            module.attr( "BRepBuilder" ), "brep",
+            "Build a builder of the BRep, which is kept alive by the "
+            "builder" );
     }
 } // namespace geode

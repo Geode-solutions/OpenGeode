@@ -22,6 +22,7 @@
  */
 
 #include "../../../common.hpp"
+#include "../../model_vertex_check.hpp"
 
 #include <geode/model/mixin/core/vertex_identifier.hpp>
 
@@ -85,11 +86,23 @@ namespace geode
                 "Return the list of ComponentMeshVertex identified with the "
                 "unique vertex; raise an IndexError if unique_vertex_id is not "
                 "in [0, nb_unique_vertices)" )
-            .def( "unique_vertex", &VertexIdentifier::unique_vertex,
+            .def(
+                "unique_vertex",
+                []( TypedObject< VertexIdentifier > self,
+                    const ComponentMeshVertex& component_vertex ) {
+                    check_model_component_vertex(
+                        "unique_vertex", self, component_vertex );
+                    return self.cast< const VertexIdentifier& >().unique_vertex(
+                        component_vertex );
+                },
                 pybind11::arg( "component_vertex" ),
                 "Return the unique vertex of the component vertex, NO_ID if "
-                "the vertex is not identified with any unique vertex. The "
-                "component must be registered and the vertex must exist in its "
-                "mesh; the result is undefined otherwise" );
+                "the vertex is not identified with any unique vertex. For a "
+                "BRep or a Section, raise an OpenGeodeDataError if the "
+                "component is not a mesh component of the model and an "
+                "IndexError if the vertex is not in its mesh; a "
+                "VertexIdentifier alone does not know the meshes: the "
+                "component must be registered and the vertex must exist in "
+                "its mesh, the result is undefined otherwise" );
     }
 } // namespace geode

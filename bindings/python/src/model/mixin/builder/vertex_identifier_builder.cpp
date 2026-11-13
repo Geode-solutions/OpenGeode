@@ -22,6 +22,7 @@
  */
 
 #include "../../../common.hpp"
+#include "../../model_vertex_check.hpp"
 
 #include <geode/model/mixin/builder/vertex_identifier_builder.hpp>
 
@@ -165,15 +166,34 @@ namespace geode
                 pybind11::arg( "nb" ),
                 "Create nb unique vertices identified with no component vertex "
                 "and return the index of the first one" )
-            .def( "set_unique_vertex",
-                &VertexIdentifierBuilder::set_unique_vertex,
+            .def(
+                "set_unique_vertex",
+                []( TypedObject< VertexIdentifierBuilder > self,
+                    const ComponentMeshVertex& component_vertex_id,
+                    index_t unique_vertex_id ) {
+                    if( pybind11::hasattr( self, "_model" ) )
+                    {
+                        const auto model = self.attr( "_model" );
+                        check_model_component_vertex(
+                            "set_unique_vertex", model, component_vertex_id );
+                        check_model_unique_vertex(
+                            "set_unique_vertex", model, unique_vertex_id );
+                    }
+                    self.cast< VertexIdentifierBuilder& >().set_unique_vertex(
+                        component_vertex_id, unique_vertex_id );
+                },
                 pybind11::arg( "component_vertex_id" ),
                 pybind11::arg( "unique_vertex_id" ),
                 "Identify the component vertex with the unique vertex, after "
                 "detaching it from the unique vertex it was identified with, "
-                "if any. The component must be registered, the vertex must "
-                "exist in its mesh and the unique vertex must exist; this is "
-                "only checked in assertion (debug) builds" )
+                "if any. For the builder of a BRep or a Section, raise an "
+                "OpenGeodeDataError if the component is not a mesh component "
+                "of the model and an IndexError if the vertex is not in its "
+                "mesh or the unique vertex does not exist; a "
+                "VertexIdentifierBuilder built alone does not know the "
+                "meshes: the component must be registered, the vertex must "
+                "exist in its mesh and the unique vertex must exist, the "
+                "result is undefined otherwise" )
             .def( "update_unique_vertices",
                 &VertexIdentifierBuilder::update_unique_vertices,
                 pybind11::arg( "component_id" ), pybind11::arg( "old2new" ),

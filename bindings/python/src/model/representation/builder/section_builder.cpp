@@ -22,6 +22,7 @@
  */
 
 #include "../../../common.hpp"
+#include "../../model_vertex_check.hpp"
 
 #include <geode/mesh/core/mesh_id.hpp>
 
@@ -43,7 +44,7 @@ namespace geode
             LinesBuilder2D, SurfacesBuilder2D, ModelBoundariesBuilder2D,
             CornerCollectionsBuilder2D, LineCollectionsBuilder2D,
             SurfaceCollectionsBuilder2D, IdentifierBuilder >( module,
-            "SectionBuilder",
+            "SectionBuilder", pybind11::dynamic_attr(),
             "Builder of a Section: the only way to modify it. It also gives "
             "the builders of the component meshes and inherits the methods of "
             "the topology, component and collection builders" )
@@ -194,5 +195,9 @@ namespace geode
                 &SectionBuilder::add_surface_in_surface_collection,
                 pybind11::arg( "surface" ), pybind11::arg( "collection" ),
                 "Add the Surface to the SurfaceCollection" );
+        remember_model_in_constructor< SectionBuilder, Section >(
+            module.attr( "SectionBuilder" ), "section",
+            "Build a builder of the Section, which is kept alive by the "
+            "builder" );
     }
 } // namespace geode
