@@ -41,6 +41,15 @@ namespace geode
         static LoggerClient &register_client(
             std::unique_ptr< LoggerClient > &&client );
 
+        /*!
+         * Enable or disable the output of every registered
+         * ConsoleLoggerClient (enabled by default). The other clients are not
+         * affected.
+         */
+        static void set_console_output( bool enabled );
+
+        [[nodiscard]] static bool is_console_output_enabled();
+
         static void trace( const std::string &message );
 
         static void debug( const std::string &message );
