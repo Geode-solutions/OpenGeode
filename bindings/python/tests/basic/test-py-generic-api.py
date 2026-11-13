@@ -20,12 +20,23 @@
 
 """Generic Python API: load/save/builder by class, registry, attributes by name."""
 
+import inspect
 import os
+import sys
 import tempfile
+import typing
 
 import geode_test_env
 
 import opengeode as og
+
+# The pure-Python module defining the generic functions (opengeode.basic in
+# the wheel, basic in the build tree)
+basic = sys.modules[og.load.__module__]
+
+DATA = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "..", "tests", "data"
+)
 
 
 def expect_raises(error_type, function, *args, contains=None, **kwargs):
@@ -563,6 +574,195 @@ def check_attributes_by_name():
 # --- Logger functions ---------------------------------------------------------
 
 
+# --- Meshes typed by their base class (model components) -------------------
+
+
+def check_component_meshes(directory, model, components):
+    checked = set()
+    for component in components:
+        mesh = component.mesh()
+        concrete = getattr(og, mesh.type_name().get())
+        builder = og.builder(mesh)
+        expected_builder = og.builder_type(concrete)
+        if type(builder) is not expected_builder:
+            raise ValueError(
+                f"[Test] Builder of a {type(mesh).__name__} that is a {concrete.__name__} "
+                f"should be a {expected_builder.__name__}, got {type(builder)}"
+            )
+        extension = og.output_extensions(concrete)[0]
+        filename = os.path.join(directory, f"component.{extension}")
+        if not og.is_saveable(mesh, filename):
+            raise ValueError(f"[Test] {type(mesh).__name__} mesh should be saveable as {extension}")
+        if og.is_saveable(mesh, os.path.join(directory, "component.unknown")):
+            raise ValueError("[Test] Component mesh should not be saveable as .unknown")
+        if og.save(mesh, filename) != [filename]:
+            raise ValueError("[Test] Wrong files written for a component mesh")
+        loaded = og.load(concrete, filename)
+        if loaded.nb_vertices() != mesh.nb_vertices():
+            raise ValueError(f"[Test] {concrete.__name__} component mesh round trip failed")
+        # The bound operations of other libraries get the resolved object too
+        if og.object_operation(mesh, "save")(filename) != [filename]:
+            raise ValueError("[Test] object_operation should resolve the mesh")
+        checked.add((type(mesh), concrete))
+    return checked
+
+
+def check_base_typed_meshes(directory):
+    brep = og.load(og.BRep, os.path.join(DATA, "box_brep.og_brep"))
+    section = og.load(og.Section, os.path.join(DATA, "quad.og_sctn"))
+    checked = set()
+    for model in [brep, section]:
+        for components in [model.corners(), model.lines(), model.surfaces()]:
+            checked |= check_component_meshes(directory, model, components)
+    checked |= check_component_meshes(directory, brep, brep.blocks())
+    # The component meshes are typed by their base class: the case resolved
+    for base in [og.SurfaceMesh3D, og.SolidMesh3D, og.SurfaceMesh2D]:
+        if not any(mesh_type is base and concrete is not base for mesh_type, concrete in checked):
+            raise ValueError(f"[Test] No component mesh typed {base.__name__} was checked: {checked}")
+    # The resolution keeps the component mesh alive and modifies it
+    surface = brep.surfaces()[0].mesh()
+    nb_vertices = surface.nb_vertices()
+    builder = og.builder(surface)
+    del surface
+    builder.create_point(og.Point3D([0, 0, 0]))
+    if brep.surfaces()[0].mesh().nb_vertices() != nb_vertices + 1:
+        raise ValueError("[Test] The builder should modify the component mesh")
+
+
+# --- Extension of a registration ----------------------------------------------
+
+
+def check_extend_type(directory):
+    def describe(model):
+        return f"model {model.name}"
+
+    og.extend_type(FakeModel, operations={"describe": describe})
+    model = FakeModel("extended")
+    if og.object_operation(model, "describe")() != "model extended":
+        raise ValueError("[Test] Wrong extended operation")
+    if og.type_operation(FakeModel, "describe") is not describe:
+        raise ValueError("[Test] type_operation should return the operation")
+    # Subclass instances use their closest registered base
+    if og.object_operation(DerivedFakeModel("derived"), "describe")() != "model derived":
+        raise ValueError("[Test] object_operation should use the closest base")
+    expect_raises(TypeError, og.type_operation, DerivedFakeModel, "describe")
+    expect_raises(TypeError, og.type_operation, FakeModel, "missing", contains="missing")
+    expect_raises(TypeError, og.object_operation, model, "missing", contains="missing")
+    expect_raises(TypeError, og.object_operation, 42, "save", contains="int")
+    # An existing operation is only replaced on request
+    expect_raises(ValueError, og.extend_type, FakeModel, operations={"describe": str}, contains="replace=True")
+    expect_raises(ValueError, og.extend_type, FakeModel, save=fake_save, is_loadable=fake_load, contains="is_loadable, save")
+    if og.type_operation(FakeModel, "describe") is not describe:
+        raise ValueError("[Test] A refused extension should change nothing")
+    og.extend_type(FakeModel, replace=True, operations={"describe": lambda model: "replaced"})
+    if og.object_operation(model, "describe")() != "replaced":
+        raise ValueError("[Test] replace=True should replace the operation")
+    # A builder added to a registered type is used (and typed in the stubs)
+    og.extend_type(FakeMesh, load=lambda filename: [FakeMesh()])
+    if not isinstance(og.load(FakeMesh, "any.file"), FakeMesh):
+        raise ValueError("[Test] Extended load should be used")
+    # Other libraries add their operations to the OpenGeode types
+    og.extend_type(og.BRep, operations={"nb_corners_of": lambda brep: brep.nb_corners()})
+    if og.object_operation(make_brep(), "nb_corners_of")() != 2:
+        raise ValueError("[Test] Operation added to BRep should be used")
+    expect_raises(ValueError, og.extend_type, og.BRep, builder=og.BRepBuilder, contains="already has builder")
+    # Errors
+    class Unregistered:
+        pass
+
+    expect_raises(ValueError, og.extend_type, Unregistered, load=fake_load, contains="not registered")
+    expect_raises(TypeError, og.extend_type, FakeModel, contains="No operation")
+    expect_raises(TypeError, og.extend_type, FakeModel, operations={"load": fake_load}, contains="keyword")
+    expect_raises(TypeError, og.extend_type, FakeModel, operations={"not valid": fake_load}, contains="Invalid")
+    expect_raises(TypeError, og.extend_type, FakeModel, operations={"other": 42}, contains="not callable")
+    expect_raises(TypeError, og.extend_type, "FakeModel", load=fake_load)
+    expect_raises(TypeError, og.register_type, Unregistered, operations={"load": fake_load})
+    # A custom operation can also be given at registration
+    og.register_type(Unregistered, operations={"describe": lambda obj: "unregistered"})
+    if og.object_operation(Unregistered(), "describe")() != "unregistered":
+        raise ValueError("[Test] Custom operation given at registration")
+
+
+def check_resolve():
+    class Handle:
+        """Downstream object standing for a concrete one, as a base-typed mesh."""
+
+        def __init__(self, target):
+            self.target = target
+
+    class Concrete:
+        pass
+
+    class ConcreteBuilder:
+        def __init__(self, concrete):
+            self.concrete = concrete
+
+    og.register_type(Concrete, builder=ConcreteBuilder, operations={"name": lambda obj: "concrete"})
+    og.register_type(Handle, resolve=lambda handle: handle.target)
+    concrete = Concrete()
+    if og.builder(Handle(concrete)).concrete is not concrete:
+        raise ValueError("[Test] builder should use the resolved object")
+    if og.object_operation(Handle(concrete), "name")() != "concrete":
+        raise ValueError("[Test] object_operation should use the resolved object")
+    # Resolution is applied once: an unregistered result is an error
+    expect_raises(TypeError, og.builder, Handle(42), contains="Handle")
+    if og.builder_type(Handle) is not None:
+        raise ValueError("[Test] builder_type does not resolve")
+
+
+# --- Runtime signatures -------------------------------------------------------
+
+
+def check_signatures():
+    signature = inspect.signature(og.builder)
+    parameters = list(signature.parameters.values())
+    if [p.name for p in parameters] != ["obj"] or parameters[0].annotation is not object:
+        raise ValueError(f"[Test] Wrong builder signature: {signature}")
+    if signature.return_annotation is not typing.Any:
+        raise ValueError(f"[Test] Wrong builder return annotation: {signature}")
+    # The documentation keeps the typed overloads
+    if "builder(obj: opengeode_py_mesh.TriangulatedSurface3D)" not in og.builder.__doc__.replace(
+        og.TriangulatedSurface3D.__module__, "opengeode_py_mesh"
+    ):
+        raise ValueError("[Test] builder docstring should list the typed overloads")
+    for name in [
+        "load", "load_all", "save", "is_loadable", "is_saveable", "input_extensions",
+        "output_extensions", "additional_files", "builder_type", "register_type",
+        "extend_type", "registered_types", "type_operation", "object_operation",
+        "find_attribute", "load_one",
+    ]:
+        function = getattr(og, name)
+        for parameter in inspect.signature(function).parameters.values():
+            if parameter.kind in (parameter.VAR_POSITIONAL, parameter.VAR_KEYWORD):
+                raise ValueError(f"[Test] {name} should show its real parameters")
+
+
+def check_attribute_fallbacks():
+    # A value type without typed functions (geode::Point<3>): the generic one
+    mesh = og.PointSet3D.create()
+    og.builder(mesh).create_point(og.Point3D([1, 2, 3]))
+    points = og.find_attribute(mesh.vertex_attribute_manager(), "points")
+    if type(points) is not og.AttributeBase or points.name() != "points":
+        raise ValueError(f"[Test] Unknown value type should give AttributeBase, got {type(points)}")
+    # A kind without typed functions: find_read_only_attribute_<type>. No such
+    # kind exists in OpenGeode: hide the variable class from the dispatch
+    manager = og.AttributeManager()
+    manager.resize(2)
+    manager.create_attribute_variable_double("height", 1.5)
+    hidden = basic.VariableAttributeDouble
+
+    class Unknown:
+        pass
+
+    basic.VariableAttributeDouble = Unknown
+    try:
+        attribute = og.find_attribute(manager, "height")
+    finally:
+        basic.VariableAttributeDouble = hidden
+    if not isinstance(attribute, og.ReadOnlyAttributeDouble) or attribute.value(1) != 1.5:
+        raise ValueError(f"[Test] Unknown kind should give the read-only attribute, got {type(attribute)}")
+
+
 def check_logger_functions():
     for name in [
         "forward_logs_to_python",
@@ -592,6 +792,11 @@ if __name__ == "__main__":
         check_external_time_series_round_trip(directory)
         check_errors(directory)
         check_registry_extension(directory)
+        check_extend_type(directory)
+        check_base_typed_meshes(directory)
+    check_resolve()
+    check_signatures()
+    check_attribute_fallbacks()
     check_builders()
     check_load_one()
     check_attributes_by_name()

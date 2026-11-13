@@ -199,10 +199,15 @@ def check_python_function(qualified_name, function, problems):
     if not (function.__doc__ or "").strip():
         problems.append(f"{qualified_name}: no docstring")
     signature = inspect.signature(function)
-    kinds = [parameter.kind for parameter in signature.parameters.values()]
-    if kinds == GENERIC_KINDS:
+    # inspect.signature follows __wrapped__, getfullargspec (used by
+    # pybind11-stubgen) does not
+    spec = inspect.getfullargspec(function)
+    if spec.varargs and spec.varkw and not spec.args and not spec.kwonlyargs:
         # Typed overloads written as a pybind11 docstring (read by
-        # pybind11-stubgen), e.g. basic.builder: checked as a binding
+        # pybind11-stubgen), e.g. basic.builder: checked as a binding, and
+        # its runtime signature (__wrapped__) must be annotated
+        if [p.kind for p in signature.parameters.values()] == GENERIC_KINDS:
+            problems.append(f"{qualified_name}: no __wrapped__ runtime signature")
         entries = split_overloads(function.__doc__ or "")
         names = {SIGNATURE.match(entry[0]).group("name") for entry in entries}
         if names != {function.__name__}:

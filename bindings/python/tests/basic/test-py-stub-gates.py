@@ -232,6 +232,37 @@ def test_no_stub_found():
         raise ValueError("[Test] An empty directory should fail:\n" + output)
 
 
+def test_typing_ellipsis_is_accepted():
+    # The `...` of Callable[..., R] and tuple[T, ...] is a valid annotation
+    expect_success(
+        """
+        import typing
+        def f(callback: typing.Callable[..., typing.Any]) -> tuple[int, ...]: ...
+        def g(callbacks: dict[str, typing.Callable[..., int]] | None = None) -> None: ...
+        """
+    )
+    # Elsewhere it is not
+    expect_failure(
+        """
+        import typing
+        def f(callback: typing.Callable[[int], ...]) -> None: ...
+        """,
+        "unresolved `...`",
+    )
+    expect_failure(
+        """
+        def f(values: tuple[..., int]) -> None: ...
+        """,
+        "unresolved `...`",
+    )
+    expect_failure(
+        """
+        def f(values: list[...]) -> None: ...
+        """,
+        "unresolved `...`",
+    )
+
+
 def test_typevar_annotation_is_rejected():
     # What pybind11-stubgen writes for a module-level TypeVar
     expect_failure(
@@ -428,6 +459,7 @@ if __name__ == "__main__":
     test_bind_vector_members_are_the_only_exception()
     test_explicit_allow()
     test_no_stub_found()
+    test_typing_ellipsis_is_accepted()
     test_typevar_annotation_is_rejected()
     test_fix_rewrites_typevars()
     test_stubtest_detects_a_wrong_stub()

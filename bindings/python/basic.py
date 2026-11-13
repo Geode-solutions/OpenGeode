@@ -20,6 +20,7 @@
 
 import atexit as _atexit
 import collections as _collections
+import functools as _functools
 import logging as _logging
 import threading as _threading
 import traceback as _traceback
@@ -71,8 +72,8 @@ def load_one(objects: "list[_T]", filename: str) -> "_T":
 
 
 class _Registry:
-    """Registration by class: {operation name: function or None, "builder":
-    class or None}, and the value types of the attributes by C++ type name.
+    """Registration by class: {operation name: function, "builder": class},
+    and the value types of the attributes by C++ type name.
 
     Not module-level dicts: pybind11-stubgen would write their content in the
     stubs (functions it cannot import, compiler-specific type names), and a
@@ -85,23 +86,7 @@ class _Registry:
 
 _registry = _Registry()
 
-
-def register_type(
-    cls: type,
-    *,
-    load: "_typing.Callable[[str], list[_typing.Any]] | None" = None,
-    save: "_typing.Callable[[_typing.Any, str], list[str]] | None" = None,
-    is_loadable: "_typing.Callable[[str], Percentage] | None" = None,
-    is_saveable: "_typing.Callable[[_typing.Any, str], bool] | None" = None,
-    input_extensions: "_typing.Callable[[], list[str]] | None" = None,
-    output_extensions: "_typing.Callable[[], list[str]] | None" = None,
-    additional_files: "_typing.Callable[[str], AdditionalFiles] | None" = None,
-    builder: "type | None" = None,
-) -> None:
-    """Register cls for the generic functions: the extension point of the
-    libraries adding their own types (OpenGeode registers its own ones when
-    its modules are imported).
-
+_REGISTRATION_DOC = """
     Every operation is optional; a generic function raises a TypeError for an
     operation that is not registered:
       load(filename) -> list of the cls objects of the file (load, load_all),
@@ -113,43 +98,156 @@ def register_type(
         is_saveable of a class),
       additional_files(filename) -> AdditionalFiles (additional_files),
       builder: the builder class of cls (builder, builder_type), built with
-        builder.create(obj) if it has a create method, else builder(obj).
+        builder.create(obj) if it has a create method, else builder(obj),
+      resolve(obj) -> obj as the class handling it, called first by the
+        functions taking an object (save, is_saveable, builder,
+        object_operation) for the instances of cls and of its subclasses: e.g.
+        the mesh of a model component, typed SurfaceMesh3D, is resolved as a
+        TriangulatedSurface3D (an object of the same class is unchanged),
+      operations: other operations by name, for the generic functions of
+        other libraries (type_operation, object_operation).
     Pass the bound functions (load_brep, BRepInputFactory.list_creators...):
     the generic functions only call them (the bound ones release the GIL).
-    load and load_all are typed by cls for any registered type; the typed
-    overloads of builder() are those of the types registered when the stubs
-    are generated (the other types get Any).
+    The registration is checked by type checkers (load(filename) must return a
+    list of cls objects...). load and load_all are typed by cls for any
+    registered type; the typed overloads of builder() are those of the types
+    registered when the stubs are generated (the other types get Any).
+"""
 
-    Raise a ValueError if cls is already registered, a TypeError if cls or
-    builder is not a class, an operation is not callable or no operation is
-    given.
-    """
+
+def _registration_entries(
+    function: str,
+    cls: object,
+    operations: "dict[str, _typing.Any]",
+    others: "dict[str, _typing.Any] | None",
+) -> "dict[str, _typing.Any]":
+    """Checked {name: operation} of a register_type or extend_type call."""
     if not isinstance(cls, type):
-        raise TypeError(f"[register_type] {cls!r} is not a class")
-    if cls in _registry.registrations:
-        raise ValueError(f"[register_type] {cls.__name__} is already registered")
-    operations = {
-        "load": load,
-        "save": save,
-        "is_loadable": is_loadable,
-        "is_saveable": is_saveable,
-        "input_extensions": input_extensions,
-        "output_extensions": output_extensions,
-        "additional_files": additional_files,
-    }
-    for name, operation in operations.items():
-        if operation is not None and not callable(operation):
+        raise TypeError(f"[{function}] {cls!r} is not a class")
+    entries = {name: value for name, value in operations.items() if value is not None}
+    for name, value in (others or {}).items():
+        if not isinstance(name, str) or not name.isidentifier():
+            raise TypeError(f"[{function}] Invalid operation name {name!r}")
+        if name in operations:
             raise TypeError(
-                f"[register_type] {name} of {cls.__name__} is not callable"
+                f"[{function}] {name} of {cls.__name__} must be given as a keyword"
             )
-    if builder is not None and not isinstance(builder, type):
-        raise TypeError(
-            f"[register_type] builder of {cls.__name__} is not a class"
+        entries[name] = value
+    for name, value in entries.items():
+        if name == "builder":
+            if not isinstance(value, type):
+                raise TypeError(f"[{function}] builder of {cls.__name__} is not a class")
+        elif not callable(value):
+            raise TypeError(f"[{function}] {name} of {cls.__name__} is not callable")
+    if not entries:
+        raise TypeError(f"[{function}] No operation given for {cls.__name__}")
+    return entries
+
+
+def register_type(
+    cls: "type[_T]",
+    *,
+    load: "_typing.Callable[[str], list[_T]] | None" = None,
+    save: "_typing.Callable[[_T, str], list[str]] | None" = None,
+    is_loadable: "_typing.Callable[[str], Percentage] | None" = None,
+    is_saveable: "_typing.Callable[[_T, str], bool] | None" = None,
+    input_extensions: "_typing.Callable[[], list[str]] | None" = None,
+    output_extensions: "_typing.Callable[[], list[str]] | None" = None,
+    additional_files: "_typing.Callable[[str], AdditionalFiles] | None" = None,
+    builder: "type | None" = None,
+    resolve: "_typing.Callable[[_T], object] | None" = None,
+    operations: "dict[str, _typing.Callable[..., _typing.Any]] | None" = None,
+) -> None:
+    """Register cls for the generic functions: the extension point of the
+    libraries adding their own types (OpenGeode registers its own ones when
+    its modules are imported). Use extend_type to add operations to a
+    registered type.
+    {doc}
+    Raise a ValueError if cls is already registered, a TypeError if cls or
+    builder is not a class, an operation is not callable, a name of operations
+    is invalid or a keyword, or no operation is given.
+    """
+    entries = _registration_entries(
+        "register_type",
+        cls,
+        {
+            "load": load,
+            "save": save,
+            "is_loadable": is_loadable,
+            "is_saveable": is_saveable,
+            "input_extensions": input_extensions,
+            "output_extensions": output_extensions,
+            "additional_files": additional_files,
+            "builder": builder,
+            "resolve": resolve,
+        },
+        operations,
+    )
+    if cls in _registry.registrations:
+        raise ValueError(
+            f"[register_type] {cls.__name__} is already registered (use extend_type)"
         )
-    if builder is None and all(operation is None for operation in operations.values()):
-        raise TypeError(f"[register_type] No operation given for {cls.__name__}")
-    _registry.registrations[cls] = dict(operations, builder=builder)
+    _registry.registrations[cls] = entries
     _update_builder_doc()
+
+
+def extend_type(
+    cls: "type[_T]",
+    *,
+    replace: bool = False,
+    load: "_typing.Callable[[str], list[_T]] | None" = None,
+    save: "_typing.Callable[[_T, str], list[str]] | None" = None,
+    is_loadable: "_typing.Callable[[str], Percentage] | None" = None,
+    is_saveable: "_typing.Callable[[_T, str], bool] | None" = None,
+    input_extensions: "_typing.Callable[[], list[str]] | None" = None,
+    output_extensions: "_typing.Callable[[], list[str]] | None" = None,
+    additional_files: "_typing.Callable[[str], AdditionalFiles] | None" = None,
+    builder: "type | None" = None,
+    resolve: "_typing.Callable[[_T], object] | None" = None,
+    operations: "dict[str, _typing.Callable[..., _typing.Any]] | None" = None,
+) -> None:
+    """Add operations to the registration of cls (see register_type), e.g. an
+    operation of another library: extend_type(BRep, operations={"save_viewable":
+    save_viewable_brep}).
+
+    An operation already registered for cls is only replaced if replace is
+    True. Raise a ValueError if cls is not registered or an operation is
+    already registered (and replace is False), a TypeError as register_type
+    for invalid operations. Nothing is changed when an error is raised.
+    """
+    entries = _registration_entries(
+        "extend_type",
+        cls,
+        {
+            "load": load,
+            "save": save,
+            "is_loadable": is_loadable,
+            "is_saveable": is_saveable,
+            "input_extensions": input_extensions,
+            "output_extensions": output_extensions,
+            "additional_files": additional_files,
+            "builder": builder,
+            "resolve": resolve,
+        },
+        operations,
+    )
+    registration = _registry.registrations.get(cls)
+    if registration is None:
+        raise ValueError(
+            f"[extend_type] {cls.__name__} is not registered (use register_type)"
+        )
+    if not replace:
+        existing = sorted(name for name in entries if name in registration)
+        if existing:
+            raise ValueError(
+                f"[extend_type] {cls.__name__} already has {', '.join(existing)} "
+                "(pass replace=True to replace)"
+            )
+    registration.update(entries)
+    _update_builder_doc()
+
+
+register_type.__doc__ = register_type.__doc__.replace("    {doc}\n", _REGISTRATION_DOC)
 
 
 def registered_types() -> "list[type]":
@@ -173,27 +271,57 @@ def _class_operation(cls: type, operation: str) -> _typing.Any:
     registration = _registry.registrations.get(cls) if isinstance(cls, type) else None
     if registration is None:
         raise _unregistered(_type_name(cls))
-    function = registration[operation]
+    function = registration.get(operation)
     if function is None:
         raise TypeError(f"{cls.__name__} has no registered {operation}")
     return function
 
 
-def _object_registration(obj: object) -> "tuple[type, dict[str, _typing.Any]]":
-    """Registration of the closest registered class of type(obj)."""
-    for cls in type(obj).__mro__:
-        registration = _registry.registrations.get(cls)
+def _closest_registration(cls: type) -> "tuple[type, dict[str, _typing.Any]] | None":
+    for base in cls.__mro__:
+        registration = _registry.registrations.get(base)
         if registration is not None:
-            return cls, registration
-    raise _unregistered(type(obj).__name__)
+            return base, registration
+    return None
 
 
-def _object_operation(obj: object, operation: str) -> _typing.Any:
-    cls, registration = _object_registration(obj)
-    function = registration[operation]
+def _resolve(obj: object) -> object:
+    """obj as the class handling it: the resolve operation of the closest
+    registered class of type(obj) that has one (applied once)."""
+    for base in type(obj).__mro__:
+        registration = _registry.registrations.get(base)
+        if registration is not None and "resolve" in registration:
+            return registration["resolve"](obj)
+    return obj
+
+
+def _object_operation(obj: object, operation: str) -> "tuple[object, _typing.Any]":
+    """(resolved obj, operation of the closest registered class of its type)."""
+    resolved = _resolve(obj)
+    closest = _closest_registration(type(resolved))
+    if closest is None:
+        raise _unregistered(type(obj).__name__)
+    cls, registration = closest
+    function = registration.get(operation)
     if function is None:
         raise TypeError(f"{cls.__name__} has no registered {operation}")
-    return function
+    return resolved, function
+
+
+def type_operation(cls: type, name: str) -> "_typing.Callable[..., _typing.Any]":
+    """Return the operation called name registered for exactly cls (e.g.
+    "load", or an operation added by another library). Raise a TypeError if
+    cls is not registered or has no such operation."""
+    return _class_operation(cls, name)
+
+
+def object_operation(obj: object, name: str) -> "_typing.Callable[..., _typing.Any]":
+    """Return the operation called name of obj, bound to it: the operation of
+    the closest registered class of type(obj), obj being resolved first (see
+    register_type), e.g. object_operation(mesh, "save")(filename). Raise a
+    TypeError if no registered class of obj has such operation."""
+    resolved, function = _object_operation(obj, name)
+    return _functools.partial(function, resolved)
 
 
 def _lowercase_extension(filename: str) -> str:
@@ -235,11 +363,15 @@ def save(obj: object, filename: str) -> "list[str]":
     """Save obj in the file, whose extension selects the writer, and return
     the list of the written files.
 
-    The writer is the one of the closest registered class of type(obj). Raise
-    an OpenGeodeDataError if no writer handles the extension, a TypeError if
-    the type of obj has no registered save.
+    The writer is the one of the closest registered class of type(obj), obj
+    being resolved first (e.g. the SurfaceMesh3D of a model component is saved
+    as its TriangulatedSurface3D or PolygonalSurface3D). Raise an
+    OpenGeodeError if no writer handles the extension or the writing fails
+    (currently an OpenGeodeInternalError: the C++ save functions wrap their
+    errors), a TypeError if the type of obj has no registered save.
     """
-    return list(_object_operation(obj, "save")(obj, filename))
+    resolved, function = _object_operation(obj, "save")
+    return list(function(resolved, filename))
 
 
 def is_loadable(cls: type, filename: str) -> Percentage:
@@ -252,14 +384,16 @@ def is_saveable(obj_or_cls: object, filename: str) -> bool:
     """Return True if the writer of the file extension can save the object.
 
     For an object, the writer is asked (it may refuse a given object): the
-    type of obj needs a registered is_saveable. For a class, return True if a
+    type of obj (resolved first, see save) needs a registered is_saveable.
+    For a class, return True if a
     writer is registered for the extension (case insensitive): cls needs a
     registered output_extensions. Raise a TypeError otherwise.
     """
     if isinstance(obj_or_cls, type):
         extensions = _class_operation(obj_or_cls, "output_extensions")()
         return _lowercase_extension(filename) in extensions
-    return bool(_object_operation(obj_or_cls, "is_saveable")(obj_or_cls, filename))
+    resolved, function = _object_operation(obj_or_cls, "is_saveable")
+    return bool(function(resolved, filename))
 
 
 def input_extensions(cls: type) -> "list[str]":
@@ -284,38 +418,43 @@ def additional_files(cls: type, filename: str) -> AdditionalFiles:
 
 
 def builder_type(cls: type) -> "type | None":
-    """Return the builder class used by builder() for the cls objects (the one
-    of the closest registered class of cls), or None if it has no builder.
-    Raise a TypeError if neither cls nor any of its bases is registered."""
+    """Return the builder class registered for the closest registered class
+    of cls, or None if it has none. builder() may return a more derived
+    builder: it resolves the object first (e.g. a SurfaceMesh3D that is a
+    triangulated surface gets a TriangulatedSurfaceBuilder3D). Raise a
+    TypeError if neither cls nor any of its bases is registered."""
     if not isinstance(cls, type):
         raise _unregistered(_type_name(cls))
-    for base in cls.__mro__:
-        registration = _registry.registrations.get(base)
-        if registration is not None:
-            return registration["builder"]
-    raise _unregistered(cls.__name__)
+    closest = _closest_registration(cls)
+    if closest is None:
+        raise _unregistered(cls.__name__)
+    return closest[1].get("builder")
 
 
 def _builder(obj: object) -> _typing.Any:
-    cls, registration = _object_registration(obj)
-    builder_class = registration["builder"]
-    if builder_class is None:
-        raise TypeError(f"{cls.__name__} has no registered builder")
+    resolved, builder_class = _object_operation(obj, "builder")
     create = getattr(builder_class, "create", None)
     if create is not None:
-        return create(obj)
-    return builder_class(obj)
+        return create(resolved)
+    return builder_class(resolved)
 
 
 def builder(*args, **kwargs):
-    # Signature and documentation set by _update_builder_doc
+    # Documentation set by _update_builder_doc. pybind11-stubgen reads the
+    # typed overloads in it because the signature (inspect.getfullargspec) is
+    # (*args, **kwargs); inspect.signature follows __wrapped__ and gives the
+    # runtime signature (obj: object) -> Any.
     return _builder(*args, **kwargs)
+
+
+builder.__wrapped__ = _builder
 
 
 _BUILDER_DOC = """Return the builder modifying obj.
 
 The builder class is the one registered for the closest registered class of
-type(obj) (see builder_type): the builder is builder_class.create(obj) if the
+type(obj), obj being resolved first (see save; builder_type gives the class
+without resolution): the builder is builder_class.create(obj) if the
 class has a create method (mesh builders), else builder_class(obj) (model
 builders). Raise a TypeError if no builder is registered for type(obj)."""
 
@@ -331,7 +470,7 @@ def _update_builder_doc() -> None:
     entries = [
         (cls, registration["builder"])
         for cls, registration in _registry.registrations.items()
-        if registration["builder"] is not None
+        if "builder" in registration
     ]
     entries.sort(key=lambda entry: -len(entry[0].__mro__))
     signatures = [

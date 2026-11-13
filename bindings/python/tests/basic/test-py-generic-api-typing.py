@@ -91,6 +91,16 @@ def listener(event: og.ProgressEvent) -> None:
 og.add_progress_listener(listener)
 og.remove_progress_listener(listener)
 og.register_type(int, load=lambda filename: [1], builder=og.BRepBuilder)
+og.register_type(
+    og.BRep,
+    load=og.load_brep,
+    save=og.save_brep,
+    is_saveable=og.is_brep_saveable,
+    resolve=lambda brep: brep,
+    operations={"other": og.save_brep},
+)
+og.extend_type(og.Section, replace=True, save=og.save_section)
+reveal_type(og.object_operation(surface, "save"))
 """
 
 EXPECTED = [
@@ -109,6 +119,7 @@ EXPECTED = [
     "opengeode_py_basic.AdditionalFiles",
     "type | None",
     "opengeode_py_basic.AttributeBase",
+    "def (*Any, **Any) -> Any",
 ]
 
 # Each line must be reported as an error
@@ -119,6 +130,13 @@ WRONG = [
     'builder: og.BRepBuilder = og.builder(og.TriangulatedSurface3D.create())',
     'og.add_progress_listener(42)',
     'og.forward_logs_to_python(42)',
+    # Registrations are checked against the registered class
+    'og.register_type(og.BRep, load=og.load_section)',
+    'og.register_type(og.BRep, save=og.save_section)',
+    'og.register_type(og.BRep, is_saveable=og.is_section_saveable)',
+    'og.extend_type(og.Section, load=og.load_brep)',
+    'og.extend_type(og.Section, replace="yes")',
+    'og.register_type(og.BRep, operations={"other": 42})',
 ]
 
 

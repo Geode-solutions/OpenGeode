@@ -40,6 +40,7 @@ add_geode_python_binding(
         "builder/tetrahedral_solid_builder.cpp"
         "builder/triangulated_surface_builder.cpp"
         "builder/vertex_set_builder.cpp"
+        "core/bound_interface.cpp"
         "core/crs.cpp"
         "core/crs_manager.cpp"
         "core/crs_managers.cpp"

@@ -23,9 +23,13 @@ OpenGeodeMeshLibrary.initialize()
 
 # The registry of the generic functions (load, save, builder...) is in basic:
 # a sibling module in the wheel package, a top-level module in the build tree
+from opengeode_py_mesh import _bound_interface
+
 try:
+    from .basic import extend_type as _extend_type
     from .basic import register_type as _register_type
 except ImportError:
+    from basic import extend_type as _extend_type
     from basic import register_type as _register_type
 
 
@@ -77,4 +81,7 @@ for _name, _class in (
 ):
     _register_mesh(_class, _name, "3D", globals()[_class.__name__[:-2] + "Builder3D"])
 _register_type(SolidMesh3D, builder=SolidMeshBuilder3D)
+# Every mesh (e.g. the SurfaceMesh3D of a model component) is handled as its
+# most derived bound class (TriangulatedSurface3D...)
+_extend_type(VertexSet, resolve=_bound_interface)
 del _dimension, _module, _name, _class

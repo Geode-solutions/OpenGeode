@@ -90,6 +90,7 @@ namespace geode
     void define_rasterize( pybind11::module& );
     void define_debug( pybind11::module& );
 
+    void define_bound_interface( pybind11::module& );
     void define_vertex_set_io( pybind11::module& );
     void define_graph_io( pybind11::module& );
     void define_edged_curve_io( pybind11::module& );
@@ -200,4 +201,6 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
     geode::define_tetrahedral_solid_io( module );
     geode::define_hybrid_solid_io( module );
     geode::define_regular_grid_io( module );
+
+    geode::define_bound_interface( module );
 }
