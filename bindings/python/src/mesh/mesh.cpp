@@ -89,6 +89,7 @@ namespace geode
     void define_mesh_crs_helper( pybind11::module& );
     void define_rasterize( pybind11::module& );
     void define_debug( pybind11::module& );
+    void define_numpy_access( pybind11::module& );
 
     void define_bound_interface( pybind11::module& );
     void define_vertex_set_io( pybind11::module& );
@@ -189,6 +190,7 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
     geode::define_mesh_crs_helper( module );
     geode::define_rasterize( module );
     geode::define_debug( module );
+    geode::define_numpy_access( module );
 
     geode::define_vertex_set_io( module );
     geode::define_graph_io( module );

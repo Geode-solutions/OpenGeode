@@ -22,6 +22,7 @@ add_geode_python_binding(
     NAME "py_mesh"
     SOURCES
         "mesh.cpp"
+        "numpy_access.cpp"
         "builder/crs_manager_builder.cpp"
         "builder/crs_managers_builder.cpp"
         "builder/grid_crs_manager_builder.cpp"

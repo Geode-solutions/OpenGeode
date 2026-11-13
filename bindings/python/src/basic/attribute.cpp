@@ -22,6 +22,7 @@
  */
 
 #include "../common.hpp"
+#include "../numpy_access.hpp"
 
 #include <geode/basic/attribute.hpp>
 #include <geode/basic/constant_attribute.hpp>
@@ -30,6 +31,124 @@
 
 namespace geode
 {
+    /*!
+     * Layout of the values of an attribute in a numpy array: the scalar
+     * type of the array and the number of items of a value (0 for a scalar
+     * value, the array has then one dimension, and k for a std::array of k
+     * values, the array has then shape (n, k)).
+     */
+    template < typename Type >
+    struct AttributeArrayTraits
+    {
+        using Scalar = Type;
+        static constexpr size_t nb_items = 0;
+        static Scalar item( const Type& value, size_t /*unused*/ )
+        {
+            return value;
+        }
+        static void set_item( Type& value, size_t /*unused*/, Scalar item )
+        {
+            value = item;
+        }
+    };
+
+    template < size_t size >
+    struct AttributeArrayTraits< std::array< double, size > >
+    {
+        using Scalar = double;
+        static constexpr size_t nb_items = size;
+        static Scalar item( const std::array< double, size >& value, size_t i )
+        {
+            return value[i];
+        }
+        static void set_item(
+            std::array< double, size >& value, size_t i, Scalar item )
+        {
+            value[i] = item;
+        }
+    };
+
+    template < typename Type >
+    std::vector< typename AttributeArrayTraits< Type >::Scalar >
+        copy_attribute_values( const ArrayLike& values )
+    {
+        using Scalar = typename AttributeArrayTraits< Type >::Scalar;
+        constexpr auto context = "set_values_array";
+        if constexpr( std::is_same_v< Scalar, bool > )
+        {
+            const auto copy = copy_booleans( context, "values", values );
+            return { copy.begin(), copy.end() };
+        }
+        else if constexpr( std::is_integral_v< Scalar > )
+        {
+            return copy_integers< Scalar >( context, "values", values );
+        }
+        else
+        {
+            return copy_reals< Scalar >( context, "values", values );
+        }
+    }
+
+    template < typename Type >
+    pybind11::array_t< typename AttributeArrayTraits< Type >::Scalar >
+        attribute_values_array( const VariableAttribute< Type >& attribute )
+    {
+        using Traits = AttributeArrayTraits< Type >;
+        const auto nb_elements = attribute.size();
+        std::vector< pybind11::ssize_t > shape{
+            static_cast< pybind11::ssize_t >( nb_elements )
+        };
+        constexpr auto nb_items = std::max< size_t >( Traits::nb_items, 1 );
+        if constexpr( Traits::nb_items != 0 )
+        {
+            shape.push_back( static_cast< pybind11::ssize_t >( nb_items ) );
+        }
+        return make_array< typename Traits::Scalar >(
+            std::move( shape ), [&]( typename Traits::Scalar* data ) {
+                for( const auto i : Range{ nb_elements } )
+                {
+                    const auto& value = attribute.value( i );
+                    for( const auto k : LRange{ nb_items } )
+                    {
+                        data[static_cast< size_t >( i ) * nb_items + k] =
+                            Traits::item( value, k );
+                    }
+                }
+            } );
+    }
+
+    template < typename Type >
+    void attribute_set_values_array(
+        VariableAttribute< Type >& attribute, const ArrayLike& values )
+    {
+        using Traits = AttributeArrayTraits< Type >;
+        const auto nb_elements = attribute.size();
+        if constexpr( Traits::nb_items == 0 )
+        {
+            check_array_shape( "set_values_array", "values", values,
+                { static_cast< pybind11::ssize_t >( nb_elements ) } );
+        }
+        else
+        {
+            check_array_shape( "set_values_array", "values", values,
+                { static_cast< pybind11::ssize_t >( nb_elements ),
+                    static_cast< pybind11::ssize_t >( Traits::nb_items ) } );
+        }
+        const auto copy = copy_attribute_values< Type >( values );
+        constexpr auto nb_items = std::max< size_t >( Traits::nb_items, 1 );
+        pybind11::gil_scoped_release release;
+        for( const auto i : Range{ nb_elements } )
+        {
+            Type value{};
+            for( const auto k : LRange{ nb_items } )
+            {
+                Traits::set_item(
+                    value, k, copy[static_cast< size_t >( i ) * nb_items + k] );
+            }
+            attribute.set_value( i, std::move( value ) );
+        }
+    }
+
     template < typename type >
     void python_attribute_class(
         pybind11::module& module, const std::string& typestr )
@@ -89,7 +208,25 @@ namespace geode
                 "IndexError if there is no such element" )
             .def( "default_values", &VariableAttribute< type >::default_values,
                 "Return the default value and the no-value marker of the "
-                "attribute" );
+                "attribute" )
+            .def( "values_array", &attribute_values_array< type >,
+                "Return the values of all the elements as a new numpy array: "
+                "shape (n,) for a value that is a number or a boolean "
+                "(dtype bool, int32, uint32, float32 or float64 as the type "
+                "of the attribute) and shape (n, k) of float64 for an "
+                "attribute whose values are arrays of k floats. The array is "
+                "a copy: later changes of the attribute do not modify it" )
+            .def( "set_values_array", &attribute_set_values_array< type >,
+                pybind11::arg( "values" ),
+                "Set the values of all the elements from a numpy array of "
+                "the same layout as values_array (n is the number of "
+                "elements of the attribute): booleans for a boolean "
+                "attribute, integers of any dtype that fit the type of the "
+                "attribute for an integer one and floats or integers of any "
+                "dtype for a float one (float values are converted to the "
+                "type of the attribute). Raise ValueError if the array has "
+                "another shape, dtype, or an integer value that does not "
+                "fit, in which case the attribute is not modified" );
         const auto sparse_name = absl::StrCat( "SparseAttribute", typestr );
         pybind11::class_< SparseAttribute< type >, ReadOnlyAttribute< type >,
             std::shared_ptr< SparseAttribute< type > > >( module,
