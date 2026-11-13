@@ -35,6 +35,7 @@
 #include <geode/model/mixin/core/surface_collection.hpp>
 #include <geode/model/representation/builder/brep_builder.hpp>
 #include <geode/model/representation/core/brep.hpp>
+#include <geode/model/representation/core/section.hpp>
 #include <geode/model/representation/io/brep_input.hpp>
 #include <geode/model/representation/io/brep_output.hpp>
 
@@ -120,6 +121,34 @@ void check_collections( const geode::BRep& brep,
     check_collection_items( brep, brep2, brep2.block_collections(), mapping );
 }
 
+template < typename Model, typename Concatener >
+void test_concatenate_itself( Model& brep )
+{
+    Concatener concatener{ brep };
+    const auto nb_corners = brep.nb_corners();
+    const auto nb_unique_vertices = brep.nb_unique_vertices();
+    bool thrown{ false };
+    try
+    {
+        geode_unused( concatener.concatenate( brep ) );
+    }
+    catch( const geode::OpenGeodeException& exception )
+    {
+        thrown = true;
+        geode::OpenGeodeModelException::test(
+            exception.type() == geode::OpenGeodeException::TYPE::data,
+            "[Test] Concatenating a model into itself should be a data "
+            "error" );
+    }
+    geode::OpenGeodeModelException::test(
+        thrown, "[Test] Concatenating a model into itself should throw" );
+    geode::OpenGeodeModelException::test(
+        brep.nb_corners() == nb_corners
+            && brep.nb_unique_vertices() == nb_unique_vertices,
+        "[Test] The model should be unchanged after a rejected "
+        "concatenation" );
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
@@ -143,6 +172,10 @@ void test()
     check_concatenation( brep, nb_components );
     check_collections( brep, brep2, mapping );
     geode::save_brep( brep, "concatenated_brep.og_brep" );
+    test_concatenate_itself< geode::BRep, geode::BRepConcatener >( brep );
+    geode::Section section;
+    test_concatenate_itself< geode::Section, geode::SectionConcatener >(
+        section );
 }
 
 OPENGEODE_TEST( "model-concatener" )

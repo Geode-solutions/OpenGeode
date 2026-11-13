@@ -44,7 +44,8 @@ namespace geode
                 "Copy all the components of other_model into the BRep with new "
                 "uuids, together with their geometry and relationships, and "
                 "return the ModelCopyMapping from the uuids of other_model to "
-                "the new ones; other_model must not be the BRep itself" );
+                "the new ones; raise an OpenGeodeDataError if other_model is "
+                "the BRep itself" );
 
         pybind11::class_< SectionConcatener >( module, "SectionConcatener",
             "Add the content of other Sections to a Section" )
@@ -58,6 +59,7 @@ namespace geode
                 "Copy all the components of other_model into the Section with "
                 "new uuids, together with their geometry and relationships, "
                 "and return the ModelCopyMapping from the uuids of other_model "
-                "to the new ones; other_model must not be the Section itself" );
+                "to the new ones; raise an OpenGeodeDataError if other_model "
+                "is the Section itself" );
     }
 } // namespace geode
