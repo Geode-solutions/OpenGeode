@@ -42,8 +42,9 @@ function(add_geode_python_test)
         PROPERTIES
             FOLDER "Bindings/Python/Tests"
     )
+    geode_python_test_executable(test_python)
     add_test(NAME ${test_name}
-        COMMAND ${PYTHON_EXECUTABLE} ${absolute_path} ${GEODE_TEST_ARGUMENTS}
+        COMMAND ${test_python} ${absolute_path} ${GEODE_TEST_ARGUMENTS}
     )
     set_tests_properties(${test_name} PROPERTIES TIMEOUT 300) 
     _find_dependency_directories(directories ${GEODE_TEST_DEPENDENCIES})
@@ -82,27 +83,92 @@ endfunction()
 set(GEODE_STUBGEN_REQUIREMENT "pybind11-stubgen==3.0.0")
 set(GEODE_MYPY_REQUIREMENT "mypy==2.4.1")
 
-# Fail the configuration, instead of silently skipping the stub gates, when the
-# Python used for the tests lacks the tools they need.
-function(geode_require_python_stub_tools)
+# Python requirements of the package: bindings/python/requirements.in lists the
+# runtime dependencies (numpy...) and exists in every checkout, unlike
+# requirements.txt which is generated. Empty when the project has none.
+function(geode_python_requirements_file output)
+    set(requirements_file "${CMAKE_SOURCE_DIR}/bindings/python/requirements.in")
+    if(EXISTS "${requirements_file}")
+        set(${output} "${requirements_file}" PARENT_SCOPE)
+    else()
+        set(${output} "" PARENT_SCOPE)
+    endif()
+endfunction()
+
+# Install the requirements of the package and the given extra packages in the
+# virtual environment, and fail with the command shown if pip fails.
+function(_geode_pip_install venv_bin venv_path)
+    cmake_parse_arguments(GEODE_PIP "" "" "PACKAGES" ${ARGN})
+    geode_python_requirements_file(requirements_file)
+    set(pip_command ${venv_bin}/python -m pip install)
+    if(requirements_file)
+        list(APPEND pip_command -r "${requirements_file}")
+    endif()
+    list(APPEND pip_command ${GEODE_PIP_PACKAGES})
     execute_process(
-        COMMAND ${PYTHON_EXECUTABLE} -c
-"from importlib.metadata import version
-import mypy.stubtest
-assert version('pybind11-stubgen') == '3.0.0'
-assert version('mypy') == '2.4.1'"
-        RESULT_VARIABLE stub_tools_missing
-        OUTPUT_QUIET
-        ERROR_QUIET
+        COMMAND ${pip_command}
+        RESULT_VARIABLE pip_result
     )
-    if(stub_tools_missing)
+    if(pip_result)
+        string(REPLACE ";" " " pip_command_text "${pip_command}")
         message(FATAL_ERROR
-            "The Python stub quality gates need ${GEODE_STUBGEN_REQUIREMENT} and "
-            "${GEODE_MYPY_REQUIREMENT} in ${PYTHON_EXECUTABLE}. Install them with:\n"
-            "  ${PYTHON_EXECUTABLE} -m pip install ${GEODE_STUBGEN_REQUIREMENT} "
-            "${GEODE_MYPY_REQUIREMENT}"
+            "Cannot install the Python requirements in ${venv_path} with:\n"
+            "  ${pip_command_text}"
         )
     endif()
+endfunction()
+
+# The Python tests run in a virtual environment created from PYTHON_EXECUTABLE
+# in the build directory, with the requirements of the package (numpy...) and
+# the pinned stub tools installed: the Python used to configure does not need
+# any package. The environment is only rebuilt when the requirements change.
+# Set ${output} to the Python of the environment.
+function(geode_python_test_executable output)
+    get_property(test_python GLOBAL PROPERTY ${PROJECT_NAME}_TEST_PYTHON)
+    if(test_python)
+        set(${output} "${test_python}" PARENT_SCOPE)
+        return()
+    endif()
+    set(venv_path "${PROJECT_BINARY_DIR}/python_test_venv")
+    if(WIN32)
+        set(venv_bin "${venv_path}/Scripts")
+    else()
+        set(venv_bin "${venv_path}/bin")
+    endif()
+    geode_python_requirements_file(requirements_file)
+    set(requirements_content "")
+    if(requirements_file)
+        file(READ "${requirements_file}" requirements_content)
+        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${requirements_file}")
+    endif()
+    string(MD5 environment_hash
+        "${PYTHON_EXECUTABLE}|${requirements_content}|${GEODE_STUBGEN_REQUIREMENT}|${GEODE_MYPY_REQUIREMENT}"
+    )
+    set(stamp_file "${venv_path}/geode_environment_hash")
+    set(stamp "")
+    if(EXISTS "${stamp_file}")
+        file(READ "${stamp_file}" stamp)
+    endif()
+    if(NOT "${stamp}" STREQUAL "${environment_hash}" OR NOT EXISTS "${venv_bin}/python${CMAKE_EXECUTABLE_SUFFIX}")
+        message(STATUS "Creating the Python test environment at: ${venv_path}")
+        execute_process(
+            COMMAND ${PYTHON_EXECUTABLE} -m venv --clear "${venv_path}"
+            RESULT_VARIABLE venv_result
+        )
+        if(venv_result)
+            message(FATAL_ERROR
+                "Cannot create the Python test environment with:\n"
+                "  ${PYTHON_EXECUTABLE} -m venv --clear ${venv_path}"
+            )
+        endif()
+        _geode_pip_install("${venv_bin}" "${venv_path}"
+            PACKAGES ${GEODE_STUBGEN_REQUIREMENT} ${GEODE_MYPY_REQUIREMENT}
+        )
+        file(WRITE "${stamp_file}" "${environment_hash}")
+    endif()
+    set(test_python "${venv_bin}/python")
+    set_property(GLOBAL PROPERTY ${PROJECT_NAME}_TEST_PYTHON "${test_python}")
+    set(${output} "${test_python}" PARENT_SCOPE)
 endfunction()
 
 # Quality gates on the stubs of the binding modules, run by CTest: generate the
@@ -110,8 +176,7 @@ endfunction()
 # check_python_stubs.py (fix of the TypeVars, no unnamed argN parameter, no
 # unresolved or raw C++ type, mypy.stubtest unless NO_STUBTEST). The wheel target runs the same gates
 # on the wheel, with stubtest on the whole package.
-# Needs the pinned pybind11-stubgen and mypy in PYTHON_EXECUTABLE, see
-# geode_require_python_stub_tools.
+# Runs in the Python test environment, see geode_python_test_executable.
 function(add_geode_python_stub_test)
     cmake_parse_arguments(GEODE_STUB_TEST
         "NO_STUBTEST"
@@ -119,7 +184,6 @@ function(add_geode_python_stub_test)
         "MODULES;DEPENDENCIES"
         ${ARGN}
     )
-    geode_require_python_stub_tools()
     if(NOT GEODE_STUB_TEST_NAME)
         set(GEODE_STUB_TEST_NAME "test-py-stubs")
     endif()
@@ -205,16 +269,11 @@ function(add_geode_python_wheel)
     execute_process(
         COMMAND ${venv_bin}/pip install --upgrade wheel packaging setuptools build
     )
-    execute_process(
-        COMMAND ${venv_bin}/pip install ${GEODE_STUBGEN_REQUIREMENT} ${GEODE_MYPY_REQUIREMENT}
-        RESULT_VARIABLE stub_tools_result
+    # The requirements of the package are needed to import the modules (the
+    # stubs refer to numpy...), then the stub quality gates need their tools
+    _geode_pip_install("${venv_bin}" "${venv_path}"
+        PACKAGES ${GEODE_STUBGEN_REQUIREMENT} ${GEODE_MYPY_REQUIREMENT}
     )
-    if(stub_tools_result)
-        message(FATAL_ERROR
-            "Cannot install ${GEODE_STUBGEN_REQUIREMENT} and ${GEODE_MYPY_REQUIREMENT} "
-            "in ${venv_path}, needed by the wheel stub quality gates"
-        )
-    endif()
     execute_process(
         COMMAND ${venv_bin}/python -c 
 "from sysconfig import get_platform

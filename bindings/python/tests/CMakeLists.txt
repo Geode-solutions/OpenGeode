@@ -18,21 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# The bulk access functions (numpy arrays) are tested with numpy, which is a
-# runtime dependency of the wheel (bindings/python/requirements.in)
-execute_process(
-    COMMAND ${PYTHON_EXECUTABLE} -c "import numpy"
-    RESULT_VARIABLE numpy_missing
-    OUTPUT_QUIET
-    ERROR_QUIET
-)
-if(numpy_missing)
-    message(FATAL_ERROR
-        "The Python tests need numpy in ${PYTHON_EXECUTABLE}. Install it with:\n"
-        "  ${PYTHON_EXECUTABLE} -m pip install numpy"
-    )
-endif()
-
 add_subdirectory(basic)
 add_subdirectory(geometry)
 add_subdirectory(image)
