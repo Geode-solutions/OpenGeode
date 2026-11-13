@@ -19,6 +19,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import os
+import subprocess
 import sys
 import threading
 import time
@@ -1059,6 +1061,70 @@ def test_too_many_rows():
             check(curve.nb_edges() == 0, "too many edges create nothing")
 
 
+MEMORY_ERROR_SCRIPT = """
+import os, resource, sys
+import numpy
+import geode_test_env
+import opengeode_py_mesh as mesh
+mesh.OpenGeodeMeshLibrary.initialize()
+with open("/proc/self/statm") as file:
+    size = int(file.read().split()[0]) * os.sysconf("SC_PAGE_SIZE")
+limit = size + 2**31
+resource.setrlimit(resource.RLIMIT_AS, (limit, resource.getrlimit(resource.RLIMIT_AS)[1]))
+# Each conversion needs about 6 GB: more than the limit
+rows = 2**28
+point_set = mesh.PointSet3D.create()
+builder = mesh.PointSetBuilder3D.create(point_set)
+try:
+    builder.create_points(numpy.broadcast_to(numpy.zeros((1, 3), dtype=numpy.float32), (rows, 3)))
+    sys.exit("create_points did not raise")
+except MemoryError:
+    pass
+assert point_set.nb_vertices() == 0, "create_points created vertices"
+surface = mesh.TriangulatedSurface3D.create()
+surface_builder = mesh.TriangulatedSurfaceBuilder3D.create(surface)
+surface_builder.create_points(numpy.zeros((3, 3)))
+try:
+    surface_builder.create_triangles(
+        numpy.broadcast_to(numpy.array([[0, 1, 2]], dtype=numpy.int32), (rows, 3))
+    )
+    sys.exit("create_triangles did not raise")
+except MemoryError:
+    pass
+assert surface.nb_polygons() == 0, "create_triangles created triangles"
+polygonal = mesh.PolygonalSurface3D.create()
+polygonal_builder = mesh.PolygonalSurfaceBuilder3D.create(polygonal)
+try:
+    polygonal_builder.create_polygons(
+        [], numpy.broadcast_to(numpy.zeros(1, dtype=numpy.int32), (3 * rows,))
+    )
+    sys.exit("create_polygons did not raise")
+except MemoryError:
+    pass
+assert polygonal.nb_polygons() == 0, "create_polygons created polygons"
+print("MemoryError raised")
+"""
+
+
+def test_conversion_out_of_memory():
+    # A conversion of the array that fails (here for lack of memory) raises
+    # its Python error, it must not be read as an array
+    if not sys.platform.startswith("linux"):
+        return
+    result = subprocess.run(
+        [sys.executable, "-c", MEMORY_ERROR_SCRIPT],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        env=dict(os.environ),
+        timeout=TIMEOUT,
+    )
+    check(
+        result.returncode == 0 and "MemoryError raised" in result.stdout,
+        f"conversion out of memory: exit {result.returncode}\n{result.stdout}",
+    )
+
+
 if __name__ == "__main__":
     mesh.OpenGeodeMeshLibrary.initialize()
     test_points_round_trip()
@@ -1074,6 +1140,7 @@ if __name__ == "__main__":
     test_polygons()
     test_empty_inputs()
     test_too_many_rows()
+    test_conversion_out_of_memory()
     test_empty_columns_are_not_empty_inputs()
     test_builder_without_mesh()
     test_keyword_arguments()

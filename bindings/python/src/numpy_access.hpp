@@ -98,6 +98,21 @@ namespace geode
                        std::numeric_limits< Type >::max() );
         }
 
+        /*!
+         * Return the array converted to a C-contiguous array of Type (no
+         * copy if it already is one). Unlike array_t::ensure(), a failed
+         * conversion (e.g. for lack of memory) raises its Python error.
+         */
+        template < typename Type >
+        pybind11::array_t< Type,
+            pybind11::array::c_style | pybind11::array::forcecast >
+            c_array( const pybind11::array& array )
+        {
+            return pybind11::array_t< Type,
+                pybind11::array::c_style | pybind11::array::forcecast >(
+                array );
+        }
+
         inline char dtype_kind( const pybind11::array& array )
         {
             return array.dtype().kind();
@@ -196,9 +211,7 @@ namespace geode
         };
         if( kind == 'i' )
         {
-            const auto values = pybind11::array_t< int64_t,
-                pybind11::array::c_style
-                    | pybind11::array::forcecast >::ensure( array );
+            const auto values = numpy_detail::c_array< int64_t >( array );
             const auto* data = values.data();
             for( size_t i = 0; i < nb; ++i )
             {
@@ -211,9 +224,7 @@ namespace geode
         }
         else
         {
-            const auto values = pybind11::array_t< uint64_t,
-                pybind11::array::c_style
-                    | pybind11::array::forcecast >::ensure( array );
+            const auto values = numpy_detail::c_array< uint64_t >( array );
             const auto* data = values.data();
             for( size_t i = 0; i < nb; ++i )
             {
@@ -264,15 +275,11 @@ namespace geode
         };
         if( kind == 'i' )
         {
-            convert( pybind11::array_t< int64_t,
-                pybind11::array::c_style
-                    | pybind11::array::forcecast >::ensure( array ) );
+            convert( numpy_detail::c_array< int64_t >( array ) );
         }
         else
         {
-            convert( pybind11::array_t< uint64_t,
-                pybind11::array::c_style
-                    | pybind11::array::forcecast >::ensure( array ) );
+            convert( numpy_detail::c_array< uint64_t >( array ) );
         }
         return result;
     }
@@ -294,9 +301,7 @@ namespace geode
                 " must be an array of floats or integers, got dtype ",
                 numpy_detail::dtype_string( array ) ) );
         }
-        const auto values = pybind11::array_t< Type,
-            pybind11::array::c_style
-                | pybind11::array::forcecast >::ensure( array );
+        const auto values = numpy_detail::c_array< Type >( array );
         return { values.data(), values.data() + values.size() };
     }
 
@@ -313,9 +318,7 @@ namespace geode
                 " must be an array of booleans, got dtype ",
                 numpy_detail::dtype_string( array ) ) );
         }
-        const auto values = pybind11::array_t< bool,
-            pybind11::array::c_style
-                | pybind11::array::forcecast >::ensure( array );
+        const auto values = numpy_detail::c_array< bool >( array );
         std::vector< bool > result( static_cast< size_t >( values.size() ) );
         for( size_t i = 0; i < result.size(); ++i )
         {
