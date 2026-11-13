@@ -62,6 +62,17 @@ namespace
         "Segment" + std::to_string( dimension ) + "D";                         \
     pybind11::class_< Segment##dimension##D >(                                 \
         module, segment##dimension.c_str(), "Segment between two points" )     \
+        .def(                                                                  \
+            "__repr__",                                                        \
+            []( const Segment##dimension##D& object ) {                        \
+                const auto& vertices = object.vertices();                      \
+                return python_call_repr( "Segment" #dimension "D",             \
+                    { python_repr( geode::Point< dimension >{ vertices[0] } ), \
+                        python_repr(                                           \
+                            geode::Point< dimension >{ vertices[1] } ) } );    \
+            },                                                                 \
+            "Return an unambiguous description of the segment: its type and "  \
+            "its two end points" )                                             \
         .def( pybind11::init< const Point< dimension >&,                       \
                   const Point< dimension >& >(),                               \
             pybind11::keep_alive< 1, 2 >(), pybind11::keep_alive< 1, 3 >(),    \
@@ -86,6 +97,15 @@ namespace
     pybind11::class_< InfiniteLine##dimension##D >( module,                    \
         line##dimension.c_str(),                                               \
         "Infinite line defined by a direction and an origin" )                 \
+        .def(                                                                  \
+            "__repr__",                                                        \
+            []( const InfiniteLine##dimension##D& object ) {                   \
+                return python_call_repr( "InfiniteLine" #dimension "D",        \
+                    { "direction=" + python_repr( object.direction() ),        \
+                        "origin=" + python_repr( object.origin() ) } );        \
+            },                                                                 \
+            "Return an unambiguous description of the line: its type, its "    \
+            "direction and its origin" )                                       \
         .def( pybind11::init< const Vector< dimension >&,                      \
                   const Point< dimension >& >(),                               \
             pybind11::keep_alive< 1, 3 >(), pybind11::arg( "direction" ),      \
@@ -153,6 +173,15 @@ namespace
     pybind11::class_< Sphere##dimension##D >( module,                          \
         sphere##dimension.c_str(),                                             \
         "Sphere (circle in 2D) defined by its center and radius" )             \
+        .def(                                                                  \
+            "__repr__",                                                        \
+            []( const Sphere##dimension##D& object ) {                         \
+                return python_call_repr( "Sphere" #dimension "D",              \
+                    { "origin=" + python_repr( object.origin() ),              \
+                        "radius=" + python_repr( object.radius() ) } );        \
+            },                                                                 \
+            "Return an unambiguous description of the sphere: its type, its "  \
+            "center and its radius" )                                          \
         .def( pybind11::init< const Point< dimension >&, double >(),           \
             pybind11::keep_alive< 1, 2 >(), pybind11::arg( "origin" ),         \
             pybind11::arg( "radius" ),                                         \
@@ -169,6 +198,15 @@ namespace
     const auto ray##dimension = "Ray" + std::to_string( dimension ) + "D";     \
     pybind11::class_< Ray##dimension##D >( module, ray##dimension.c_str(),     \
         "Half line defined by a direction and an origin" )                     \
+        .def(                                                                  \
+            "__repr__",                                                        \
+            []( const Ray##dimension##D& object ) {                            \
+                return python_call_repr( "Ray" #dimension "D",                 \
+                    { "direction=" + python_repr( object.direction() ),        \
+                        "origin=" + python_repr( object.origin() ) } );        \
+            },                                                                 \
+            "Return an unambiguous description of the ray: its type, its "     \
+            "direction and its origin" )                                       \
         .def( pybind11::init< const Vector< dimension >&,                      \
                   const Point< dimension >& >(),                               \
             pybind11::keep_alive< 1, 3 >(), pybind11::arg( "direction" ),      \
@@ -218,6 +256,15 @@ namespace geode
     {
         pybind11::class_< Plane >(
             module, "Plane", "Plane defined by its normal and a point" )
+            .def(
+                "__repr__",
+                []( const Plane& object ) {
+                    return python_call_repr( "Plane",
+                        { "normal=" + python_repr( object.normal() ),
+                            "origin=" + python_repr( object.origin() ) } );
+                },
+                "Return an unambiguous description of the plane: its type, its "
+                "normal and its origin" )
             .def( pybind11::init< const Vector3D&, const Point3D& >(),
                 pybind11::keep_alive< 1, 3 >(), pybind11::arg( "normal" ),
                 pybind11::arg( "origin" ),
@@ -234,6 +281,18 @@ namespace geode
 
         pybind11::class_< Tetrahedron >(
             module, "Tetrahedron", "Tetrahedron defined by its four vertices" )
+            .def(
+                "__repr__",
+                []( const Tetrahedron& object ) {
+                    const auto& vertices = object.vertices();
+                    return python_call_repr( "Tetrahedron",
+                        { python_repr( Point3D{ vertices[0] } ),
+                            python_repr( Point3D{ vertices[1] } ),
+                            python_repr( Point3D{ vertices[2] } ),
+                            python_repr( Point3D{ vertices[3] } ) } );
+                },
+                "Return an unambiguous description of the tetrahedron: its "
+                "type and its four vertices" )
             .def( pybind11::init< const Point3D&, const Point3D&,
                       const Point3D&, const Point3D& >(),
                 pybind11::keep_alive< 1, 2 >(), pybind11::keep_alive< 1, 3 >(),
@@ -250,6 +309,15 @@ namespace geode
         pybind11::class_< Circle >( module, "Circle",
             "Circle of the 3D space defined by its supporting plane and "
             "radius" )
+            .def(
+                "__repr__",
+                []( const Circle& object ) {
+                    return python_call_repr( "Circle",
+                        { "plane=" + python_repr( object.plane() ),
+                            "radius=" + python_repr( object.radius() ) } );
+                },
+                "Return an unambiguous description of the circle: its type, "
+                "its supporting plane and its radius" )
             .def( pybind11::init< const Plane&, double >(),
                 pybind11::keep_alive< 1, 2 >(), pybind11::arg( "plane" ),
                 pybind11::arg( "radius" ),
@@ -320,6 +388,15 @@ namespace geode
 
         pybind11::class_< Cylinder >( module, "Cylinder",
             "Cylinder defined by its axis (a segment) and radius" )
+            .def(
+                "__repr__",
+                []( const Cylinder& object ) {
+                    return python_call_repr( "Cylinder",
+                        { "axis=" + python_repr( object.axis() ),
+                            "radius=" + python_repr( object.radius() ) } );
+                },
+                "Return an unambiguous description of the cylinder: its type, "
+                "its axis and its radius" )
             .def( pybind11::init< Segment3D, double >(),
                 pybind11::keep_alive< 1, 2 >(), pybind11::arg( "axis" ),
                 pybind11::arg( "radius" ),

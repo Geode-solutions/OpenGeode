@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <cmath>
 #include <string>
 #include <string_view>
 #include <tuple>
@@ -158,6 +159,24 @@ namespace pybind11
 namespace geode
 {
     /*!
+     * Return the Python expression of a double: its repr, except for the
+     * values that have no literal, which are given by float(...)
+     */
+    inline std::string python_repr( double value )
+    {
+        if( std::isnan( value ) )
+        {
+            return "float('nan')";
+        }
+        if( std::isinf( value ) )
+        {
+            return value > 0 ? "float('inf')" : "float('-inf')";
+        }
+        return pybind11::repr( pybind11::float_( value ) )
+            .template cast< std::string >();
+    }
+
+    /*!
      * Return the Python repr of the value, e.g. 1.0 for a double, 'text' for
      * a string or Point3D([1.0, 2.0, 3.0]) for a Point3D.
      */
@@ -174,12 +193,16 @@ namespace geode
     template < index_t dimension >
     std::string coordinates_repr( const Point< dimension >& point )
     {
-        std::array< double, dimension > coordinates;
+        std::string result{ "[" };
         for( const auto i : LRange{ dimension } )
         {
-            coordinates[i] = point.value( i );
+            if( i != 0 )
+            {
+                result += ", ";
+            }
+            result += python_repr( point.value( i ) );
         }
-        return python_repr( coordinates );
+        return result + "]";
     }
 
     /*!

@@ -30,6 +30,14 @@ namespace geode
     void define_angle( pybind11::module& module )
     {
         pybind11::class_< Angle >( module, "Angle", "Angle stored in radians" )
+            .def(
+                "__repr__",
+                []( const Angle& angle ) {
+                    return "Angle.create_from_radians("
+                           + python_repr( angle.radians() ) + ")";
+                },
+                "Return an expression building the angle from its value in "
+                "radians" )
             .def_static( "create_from_radians", &Angle::create_from_radians,
                 pybind11::arg( "radians" ),
                 "Build an angle from a value in radians" )

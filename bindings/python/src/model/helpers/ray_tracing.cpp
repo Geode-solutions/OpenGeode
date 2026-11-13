@@ -39,6 +39,17 @@ namespace geode
                 "Result of a point-in-block query: its position is outside, "
                 "inside or on_border; the result is True (bool) only when the "
                 "position is inside" )
+                .def(
+                    "__repr__",
+                    []( const RayTracingResult& object ) {
+                        return python_call_repr( "RayTracingResult",
+                            { "position=RayTracingResult.Position."
+                                + pybind11::cast( object.position )
+                                    .attr( "name" )
+                                    .cast< std::string >() } );
+                    },
+                    "Return an unambiguous description of the result: its type "
+                    "and its position" )
                 .def( pybind11::init<>(),
                     "Build a result whose position is outside" )
                 .def( "__bool__", &RayTracingResult::operator bool );

@@ -88,6 +88,16 @@ namespace geode
                 "A polygon edge of a Surface mesh (field facet) together with "
                 "the indices of its two vertices in the Surface mesh (field "
                 "vertices)" )
+                .def(
+                    "__repr__",
+                    []( const SurfacePolygonEdge& object ) {
+                        return python_call_repr( "SurfacePolygonEdge",
+                            { "facet=" + python_repr( object.edge ),
+                                "vertices="
+                                    + python_repr( object.vertices ) } );
+                    },
+                    "Return an unambiguous description of the edge: its type, "
+                    "its polygon edge and the indices of its two vertices" )
                 .def( pybind11::init<>(), "Build an empty SurfacePolygonEdge" )
                 .def( pybind11::init< PolygonEdge >(), pybind11::arg( "edge" ),
                     "Build a SurfacePolygonEdge of the given polygon edge, "

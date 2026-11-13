@@ -24,6 +24,7 @@
 when possible), the type, the id and the main counts for meshes and models.
 str keeps returning the readable string() of the object."""
 
+import math
 import re
 
 import geode_test_env
@@ -85,6 +86,111 @@ def test_points_and_vectors():
         check_roundtrip(point)
     # a Vector is not mistaken for a Point
     check(not repr(geometry.Vector3D()).startswith("Point"), "Vector repr")
+
+
+def test_special_doubles():
+    values = [float("nan"), float("inf"), float("-inf"), -0.0, 5e-324, 1e308, 0.1, 1 / 3]
+    for value in values:
+        point = geometry.Point1D([value])
+        rebuilt = eval(repr(point), NAMESPACE)
+        got = rebuilt.value(0)
+        if math.isnan(value):
+            check(math.isnan(got), f"{repr(point)} rebuilds a NaN")
+        else:
+            check(got == value, f"{repr(point)} rebuilds {value}")
+            check(math.copysign(1, got) == math.copysign(1, value), f"sign of {repr(point)}")
+        check(repr(rebuilt) == repr(point), f"{repr(point)} is stable")
+    check_repr(geometry.Point1D([float("nan")]), "Point1D([float('nan')])")
+    check_repr(geometry.Point1D([float("inf")]), "Point1D([float('inf')])")
+    check_repr(geometry.Point1D([float("-inf")]), "Point1D([float('-inf')])")
+    check_repr(geometry.Point1D([-0.0]), "Point1D([-0.0])")
+    check_repr(geometry.Point1D([5e-324]), "Point1D([5e-324])")
+    check_repr(geometry.Point1D([1e308]), "Point1D([1e+308])")
+    mixed = geometry.Vector3D([float("nan"), float("inf"), -1.0])
+    check_repr(mixed, "Vector3D([float('nan'), float('inf'), -1.0])")
+    check(math.isnan(eval(repr(mixed), NAMESPACE).value(0)), "vector with NaN rebuilds")
+    check_repr(
+        geometry.Sphere2D(geometry.Point2D([0, 0]), float("inf")),
+        "Sphere2D(origin=Point2D([0.0, 0.0]), radius=float('inf'))",
+    )
+    box = geometry.BoundingBox2D()
+    check("1.7976931348623157e+308" in repr(box), f"an empty box uses the largest double: {repr(box)}")
+    check(
+        repr(eval(repr(box.min()), NAMESPACE)) == repr(box.min()),
+        "the extreme point rebuilds",
+    )
+
+
+def test_geometry_value_objects():
+    p2 = [geometry.Point2D([0, 0]), geometry.Point2D([1, 2])]
+    p3 = [geometry.Point3D([0, 0, 0]), geometry.Point3D([1, 0, 0]),
+          geometry.Point3D([0, 1, 0]), geometry.Point3D([0, 0, 1])]
+    s2 = geometry.Segment2D(*p2)
+    check_repr(s2, "Segment2D(Point2D([0.0, 0.0]), Point2D([1.0, 2.0]))")
+    s3 = geometry.Segment3D(p3[0], p3[1])
+    check_repr(s3, "Segment3D(Point3D([0.0, 0.0, 0.0]), Point3D([1.0, 0.0, 0.0]))")
+    check(repr(eval(repr(s3), NAMESPACE)) == repr(s3), "Segment3D rebuilds")
+    check(repr(eval(repr(s2), NAMESPACE)) == repr(s2), "Segment2D rebuilds")
+    check_str_unchanged_if_any(s3)
+    tetra = geometry.Tetrahedron(*p3)
+    check_repr(
+        tetra,
+        "Tetrahedron(Point3D([0.0, 0.0, 0.0]), Point3D([1.0, 0.0, 0.0]), "
+        "Point3D([0.0, 1.0, 0.0]), Point3D([0.0, 0.0, 1.0]))",
+    )
+    check(repr(eval(repr(tetra), NAMESPACE)) == repr(tetra), "Tetrahedron rebuilds")
+    plane = geometry.Plane(geometry.Vector3D([0, 0, 2]), p3[1])
+    check_repr(plane, "Plane(normal=Vector3D([0.0, 0.0, 1.0]), origin=Point3D([1.0, 0.0, 0.0]))")
+    check(repr(eval(repr(plane), NAMESPACE)) == repr(plane), "Plane rebuilds")
+    circle = geometry.Circle(plane, 2.5)
+    check_repr(
+        circle,
+        "Circle(plane=Plane(normal=Vector3D([0.0, 0.0, 1.0]), "
+        "origin=Point3D([1.0, 0.0, 0.0])), radius=2.5)",
+    )
+    check(repr(eval(repr(circle), NAMESPACE)) == repr(circle), "Circle rebuilds")
+    for dimension, origin, direction in (
+        (2, geometry.Point2D([1, 2]), geometry.Vector2D([0, 3])),
+        (3, geometry.Point3D([1, 2, 3]), geometry.Vector3D([4, 0, 0])),
+    ):
+        sphere = getattr(geometry, f"Sphere{dimension}D")(origin, 0.5)
+        check_repr(sphere, f"Sphere{dimension}D(origin={repr(origin)}, radius=0.5)")
+        check(repr(eval(repr(sphere), NAMESPACE)) == repr(sphere), "Sphere rebuilds")
+        for kind in ("Ray", "InfiniteLine"):
+            obj = getattr(geometry, f"{kind}{dimension}D")(direction, origin)
+            normalized = repr(obj.direction())
+            check_repr(obj, f"{kind}{dimension}D(direction={normalized}, origin={repr(origin)})")
+            check(repr(eval(repr(obj), NAMESPACE)) == repr(obj), f"{kind}{dimension}D rebuilds")
+    cylinder = geometry.Cylinder(geometry.Segment3D(p3[0], p3[3]), 0.25)
+    check_repr(
+        cylinder,
+        "Cylinder(axis=Segment3D(Point3D([0.0, 0.0, 0.0]), Point3D([0.0, 0.0, 1.0])), radius=0.25)",
+    )
+    check(repr(eval(repr(cylinder), NAMESPACE)) == repr(cylinder), "Cylinder rebuilds")
+    angle = geometry.Angle.create_from_radians(0.5)
+    check_repr(angle, "Angle.create_from_radians(0.5)")
+    rebuilt = eval(repr(angle), NAMESPACE)
+    check(rebuilt == angle, "Angle rebuilds")
+    third = geometry.Angle.create_from_degrees(1)
+    check(eval(repr(third), NAMESPACE) == third, "Angle from degrees rebuilds exactly")
+
+
+def check_str_unchanged_if_any(value):
+    if hasattr(value, "string"):
+        check_str_unchanged(value)
+
+
+def test_ray_tracing_and_polygon_edge():
+    result = model.RayTracingResult()
+    check_repr(result, "RayTracingResult(position=RayTracingResult.Position.outside)")
+    result.position = model.RayTracingResult.Position.on_border
+    check_repr(result, "RayTracingResult(position=RayTracingResult.Position.on_border)")
+    edge = model.SurfacePolygonEdge(mesh.PolygonEdge(3, 1))
+    edge.vertices = [7, 8]
+    check_repr(
+        edge,
+        "SurfacePolygonEdge(facet=PolygonEdge(polygon_id=3, edge_id=1), vertices=[7, 8])",
+    )
 
 
 def test_geometry_objects():
@@ -330,6 +436,9 @@ def test_models():
 
 if __name__ == "__main__":
     test_points_and_vectors()
+    test_special_doubles()
+    test_geometry_value_objects()
+    test_ray_tracing_and_polygon_edge()
     test_geometry_objects()
     test_basic_values()
     test_mesh_elements()
