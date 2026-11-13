@@ -84,8 +84,9 @@ package read `help(opengeode)`, whose text is `bindings/python/opengeode_doc.txt
 - Registry: `register_type(cls, load=..., save=..., builder=..., ...)` in the
   pure-Python module of the binding (see `mesh.py`, `model.py`) for each new
   type; `extend_type` to add operations; `resolve` maps an object to its most
-  derived bound class (`_bound_interface`). Pass the bound functions: the
-  generic functions only call them. Add the type to the tests of
+  derived bound class (`_bound_interface`); `resolve` is not a separate function to
+  register: pass it as the `resolve=` argument of `register_type` or `extend_type`.
+  Pass the bound functions: the generic functions only call them. Add the type to the tests of
   `test-py-generic-api.py`.
 - Comments and docstrings in the binding code stay short and factual; C++ is
   formatted with the repo `.clang-format`; each file keeps its line endings
@@ -116,9 +117,39 @@ package read `help(opengeode)`, whose text is `bindings/python/opengeode_doc.txt
 
 ## Build and run
 
-Configure once (Python ON, tests ON, no superbuild, a venv providing
-pybind11 for `PYTHON_EXECUTABLE`; see `build/opengeode/CMakeCache.txt` of an
-existing build for the exact options), then:
+Configure once. A fresh worktree is configured standalone (no superbuild), reusing
+the third-party installs of an existing checkout (`<third>` below, e.g.
+`<main checkout>/build/third_party`), with a venv providing pybind11:
+
+    python3 -m venv build/venv && build/venv/bin/pip install pybind11==3.0.4
+    mkdir -p build/empty_install build/empty_pybind11
+    cmake -S . -B build/opengeode -G Ninja -DCMAKE_BUILD_TYPE=Release \
+      -DUSE_SUPERBUILD=OFF -DOPENGEODE_WITH_PYTHON=ON -DOPENGEODE_WITH_TESTS=ON \
+      -DPYTHON_EXECUTABLE=$PWD/build/venv/bin/python \
+      -DPython_EXECUTABLE=$PWD/build/venv/bin/python \
+      -Dpybind11_DIR=$(build/venv/bin/python -m pybind11 --cmakedir) \
+      -DOpenGeode_PATH_INSTALL=$PWD/build/empty_install \
+      -DPYBIND11_INSTALL_PREFIX=$PWD/build/empty_pybind11 \
+      -DABSEIL_INSTALL_PREFIX=<third>/abseil/install \
+      -DASYNCPLUSPLUS_INSTALL_PREFIX=<third>/asyncplusplus/install \
+      -DBITSERY_INSTALL_PREFIX=<third>/bitsery/install \
+      -DEARCUT_INSTALL_PREFIX=<third>/earcut/install \
+      -DGDAL_INSTALL_PREFIX=<third>/gdal/install \
+      -DJSON_INSTALL_PREFIX=<third>/json/install \
+      -DMINIZIP_INSTALL_PREFIX=<third>/minizip/install \
+      -DNANOFLANN_INSTALL_PREFIX=<third>/nanoflann/install \
+      -DPROJ_INSTALL_PREFIX=<third>/proj/install \
+      -DSPDLOG_INSTALL_PREFIX=<third>/spdlog/install \
+      -DSQLITE_INSTALL_PREFIX=<third>/sqlite/install \
+      -DZLIB_INSTALL_PREFIX=<third>/zlib/install \
+      -DCMAKE_INSTALL_PREFIX=$PWD/build/opengeode/install
+
+Set `OpenGeode_PATH_INSTALL` and `PYBIND11_INSTALL_PREFIX` to an empty directory
+before any `ninja install`: they feed `install(DIRECTORY <dir>/ DESTINATION .)`,
+which copies the whole filesystem root when they are empty strings. Never take
+`CMAKE_INSTALL_PREFIX` from another build (it would overwrite its install), and
+check `grep 'TYPE DIRECTORY' build/opengeode/cmake_install.cmake` before installing.
+`build/opengeode/CMakeCache.txt` of an existing build shows the exact options. Then:
 
     ninja -C build/opengeode -j10
     ctest --test-dir build/opengeode -R py -j8 --output-on-failure
