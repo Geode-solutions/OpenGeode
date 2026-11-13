@@ -104,14 +104,7 @@ namespace geode
 
 PYBIND11_MODULE( opengeode_py_mesh, module )
 {
-    try
-    {
-        pybind11::module::import( "opengeode_py_basic" );
-    }
-    catch( ... )
-    {
-        pybind11::module::import( "opengeode" );
-    }
+    pybind11::module::import( "opengeode_py_basic" );
     pybind11::add_ostream_redirect( module );
     module.doc() = "OpenGeode Python binding for mesh";
     pybind11::class_< geode::OpenGeodeMeshLibrary >(
