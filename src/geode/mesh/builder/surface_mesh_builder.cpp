@@ -763,6 +763,11 @@ namespace geode
     std::vector< index_t > SurfaceMeshBuilder< dimension >::delete_polygons(
         const std::vector< bool >& to_delete )
     {
+        OpenGeodeMeshException::check_exception(
+            to_delete.size() == surface_mesh_.nb_polygons(), nullptr,
+            OpenGeodeException::TYPE::data,
+            "[SurfaceMeshBuilder::delete_polygons] to_delete should have one "
+            "value per polygon" );
         const auto old2new = mapping_after_deletion( to_delete );
         if( absl::c_find( to_delete, true ) == to_delete.end() )
         {
@@ -795,6 +800,11 @@ namespace geode
     std::vector< index_t > SurfaceMeshBuilder< dimension >::permute_polygons(
         absl::Span< const index_t > permutation )
     {
+        OpenGeodeMeshException::check_exception(
+            permutation.size() == surface_mesh_.nb_polygons(), nullptr,
+            OpenGeodeException::TYPE::data,
+            "[SurfaceMeshBuilder::permute_polygons] permutation should have "
+            "one value per polygon" );
         const auto old2new = old2new_permutation( permutation );
         update_polygon_around( surface_mesh_, *this, old2new );
         update_polygon_adjacencies( old2new );

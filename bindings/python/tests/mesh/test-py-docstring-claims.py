@@ -642,8 +642,7 @@ def test_graph_builder_results():
     )
     check(graph.edge_vertex(mesh.EdgeVertex(0, 1)) == 2, "edge endpoints after deletion")
     check(len(graph.edges_around_vertex(0)) == 1, "edges around a vertex after deletion")
-    # Error paths, on a graph that is not used afterwards (a rejected call
-    # may leave the edges around the vertices inconsistent)
+    # Error paths
     other = mesh.Graph.create()
     other_builder = mesh.GraphBuilder.create(other)
     other_builder.create_vertices(3)

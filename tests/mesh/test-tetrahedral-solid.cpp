@@ -899,9 +899,82 @@ void test_std_hash()
         "std::hash of PolyhedronFacetEdge should not collide" );
 }
 
+template < typename Function >
+void expect_data_error( Function&& function, std::string_view message )
+{
+    bool thrown{ false };
+    try
+    {
+        function();
+    }
+    catch( const geode::OpenGeodeException& exception )
+    {
+        thrown = true;
+        geode::OpenGeodeMeshException::test(
+            exception.type() == geode::OpenGeodeException::TYPE::data,
+            "[Test] ", message, " should be a data error" );
+    }
+    geode::OpenGeodeMeshException::test(
+        thrown, "[Test] ", message, " should throw" );
+}
+
+void test_invalid_polyhedron_operations()
+{
+    auto solid = geode::TetrahedralSolid3D::create();
+    auto builder = geode::TetrahedralSolidBuilder3D::create( *solid );
+    builder->create_vertices( 5 );
+    builder->create_tetrahedron( { 0, 1, 2, 3 } );
+    builder->create_tetrahedron( { 1, 2, 3, 4 } );
+    const auto check_intact = [&solid]( std::string_view when ) {
+        geode::OpenGeodeMeshException::test( solid->nb_polyhedra() == 2,
+            "[Test] Wrong number of polyhedra after ", when );
+        geode::OpenGeodeMeshException::test(
+            solid->polyhedron_vertex( { 0, 0 } ) == 0
+                && solid->polyhedron_vertex( { 1, 3 } ) == 4,
+            "[Test] Polyhedron vertices changed after ", when );
+        const auto around_0 = solid->polyhedron_around_vertex( 0 );
+        const auto around_4 = solid->polyhedron_around_vertex( 4 );
+        geode::OpenGeodeMeshException::test(
+            around_0 && around_0->polyhedron_id == 0 && around_4
+                && around_4->polyhedron_id == 1,
+            "[Test] Polyhedron around vertex changed after ", when );
+    };
+    expect_data_error(
+        [&] {
+            geode_unused( builder->permute_polyhedra( { 0 } ) );
+        },
+        "permute_polyhedra with too few values" );
+    check_intact( "short permutation" );
+    expect_data_error(
+        [&] {
+            geode_unused( builder->permute_polyhedra( { 0, 1, 2 } ) );
+        },
+        "permute_polyhedra with too many values" );
+    check_intact( "long permutation" );
+    expect_data_error(
+        [&] {
+            geode_unused( builder->delete_polyhedra( { true } ) );
+        },
+        "delete_polyhedra with too few flags" );
+    check_intact( "short delete flags" );
+    expect_data_error(
+        [&] {
+            geode_unused( builder->delete_polyhedra( { true, false, false } ) );
+        },
+        "delete_polyhedra with too many flags" );
+    check_intact( "long delete flags" );
+    expect_data_error(
+        [&] {
+            geode_unused( builder->delete_polyhedra( { false } ) );
+        },
+        "delete_polyhedra with too few flags, none to delete" );
+    check_intact( "short delete flags, none to delete" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
+    test_invalid_polyhedron_operations();
     test_backward_v18_5();
     auto solid = geode::TetrahedralSolid3D::create(
         geode::OpenGeodeTetrahedralSolid3D::impl_name_static() );

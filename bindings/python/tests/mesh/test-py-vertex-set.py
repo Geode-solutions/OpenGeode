@@ -22,6 +22,7 @@
 import geode_test_env
 
 import opengeode_py_mesh as mesh
+import opengeode
 
 mesh.OpenGeodeMeshLibrary.initialize()
 
@@ -49,9 +50,30 @@ def test_clone(vertex_set):
         raise ValueError("[Test] VertexSet2 should have 5 vertices")
 
 
+def expect_data_error(function, message):
+    try:
+        function()
+    except opengeode.OpenGeodeDataError:
+        return
+    raise ValueError(f"[Test] {message} should raise an OpenGeodeDataError")
+
+
+def test_invalid_delete_vertices():
+    vertex_set = mesh.VertexSet.create()
+    builder = mesh.VertexSetBuilder.create(vertex_set)
+    builder.create_vertices(3)
+    for flags in [[True], [False], [True, False, False, False], []]:
+        expect_data_error(lambda: builder.delete_vertices(flags), f"delete_vertices({flags})")
+        if vertex_set.nb_vertices() != 3:
+            raise ValueError("[Test] The vertex set should be unchanged")
+    if builder.delete_vertices([False, True, False]) != [0, opengeode.NO_ID, 1]:
+        raise ValueError("[Test] A valid deletion should still work")
+
+
 if __name__ == '__main__':
     vertex_set = mesh.VertexSet.create()
     builder = mesh.VertexSetBuilder.create(vertex_set)
     test_create_vertices(vertex_set, builder)
     test_delete_vertex(vertex_set, builder)
     test_clone(vertex_set)
+    test_invalid_delete_vertices()

@@ -125,6 +125,52 @@ def test_delete_isolated_vertices(graph, builder):
         raise ValueError("[Test] Graph2 should have 2 edges")
 
 
+def expect_data_error(function, message):
+    try:
+        function()
+    except opengeode.OpenGeodeDataError:
+        return
+    raise ValueError(f"[Test] {message} should raise an OpenGeodeDataError")
+
+
+def test_invalid_edge_operations():
+    graph = mesh.Graph.create()
+    builder = mesh.GraphBuilder.create(graph)
+    builder.create_vertices(3)
+    for vertices in [(0, 1), (1, 2), (0, 2)]:
+        builder.create_edge_with_vertices(*vertices)
+
+    def check_intact(when):
+        if graph.nb_edges() != 3:
+            raise ValueError(f"[Test] Wrong number of edges after {when}")
+        expected = [[0, 1], [1, 2], [0, 2]]
+        if [graph.edge_vertices(e) for e in range(3)] != expected:
+            raise ValueError(f"[Test] Edge vertices changed after {when}")
+        for vertex in range(3):
+            around = graph.edges_around_vertex(vertex)
+            if len(around) != 2:
+                raise ValueError(f"[Test] Edges around vertex {vertex} changed after {when}")
+            for edge_vertex in around:
+                if graph.edge_vertex(edge_vertex) != vertex:
+                    raise ValueError(f"[Test] Wrong edge around vertex {vertex} after {when}")
+
+    for permutation in [[0, 1], [0, 1, 2, 3], [0, 0, 1], [0, 1, 3], []]:
+        expect_data_error(
+            lambda: builder.permute_edges(permutation), f"permute_edges{permutation}"
+        )
+        check_intact(f"permute_edges{permutation}")
+    for flags in [[True], [True, False, False, False], [False], []]:
+        expect_data_error(
+            lambda: builder.delete_edges(flags), f"delete_edges{flags}"
+        )
+        check_intact(f"delete_edges{flags}")
+    # The graph is still usable
+    if builder.permute_edges([2, 1, 0]) != [2, 1, 0]:
+        raise ValueError("[Test] Wrong mapping of a valid permutation")
+    if builder.delete_edges([False, True, False]) != [0, opengeode.NO_ID, 1]:
+        raise ValueError("[Test] Wrong mapping of a valid deletion")
+
+
 if __name__ == '__main__':
     mesh.OpenGeodeMeshLibrary.initialize()
     graph = mesh.Graph.create()
@@ -137,3 +183,4 @@ if __name__ == '__main__':
     test_delete_edge(graph, builder)
     test_clone(graph)
     test_delete_isolated_vertices(graph, builder)
+    test_invalid_edge_operations()
