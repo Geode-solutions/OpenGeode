@@ -520,6 +520,42 @@ def test_empty_inputs():
     )
 
 
+def test_empty_columns_are_not_empty_inputs():
+    # No row is nothing to create, but no column is a wrong shape
+    for shape in [(5, 0), (2, 0)]:
+        empty = numpy.empty(shape)
+        point_set = mesh.PointSet3D.create()
+        builder = mesh.PointSetBuilder3D.create(point_set)
+        check_raises(
+            ValueError,
+            f"points must have shape (n, 3), got {shape}",
+            lambda: builder.create_points(empty),
+            f"create_points of an array of shape {shape}",
+        )
+        check(point_set.nb_vertices() == 0, "no point created from a wrong shape")
+        surface, surface_builder = square_surface()
+        check_raises(
+            ValueError,
+            f"must have shape (n, 3), got {shape}",
+            lambda: surface_builder.create_triangles(empty.astype(numpy.int32)),
+            f"create_triangles of an array of shape {shape}",
+        )
+        check(surface.nb_polygons() == 0, "no triangle created from a wrong shape")
+        curve = mesh.EdgedCurve3D.create()
+        curve_builder = mesh.EdgedCurveBuilder3D.create(curve)
+        check_raises(
+            ValueError,
+            f"must have shape (n, 2), got {shape}",
+            lambda: curve_builder.create_edges_with_vertices(empty.astype(numpy.int32)),
+            f"create_edges_with_vertices of an array of shape {shape}",
+        )
+    # No row, whatever the number of columns, stays accepted
+    point_set = mesh.PointSet3D.create()
+    builder = mesh.PointSetBuilder3D.create(point_set)
+    check(builder.create_points(numpy.empty((0, 0))) == 0, "(0, 0) points")
+    check(builder.create_points(numpy.empty((0, 5))) == 0, "(0, 5) points")
+
+
 def test_builder_without_mesh():
     # A builder that does not know its mesh cannot check the vertices
     surface, builder = square_surface()
@@ -960,6 +996,7 @@ if __name__ == "__main__":
     test_triangles_atomic_with_late_invalid_row()
     test_polygons()
     test_empty_inputs()
+    test_empty_columns_are_not_empty_inputs()
     test_builder_without_mesh()
     test_keyword_arguments()
     test_polygons_of_a_triangulated_surface()

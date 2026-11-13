@@ -24,6 +24,8 @@
 #include "../common.hpp"
 #include "../numpy_access.hpp"
 
+#include <cmath>
+
 #include <geode/basic/attribute.hpp>
 #include <geode/basic/constant_attribute.hpp>
 #include <geode/basic/sparse_attribute.hpp>
@@ -146,7 +148,7 @@ namespace geode
     {
         using Traits = AttributeArrayTraits< Type >;
         const auto nb_elements = attribute.size();
-        if( nb_elements == 0 && values.size() == 0 )
+        if( nb_elements == 0 && is_empty_input( values ) )
         {
             // Nothing to set, whatever the dtype and shape (e.g. [])
             return;

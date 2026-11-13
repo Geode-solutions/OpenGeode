@@ -110,6 +110,18 @@ namespace geode
     } // namespace numpy_detail
 
     /*!
+     * Return true for an array that holds nothing, which is accepted
+     * whatever its dtype and the other extents: a one dimensional array (such
+     * as []) or an array without row (shape (0, n)). An array of shape (n, 0)
+     * is not empty input: its shape is checked like any other.
+     */
+    inline bool is_empty_input( const pybind11::array& array )
+    {
+        return array.size() == 0
+               && ( array.ndim() == 1 || array.shape( 0 ) == 0 );
+    }
+
+    /*!
      * Raise a ValueError if the array is not of the given shape. A negative
      * extent in the expected shape matches any size.
      */

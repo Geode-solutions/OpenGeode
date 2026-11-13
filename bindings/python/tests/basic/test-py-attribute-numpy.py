@@ -375,6 +375,27 @@ def test_empty_values():
     )
 
 
+def test_empty_columns_are_not_empty_values():
+    manager = basic.AttributeManager()
+    attribute = create_attribute(manager, "double", 0.0)
+    check_raises(
+        ValueError,
+        "values must have shape (0,), got (5, 0)",
+        lambda: attribute.set_values_array(numpy.empty((5, 0))),
+        "values with no column for an empty attribute",
+    )
+    vectors = create_vector_attribute(manager, "arraydouble2")
+    check_raises(
+        ValueError,
+        "values must have shape (0, 2), got (5, 0)",
+        lambda: vectors.set_values_array(numpy.empty((5, 0))),
+        "vectors with no column for an empty attribute",
+    )
+    # No row stays accepted, with any dtype
+    vectors.set_values_array(numpy.empty((0, 2), dtype=object))
+    check(vectors.values_array().shape == (0, 2), "no row")
+
+
 def test_attribute_of_a_mesh():
     point_set = mesh.PointSet3D.create()
     builder = mesh.PointSetBuilder3D.create(point_set)
@@ -420,4 +441,5 @@ if __name__ == "__main__":
     test_input_dtypes()
     test_float_conversions()
     test_empty_values()
+    test_empty_columns_are_not_empty_values()
     test_attribute_of_a_mesh()

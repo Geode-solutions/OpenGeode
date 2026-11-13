@@ -106,7 +106,7 @@ namespace geode::numpy_bindings
         geode::TypedObject< Builder > self, const geode::ArrayLike& points )
     {
         constexpr auto context = "create_points";
-        if( points.size() == 0 )
+        if( geode::is_empty_input( points ) )
         {
             // An empty array, whatever its dtype and shape (e.g. []), creates
             // nothing
@@ -185,7 +185,7 @@ namespace geode::numpy_bindings
         Create create )
     {
         const auto& mesh = builder_mesh< Mesh >( context, self );
-        if( elements.size() == 0 )
+        if( geode::is_empty_input( elements ) )
         {
             // An empty array, whatever its dtype and shape (e.g. []), creates
             // nothing
