@@ -33,8 +33,10 @@ namespace geode
     {
         module
             .def( "filter_brep_components_with_regards_to_blocks",
-                &filter_brep_components_with_regards_to_blocks )
+                &filter_brep_components_with_regards_to_blocks,
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
             .def( "filter_section_components_with_regards_to_surfaces",
-                &filter_section_components_with_regards_to_surfaces );
+                &filter_section_components_with_regards_to_surfaces,
+                pybind11::call_guard< pybind11::gil_scoped_release >() );
     }
 } // namespace geode

@@ -43,7 +43,8 @@
         "NNSearch" + std::to_string( dimension ) + "D";                        \
     pybind11::class_< NNSearch##dimension##D >(                                \
         module, name##dimension.c_str() )                                      \
-        .def( pybind11::init< std::vector< Point< dimension > > >() )          \
+        .def( pybind11::init< std::vector< Point< dimension > > >(),           \
+            pybind11::call_guard< pybind11::gil_scoped_release >() )           \
         .def( "nb_points", &NNSearch##dimension##D::nb_points )                \
         .def( "point", &NNSearch##dimension##D::point )                        \
         .def( "closest_neighbor", &NNSearch##dimension##D::closest_neighbor )  \
@@ -53,12 +54,14 @@
         .def( "radius_colocated_index_mapping",                                \
             static_cast< NNSearch##dimension##D::ColocatedInfo (               \
                 NNSearch##dimension##D::* )( double ) const >(                 \
-                &NNSearch##dimension##D::colocated_index_mapping ) )           \
+                &NNSearch##dimension##D::colocated_index_mapping ),            \
+            pybind11::call_guard< pybind11::gil_scoped_release >() )           \
         .def( "frame_colocated_index_mapping",                                 \
             static_cast< NNSearch##dimension##D::ColocatedInfo (               \
                 NNSearch##dimension##D::* )( const Frame##dimension##D& )      \
                     const >(                                                   \
-                &NNSearch##dimension##D::colocated_index_mapping ) )
+                &NNSearch##dimension##D::colocated_index_mapping ),            \
+            pybind11::call_guard< pybind11::gil_scoped_release >() )
 
 namespace geode
 {

@@ -46,9 +46,11 @@ namespace geode
             .def( "section_active_coordinate_reference_systems",
                 &section_active_coordinate_reference_systems )
             .def( "create_brep_coordinate_system",
-                &create_brep_coordinate_system )
+                &create_brep_coordinate_system,
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
             .def( "create_section_coordinate_system",
-                &create_section_coordinate_system )
+                &create_section_coordinate_system,
+                pybind11::call_guard< pybind11::gil_scoped_release >() )
             .def( "set_brep_active_coordinate_system",
                 &set_brep_active_coordinate_system )
             .def( "set_section_active_coordinate_system",

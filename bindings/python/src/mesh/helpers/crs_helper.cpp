@@ -39,7 +39,8 @@
     const auto name##mesh##dimension = absl::StrCat(                           \
         "create_", #mesh, "_coordinate_system", dimension, "D" );              \
     module.def( name##mesh##dimension.c_str(),                                 \
-        &create_##mesh##_coordinate_system< dimension > )
+        &create_##mesh##_coordinate_system< dimension >,                       \
+        pybind11::call_guard< pybind11::gil_scoped_release >() )
 
 namespace geode
 {
