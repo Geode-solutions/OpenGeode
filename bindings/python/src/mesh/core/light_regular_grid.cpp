@@ -43,6 +43,16 @@ namespace
             pybind11::smart_holder >( module, class_name.c_str(),
             "Regular grid that only stores its geometry (origin, cell numbers "
             "and lengths), without explicit vertices or cells" )
+            .def(
+                "__repr__",
+                []( const geode::LightRegularGrid< dimension >& object ) {
+                    return geode::identifier_repr( object,
+                        geode::python_type_name( object ),
+                        { { "nb_cells",
+                            geode::python_repr( object.nb_cells() ) } } );
+                },
+                "Return an unambiguous description of the grid: its type, its "
+                "id, its name if it has one and its number of cells" )
             .def( pybind11::init< geode::Point< dimension >,
                       std::array< geode::index_t, dimension >,
                       std::array< double, dimension > >(),

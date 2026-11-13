@@ -34,6 +34,16 @@ namespace geode
     {
         pybind11::class_< Graph, VertexSet, pybind11::smart_holder >(
             module, "Graph", "Graph: a set of vertices linked by edges" )
+            .def(
+                "__repr__",
+                []( const Graph& mesh ) {
+                    return identifier_repr( mesh, mesh.type_name().get(),
+                        { { "nb_vertices", python_repr( mesh.nb_vertices() ) },
+                            { "nb_edges", python_repr( mesh.nb_edges() ) } } );
+                },
+                "Return an unambiguous description of the graph: its type, its "
+                "id, its name if it has one and its numbers of vertices and "
+                "edges" )
             .def_static( "create",
                 static_cast< std::unique_ptr< Graph > ( * )() >(
                     &Graph::create ),

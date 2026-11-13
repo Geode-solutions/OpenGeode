@@ -53,6 +53,19 @@ namespace geode
             "containers and of PhysicalProperties" )
             .def( pybind11::init<>(), "Build an empty BRep" )
             .def(
+                "__repr__",
+                []( const BRep& model ) {
+                    return identifier_repr( model, python_type_name( model ),
+                        { { "nb_corners", python_repr( model.nb_corners() ) },
+                            { "nb_lines", python_repr( model.nb_lines() ) },
+                            { "nb_surfaces",
+                                python_repr( model.nb_surfaces() ) },
+                            { "nb_blocks",
+                                python_repr( model.nb_blocks() ) } } );
+                },
+                "Return an unambiguous description of the model: its type, its "
+                "id, its name if it has one and its numbers of components" )
+            .def(
                 "boundary_corners",
                 []( const BRep& brep, const Line3D& line ) {
                     std::vector< const Corner3D* > components;

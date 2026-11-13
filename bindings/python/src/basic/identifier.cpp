@@ -32,6 +32,14 @@ namespace geode
     {
         pybind11::class_< Identifier, pybind11::smart_holder >(
             module, "Identifier", "Unique id and optional name of an object" )
+            .def(
+                "__repr__",
+                []( const Identifier& object ) {
+                    return identifier_repr(
+                        object, python_type_name( object ), {} );
+                },
+                "Return an unambiguous description of the object: its type, "
+                "its id and its name if it has one" )
             .def( "id", &Identifier::id, "Return the uuid of the object" )
             .def( "name", &Identifier::name,
                 "Return the name of the object, or None if it has none" );

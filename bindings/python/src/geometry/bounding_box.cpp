@@ -33,7 +33,12 @@
         "BoundingBox" + std::to_string( dimension ) + "D";                     \
     define_string_representation(                                              \
         pybind11::class_< BoundingBox##dimension##D >(                         \
-            module, name##dimension.c_str(), "Axis-aligned bounding box" ) )   \
+            module, name##dimension.c_str(), "Axis-aligned bounding box" ),    \
+        []( const BoundingBox##dimension##D& box ) {                           \
+            return python_call_repr( "BoundingBox" #dimension "D",             \
+                { "min=" + python_repr( box.min() ),                           \
+                    "max=" + python_repr( box.max() ) } );                     \
+        } )                                                                    \
         .def( pybind11::init<>(), "Build an empty bounding box" )              \
         .def( "add_box", &BoundingBox##dimension##D::add_box,                  \
             pybind11::arg( "box" ),                                            \

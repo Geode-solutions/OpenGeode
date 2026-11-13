@@ -31,7 +31,11 @@ namespace geode
     {
         define_string_representation(
             pybind11::class_< GreyscaleColor >( module, "GreyscaleColor",
-                "Grey level of a pixel, between 0 and 255" ) )
+                "Grey level of a pixel, between 0 and 255" ),
+            []( const GreyscaleColor& color ) {
+                return python_call_repr(
+                    "GreyscaleColor", { python_repr( color.value() ) } );
+            } )
             .def( pybind11::init<>(), "Build a black color" )
             .def( pybind11::init< local_index_t >(), pybind11::arg( "value" ),
                 "Build a color from its grey level (0 to 255)" )

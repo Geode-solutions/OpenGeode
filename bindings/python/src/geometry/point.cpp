@@ -39,7 +39,11 @@ namespace
     define_string_representation(                                              \
         pybind11::class_< Point##dimension##D >( module,                       \
             name##dimension.c_str(),                                           \
-            "Point of the space, defined by its coordinates" ) )               \
+            "Point of the space, defined by its coordinates" ),                \
+        []( const Point##dimension##D& point ) {                               \
+            return python_call_repr(                                           \
+                "Point" #dimension "D", { coordinates_repr( point ) } );       \
+        } )                                                                    \
         .def( pybind11::init<>(), "Build a point at the origin" )              \
         .def( pybind11::init< std::array< double, dimension > >(),             \
             pybind11::arg( "values" ), "Build a point from its coordinates" )  \

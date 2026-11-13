@@ -31,7 +31,11 @@ namespace geode
     {
         define_string_representation(
             pybind11::class_< uuid >(
-                module, "uuid", "Universally unique identifier of an object" ) )
+                module, "uuid", "Universally unique identifier of an object" ),
+            []( const uuid& id ) {
+                return python_call_repr(
+                    "uuid", { python_repr( id.string() ) } );
+            } )
             .def( pybind11::init<>(), "Generate a new unique uuid (version 7, "
                                       "ordered by creation time)" )
             .def( pybind11::init< std::string_view >(),

@@ -107,7 +107,15 @@ namespace
     define_string_representation(                                              \
         pybind11::class_< Triangle##dimension##D >( module,                    \
             triangle##dimension.c_str(),                                       \
-            "Triangle defined by its three vertices" ) )                       \
+            "Triangle defined by its three vertices" ),                        \
+        []( const Triangle##dimension##D& triangle ) {                         \
+            const auto& vertices = triangle.vertices();                        \
+            return python_call_repr( "Triangle" #dimension "D",                \
+                { python_repr( geode::Point< dimension >{ vertices[0] } ),     \
+                    python_repr( geode::Point< dimension >{ vertices[1] } ),   \
+                    python_repr(                                               \
+                        geode::Point< dimension >{ vertices[2] } ) } );        \
+        } )                                                                    \
         .def( pybind11::init< const Point< dimension >&,                       \
                   const Point< dimension >&, const Point< dimension >& >(),    \
             pybind11::keep_alive< 1, 2 >(), pybind11::keep_alive< 1, 3 >(),    \

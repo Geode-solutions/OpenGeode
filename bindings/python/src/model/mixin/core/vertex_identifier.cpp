@@ -34,7 +34,12 @@ namespace geode
                 pybind11::class_< ComponentMeshVertex >( module,
                     "ComponentMeshVertex",
                     "Identify a vertex of the mesh of a model component by the "
-                    "component and the vertex index in its mesh" ) )
+                    "component and the vertex index in its mesh" ),
+                []( const ComponentMeshVertex& vertex ) {
+                    return python_call_repr( "ComponentMeshVertex",
+                        { "component_id=" + python_repr( vertex.component_id ),
+                            "vertex_id=" + python_repr( vertex.vertex ) } );
+                } )
                 .def( pybind11::init< ComponentID, index_t >(),
                     pybind11::arg( "component_id" ),
                     pybind11::arg( "vertex_id" ),

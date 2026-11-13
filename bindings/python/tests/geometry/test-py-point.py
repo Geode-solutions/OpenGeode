@@ -59,8 +59,12 @@ def test_operators():
 
 def test_string():
     p = geom.Point3D([1, 2, 3])
-    if str(p) != p.string() or repr(p) != p.string():
-        raise ValueError("[Test] str/repr of Point should return its string")
+    if str(p) != p.string():
+        raise ValueError("[Test] str of Point should return its string")
+    if repr(p) != "Point3D([1.0, 2.0, 3.0])":
+        raise ValueError("[Test] repr of Point should give its type and coordinates")
+    if eval(repr(p), {"Point3D": geom.Point3D}) != p:
+        raise ValueError("[Test] repr of Point should rebuild the same point")
 
 
 if __name__ == '__main__':

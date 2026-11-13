@@ -32,7 +32,17 @@
         pybind11::class_< CoordinateSystem##dimension##D,                      \
             pybind11::smart_holder >( module, name##dimension.c_str(),         \
             "Coordinate system defined by an origin and one direction per "    \
-            "axis" ) )                                                         \
+            "axis" ),                                                          \
+        []( const CoordinateSystem##dimension##D& system ) {                   \
+            std::array< Vector< dimension >, dimension > directions;           \
+            for( const auto i : LRange{ dimension } )                          \
+            {                                                                  \
+                directions[i] = system.direction( i );                         \
+            }                                                                  \
+            return python_call_repr( "CoordinateSystem" #dimension "D",        \
+                { "directions=" + python_repr( directions ),                   \
+                    "origin=" + python_repr( system.origin() ) } );            \
+        } )                                                                    \
         .def( pybind11::init<>(),                                              \
             "Build the canonical coordinate system, centered on the origin" )  \
         .def( pybind11::init< std::array< Vector< dimension >, dimension >,    \

@@ -33,6 +33,15 @@ namespace geode
     {
         pybind11::class_< VertexSet, Identifier, pybind11::smart_holder >(
             module, "VertexSet", "Set of vertices, the base of every mesh" )
+            .def(
+                "__repr__",
+                []( const VertexSet& mesh ) {
+                    return identifier_repr( mesh, mesh.type_name().get(),
+                        { { "nb_vertices",
+                            python_repr( mesh.nb_vertices() ) } } );
+                },
+                "Return an unambiguous description of the mesh: its type, its "
+                "id, its name if it has one and its number of vertices" )
             .def_static( "create",
                 static_cast< std::unique_ptr< VertexSet > ( * )() >(
                     &VertexSet::create ),

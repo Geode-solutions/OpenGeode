@@ -30,8 +30,16 @@
     const auto name##dimension = "Frame" + std::to_string( dimension ) + "D";  \
     define_string_representation(                                              \
         pybind11::class_< Frame##dimension##D >( module,                       \
-            name##dimension.c_str(),                                           \
-            "Set of one direction vector per axis" ) )                         \
+            name##dimension.c_str(), "Set of one direction vector per axis" ), \
+        []( const Frame##dimension##D& frame ) {                               \
+            std::array< Vector< dimension >, dimension > directions;           \
+            for( const auto i : LRange{ dimension } )                          \
+            {                                                                  \
+                directions[i] = frame.direction( i );                          \
+            }                                                                  \
+            return python_call_repr(                                           \
+                "Frame" #dimension "D", { python_repr( directions ) } );       \
+        } )                                                                    \
         .def( pybind11::init<>(), "Build the canonical frame" )                \
         .def(                                                                  \
             pybind11::init< std::array< Vector< dimension >, dimension > >(),  \

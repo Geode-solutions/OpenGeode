@@ -32,21 +32,41 @@ namespace geode
         auto vertex = define_string_representation(
             pybind11::class_< PolyhedronVertex >( module, "PolyhedronVertex",
                 "Local vertex of a polyhedron: the polyhedron index and the "
-                "index of the vertex in the polyhedron" ) );
+                "index of the vertex in the polyhedron" ),
+            []( const PolyhedronVertex& value ) {
+                return python_call_repr( "PolyhedronVertex",
+                    { "polyhedron_id=" + python_repr( value.polyhedron_id ),
+                        "vertex_id=" + python_repr( value.vertex_id ) } );
+            } );
         auto facet = define_string_representation(
             pybind11::class_< PolyhedronFacet >( module, "PolyhedronFacet",
                 "Local facet of a polyhedron: the polyhedron index and the "
-                "index of the facet in the polyhedron" ) );
+                "index of the facet in the polyhedron" ),
+            []( const PolyhedronFacet& value ) {
+                return python_call_repr( "PolyhedronFacet",
+                    { "polyhedron_id=" + python_repr( value.polyhedron_id ),
+                        "facet_id=" + python_repr( value.facet_id ) } );
+            } );
         auto facet_vertex = define_string_representation(
             pybind11::class_< PolyhedronFacetVertex >( module,
                 "PolyhedronFacetVertex",
                 "Local vertex of a polyhedron facet: the polyhedron facet and "
-                "the index of the vertex in the facet" ) );
+                "the index of the vertex in the facet" ),
+            []( const PolyhedronFacetVertex& value ) {
+                return python_call_repr( "PolyhedronFacetVertex",
+                    { "facet=" + python_repr( value.polyhedron_facet ),
+                        "vertex_id=" + python_repr( value.vertex_id ) } );
+            } );
         auto facet_edge = define_string_representation(
             pybind11::class_< PolyhedronFacetEdge >( module,
                 "PolyhedronFacetEdge",
                 "Local edge of a polyhedron facet: the polyhedron facet and "
-                "the index of the edge in the facet" ) );
+                "the index of the edge in the facet" ),
+            []( const PolyhedronFacetEdge& value ) {
+                return python_call_repr( "PolyhedronFacetEdge",
+                    { "facet=" + python_repr( value.polyhedron_facet ),
+                        "edge_id=" + python_repr( value.edge_id ) } );
+            } );
         vertex
             .def( pybind11::init<>(),
                 "Build a polyhedron vertex with invalid indices (NO_ID, "

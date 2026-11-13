@@ -32,12 +32,22 @@ namespace geode
         auto vertex = define_string_representation(
             pybind11::class_< PolygonVertex >( module, "PolygonVertex",
                 "Local vertex of a polygon: the polygon index and the index "
-                "of the vertex in the polygon" ) );
+                "of the vertex in the polygon" ),
+            []( const PolygonVertex& value ) {
+                return python_call_repr( "PolygonVertex",
+                    { "polygon_id=" + python_repr( value.polygon_id ),
+                        "vertex_id=" + python_repr( value.vertex_id ) } );
+            } );
         auto edge = define_string_representation(
             pybind11::class_< PolygonEdge >( module, "PolygonEdge",
                 "Local edge of a polygon: the polygon index and the index of "
                 "the edge in the polygon, edge i going from the vertex i to "
-                "the vertex i + 1" ) );
+                "the vertex i + 1" ),
+            []( const PolygonEdge& value ) {
+                return python_call_repr( "PolygonEdge",
+                    { "polygon_id=" + python_repr( value.polygon_id ),
+                        "edge_id=" + python_repr( value.edge_id ) } );
+            } );
         vertex
             .def( pybind11::init<>(),
                 "Build a polygon vertex with invalid indices (NO_ID, NO_LID)" )

@@ -34,7 +34,12 @@ namespace geode
                 "ComponentMeshElement",
                 "Identify an element (an edge, a polygon, a polyhedron...) of "
                 "the mesh of a model component by the component and the "
-                "element index in its mesh" ) )
+                "element index in its mesh" ),
+            []( const ComponentMeshElement& element ) {
+                return python_call_repr( "ComponentMeshElement",
+                    { "component_id=" + python_repr( element.component_id ),
+                        "element_id=" + python_repr( element.element_id ) } );
+            } )
             .def( pybind11::init< ComponentID, index_t >(),
                 pybind11::arg( "component_id" ), pybind11::arg( "element_id" ),
                 "Build the identifier of the element element_id of the mesh of "

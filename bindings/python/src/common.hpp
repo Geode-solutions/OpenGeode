@@ -40,7 +40,11 @@
 #include <absl/strings/str_cat.h>
 #include <absl/types/span.h>
 
+#include <geode/basic/identifier.hpp>
+#include <geode/basic/range.hpp>
 #include <geode/basic/types.hpp>
+#include <geode/basic/uuid.hpp>
+#include <geode/geometry/point.hpp>
 
 namespace pybind11
 {
@@ -153,26 +157,133 @@ namespace pybind11
 
 namespace geode
 {
-    template < typename Class, typename Getter, typename... Options >
-    pybind11::class_< Class, Options... > define_string_representation(
-        pybind11::class_< Class, Options... > python_class, Getter&& getter )
+    /*!
+     * Return the Python repr of the value, e.g. 1.0 for a double, 'text' for
+     * a string or Point3D([1.0, 2.0, 3.0]) for a Point3D.
+     */
+    template < typename Type >
+    std::string python_repr( const Type& value )
     {
-        python_class
-            .def( "__str__", getter,
-                "Return a readable description of the object" )
-            .def( "__repr__", std::forward< Getter >( getter ),
-                "Return a readable description of the object" );
-        return python_class;
+        return pybind11::repr( pybind11::cast( value ) )
+            .template cast< std::string >();
     }
 
-    template < typename Class, typename... Options >
+    /*!
+     * Return the repr of the coordinates of a point or vector, as a list
+     */
+    template < index_t dimension >
+    std::string coordinates_repr( const Point< dimension >& point )
+    {
+        std::array< double, dimension > coordinates;
+        for( const auto i : LRange{ dimension } )
+        {
+            coordinates[i] = point.value( i );
+        }
+        return python_repr( coordinates );
+    }
+
+    /*!
+     * Return the name of the Python class of the object, which is the name
+     * of its most derived bound class (e.g. TriangulatedSurface3D for an
+     * object seen as a VertexSet)
+     */
+    template < typename Type >
+    std::string python_type_name( const Type& object )
+    {
+        return pybind11::type::of(
+            pybind11::cast(
+                &object, pybind11::return_value_policy::reference ) )
+            .attr( "__name__" )
+            .template cast< std::string >();
+    }
+
+    /*!
+     * Return name(arguments...), where each argument is already a Python
+     * expression (a positional value or keyword=value).
+     */
+    inline std::string python_call_repr(
+        std::string_view name, std::initializer_list< std::string > arguments )
+    {
+        std::string result{ name };
+        result += '(';
+        auto first = true;
+        for( const auto& argument : arguments )
+        {
+            if( !first )
+            {
+                result += ", ";
+            }
+            first = false;
+            result += argument;
+        }
+        result += ')';
+        return result;
+    }
+
+    /*!
+     * Return the repr of an object identified by an Identifier:
+     * ClassName(id='...', name='...', fields...). The name is only given when
+     * the object has one. Each field is a pair (keyword, Python expression).
+     */
+    inline std::string identifier_repr( const Identifier& object,
+        std::string_view type_name,
+        std::initializer_list< std::pair< std::string_view, std::string > >
+            fields )
+    {
+        std::string result{ type_name };
+        result += "(id=" + python_repr( object.id().string() );
+        if( object.name() )
+        {
+            result += ", name=" + python_repr( object.name().value() );
+        }
+        for( const auto& field : fields )
+        {
+            result += ", ";
+            result += field.first;
+            result += '=';
+            result += field.second;
+        }
+        result += ')';
+        return result;
+    }
+
+    /*!
+     * Define __repr__ with the repr_getter, and __str__ and string() with the
+     * string() method of the class, which gives a readable description. The
+     * repr must be unambiguous: the type and the value for the value types
+     * (eval-able when possible), the type, the id and key counts for the meshes
+     * and models.
+     */
+    template < typename Class, typename Repr, typename... Options >
     pybind11::class_< Class, Options... > define_string_representation(
-        pybind11::class_< Class, Options... > python_class )
+        pybind11::class_< Class, Options... > python_class, Repr&& repr_getter )
     {
         python_class.def( "string", &Class::string,
             "Return a readable description of the object" );
-        return define_string_representation(
-            std::move( python_class ), &Class::string );
+        return define_string_representation( std::move( python_class ),
+            &Class::string, std::forward< Repr >( repr_getter ) );
+    }
+
+    /*!
+     * Same as above with a custom getter for __str__, and without string().
+     */
+    template < typename Class,
+        typename Getter,
+        typename Repr,
+        typename... Options >
+    pybind11::class_< Class, Options... > define_string_representation(
+        pybind11::class_< Class, Options... > python_class,
+        Getter&& getter,
+        Repr&& repr_getter )
+    {
+        python_class
+            .def( "__str__", std::forward< Getter >( getter ),
+                "Return a readable description of the object" )
+            .def( "__repr__", std::forward< Repr >( repr_getter ),
+                "Return an unambiguous description of the object: its type "
+                "and its value, or its id and main counts for the meshes and "
+                "models" );
+        return python_class;
     }
 
     /*!

@@ -32,7 +32,12 @@ namespace geode
         auto element = define_string_representation(
             pybind11::class_< MeshElement >( module, "MeshElement",
                 "Element of a mesh identified by the unique id of the mesh "
-                "and the index of the element in the mesh" ) );
+                "and the index of the element in the mesh" ),
+            []( const MeshElement& element ) {
+                return python_call_repr( "MeshElement",
+                    { "mesh_id=" + python_repr( element.mesh_id ),
+                        "element_id=" + python_repr( element.element_id ) } );
+            } );
         element
             .def( pybind11::init<>(),
                 "Build an element with a default uuid and an invalid index "

@@ -34,8 +34,12 @@ namespace
         const char* class_doc,
         const char* init_doc )
     {
-        define_string_representation(
-            pybind11::class_< Type >( module, name, class_doc ), &Type::get )
+        geode::define_string_representation(
+            pybind11::class_< Type >( module, name, class_doc ), &Type::get,
+            [name]( const Type& id ) {
+                return geode::python_call_repr(
+                    name, { geode::python_repr( id.get() ) } );
+            } )
             .def( pybind11::init< std::string >(), pybind11::arg( "value" ),
                 init_doc )
             .def( "get", &Type::get, "Return the name as a string" )

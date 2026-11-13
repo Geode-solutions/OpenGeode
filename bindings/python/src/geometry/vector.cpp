@@ -29,6 +29,14 @@
     const auto name##dimension = "Vector" + std::to_string( dimension ) + "D"; \
     pybind11::class_< Vector##dimension##D, Point##dimension##D >( module,     \
         name##dimension.c_str(), "Vector of the space, derived from Point" )   \
+        .def(                                                                  \
+            "__repr__",                                                        \
+            []( const Vector##dimension##D& vector ) {                         \
+                return python_call_repr(                                       \
+                    "Vector" #dimension "D", { coordinates_repr( vector ) } ); \
+            },                                                                 \
+            "Return an unambiguous description of the vector: its type and "   \
+            "its coordinates" )                                                \
         .def( pybind11::init<>(), "Build a null vector" )                      \
         .def( pybind11::init< std::array< double, dimension > >(),             \
             pybind11::arg( "values" ), "Build a vector from its coordinates" ) \

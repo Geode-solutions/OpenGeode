@@ -35,6 +35,10 @@ namespace geode
                 "'Line', 'Surface', 'Block' or 'ModelBoundary'" ),
             []( const ComponentType& type ) {
                 return std::string{ type.get() };
+            },
+            []( const ComponentType& type ) {
+                return python_call_repr(
+                    "ComponentType", { python_repr( type.get() ) } );
             } )
             .def(
                 pybind11::init<>(), "Build a ComponentType with an empty name" )
@@ -56,7 +60,11 @@ namespace geode
                     "Identifier of a component of a model: its type "
                     "(ComponentType) and its uuid. Hashable: do not modify "
                     "type or id of a ComponentID used as a dict key or in a "
-                    "set" ) )
+                    "set" ),
+                []( const ComponentID& id ) {
+                    return python_call_repr( "ComponentID",
+                        { python_repr( id.type ), python_repr( id.id ) } );
+                } )
                 .def( pybind11::init<>(),
                     "Build an undefined ComponentID: type 'undefined' and a "
                     "newly generated uuid" )

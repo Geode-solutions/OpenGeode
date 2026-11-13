@@ -32,7 +32,12 @@ namespace geode
         define_string_representation(
             pybind11::class_< RGBColor >( module, "RGBColor",
                 "Color of a pixel given by its red, green and blue levels, "
-                "between 0 and 255" ) )
+                "between 0 and 255" ),
+            []( const RGBColor& color ) {
+                return python_call_repr( "RGBColor",
+                    { python_repr( color.red() ), python_repr( color.green() ),
+                        python_repr( color.blue() ) } );
+            } )
             .def( pybind11::init<>(), "Build a black color" )
             .def(
                 pybind11::init< local_index_t, local_index_t, local_index_t >(),

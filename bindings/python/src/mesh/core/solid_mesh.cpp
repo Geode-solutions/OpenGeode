@@ -43,6 +43,17 @@
         CoordinateReferenceSystemManagers##dimension##D,                       \
         pybind11::smart_holder >( module, name##dimension.c_str(),             \
         "Solid made of polyhedra whose vertices have coordinates" )            \
+        .def(                                                                  \
+            "__repr__",                                                        \
+            []( const SolidMesh##dimension##D& object ) {                      \
+                return identifier_repr( object, object.type_name().get(),      \
+                    { { "nb_vertices", python_repr( object.nb_vertices() ) },  \
+                        { "nb_polyhedra",                                      \
+                            python_repr( object.nb_polyhedra() ) } } );        \
+            },                                                                 \
+            "Return an unambiguous description of the mesh: its type, its "    \
+            "id, its name if it has one and its numbers of vertices and "      \
+            "polyhedra" )                                                      \
         .def_static( "create",                                                 \
             static_cast< std::unique_ptr< SolidMesh##dimension##D > ( * )() >( \
                 &SolidMesh##dimension##D::create ),                            \

@@ -34,7 +34,12 @@ namespace geode
         auto edge_vertex = define_string_representation(
             pybind11::class_< EdgeVertex >( module, "EdgeVertex",
                 "Endpoint of a graph edge: the edge index and the endpoint "
-                "(0 or 1)" ) );
+                "(0 or 1)" ),
+            []( const EdgeVertex& value ) {
+                return python_call_repr( "EdgeVertex",
+                    { "edge_id=" + python_repr( value.edge_id ),
+                        "vertex_id=" + python_repr( value.vertex_id ) } );
+            } );
         edge_vertex
             .def( pybind11::init<>(),
                 "Build an edge endpoint with invalid indices (NO_ID, NO_LID)" )

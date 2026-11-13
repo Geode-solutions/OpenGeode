@@ -42,6 +42,17 @@
         pybind11::smart_holder >( module, name##dimension.c_str(),             \
         "Surface made of polygons (triangles, quads, ...) whose vertices "     \
         "have coordinates" )                                                   \
+        .def(                                                                  \
+            "__repr__",                                                        \
+            []( const SurfaceMesh##dimension##D& object ) {                    \
+                return identifier_repr( object, object.type_name().get(),      \
+                    { { "nb_vertices", python_repr( object.nb_vertices() ) },  \
+                        { "nb_polygons",                                       \
+                            python_repr( object.nb_polygons() ) } } );         \
+            },                                                                 \
+            "Return an unambiguous description of the mesh: its type, its "    \
+            "id, its name if it has one and its numbers of vertices and "      \
+            "polygons" )                                                       \
         .def( "are_edges_enabled",                                             \
             &SurfaceMesh##dimension##D::are_edges_enabled,                     \
             "Return True if the edges of the surface are enabled" )            \
