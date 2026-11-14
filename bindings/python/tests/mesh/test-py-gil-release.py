@@ -20,7 +20,6 @@
 # SOFTWARE.
 
 import os
-import sys
 import tempfile
 import threading
 
@@ -32,65 +31,20 @@ import opengeode_py_model as model
 import opengeode
 
 TIMEOUT = 60
-ATTEMPTS = 3
+DEADLINE = 60
 
 DATA_DIR = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "../../../../tests/data")
 )
 
-# The checks below are deterministic thanks to a huge interpreter switch
-# interval: the interpreter never forces a GIL hand-over, so a thread keeps the
-# GIL until it blocks or exits. If a bound call holds the GIL, the worker thread
-# runs the whole call (and everything after it, up to `finished.set()`) before
-# any other Python thread can run. If the call releases the GIL, the main
-# thread is scheduled as soon as the call is inside C++ and sees the call
-# still running. Holding the GIL can therefore never pass; the only possible
-# flakiness is a call finishing before the main thread wakes up, hence the
-# workloads repeat the call and `ATTEMPTS` retries are allowed.
+# The checks below use geode_test_env.assert_gil_released: with a huge
+# interpreter switch interval, a worker thread repeats the call until the main
+# thread has run. Holding the GIL can never pass, and a released call always
+# passes, whatever the machine load or the duration of the call.
 
 
-class HugeSwitchInterval:
-    def __enter__(self):
-        self.previous = sys.getswitchinterval()
-        sys.setswitchinterval(1000)
-
-    def __exit__(self, *args):
-        sys.setswitchinterval(self.previous)
-
-
-def run_in_worker(work):
-    """Run `work` in a thread; return (`finished` flag seen by the main thread
-    as soon as it could run, result)."""
-    ready = threading.Event()
-    finished = threading.Event()
-    box = {}
-
-    def target():
-        ready.set()
-        try:
-            box["result"] = work()
-        except BaseException as error:
-            box["error"] = error
-        finished.set()
-
-    thread = threading.Thread(target=target)
-    thread.start()
-    if not ready.wait(TIMEOUT):
-        raise ValueError("[Test] Worker thread did not start")
-    main_ran_during_call = not finished.is_set()
-    thread.join(TIMEOUT)
-    if "error" in box:
-        raise box["error"]
-    return main_ran_during_call, box.get("result")
-
-
-def assert_gil_released(name, work):
-    with HugeSwitchInterval():
-        for _ in range(ATTEMPTS):
-            main_ran_during_call, result = run_in_worker(work)
-            if main_ran_during_call:
-                return result
-    raise ValueError(f"[Test] {name} kept the GIL during the whole call")
+def assert_gil_released(name, call):
+    return geode_test_env.assert_gil_released(call, deadline=DEADLINE, name=name)
 
 
 def grid3d(nb_cells):
@@ -128,9 +82,7 @@ def load_brep(name):
 
 def check_distance_transform():
     def work():
-        for i in range(5):
-            mesh.euclidean_distance_transform3D(
-                grid3d(80), [[0, 0, 0]], f"gil_edt{i}")
+        mesh.euclidean_distance_transform3D(grid3d(80), [[0, 0, 0]], "gil_edt")
 
     assert_gil_released("euclidean_distance_transform3D", work)
 
@@ -140,11 +92,8 @@ def check_save_load(directory):
     filename = os.path.join(directory, "big.og_pts3d")
 
     def work():
-        loaded = None
-        for _ in range(3):
-            mesh.save_point_set3D(source, filename)
-            loaded = mesh.load_point_set3D(filename)
-        return loaded
+        mesh.save_point_set3D(source, filename)
+        return mesh.load_point_set3D(filename)
 
     loaded = assert_gil_released("save/load_point_set3D", work)
     if len(loaded) != 1 or loaded[0].nb_vertices() != source.nb_vertices():
@@ -153,21 +102,18 @@ def check_save_load(directory):
 
 def check_conversion():
     def work():
-        return [mesh.convert_grid_into_tetrahedral_solid(grid3d(20))
-                for _ in range(3)]
+        return mesh.convert_grid_into_tetrahedral_solid(grid3d(20))
 
-    solids = assert_gil_released("convert_grid_into_tetrahedral_solid", work)
-    for solid in solids:
-        if solid.nb_polyhedra() != 20 * 20 * 20 * 6:
-            raise ValueError("[Test] Wrong converted solid")
+    solid = assert_gil_released("convert_grid_into_tetrahedral_solid", work)
+    if solid.nb_polyhedra() != 20 * 20 * 20 * 6:
+        raise ValueError("[Test] Wrong converted solid")
 
 
 def check_builder_adjacencies():
     surface, builder = triangulated_surface(20000)
 
     def work():
-        for _ in range(5):
-            builder.compute_polygon_adjacencies()
+        builder.compute_polygon_adjacencies()
 
     assert_gil_released("compute_polygon_adjacencies", work)
     if surface.polygon_adjacent(mesh.PolygonEdge(0, 1)) != 1:
@@ -179,11 +125,8 @@ def check_brep_io(directory):
     filename = os.path.join(directory, "released." + brep.native_extension())
 
     def work():
-        reloaded = None
-        for _ in range(30):
-            model.save_brep(brep, filename)
-            reloaded = opengeode.load_one(model.load_brep(filename), filename)
-        return reloaded
+        model.save_brep(brep, filename)
+        return opengeode.load_one(model.load_brep(filename), filename)
 
     reloaded = assert_gil_released("save/load_brep", work)
     if reloaded.nb_blocks() != brep.nb_blocks():
@@ -196,37 +139,31 @@ def check_concatenation():
     expected = []
 
     def work():
-        results = []
-        for _ in range(20):
-            brep = load_brep("prism_curve.og_brep")
-            other = load_brep("dangling.og_brep")
-            expected.append(brep.nb_surfaces() + other.nb_surfaces())
-            model.BRepConcatener(brep).concatenate(other)
-            results.append(brep.nb_surfaces())
-        return results
+        brep = load_brep("prism_curve.og_brep")
+        other = load_brep("dangling.og_brep")
+        expected.append(brep.nb_surfaces() + other.nb_surfaces())
+        model.BRepConcatener(brep).concatenate(other)
+        return brep.nb_surfaces()
 
-    results = assert_gil_released("BRepConcatener.concatenate", work)
-    if results != expected:
+    result = assert_gil_released("BRepConcatener.concatenate", work)
+    if result != expected[-1]:
         raise ValueError("[Test] Wrong concatenated BRep")
 
 
 def check_model_conversion():
     def work():
-        breps = []
-        for _ in range(5):
-            brep = load_brep("layers.og_brep")
-            model.triangulate_brep_surface_meshes(brep)
-            model.convert_brep_surface_meshes_into_triangulated_surfaces(brep)
-            model.convert_brep_block_meshes_into_tetrahedral_solids(brep)
-            breps.append(brep)
-        return breps
+        brep = load_brep("layers.og_brep")
+        model.triangulate_brep_surface_meshes(brep)
+        model.convert_brep_surface_meshes_into_triangulated_surfaces(brep)
+        model.convert_brep_block_meshes_into_tetrahedral_solids(brep)
+        return brep
 
-    for brep in assert_gil_released("convert_model_meshes", work):
-        for surface in brep.surfaces():
-            mesh_ = surface.mesh()
-            for p in range(mesh_.nb_polygons()):
-                if mesh_.nb_polygon_vertices(p) != 3:
-                    raise ValueError("[Test] Surface mesh not triangulated")
+    brep = assert_gil_released("convert_model_meshes", work)
+    for surface in brep.surfaces():
+        mesh_ = surface.mesh()
+        for p in range(mesh_.nb_polygons()):
+            if mesh_.nb_polygon_vertices(p) != 3:
+                raise ValueError("[Test] Surface mesh not triangulated")
 
 
 def check_nn_search():
@@ -234,15 +171,11 @@ def check_nn_search():
               for i in range(20000)]
 
     def work():
-        mappings = []
-        for _ in range(5):
-            search = geom.NNSearch3D(points)
-            mappings.append(search.radius_colocated_index_mapping(0.5))
-        return mappings
+        return geom.NNSearch3D(points).radius_colocated_index_mapping(0.5)
 
-    for info in assert_gil_released("NNSearch3D", work):
-        if info.nb_unique_points() != len(points):
-            raise ValueError("[Test] Wrong colocated mapping")
+    info = assert_gil_released("NNSearch3D", work)
+    if info.nb_unique_points() != len(points):
+        raise ValueError("[Test] Wrong colocated mapping")
 
 
 def check_exception_translated_after_release(directory):
@@ -264,11 +197,10 @@ def check_exception_translated_after_release(directory):
         mesh.load_triangulated_surface3D(missing)
 
     # The exception also crosses a released call made from a worker thread
-    with HugeSwitchInterval():
-        try:
-            run_in_worker(failing)
-        except opengeode.OpenGeodeDataError:
-            return
+    try:
+        assert_gil_released("load_triangulated_surface3D", failing)
+    except opengeode.OpenGeodeDataError:
+        return
     raise ValueError("[Test] Worker thread should have raised OpenGeodeDataError")
 
 
@@ -317,49 +249,25 @@ def check_bridge_delivers_during_released_call():
     """Task 5 bridge: the progress event emitted by a released call reaches
     the Python listener while that call is still running. With the GIL held,
     the listener could only run after the worker thread finished."""
-    Logger = opengeode.Logger
-    ProgressLogger = opengeode.ProgressLogger
     message = "Compute 3D euclidian distance"
-    delivered_during_call = []
+    start_received = threading.Event()
+
+    def listener(event):
+        if event.message == message and event.kind == "start":
+            start_received.set()
+
+    def work():
+        mesh.euclidean_distance_transform3D(grid3d(80), [[0, 0, 0]], "gil_bridge")
 
     opengeode.forward_logs_to_python("opengeode.gil_test")
+    opengeode.add_progress_listener(listener)
     try:
-        with HugeSwitchInterval():
-            for attempt in range(ATTEMPTS):
-                start_received = threading.Event()
-                finished = threading.Event()
-                seen = []
-
-                def listener(event):
-                    if event.message == message and event.kind == "start" and not seen:
-                        seen.append(not finished.is_set())
-                        start_received.set()
-
-                opengeode.add_progress_listener(listener)
-                try:
-                    def work():
-                        for i in range(5):
-                            mesh.euclidean_distance_transform3D(
-                                grid3d(80), [[0, 0, 0]], f"gil_bridge{attempt}{i}")
-                        finished.set()
-
-                    thread = threading.Thread(target=work)
-                    thread.start()
-                    if not start_received.wait(TIMEOUT):
-                        raise ValueError("[Test] Progress start event never forwarded")
-                    thread.join(TIMEOUT)
-                finally:
-                    opengeode.remove_progress_listener(listener)
-                delivered_during_call.append(seen[0])
-                if seen[0]:
-                    break
-    finally:
-        opengeode.stop_forwarding_logs()
-    if not delivered_during_call[-1]:
-        raise ValueError(
-            "[Test] The progress event was only delivered after the "
-            "released call returned"
+        geode_test_env.assert_event_during_calls(
+            work, start_received, deadline=DEADLINE, name="progress bridge"
         )
+    finally:
+        opengeode.remove_progress_listener(listener)
+        opengeode.stop_forwarding_logs()
 
 
 if __name__ == "__main__":

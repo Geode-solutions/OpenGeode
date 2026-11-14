@@ -22,7 +22,6 @@
 import os
 import subprocess
 import sys
-import threading
 import time
 
 import numpy
@@ -924,46 +923,8 @@ def test_performance():
 # GIL
 
 
-class HugeSwitchInterval:
-    def __enter__(self):
-        self.previous = sys.getswitchinterval()
-        sys.setswitchinterval(1000)
-
-    def __exit__(self, *args):
-        sys.setswitchinterval(self.previous)
-
-
-def main_runs_during(work):
-    """Run work in a thread with a huge switch interval: the main thread runs
-    during the call only if the call released the GIL."""
-    ready = threading.Event()
-    finished = threading.Event()
-    box = {}
-
-    def target():
-        ready.set()
-        try:
-            work()
-        except BaseException as error:
-            box["error"] = error
-        finished.set()
-
-    thread = threading.Thread(target=target)
-    thread.start()
-    check(ready.wait(TIMEOUT), "worker did not start")
-    main_ran = not finished.is_set()
-    thread.join(TIMEOUT)
-    if "error" in box:
-        raise box["error"]
-    return main_ran
-
-
-def assert_gil_released(name, work):
-    with HugeSwitchInterval():
-        for _ in range(3):
-            if main_runs_during(work):
-                return
-    raise ValueError(f"[Test] {name} kept the GIL during the whole call")
+def assert_gil_released(name, call):
+    geode_test_env.assert_gil_released(call, deadline=TIMEOUT, name=name)
 
 
 def test_gil_released():
