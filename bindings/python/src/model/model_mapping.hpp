@@ -24,6 +24,8 @@
 #pragma once
 
 #include <string>
+#include <type_traits>
+#include <vector>
 
 #include <absl/strings/str_cat.h>
 
@@ -34,10 +36,24 @@
 
 namespace geode
 {
+    namespace detail
+    {
+        template < typename Mapping >
+        struct is_uuid_list : std::false_type
+        {
+        };
+
+        template <>
+        struct is_uuid_list< std::vector< uuid > > : std::true_type
+        {
+        };
+    } // namespace detail
+
     /*!
      * Bind ModelMapping< Mapping > (one Mapping per component type) as the
      * Python class name. mapping_name is the Python name of Mapping, used in
-     * the docstrings.
+     * the docstrings. A Mapping which is a list of uuids
+     * (ModelAddedComponentMapping...) is returned as a copy by at.
      */
     template < typename Mapping >
     pybind11::class_< ModelMapping< Mapping > > define_model_mapping(
@@ -89,9 +105,14 @@ namespace geode
                 },
                 pybind11::arg( "type" ),
                 pybind11::return_value_policy::reference_internal,
-                absl::StrCat( "Return the ", mapping_name,
-                    " of the components of the given type, modifiable; raise "
-                    "KeyError if there is none for this type" )
+                ( detail::is_uuid_list< Mapping >::value
+                        ? absl::StrCat( "Return a copy of the ", mapping_name,
+                              " of the components of the given type; raise "
+                              "KeyError if there is none for this type" )
+                        : absl::StrCat( "Return the ", mapping_name,
+                              " of the components of the given type, "
+                              "modifiable; raise KeyError if there is none for "
+                              "this type" ) )
                     .c_str() )
             .def( "emplace", &Model::emplace, pybind11::arg( "type" ),
                 pybind11::arg( "mapping" ),

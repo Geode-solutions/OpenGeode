@@ -188,6 +188,86 @@ def test_model_mappings():
           "model mapping move constructor empties the source")
 
 
+def test_mesh_mappings():
+    surface = model.ComponentID(model.Surface3D.component_type_static(), basic.uuid())
+    line = model.ComponentID(model.Line3D.component_type_static(), basic.uuid())
+    cases = [
+        (model.MeshElementMapping, mesh.MeshElement, mesh.MeshElement),
+        (model.MeshVertexMapping, mesh.MeshVertex, mesh.MeshVertex),
+        (model.ComponentMeshElementMapping, mesh.MeshElement,
+         lambda component, index: model.ComponentMeshElement(component, index)),
+        (model.ComponentMeshVertexMapping, mesh.MeshVertex,
+         lambda component, index: model.ComponentMeshVertex(component, index)),
+    ]
+    for mapping_type, make_input, make_output in cases:
+        name = mapping_type.__name__
+        inputs = [make_input(surface.id, index) for index in range(4)]
+        if mapping_type in (model.ComponentMeshElementMapping, model.ComponentMeshVertexMapping):
+            outputs = [make_output(line if index % 2 else surface, index) for index in range(4)]
+        else:
+            outputs = [make_input(line.id, index) for index in range(4)]
+        mapping = mapping_type()
+        mapping.map(inputs[0], outputs[0])
+        mapping.map(inputs[0], outputs[1])
+        mapping.map(inputs[1], outputs[1])
+        check(mapping.size_in() == 2 and mapping.size_out() == 2, name + " sizes")
+        check(mapping.in2out(inputs[0]) == outputs[:2], name + " in2out")
+        check(mapping.out2in_map() == {outputs[0]: [inputs[0]], outputs[1]: inputs[:2]},
+              name + " out2in_map with hashable outputs")
+        check(all(type(value) is type(outputs[0]) for value in mapping.in2out_map()[inputs[0]]),
+              name + " output type")
+        mapping.erase_out(outputs[1])
+        check(mapping.size_in() == 1 and mapping.size_out() == 1, name + " erase_out")
+    # The typed elements are not interchangeable
+    check_raises(lambda: model.MeshVertexMapping().map(mesh.MeshElement(), mesh.MeshVertex()),
+                 TypeError, "MeshVertexMapping takes MeshVertex")
+
+    corner_type = model.Corner3D.component_type_static()
+    vertices = model.ModelMeshesVertexMapping()
+    vertex_mapping = model.MeshVertexMapping()
+    vertex_mapping.map(mesh.MeshVertex(surface.id, 0), mesh.MeshVertex(line.id, 1))
+    vertices.emplace(corner_type, vertex_mapping)
+    check(vertices.component_types() == [corner_type], "ModelMeshesVertexMapping types")
+    check(vertices.at(corner_type).size_in() == 1, "ModelMeshesVertexMapping at")
+    check("MeshVertexMapping" in model.ModelMeshesVertexMapping.at.__doc__, "at doc")
+    elements = model.ModelMeshesElementMapping()
+    check(elements.component_types() == [], "ModelMeshesElementMapping empty")
+    check("MeshElementMapping" in model.ModelMeshesElementMapping.at.__doc__, "at doc")
+
+    # The added, removed and unchanged components: lists of uuids
+    uuids = model.ModelComponentUuidsMapping()
+    identifiers = [basic.uuid(), basic.uuid()]
+    uuids.emplace(corner_type, identifiers)
+    listed = uuids.at(corner_type)
+    check(listed == identifiers, "ModelComponentUuidsMapping at")
+    listed.append(basic.uuid())
+    check(len(uuids.at(corner_type)) == 2, "at returns a copy of the list")
+    check("copy" in model.ModelComponentUuidsMapping.at.__doc__, "at doc says copy")
+    check_raises(lambda: uuids.at(model.Line3D.component_type_static()), KeyError, "at KeyError")
+
+    mappings = model.ModelMappings()
+    for field, field_type in (
+        ("component_mapping", model.ModelGenericMapping),
+        ("added_components", model.ModelComponentUuidsMapping),
+        ("removed_components", model.ModelComponentUuidsMapping),
+        ("unchanged_components", model.ModelComponentUuidsMapping),
+        ("mesh_element_mapping", model.ModelMeshesElementMapping),
+        ("mesh_vertices_mapping", model.ModelMeshesVertexMapping),
+    ):
+        value = getattr(mappings, field)
+        check(type(value) is field_type, field + " type")
+        check(value.component_types() == [], field + " empty")
+        check(getattr(model.ModelMappings, field).__doc__, field + " documented")
+    # The fields are the mappings of the struct, not copies
+    mappings.added_components.emplace(corner_type, identifiers)
+    check(mappings.added_components.at(corner_type) == identifiers, "fields are references")
+    mappings.component_mapping.emplace(corner_type, basic.GenericMappinguuid())
+    check(mappings.component_mapping.has_mapping_type(corner_type), "component_mapping reference")
+    mappings.component_mapping.at(corner_type).map(identifiers[0], identifiers[1])
+    check(mappings.component_mapping.at(corner_type).in2out(identifiers[0]) == [identifiers[1]],
+          "nested modification")
+
+
 if __name__ == "__main__":
     uuids = [basic.uuid() for _ in range(4)]
     test_bijective(uuids, basic.BijectiveMappinguuid)
@@ -195,5 +275,9 @@ if __name__ == "__main__":
     elements = [mesh.MeshElement(uuids[0], index) for index in range(4)]
     test_bijective(elements, model.MeshElementToIndexMapping, outputs=[10, 11, 12, 13])
     test_bijective([0, 1, 2, 3], model.IndexToIndexMapping)
+    surface_id = basic.uuid()
+    test_generic([mesh.MeshElement(surface_id, index) for index in range(4)], model.MeshElementMapping)
+    test_generic([mesh.MeshVertex(surface_id, index) for index in range(4)], model.MeshVertexMapping)
     test_conversion_mappings()
     test_model_mappings()
+    test_mesh_mappings()
