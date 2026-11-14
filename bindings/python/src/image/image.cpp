@@ -44,11 +44,10 @@ PYBIND11_MODULE( opengeode_py_image, module )
         "RGBColor cells), the colors (RGBColor, GreyscaleColor) and the "
         "functions loading and saving raster images (load_raster_imageND, "
         "save_raster_imageND...)";
-    pybind11::class_< geode::OpenGeodeImageLibrary >( module,
+    geode::define_library< geode::OpenGeodeImageLibrary >( module,
         "OpenGeodeImageLibrary",
-        "Initialization of the OpenGeode image library" )
-        .def_static( "initialize", &geode::OpenGeodeImageLibrary::initialize,
-            "Initialize the library: must be called once before using it" );
+        "Initialization of the OpenGeode image library",
+        "Initialize the library: must be called once before using it" );
     geode::define_greyscale_color( module );
     geode::define_rgb_color( module );
     geode::define_raster_image( module );

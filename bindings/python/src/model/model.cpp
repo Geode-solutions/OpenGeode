@@ -116,11 +116,10 @@ PYBIND11_MODULE( opengeode_py_model, module )
         "locating points (BRepRayTracing) and the helpers on the coordinate "
         "reference systems. Call OpenGeodeModelLibrary.initialize() before "
         "using the module.";
-    pybind11::class_< geode::OpenGeodeModelLibrary >(
-        module, "OpenGeodeModelLibrary", "Initialization of the model module" )
-        .def_static( "initialize", &geode::OpenGeodeModelLibrary::initialize,
-            "Initialize the model module and the modules it depends on; call "
-            "it before using models" );
+    geode::define_library< geode::OpenGeodeModelLibrary >( module,
+        "OpenGeodeModelLibrary", "Initialization of the model module",
+        "Initialize the model module and the modules it depends on; call "
+        "it before using models" );
     geode::define_component_type( module );
     geode::define_component( module );
     geode::define_component_mesh_element( module );

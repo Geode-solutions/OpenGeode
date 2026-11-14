@@ -19,7 +19,7 @@ package read `help(opengeode)`, whose text is `bindings/python/opengeode_doc.txt
   (`forward_logs_to_python`, progress listeners).
 - `bindings/python/src/common.hpp`: helpers shared by every binding
   (`check_index`, `checked`, `checked_as`, `checked_builder`, `TypedObject`,
-  `builder_with_mesh`, `def_readwrite_named`, `define_string_representation`,
+  `builder_with_mesh`, `def_readwrite_named`, `define_library`, `define_string_representation`,
   `python_call_repr`, ...). `src/mesh/index_check.hpp` has the index checks of
   meshes; `src/numpy_access.hpp` and `src/mesh/numpy_access.cpp` the numpy bulk
   access.
@@ -33,8 +33,10 @@ package read `help(opengeode)`, whose text is `bindings/python/opengeode_doc.txt
   `#include <geode/bindings/python/common.hpp>` (or `.../mesh/index_check.hpp`,
   ...) instead of copying them; their own modules call
   `geode::document_missing_constructors( module )` at the end of the
-  `PYBIND11_MODULE` and import the OpenGeode modules with
-  `geode::import_binding_dependency`. Keep these headers project-agnostic and
+  `PYBIND11_MODULE`, import the OpenGeode modules with
+  `geode::import_binding_dependency` and bind their library classes with
+  `geode::define_library< Library >( module, name, doc, initialize_doc )`
+  (include the helpers, never copy them). Keep these headers project-agnostic and
   their includes relative (`"../common.hpp"`); a new reusable header is added to
   the install list of `bindings/python/helpers/CMakeLists.txt` (installed by
   every configure, even with `OPENGEODE_WITH_PYTHON` OFF).

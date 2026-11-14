@@ -619,6 +619,19 @@ namespace geode
     }
 
     /*!
+     * Define the class of a library, with its static initialize().
+     */
+    template < typename Library >
+    void define_library( pybind11::module_& module,
+        const char* name,
+        const char* doc,
+        const char* initialize_doc )
+    {
+        pybind11::class_< Library >( module, name, doc )
+            .def_static( "initialize", &Library::initialize, initialize_doc );
+    }
+
+    /*!
      * Raise a Python IndexError if @a index is not in [0, size[.
      * @param[in] context Name of the Python function being called.
      * @param[in] what Kind of the checked index (vertex, polygon...).

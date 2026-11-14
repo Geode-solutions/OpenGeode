@@ -50,7 +50,16 @@ HELPERS = [
 ]
 # Each translation unit includes one helper first, then uses it
 UNITS = {
-    "common.hpp": "",
+    "common.hpp": """
+#include <geode/basic/common.hpp>
+namespace geode
+{
+    void define( pybind11::module_& module )
+    {
+        define_library< OpenGeodeBasicLibrary >( module, "A", "doc", "doc" );
+    }
+}
+""",
     "numpy_access.hpp": "",
     "basic/factory.hpp": """
 #include <geode/mesh/io/triangulated_surface_input.hpp>

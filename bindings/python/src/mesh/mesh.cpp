@@ -123,11 +123,10 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
         "3D are suffixed with 2D or 3D. Indices given to the mesh and builder "
         "methods are checked: an out-of-range index raises IndexError. Call "
         "OpenGeodeMeshLibrary.initialize() before using the module.";
-    pybind11::class_< geode::OpenGeodeMeshLibrary >(
-        module, "OpenGeodeMeshLibrary", "Initialization of the mesh module" )
-        .def_static( "initialize", &geode::OpenGeodeMeshLibrary::initialize,
-            "Initialize the mesh module and the modules it depends on; call it "
-            "before using meshes" );
+    geode::define_library< geode::OpenGeodeMeshLibrary >( module,
+        "OpenGeodeMeshLibrary", "Initialization of the mesh module",
+        "Initialize the mesh module and the modules it depends on; call it "
+        "before using meshes" );
 
     geode::define_crs( module );
     geode::define_crs_manager( module );

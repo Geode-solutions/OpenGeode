@@ -53,11 +53,10 @@ PYBIND11_MODULE( opengeode_py_basic, module )
     module.attr( "NO_ID" ) = geode::NO_ID;
     module.attr( "NO_LID" ) = geode::NO_LID;
     module.attr( "GLOBAL_EPSILON" ) = geode::GLOBAL_EPSILON;
-    pybind11::class_< geode::OpenGeodeBasicLibrary >( module,
+    geode::define_library< geode::OpenGeodeBasicLibrary >( module,
         "OpenGeodeBasicLibrary",
-        "Initialization of the OpenGeode basic library" )
-        .def_static( "initialize", &geode::OpenGeodeBasicLibrary::initialize,
-            "Initialize the library: must be called once before using it" );
+        "Initialization of the OpenGeode basic library",
+        "Initialize the library: must be called once before using it" );
     geode::define_exception( module );
     geode::define_cell_array( module );
     geode::define_uuid( module );
