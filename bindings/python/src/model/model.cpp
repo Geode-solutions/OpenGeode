@@ -185,4 +185,6 @@ PYBIND11_MODULE( opengeode_py_model, module )
     geode::define_model_coordinate_reference_system( module );
     geode::define_model_ray_tracing( module );
     geode::define_simplicial_brep_creator( module );
+
+    geode::document_missing_constructors( module );
 }

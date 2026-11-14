@@ -36,6 +36,7 @@
 
 #include <absl/container/fixed_array.h>
 #include <absl/container/flat_hash_map.h>
+#include <absl/container/flat_hash_set.h>
 #include <absl/container/inlined_vector.h>
 #include <absl/hash/hash.h>
 #include <absl/strings/str_cat.h>
@@ -137,6 +138,139 @@ namespace geode
             pybind11::module_::import(
                 ( package.substr( 0, dot + 1 ) + name ).c_str() );
         }
+    }
+} // namespace geode
+
+namespace geode
+{
+    namespace detail
+    {
+        constexpr auto MISSING_CONSTRUCTOR = " cannot be constructed directly";
+
+        // Python gives every class its own __init__ entry: a class bound
+        // without constructor has the slot wrapper of Python
+        // (wrapper_descriptor) calling the __init__ of pybind11_object, which
+        // raises; the __init__ of a base class is not used by pybind11
+        inline bool has_constructor( const pybind11::handle& cls )
+        {
+            const auto dict = cls.attr( "__dict__" );
+            if( !dict.contains( "__init__" ) )
+            {
+                return true;
+            }
+            return !PyObject_TypeCheck(
+                dict[pybind11::str( "__init__" )].ptr(), &PyWrapperDescr_Type );
+        }
+
+        // The first public static method of a class whose public members
+        // (its own and those of its bases) are all static methods, empty
+        // otherwise
+        inline std::string static_only_method( const pybind11::handle& cls )
+        {
+            std::string first;
+            for( const auto& base : cls.attr( "__mro__" ) )
+            {
+                const auto base_name =
+                    base.attr( "__name__" ).cast< std::string >();
+                if( base_name == "pybind11_object" || base_name == "object" )
+                {
+                    continue;
+                }
+                const pybind11::dict dict( base.attr( "__dict__" ) );
+                for( const auto& item : dict )
+                {
+                    const auto member = item.first.cast< std::string >();
+                    if( member.empty() || member.front() == '_' )
+                    {
+                        continue;
+                    }
+                    if( !PyObject_TypeCheck(
+                            item.second.ptr(), &PyStaticMethod_Type ) )
+                    {
+                        return {};
+                    }
+                    if( first.empty() || member < first )
+                    {
+                        first = member;
+                    }
+                }
+            }
+            return first;
+        }
+
+        inline void document_missing_constructor( const pybind11::handle& cls )
+        {
+            const auto name = cls.attr( "__name__" ).cast< std::string >();
+            const auto static_method = static_only_method( cls );
+            // Only a create of the class itself returns this class
+            const auto message =
+                cls.attr( "__dict__" ).contains( "create" )
+                    ? absl::StrCat( name, MISSING_CONSTRUCTOR,
+                          ": use the static method ", name, ".create" )
+                : !static_method.empty()
+                    ? absl::StrCat( name, MISSING_CONSTRUCTOR, ": ", name,
+                          " has only static methods, call them on the class "
+                          "(e.g. ",
+                          name, ".", static_method, "(...))" )
+                    : absl::StrCat( name, MISSING_CONSTRUCTOR,
+                          ": get one from the "
+                          "functions returning it (a builder, a loader or "
+                          "the object owning it)" );
+            const pybind11::cpp_function init(
+                [message]( pybind11::detail::value_and_holder& ) {
+                    throw pybind11::type_error( message );
+                },
+                pybind11::name( "__init__" ), pybind11::is_method( cls ),
+                pybind11::detail::is_new_style_constructor(), message.c_str() );
+            pybind11::setattr( cls, "__init__", init );
+        }
+
+        inline void document_missing_constructors(
+            const pybind11::handle& scope,
+            const std::string& module_name,
+            absl::flat_hash_set< PyObject* >& visited )
+        {
+            const auto items = pybind11::reinterpret_borrow< pybind11::dict >(
+                scope.attr( "__dict__" ) )
+                                   .attr( "copy" )();
+            for( const auto& item :
+                pybind11::reinterpret_borrow< pybind11::dict >( items ) )
+            {
+                const auto& value = item.second;
+                if( !PyType_Check( value.ptr() )
+                    || pybind11::detail::get_type_info(
+                           reinterpret_cast< PyTypeObject* >( value.ptr() ) )
+                           == nullptr
+                    || !pybind11::hasattr( value, "__module__" )
+                    || value.attr( "__module__" ).cast< std::string >()
+                           != module_name
+                    || !visited.insert( value.ptr() ).second )
+                {
+                    continue;
+                }
+                if( !has_constructor( value ) )
+                {
+                    document_missing_constructor( value );
+                }
+                // A class attribute may alias any class: each one is
+                // visited once
+                document_missing_constructors( value, module_name, visited );
+            }
+        }
+    } // namespace detail
+
+    /*!
+     * Give the bound classes of the module (and their nested classes) that
+     * have no constructor an __init__ raising TypeError with a docstring
+     * telling how to get an instance, instead of the generic "Initialize
+     * self" of Python. Call it at the end of the PYBIND11_MODULE, after every
+     * class is bound.
+     */
+    inline void document_missing_constructors( pybind11::module_& module )
+    {
+        absl::flat_hash_set< PyObject* > visited;
+        detail::document_missing_constructors(
+            module, module.attr( "__name__" ).cast< std::string >(), visited );
     }
 } // namespace geode
 

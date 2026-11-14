@@ -205,4 +205,6 @@ PYBIND11_MODULE( opengeode_py_mesh, module )
     geode::define_regular_grid_io( module );
 
     geode::define_bound_interface( module );
+
+    geode::document_missing_constructors( module );
 }

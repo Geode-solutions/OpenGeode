@@ -86,4 +86,6 @@ PYBIND11_MODULE( opengeode_py_geometry, module )
     geode::define_rotation( module );
     geode::define_sign( module );
     geode::define_coordinate_system( module );
+
+    geode::document_missing_constructors( module );
 }

@@ -69,4 +69,6 @@ PYBIND11_MODULE( opengeode_py_basic, module )
     geode::define_logger( module );
     geode::define_mapping( module );
     geode::define_percentage( module );
+
+    geode::document_missing_constructors( module );
 }

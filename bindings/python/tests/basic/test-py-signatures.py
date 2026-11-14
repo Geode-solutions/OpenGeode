@@ -163,6 +163,7 @@ def check_class(qualified_name, cls, problems, seen):
         return
     if not (cls.__doc__ or "").strip():
         problems.append(f"{qualified_name}: class without docstring")
+    check_constructor(qualified_name, cls, problems)
     if qualified_name in PYBIND11_CONTAINERS:
         return
     for name, member in vars(cls).items():
@@ -190,6 +191,87 @@ def check_class(qualified_name, cls, problems, seen):
             check_callable(member_name, member, problems, name not in EXEMPT_DOC)
         elif inspect.isfunction(member):
             check_python_function(member_name, member, problems)
+
+
+# Docstring of object.__init__, inherited by a pybind11 class without
+# constructor (help() then says nothing about how to get an instance)
+GENERIC_INIT_DOC = "Initialize self."
+MISSING_CONSTRUCTOR = "cannot be constructed directly"
+NON_CONSTRUCTIBLE = []
+
+
+def check_constructor(qualified_name, cls, problems):
+    if issubclass(cls, BaseException):
+        return
+    doc = cls.__init__.__doc__ or ""
+    if doc.startswith(GENERIC_INIT_DOC):
+        problems.append(f"{qualified_name}: generic __init__ docstring")
+    elif MISSING_CONSTRUCTOR in doc:
+        NON_CONSTRUCTIBLE.append((qualified_name, cls))
+
+
+def check_missing_constructors(problems):
+    """The classes without constructor raise a TypeError telling how to get
+    an instance, with or without arguments."""
+    for qualified_name, cls in NON_CONSTRUCTIBLE:
+        for arguments in ((), (1,)):
+            try:
+                cls(*arguments)
+            except TypeError as error:
+                if not arguments and MISSING_CONSTRUCTOR not in str(error):
+                    problems.append(f"{qualified_name}(): wrong error {error}")
+            else:
+                problems.append(f"{qualified_name}{arguments} did not raise")
+    names = {name for name, _ in NON_CONSTRUCTIBLE}
+    for dimension in (2, 3):
+        name = f"opengeode_py_mesh.RegularGrid{dimension}D"
+        cls = importlib.import_module("opengeode_py_mesh").__dict__[name.split(".")[1]]
+        if name not in names:
+            problems.append(f"{name}: not documented as non-constructible")
+        elif f"RegularGrid{dimension}D.create" not in cls.__init__.__doc__:
+            problems.append(f"{name}: the __init__ docstring should point to create")
+        if not isinstance(cls.create(), cls):
+            problems.append(f"{name}.create does not return a {name}")
+    # create is only suggested when the class defines it (an inherited one
+    # returns the base class)
+    for name, cls in NON_CONSTRUCTIBLE:
+        suggested = ".create" in cls.__init__.__doc__
+        if suggested != ("create" in vars(cls)):
+            problems.append(f"{name}: wrong create suggestion in {cls.__init__.__doc__}")
+    # The classes with only static methods are not obtained, they are used
+    # through the class (libraries, factories)
+    for name, cls in NON_CONSTRUCTIBLE:
+        public = [
+            member
+            for base in cls.__mro__
+            if base.__name__ not in ("pybind11_object", "object")
+            for member_name, member in vars(base).items()
+            if not member_name.startswith("_")
+        ]
+        static_only = bool(public) and all(
+            isinstance(member, staticmethod) for member in public
+        )
+        documented = "has only static methods" in cls.__init__.__doc__
+        if "create" not in vars(cls) and static_only != documented:
+            problems.append(f"{name}: wrong static-only text in {cls.__init__.__doc__}")
+    mesh_module = importlib.import_module("opengeode_py_mesh")
+    for cls, method in [
+        (mesh_module.OpenGeodeMeshLibrary, "initialize"),
+        (mesh_module.TriangulatedSurfaceInputFactory3D, "has_creator"),
+        (mesh_module.MeshFactory, None),
+    ]:
+        doc = cls.__init__.__doc__
+        if "has only static methods" not in doc or "a builder, a loader" in doc:
+            problems.append(f"{cls.__name__}: not documented as static-only: {doc}")
+        if method and f"{cls.__name__}.{method}(...)" not in doc:
+            problems.append(f"{cls.__name__}: the docstring should show {method}")
+        if method:
+            getattr(cls, method)
+    corner = importlib.import_module("opengeode_py_model").Corner3D
+    if "a builder, a loader or the object owning it" not in corner.__init__.__doc__:
+        problems.append("Corner3D: no hint to get an instance")
+    if len(NON_CONSTRUCTIBLE) < 150:
+        problems.append(f"only {len(NON_CONSTRUCTIBLE)} non-constructible classes seen")
 
 
 GENERIC_KINDS = [inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD]
@@ -268,6 +350,13 @@ def check_sanity():
     entries = split_overloads(overloaded)
     assert [e[1] for e in entries] == ["Doc one", "Doc two"], entries
 
+    class Plain:
+        """A class without constructor"""
+
+    problems = []
+    check_constructor("plain", Plain, problems)
+    assert problems == ["plain: generic __init__ docstring"], problems
+
 
 if __name__ == "__main__":
     check_sanity()
@@ -277,6 +366,7 @@ if __name__ == "__main__":
         check_module(importlib.import_module(module_name), problems, seen)
     for module_name in PYTHON_MODULES:
         check_python_module(importlib.import_module(module_name), problems)
+    check_missing_constructors(problems)
     # The walker must really visit the bindings, not silently skip them
     assert len(CHECKED) > 1400, f"only {len(CHECKED)} callables were checked"
     if problems:

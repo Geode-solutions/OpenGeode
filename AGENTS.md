@@ -57,6 +57,11 @@ package read `help(opengeode)`, whose text is `bindings/python/opengeode_doc.txt
   `check_index(context, what, index, size)`. Out of range raises `IndexError`
   with `[function] vertex 99 out of range [0, 4)`. Unsigned parameters reject
   negative numbers with the usual pybind11 `TypeError`.
+- Constructors: a class bound without `pybind11::init` gets an `__init__`
+  raising `TypeError` with a docstring telling how to get an instance from
+  `geode::document_missing_constructors( module )`, called last in each
+  `PYBIND11_MODULE` (`test-py-signatures.py` rejects the generic "Initialize
+  self" docstring).
 - Enums: `pybind11::native_enum<...>(module, "CamelCase", "enum.Enum", doc)`
   with `.value(...)` and `.finalize()`, and no `export_values()`: members are
   used through the class (`Logger.Level.info`).

@@ -53,4 +53,6 @@ PYBIND11_MODULE( opengeode_py_image, module )
     geode::define_rgb_color( module );
     geode::define_raster_image( module );
     geode::define_raster_image_io( module );
+
+    geode::document_missing_constructors( module );
 }
