@@ -146,23 +146,31 @@ namespace geode
     }
 
     /*!
-     * Replace the __init__ of the builder class so that it keeps the model it
-     * modifies in its `_model` attribute (the class needs dynamic_attr), to
-     * check the arguments of the functions of the VertexIdentifierBuilder.
+     * Call policy of the constructor of a builder, to give to the builder the
+     * `_model` attribute (the class needs dynamic_attr): the model it modifies
+     * (the second argument of the constructor), to check the arguments of the
+     * functions of the VertexIdentifierBuilder. As a call policy, it keeps the
+     * new-style pybind11 constructor, which a replacement of __init__ would
+     * turn into an old-style one (deprecated by pybind11). A class deriving
+     * from the builder can use it in its own constructor, if not it has no
+     * `_model` and its calls are not checked.
      */
-    template < typename Builder, typename Model >
-    void remember_model_in_constructor(
-        const pybind11::object& cls, const char* argument, const char* doc )
+    struct remember_model
     {
-        const pybind11::object init = cls.attr( "__init__" );
-        cls.attr( "__init__" ) = pybind11::cpp_function(
-            [init]( TypedObject< Builder > self, Model& model ) {
-                const auto object = pybind11::cast(
-                    &model, pybind11::return_value_policy::reference );
-                init( self, object );
-                self.attr( "_model" ) = object;
-            },
-            pybind11::name( "__init__" ), pybind11::is_method( cls ),
-            pybind11::arg( argument ), doc );
-    }
+    };
 } // namespace geode
+
+namespace pybind11::detail
+{
+    template <>
+    struct process_attribute< geode::remember_model >
+        : process_attribute_default< geode::remember_model >
+    {
+        static void postcall( function_call& call, handle /*unused*/ )
+        {
+            // The constructor is called with (self, model), and self is not
+            // in the arguments of a new-style constructor
+            call.init_self.attr( "_model" ) = call.args[1];
+        }
+    };
+} // namespace pybind11::detail

@@ -53,7 +53,7 @@ namespace geode
             "builders of the component meshes and inherits the methods of the "
             "topology, component, collection and physical properties builders" )
             .def( pybind11::init< BRep& >(), pybind11::arg( "brep" ),
-                pybind11::keep_alive< 1, 2 >(),
+                pybind11::keep_alive< 1, 2 >(), remember_model(),
                 "Build a builder of the BRep, which is kept alive by the "
                 "builder" )
             .def( "copy", &BRepBuilder::copy, pybind11::arg( "brep" ),
@@ -244,9 +244,5 @@ namespace geode
                 &BRepBuilder::add_block_in_block_collection,
                 pybind11::arg( "block" ), pybind11::arg( "collection" ),
                 "Add the Block to the BlockCollection" );
-        remember_model_in_constructor< BRepBuilder, BRep >(
-            module.attr( "BRepBuilder" ), "brep",
-            "Build a builder of the BRep, which is kept alive by the "
-            "builder" );
     }
 } // namespace geode

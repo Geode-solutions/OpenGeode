@@ -49,7 +49,7 @@ namespace geode
             "the builders of the component meshes and inherits the methods of "
             "the topology, component and collection builders" )
             .def( pybind11::init< Section& >(), pybind11::arg( "section" ),
-                pybind11::keep_alive< 1, 2 >(),
+                pybind11::keep_alive< 1, 2 >(), remember_model(),
                 "Build a builder of the Section, which is kept alive by the "
                 "builder" )
             .def( "copy", &SectionBuilder::copy, pybind11::arg( "section" ),
@@ -195,9 +195,5 @@ namespace geode
                 &SectionBuilder::add_surface_in_surface_collection,
                 pybind11::arg( "surface" ), pybind11::arg( "collection" ),
                 "Add the Surface to the SurfaceCollection" );
-        remember_model_in_constructor< SectionBuilder, Section >(
-            module.attr( "SectionBuilder" ), "section",
-            "Build a builder of the Section, which is kept alive by the "
-            "builder" );
     }
 } // namespace geode

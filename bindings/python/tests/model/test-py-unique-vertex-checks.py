@@ -20,6 +20,8 @@
 # SOFTWARE.
 
 import os
+import subprocess
+import sys
 
 import geode_test_env
 
@@ -202,6 +204,80 @@ def test_standalone_identifier():
     if identifier.nb_unique_vertices() != 2:
         raise ValueError("[Test] Wrong number of unique vertices")
 
+IMPORT_SCRIPT = """
+import geode_test_env
+import opengeode_py_model
+print("imported")
+"""
+
+
+def test_import_emits_no_warning():
+    # An __init__ replaced by a plain function is an old-style constructor, which
+    # pybind11 reports with a FutureWarning (in non-NDEBUG builds)
+    result = subprocess.run(
+        [sys.executable, "-W", "error::FutureWarning", "-c", IMPORT_SCRIPT],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        env=dict(os.environ),
+        timeout=120,
+    )
+    if result.returncode != 0 or "imported" not in result.stdout:
+        raise ValueError(
+            f"[Test] Importing the model bindings should not warn:\n{result.stdout}"
+        )
+
+
+def test_builder_subclass():
+    # A Python subclass calling the constructor of its base is checked too
+    class MyBuilder(model.BRepBuilder):
+        def __init__(self, brep):
+            super().__init__(brep)
+
+    brep = model.BRep()
+    builder = MyBuilder(brep)
+    corner = brep.corner(builder.add_corner())
+    builder.create_unique_vertex()
+    builder.corner_mesh_builder(corner).create_point(geometry.Point3D([0, 0, 0]))
+    check_raises(
+        lambda: builder.set_unique_vertex(vertex(corner.component_id(), 1), 0),
+        IndexError,
+        "set_unique_vertex of a subclass builder",
+    )
+    check_raises(
+        lambda: builder.set_unique_vertex(vertex(corner.component_id(), 0), 5),
+        IndexError,
+        "set_unique_vertex of a subclass builder, missing unique vertex",
+    )
+    builder.set_unique_vertex(vertex(corner.component_id(), 0), 0)
+    if brep.unique_vertex(vertex(corner.component_id(), 0)) != 0:
+        raise ValueError("[Test] A subclass builder should build the model")
+
+
+def test_derived_builder_without_model():
+    # A class deriving from the builder without calling its constructor is not
+    # an initialized builder
+    class LazyBuilder(model.BRepBuilder):
+        def __init__(self, brep):
+            self.brep = brep
+
+    brep = model.BRep()
+    check_raises(
+        lambda: LazyBuilder(brep).create_unique_vertex(),
+        TypeError,
+        "a builder that was not initialized",
+    )
+
+
+def test_model_is_the_given_object():
+    brep = model.BRep()
+    builder = model.BRepBuilder(brep)
+    if builder._model is not brep:
+        raise ValueError("[Test] The builder should remember the given BRep")
+    section = model.Section()
+    if model.SectionBuilder(section)._model is not section:
+        raise ValueError("[Test] The builder should remember the given Section")
+
 
 if __name__ == "__main__":
     model.OpenGeodeModelLibrary.initialize()
@@ -210,3 +286,7 @@ if __name__ == "__main__":
     test_removed_component()
     test_keyword_arguments_and_builder_attributes()
     test_standalone_identifier()
+    test_import_emits_no_warning()
+    test_builder_subclass()
+    test_derived_builder_without_model()
+    test_model_is_the_given_object()
