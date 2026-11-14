@@ -48,11 +48,17 @@ namespace
             .def( "has_mapping_output", &Mapping::has_mapping_output,
                 pybind11::arg( "output" ),
                 "Return True if the output is mapped to an input" )
-            .def( "in2out", &Mapping::in2out, pybind11::arg( "input" ),
-                "Return the output mapped to the input; raise an error if "
+            .def( "in2out",
+                geode::mapping_lookup< Mapping >(
+                    "in2out", &Mapping::has_mapping_input, &Mapping::in2out ),
+                pybind11::arg( "input" ),
+                "Return the output mapped to the input; raise KeyError if "
                 "there is none" )
-            .def( "out2in", &Mapping::out2in, pybind11::arg( "output" ),
-                "Return the input mapped to the output; raise an error if "
+            .def( "out2in",
+                geode::mapping_lookup< Mapping >(
+                    "out2in", &Mapping::has_mapping_output, &Mapping::out2in ),
+                pybind11::arg( "output" ),
+                "Return the input mapped to the output; raise KeyError if "
                 "there is none" )
             .def( "size", &Mapping::size,
                 "Return the number of mapped input and output pairs" );

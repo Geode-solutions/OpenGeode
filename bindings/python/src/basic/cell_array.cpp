@@ -29,15 +29,23 @@
 namespace geode
 {
     template < index_t dimension >
+    void check_cell_indices( std::string_view name,
+        const CellArray< dimension >& array,
+        const typename CellArray< dimension >::CellIndices& index )
+    {
+        check_grid_indices( name, "cell index", index, [&array]( index_t d ) {
+            return array.nb_cells_in_direction( d );
+        } );
+    }
+
+    template < index_t dimension >
     void check_cell_array_arguments( std::string_view name,
         const CellArray< dimension >& array,
         const typename CellArray< dimension >::CellIndices& index,
         index_t direction )
     {
         check_direction( name, direction, dimension );
-        check_grid_indices( name, "cell index", index, [&array]( index_t d ) {
-            return array.nb_cells_in_direction( d );
-        } );
+        check_cell_indices( name, array, index );
     }
 } // namespace geode
 
@@ -68,31 +76,24 @@ namespace geode
             "cell_index",                                                      \
             []( const CellArray##dimension##D& array,                          \
                 const CellArray##dimension##D::CellIndices& index ) {          \
-                for( const auto d : LRange{ dimension } )                      \
-                {                                                              \
-                    OpenGeodeBasicException::check_exception(                  \
-                        index[d] < array.nb_cells_in_direction( d ), nullptr,  \
-                        OpenGeodeException::TYPE::data,                        \
-                        "[CellArray::cell_index] Invalid index ", index[d],    \
-                        " in direction ", d );                                 \
-                }                                                              \
+                check_cell_indices( "cell_index", array, index );              \
                 return array.cell_index( index );                              \
             },                                                                 \
             pybind11::arg( "index" ),                                          \
             "Return the cell index of the cell with the given indices (one "   \
-            "per direction). Raise an error if one is out of range" )          \
+            "per direction). Raise IndexError if one is not in [0, "           \
+            "nb_cells_in_direction)" )                                         \
         .def(                                                                  \
             "cell_indices",                                                    \
             []( const CellArray##dimension##D& array, index_t index ) {        \
-                OpenGeodeBasicException::check_exception(                      \
-                    index < array.nb_cells(), nullptr,                         \
-                    OpenGeodeException::TYPE::data,                            \
-                    "[CellArray::cell_indices] Invalid index ", index );       \
+                check_index(                                                   \
+                    "cell_indices", "cell", index, array.nb_cells() );         \
                 return array.cell_indices( index );                            \
             },                                                                 \
             pybind11::arg( "index" ),                                          \
             "Return the indices (one per direction) of the cell with the "     \
-            "given cell index. Raise an error if it is out of range" )         \
+            "given cell index. Raise IndexError if it is not in [0, "          \
+            "nb_cells)" )                                                      \
         .def(                                                                  \
             "next_cell",                                                       \
             []( const CellArray##dimension##D& array,                          \
@@ -121,10 +122,17 @@ namespace geode
             "None if the cell is the first one in this direction. Raise "      \
             "IndexError if the direction is not in [0, dimension) or an "      \
             "index is not in [0, nb_cells_in_direction)" )                     \
-        .def( "is_cell_on_border",                                             \
-            &CellArray##dimension##D::is_cell_on_border,                       \
+        .def(                                                                  \
+            "is_cell_on_border",                                               \
+            []( const CellArray##dimension##D& array,                          \
+                const CellArray##dimension##D::CellIndices& cell_indices ) {   \
+                check_cell_indices(                                            \
+                    "is_cell_on_border", array, cell_indices );                \
+                return array.is_cell_on_border( cell_indices );                \
+            },                                                                 \
             pybind11::arg( "cell_indices" ),                                   \
-            "Return True if the cell is on the border of the array" )
+            "Return True if the cell is on the border of the array. Raise "    \
+            "IndexError if an index is not in [0, nb_cells_in_direction)" )
 
 namespace geode
 {

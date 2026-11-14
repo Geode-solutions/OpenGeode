@@ -51,37 +51,27 @@
         .def(                                                                  \
             "color",                                                           \
             []( const RasterImage##dimension##D& raster, index_t index ) {     \
-                check_raster_cell( raster, index );                            \
+                check_index( "color", "cell", index, raster.nb_cells() );      \
                 return raster.color( index );                                  \
             },                                                                 \
             pybind11::arg( "index" ),                                          \
             "Return the color of the cell with the given cell index. Raise "   \
-            "an error if the index is out of range" )                          \
+            "IndexError if the index is not in [0, nb_cells)" )                \
         .def(                                                                  \
             "set_color",                                                       \
             []( RasterImage##dimension##D& raster, index_t index,              \
                 RGBColor color ) {                                             \
-                check_raster_cell( raster, index );                            \
+                check_index( "set_color", "cell", index, raster.nb_cells() );  \
                 raster.set_color( index, std::move( color ) );                 \
             },                                                                 \
             pybind11::arg( "index" ), pybind11::arg( "color" ),                \
-            "Set the color of the cell with the given cell index. Raise an "   \
-            "error if the index is out of range" )                             \
+            "Set the color of the cell with the given cell index. Raise "      \
+            "IndexError if the index is not in [0, nb_cells)" )                \
         .def( "clone", &RasterImage##dimension##D::clone,                      \
             "Return a copy of the raster image" )
 
 namespace geode
 {
-    template < index_t dimension >
-    void check_raster_cell(
-        const RasterImage< dimension >& raster, index_t index )
-    {
-        OpenGeodeImageException::check_exception( index < raster.nb_cells(),
-            nullptr, OpenGeodeException::TYPE::data,
-            "[RasterImage] Invalid cell index ", index, " (", raster.nb_cells(),
-            " cells)" );
-    }
-
     void define_raster_image( pybind11::module& module )
     {
         PYTHON_RASTER_IMAGE( 1 );

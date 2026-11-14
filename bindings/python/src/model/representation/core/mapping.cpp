@@ -39,15 +39,22 @@ namespace geode
                 pybind11::arg( "mapping" ),
                 "Build a mapping by taking over the content of mapping, which "
                 "is emptied" )
-            .def( "at",
-                static_cast< ModelCopyMapping::Mapping& (
-                    ModelCopyMapping::*) ( const ComponentType& ) >(
-                    &ModelCopyMapping::at ),
+            .def(
+                "at",
+                []( ModelCopyMapping& mapping,
+                    const ComponentType& type ) -> ModelCopyMapping::Mapping& {
+                    if( !mapping.has_mapping_type( type ) )
+                    {
+                        throw pybind11::key_error( absl::StrCat(
+                            "[at] no mapping for ", python_repr( type ) ) );
+                    }
+                    return mapping.at( type );
+                },
                 pybind11::arg( "type" ),
                 pybind11::return_value_policy::reference_internal,
                 "Return the BijectiveMapping of the components of the given "
-                "type, modifiable; raise an IndexError if there is none for "
-                "this type" );
+                "type, modifiable; raise KeyError if there is none for this "
+                "type" );
     }
     void define_generic_mapping( pybind11::module& module )
     {
@@ -62,14 +69,21 @@ namespace geode
                 pybind11::arg( "mapping" ),
                 "Build a mapping by taking over the content of mapping, which "
                 "is emptied" )
-            .def( "at",
-                static_cast< ModelGenericMapping::Mapping& (
-                    ModelGenericMapping::*) ( const ComponentType& ) >(
-                    &ModelGenericMapping::at ),
+            .def(
+                "at",
+                []( ModelGenericMapping& mapping, const ComponentType& type )
+                    -> ModelGenericMapping::Mapping& {
+                    if( !mapping.has_mapping_type( type ) )
+                    {
+                        throw pybind11::key_error( absl::StrCat(
+                            "[at] no mapping for ", python_repr( type ) ) );
+                    }
+                    return mapping.at( type );
+                },
                 pybind11::arg( "type" ),
                 pybind11::return_value_policy::reference_internal,
                 "Return the GenericMapping of the components of the given "
-                "type, modifiable; raise an IndexError if there is none for "
-                "this type" );
+                "type, modifiable; raise KeyError if there is none for this "
+                "type" );
     }
 } // namespace geode

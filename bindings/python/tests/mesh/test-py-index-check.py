@@ -845,6 +845,142 @@ def test_component_mesh_polygons():
         )
 
 
+def test_grid_indices():
+    for grid, dimension in grids():
+        label = type(grid).__name__
+        rest = [0] * (dimension - 1)
+        nb_cells = 2**dimension
+        nb_vertices = 3**dimension
+        check(grid.cell_index([1] * dimension) == nb_cells - 1, label + " cell_index")
+        check(grid.cell_indices(nb_cells - 1) == [1] * dimension, label + " cell_indices")
+        check(grid.vertex_index([2] * dimension) == nb_vertices - 1, label + " vertex_index")
+        check(grid.vertex_indices(nb_vertices - 1) == [2] * dimension, label + " vertex_indices")
+        check(grid.grid_point([2] * dimension).value(0) == 2, label + " grid_point")
+        check(len(grid.cell_vertices([1] * dimension)) == nb_cells, label + " cell_vertices")
+        check(grid.cell_barycenter([1] * dimension).value(0) == 1.5, label + " cell_barycenter")
+        check(grid.is_cell_on_border([1] * dimension), label + " is_cell_on_border")
+        check(grid.is_grid_vertex_on_border([2] * dimension), label + " is_grid_vertex_on_border")
+        check(
+            grid.cell_vertex_indices([1] * dimension, 0) == [1] * dimension,
+            label + " cell_vertex_indices",
+        )
+        for cell in [[2] + rest, rest + [10**7]]:
+            direction = 0 if cell[0] == 2 else dimension - 1
+            expected = "cell index %d out of range [0, 2) in direction %d" % (
+                cell[direction],
+                direction,
+            )
+            for name, call in [
+                ("cell_index", lambda: grid.cell_index(cell)),
+                ("cell_vertices", lambda: grid.cell_vertices(cell)),
+                ("cell_vertex_indices", lambda: grid.cell_vertex_indices(cell, 0)),
+                ("cell_barycenter", lambda: grid.cell_barycenter(cell)),
+                ("is_cell_on_border", lambda: grid.is_cell_on_border(cell)),
+            ]:
+                check_index_error(call, "[%s] %s" % (name, expected), label + " " + name)
+        for vertex in [[3] + rest, rest + [10**7]]:
+            direction = 0 if vertex[0] == 3 else dimension - 1
+            expected = "vertex index %d out of range [0, 3) in direction %d" % (
+                vertex[direction],
+                direction,
+            )
+            for name, call in [
+                ("vertex_index", lambda: grid.vertex_index(vertex)),
+                ("grid_point", lambda: grid.grid_point(vertex)),
+                ("is_grid_vertex_on_border", lambda: grid.is_grid_vertex_on_border(vertex)),
+            ]:
+                check_index_error(call, "[%s] %s" % (name, expected), label + " " + name)
+        check_index_error(
+            lambda: grid.cell_indices(nb_cells),
+            "[cell_indices] cell %d out of range [0, %d)" % (nb_cells, nb_cells),
+            label + " cell_indices",
+        )
+        check_index_error(
+            lambda: grid.vertex_indices(nb_vertices),
+            "[vertex_indices] vertex %d out of range [0, %d)" % (nb_vertices, nb_vertices),
+            label + " vertex_indices",
+        )
+
+
+def test_raster_indices():
+    for dimension in [1, 2, 3]:
+        raster = getattr(image, "RasterImage%dD" % dimension)([2] * dimension)
+        label = type(raster).__name__
+        nb_cells = 2**dimension
+        raster.set_color(nb_cells - 1, image.RGBColor(1, 2, 3))
+        check(raster.color(nb_cells - 1).red() == 1, label + " valid color")
+        for cell in [nb_cells, 10**7]:
+            check_index_error(
+                lambda: raster.color(cell),
+                "[color] cell %d out of range [0, %d)" % (cell, nb_cells),
+                label + " color",
+            )
+            check_index_error(
+                lambda: raster.set_color(cell, image.RGBColor(1, 2, 3)),
+                "[set_color] cell %d out of range [0, %d)" % (cell, nb_cells),
+                label + " set_color",
+            )
+        check_index_error(
+            lambda: raster.cell_index([2] + [0] * (dimension - 1)),
+            "[cell_index] cell index 2 out of range [0, 2) in direction 0",
+            label + " cell_index",
+        )
+
+
+def check_key_error(function, expected_message, label):
+    try:
+        function()
+    except KeyError as error:
+        check(
+            expected_message in str(error),
+            label + ": unexpected message '" + str(error) + "'",
+        )
+        return
+    except Exception as error:
+        raise ValueError("[Test] " + label + ": expected KeyError, got " + repr(error))
+    raise ValueError("[Test] " + label + ": expected KeyError, nothing raised")
+
+
+def test_mapping_keys():
+    unknown = basic.uuid()
+    for mapping in [basic.BijectiveMappinguuid(), basic.GenericMappinguuid()]:
+        label = type(mapping).__name__
+        for name in ["in2out", "out2in"]:
+            check_key_error(
+                lambda: getattr(mapping, name)(unknown),
+                "[%s] %r is not mapped" % (name, unknown),
+                label + " " + name,
+            )
+    corner_type = model.Corner3D.component_type_static()
+    for mapping in [model.ModelCopyMapping(), model.ModelGenericMapping()]:
+        check_key_error(
+            lambda: mapping.at(corner_type),
+            "[at] no mapping for %r" % corner_type,
+            type(mapping).__name__ + " at",
+        )
+    _, mappings = model.convert_brep_into_curve(model.BRep())
+    element = mesh.MeshElement(unknown, 3)
+    for name, value in [("in2out", element), ("out2in", 5)]:
+        check_key_error(
+            lambda: getattr(mappings.line_edges_mapping, name)(value),
+            "[%s] %r is not mapped" % (name, value),
+            "MeshElementToIndexMapping " + name,
+        )
+    for name in ["in2out", "out2in"]:
+        check_key_error(
+            lambda: getattr(mappings.unique_vertices_mapping, name)(7),
+            "[%s] 7 is not mapped" % name,
+            "IndexToIndexMapping " + name,
+        )
+    # A mapped key still gives its value
+    source = model.BRep()
+    model.BRepBuilder(source).add_corner()
+    copy = model.BRepBuilder(model.BRep()).copy(source)
+    corner = source.corners()[0].id()
+    copied = copy.at(corner_type).in2out(corner)
+    check(copy.at(corner_type).out2in(copied) == corner, "Valid mapping lookups")
+
+
 if __name__ == "__main__":
     mesh.OpenGeodeMeshLibrary.initialize()
     test_point()
@@ -864,3 +1000,6 @@ if __name__ == "__main__":
     test_euclidean_distance_transform()
     test_texture()
     test_component_mesh_polygons()
+    test_grid_indices()
+    test_raster_indices()
+    test_mapping_keys()

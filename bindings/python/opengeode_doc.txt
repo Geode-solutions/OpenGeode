@@ -159,14 +159,25 @@ OpenGeodeError: it keeps the translation of pybind11, RuntimeError for
 std::runtime_error and most others, IndexError for std::out_of_range,
 ValueError for std::invalid_argument and MemoryError for std::bad_alloc.
 
-An index out of range raises the standard IndexError, a wrong type a TypeError
-or a ValueError:
+An index out of range raises the standard IndexError (constant and sparse
+attributes accept any element), a key without value in a mapping (in2out,
+out2in, at) a KeyError, a wrong type a TypeError or a ValueError:
 
     >>> try:
     ...     loaded.point(99)
     ... except IndexError as error:
     ...     print(error)
     [point] vertex 99 out of range [0, 4)
+    >>> try:
+    ...     opengeode.BijectiveMappinguuid().in2out(opengeode.uuid())
+    ... except KeyError:
+    ...     print("not mapped")
+    not mapped
+
+The indices that the C++ library validates itself raise OpenGeodeDataError:
+the vertices given to create_polygon and create_polyhedron, the axis of the
+2D/3D conversions, and the lists given to the delete_* and permute_* functions
+of the builders when their size or values do not match the mesh.
 
 Logging and progress
 ====================

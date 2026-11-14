@@ -389,6 +389,32 @@ namespace geode
         }
     }
 
+    /*!
+     * Wrap a lookup of a mapping (in2out, out2in, at) so that a key without
+     * value raises a Python KeyError naming the key, instead of the
+     * IndexError of the C++ container.
+     * @param[in] has Function telling whether the key has a value.
+     */
+    template < typename Mapping,
+        typename Key,
+        typename Return,
+        typename HasClass,
+        typename GetClass >
+    auto mapping_lookup( std::string_view name,
+        bool ( HasClass::*has )( const Key& ) const,
+        Return ( GetClass::*get )( const Key& ) const )
+    {
+        return [name = std::string{ name }, has, get](
+                   const Mapping& mapping, const Key& key ) -> Return {
+            if( !( mapping.*has )( key ) )
+            {
+                throw pybind11::key_error( absl::StrCat(
+                    "[", name, "] ", python_repr( key ), " is not mapped" ) );
+            }
+            return ( mapping.*get )( key );
+        };
+    }
+
     namespace detail
     {
         template < typename Mesh,

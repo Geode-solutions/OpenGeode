@@ -997,8 +997,8 @@ def test_model_builders():
     check_raises(lambda: model.BRepBuilder(target).copy(source), basic.OpenGeodeDataError, "copy into a non-empty BRep raises")
     moved = model.ModelCopyMapping(mapping)
     check(moved.at(corner_type).has_mapping_input(source.corners()[0].id()), "the move constructor takes the content")
-    check_raises(lambda: mapping.at(corner_type), IndexError, "the moved mapping is emptied")
-    check_raises(lambda: model.ModelCopyMapping().at(corner_type), IndexError, "at() of an unknown type raises IndexError")
+    check_raises(lambda: mapping.at(corner_type), KeyError, "the moved mapping is emptied")
+    check_raises(lambda: model.ModelCopyMapping().at(corner_type), KeyError, "at() of an unknown type raises KeyError")
     # concatenation appends, with new uuids, geometry and unique vertices
     concatener = model.BRepConcatener(target)
     added = concatener.concatenate(source)
