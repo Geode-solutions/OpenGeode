@@ -164,6 +164,7 @@ def check_class(qualified_name, cls, problems, seen):
     if not (cls.__doc__ or "").strip():
         problems.append(f"{qualified_name}: class without docstring")
     check_constructor(qualified_name, cls, problems)
+    check_hidden_overloads(qualified_name, cls, problems)
     if qualified_name in PYBIND11_CONTAINERS:
         return
     for name, member in vars(cls).items():
@@ -274,6 +275,44 @@ def check_missing_constructors(problems):
         problems.append(f"only {len(NON_CONSTRUCTIBLE)} non-constructible classes seen")
 
 
+def overload_parameters(member):
+    """The parameter types (without self) of the overloads of a binding: a
+    renamed parameter is not a hidden overload."""
+    result = set()
+    for signature, _ in split_overloads(member.__doc__ or ""):
+        match = SIGNATURE.match(signature)
+        parameters = [p.strip() for p in match.group("args").split(",") if p.strip()]
+        if parameters and parameters[0].startswith("self"):
+            parameters = parameters[1:]
+        result.add(", ".join(p.split(":", 1)[-1].strip() for p in parameters))
+    return result
+
+
+# Methods redefined on purpose without some overloads of the base class
+INTENDED_HIDDEN_OVERLOADS = set()
+
+
+def check_hidden_overloads(qualified_name, cls, problems):
+    """A .def of a derived class hides every overload of the same name of its
+    bases (pybind11 does not chain the overloads across classes): each
+    parameter list of a base method must still be accepted."""
+    for name, member in vars(cls).items():
+        if name.startswith("__") or not is_pybind_callable(member):
+            continue
+        accepted = overload_parameters(member)
+        for base in cls.__mro__[1:]:
+            base_member = vars(base).get(name)
+            if base_member is None or not is_pybind_callable(base_member):
+                continue
+            hidden = overload_parameters(base_member) - accepted
+            key = f"{qualified_name}.{name}"
+            if hidden and key not in INTENDED_HIDDEN_OVERLOADS:
+                problems.append(
+                    f"{key} hides the overloads ({'), ('.join(sorted(hidden))}) "
+                    f"of {base.__name__}.{name}"
+                )
+
+
 GENERIC_KINDS = [inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD]
 
 
@@ -356,6 +395,16 @@ def check_sanity():
     problems = []
     check_constructor("plain", Plain, problems)
     assert problems == ["plain: generic __init__ docstring"], problems
+
+    class Doc:
+        def __init__(self, doc):
+            self.__doc__ = doc
+
+    assert overload_parameters(Doc("f(self: A, x: int) -> int\n\nDoc\n")) == {"int"}
+    assert overload_parameters(
+        Doc("Overloaded function.\n\n1. f(self: A, x: int) -> int\n\nOne\n\n"
+            "2. f(self: A, p: Point3D, v: Vector3D) -> int\n\nTwo\n")
+    ) == {"int", "Point3D, Vector3D"}
 
 
 if __name__ == "__main__":

@@ -57,6 +57,11 @@ package read `help(opengeode)`, whose text is `bindings/python/opengeode_doc.txt
   `check_index(context, what, index, size)`. Out of range raises `IndexError`
   with `[function] vertex 99 out of range [0, 4)`. Unsigned parameters reject
   negative numbers with the usual pybind11 `TypeError`.
+- Overloads do not cross classes: a `.def( "name", ... )` on a derived class
+  hides every overload of `name` bound on its base classes (pybind11 only
+  chains the overloads defined on the same class). Re-bind the base overloads
+  on the derived class when it adds one; `test-py-signatures.py`
+  (`check_hidden_overloads`) reports a base parameter list no longer accepted.
 - Constructors: a class bound without `pybind11::init` gets an `__init__`
   raising `TypeError` with a docstring telling how to get an instance from
   `geode::document_missing_constructors( module )`, called last in each
