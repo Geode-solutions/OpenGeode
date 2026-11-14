@@ -80,6 +80,9 @@ package read `help(opengeode)`, whose text is `bindings/python/opengeode_doc.txt
   so that the stubs say `T` instead of `object`.
 - Value classes (Point, Vector, uuid, ...) are hashable by value and have an
   eval-able `__repr__` (`define_string_representation`, `python_call_repr`).
+  A mutable class with `__eq__` and no `__hash__` is unhashable (pybind11 sets
+  `__hash__ = None`): no explicit `__hash__` is needed, `check_python_stubs.py
+  fix` makes its stub line (`__hash__: ClassVar[None] = None`) pass mypy.
 - Geometry objects built from Points share the Python Point objects (mutating a
   point mutates the geometry); geometry returned by a mesh is a snapshot built
   from copies of the mesh points (`checked_snapshot` in `mesh/index_check.hpp`):

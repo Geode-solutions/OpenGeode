@@ -351,6 +351,79 @@ def test_fix_rewrites_typevars():
         raise ValueError("[Test] fix of an empty directory should fail:\n" + output)
 
 
+UNHASHABLE_RUNTIME = """
+class Value:
+    def __eq__(self, other: object) -> bool:
+        return True
+class Derived(Value):
+    pass
+"""
+
+
+def test_fix_unhashable_class():
+    # pybind11 sets __hash__ to None for a class defining __eq__ without
+    # __hash__; stubgen writes it as a ClassVar that mypy rejects
+    stub = """
+        from __future__ import annotations
+        import typing
+        __all__: list[str] = ['Derived', 'Value']
+        class Value:
+            __hash__: typing.ClassVar[None] = None
+            def __eq__(self, other: object) -> bool:
+                ...
+        class Derived(Value):
+            pass
+        """
+    with tempfile.TemporaryDirectory() as directory:
+        path = os.path.join(directory, "synthetic_stub_module.pyi")
+        with open(path, "w") as file:
+            file.write(textwrap.dedent(stub))
+        with open(os.path.join(directory, "synthetic_stub_module.py"), "w") as file:
+            file.write(UNHASHABLE_RUNTIME)
+        environment = dict(os.environ)
+        environment["MYPYPATH"] = directory
+        environment["PYTHONPATH"] = directory + os.pathsep + environment.get(
+            "PYTHONPATH", ""
+        )
+        arguments = ["stubtest", "synthetic_stub_module", "--mypy-config-file", MYPY_CONFIG]
+        status, output = run(arguments, environment)
+        if status == 0:
+            raise ValueError("[Test] The unfixed stub should fail mypy:\n" + output)
+        status, output = run(["fix", directory])
+        if status != 0:
+            raise ValueError("[Test] fix failed:\n" + output)
+        with open(path) as file:
+            fixed = file.read()
+        expected = "__hash__: typing.ClassVar[None] = None  # type: ignore[assignment]"
+        if fixed.count(expected) != 1:
+            raise ValueError("[Test] fix did not ignore the __hash__ error:\n" + fixed)
+        run(["fix", directory])
+        with open(path) as file:
+            if file.read() != fixed:
+                raise ValueError("[Test] fix should be idempotent:\n" + fixed)
+        status, output = run(["stubs", directory])
+        if status != 0:
+            raise ValueError("[Test] Fixed stub rejected:\n" + output)
+        status, output = run(arguments, environment)
+        if status != 0:
+            raise ValueError("[Test] Fixed unhashable stub fails stubtest:\n" + output)
+    # The bare ClassVar form is handled too, other attributes are untouched
+    with tempfile.TemporaryDirectory() as directory:
+        path = os.path.join(directory, "other.pyi")
+        with open(path, "w") as file:
+            file.write(
+                "from typing import ClassVar\nclass A:\n"
+                "    __hash__: ClassVar[None]\n    other: ClassVar[None] = None\n"
+            )
+        run(["fix", directory])
+        with open(path) as file:
+            fixed = file.read()
+        if "__hash__: ClassVar[None]  # type: ignore[assignment]" not in fixed or (
+            "other: ClassVar[None] = None\n" not in fixed
+        ):
+            raise ValueError("[Test] Wrong fix of the bare ClassVar:\n" + fixed)
+
+
 def test_real_binding_stubs():
     # The stubs of a real binding are accepted ...
     status, output = run(["modules", "opengeode_py_basic", "--mypy-config-file", MYPY_CONFIG])
@@ -462,5 +535,6 @@ if __name__ == "__main__":
     test_typing_ellipsis_is_accepted()
     test_typevar_annotation_is_rejected()
     test_fix_rewrites_typevars()
+    test_fix_unhashable_class()
     test_stubtest_detects_a_wrong_stub()
     test_real_binding_stubs()

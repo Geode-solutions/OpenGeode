@@ -32,7 +32,11 @@
 TypeVar of a pure-Python module (e.g. `_T = typing.TypeVar("_T")`, used by the
 generic functions of basic.py) is written `_T: typing.TypeVar`, which type
 checkers reject; it becomes `_T = typing.TypeVar("_T")`. Only plain TypeVars
-are supported (stubgen keeps no bound nor constraint). `modules` applies it.
+are supported (stubgen keeps no bound nor constraint). A class defining __eq__
+without __hash__ is unhashable (pybind11 sets __hash__ to None), written
+`__hash__: typing.ClassVar[None] = None`, which mypy rejects as an incompatible
+override of object.__hash__: the line gets `# type: ignore[assignment]`, as in
+typeshed for the unhashable builtins. `modules` applies it.
 
 `stubs` fails if a stub contains
   - a parameter named arg0, arg1... (a binding without pybind11::arg),
@@ -65,6 +69,9 @@ import tempfile
 ARG_NAME = re.compile(r"arg\d+")
 RAW_CPP_NAME = re.compile(r"\b(geode|absl|std)::")
 TYPEVAR_ANNOTATION = re.compile(r"^(\w+): typing\.TypeVar[ \t]*$", re.M)
+UNHASHABLE = re.compile(
+    r"^([ \t]*__hash__: (?:typing\.)?ClassVar\[None\](?: = None)?)[ \t]*$", re.M
+)
 BIND_VECTOR_MEMBERS = {"__init__", "__getitem__", "__setitem__", "__delitem__"}
 BIND_VECTOR_MARKERS = {"append", "extend", "pop"}
 
@@ -243,12 +250,14 @@ def run_stubs(paths, allowed):
 
 
 def fix_stubs(paths):
-    """Rewrite `_T: typing.TypeVar` as `_T = typing.TypeVar("_T")`."""
+    """Rewrite `_T: typing.TypeVar` as `_T = typing.TypeVar("_T")` and
+    ignore the mypy error of the unhashable classes (see the module doc)."""
     files = stub_files(paths)
     for path in files:
         with open(path, encoding="utf-8") as stub:
             source = stub.read()
         fixed = TYPEVAR_ANNOTATION.sub(r'\1 = typing.TypeVar("\1")', source)
+        fixed = UNHASHABLE.sub(r"\1  # type: ignore[assignment]", fixed)
         if fixed != source:
             with open(path, "w", encoding="utf-8", newline="") as stub:
                 stub.write(fixed)
