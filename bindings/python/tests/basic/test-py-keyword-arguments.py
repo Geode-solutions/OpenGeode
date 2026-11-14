@@ -850,6 +850,15 @@ def test_mesh_crs():
     check(main.active_coordinate_reference_system().point(point_id=1).value(0) == 1, "active crs")
     managers_builder.set_point(vertex=0, point=point2(9, 9))
     check(surface.point(vertex_id=0).value(0) == 9, "set_point keyword")
+    # The point of the managers and of the mesh take the same keyword
+    managers_class = type(surface).__mro__[
+        [c.__name__ for c in type(surface).__mro__].index("CoordinateReferenceSystemManagers2D")
+    ]
+    check(
+        managers_class.point(surface, vertex_id=0) == surface.point(vertex_id=0),
+        "CoordinateReferenceSystemManagers2D.point keyword",
+    )
+    check_raises(lambda: surface.point(vertex=0), TypeError, "no vertex keyword")
     check(
         surface.coordinate_reference_system_manager2D().nb_coordinate_reference_systems() == 2,
         "manager2D",

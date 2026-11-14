@@ -276,15 +276,15 @@ def check_missing_constructors(problems):
 
 
 def overload_parameters(member):
-    """The parameter types (without self) of the overloads of a binding: a
-    renamed parameter is not a hidden overload."""
+    """The parameter lists (without self) of the overloads of a binding: a
+    renamed parameter hides the keyword of the base class."""
     result = set()
     for signature, _ in split_overloads(member.__doc__ or ""):
         match = SIGNATURE.match(signature)
         parameters = [p.strip() for p in match.group("args").split(",") if p.strip()]
         if parameters and parameters[0].startswith("self"):
             parameters = parameters[1:]
-        result.add(", ".join(p.split(":", 1)[-1].strip() for p in parameters))
+        result.add(", ".join(parameters))
     return result
 
 
@@ -400,11 +400,11 @@ def check_sanity():
         def __init__(self, doc):
             self.__doc__ = doc
 
-    assert overload_parameters(Doc("f(self: A, x: int) -> int\n\nDoc\n")) == {"int"}
+    assert overload_parameters(Doc("f(self: A, x: int) -> int\n\nDoc\n")) == {"x: int"}
     assert overload_parameters(
         Doc("Overloaded function.\n\n1. f(self: A, x: int) -> int\n\nOne\n\n"
             "2. f(self: A, p: Point3D, v: Vector3D) -> int\n\nTwo\n")
-    ) == {"int", "Point3D, Vector3D"}
+    ) == {"x: int", "p: Point3D, v: Vector3D"}
 
 
 if __name__ == "__main__":

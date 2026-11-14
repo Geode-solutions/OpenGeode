@@ -74,18 +74,18 @@
             "point",                                                           \
             []( const CoordinateReferenceSystemManagers##dimension##D&         \
                     managers,                                                  \
-                index_t vertex ) {                                             \
+                index_t vertex_id ) {                                          \
                 check_crs_point( "point",                                      \
                     managers.main_coordinate_reference_system_manager()        \
                         .active_coordinate_reference_system(),                 \
-                    vertex );                                                  \
-                return managers.point( vertex );                               \
+                    vertex_id );                                               \
+                return managers.point( vertex_id );                            \
             },                                                                 \
             "Return the coordinates of a vertex in the active coordinate "     \
             "reference system of the main manager. Raise IndexError if the "   \
             "vertex is out of range for a coordinate reference system "        \
             "storing one point per vertex",                                    \
-            pybind11::arg( "vertex" ) )
+            pybind11::arg( "vertex_id" ) )
 
 namespace geode
 {
