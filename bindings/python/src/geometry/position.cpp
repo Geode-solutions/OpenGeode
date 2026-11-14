@@ -36,12 +36,18 @@
         "point_segment_position" + std::to_string( dimension ) + "D";          \
     module.def( point_segment##dimension.c_str(),                              \
         static_cast< POSITION ( * )( const Point< dimension >&,                \
-            const Segment< dimension >& ) >( &point_segment_position ) );      \
+            const Segment< dimension >& ) >( &point_segment_position ),        \
+        pybind11::arg( "point" ), pybind11::arg( "segment" ),                  \
+        "Return the position of a point on a segment: inside, outside or on "  \
+        "a vertex" );                                                          \
     const auto point_triangle##dimension =                                     \
         "point_triangle_position" + std::to_string( dimension ) + "D";         \
     module.def( point_triangle##dimension.c_str(),                             \
         static_cast< POSITION ( * )( const Point< dimension >&,                \
-            const Triangle< dimension >& ) >( &point_triangle_position ) )
+            const Triangle< dimension >& ) >( &point_triangle_position ),      \
+        pybind11::arg( "point" ), pybind11::arg( "triangle" ),                 \
+        "Return the position of a point relative to a triangle: inside, "      \
+        "outside, on a vertex or on an edge" )
 
 namespace geode
 {
@@ -49,11 +55,21 @@ namespace geode
     {
         PYTHON_POSITION( 2 );
         PYTHON_POSITION( 3 );
-        module.def( "point_side_to_segment2D", &point_side_to_segment );
-        module.def( "point_side_to_line2D", &point_side_to_line );
-        module.def( "point_side_to_plane3D", &point_side_to_plane );
-        module.def( "point_side_to_triangle3D", &point_side_to_triangle );
-        module.def(
-            "point_tetrahedron_position3D", &point_tetrahedron_position );
+        module.def( "point_side_to_segment2D", &point_side_to_segment,
+            pybind11::arg( "point" ), pybind11::arg( "segment" ),
+            "Return the side of the 2D segment on which the point lies" );
+        module.def( "point_side_to_line2D", &point_side_to_line,
+            pybind11::arg( "point" ), pybind11::arg( "line" ),
+            "Return the side of the 2D line on which the point lies" );
+        module.def( "point_side_to_plane3D", &point_side_to_plane,
+            pybind11::arg( "point" ), pybind11::arg( "plane" ),
+            "Return the side of the plane on which the point lies" );
+        module.def( "point_side_to_triangle3D", &point_side_to_triangle,
+            pybind11::arg( "point" ), pybind11::arg( "triangle" ),
+            "Return the side of the 3D triangle on which the point lies" );
+        module.def( "point_tetrahedron_position3D", &point_tetrahedron_position,
+            pybind11::arg( "point" ), pybind11::arg( "tetra" ),
+            "Return the position of a point relative to a tetrahedron: inside, "
+            "outside, on a vertex, an edge or a facet" );
     }
 } // namespace geode

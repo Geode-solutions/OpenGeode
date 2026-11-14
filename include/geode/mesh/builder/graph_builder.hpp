@@ -113,7 +113,9 @@ namespace geode
         /*!
          * Permute edges to match the given order.
          * @param[in] permutation Vector of size graph_.nb_edges().
-         * Each value corresponds to the destination position.
+         * permutation[new_index] is the old index of the edge that is moved
+         * to new_index. It must be a permutation of the indices, otherwise an
+         * OpenGeodeException of type data is thrown.
          * @return the mapping between old edge indices to new ones.
          */
         std::vector< index_t > permute_edges(

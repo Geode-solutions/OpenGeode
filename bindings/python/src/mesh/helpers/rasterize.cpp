@@ -36,18 +36,50 @@ namespace geode
 {
     void define_rasterize( pybind11::module& module )
     {
-        module.def( "rasterize_segment2D", &rasterize_segment< 2 > );
-        module.def( "rasterize_segment3D", &rasterize_segment< 3 > );
+        module.def( "rasterize_segment2D", &rasterize_segment< 2 >,
+            pybind11::arg( "grid" ), pybind11::arg( "segment" ),
+            pybind11::call_guard< pybind11::gil_scoped_release >(),
+            "Return the indices of the cells of the 2D grid crossed by the "
+            "segment; only its part inside the grid is rasterized" );
+        module.def( "rasterize_segment3D", &rasterize_segment< 3 >,
+            pybind11::arg( "grid" ), pybind11::arg( "segment" ),
+            pybind11::call_guard< pybind11::gil_scoped_release >(),
+            "Return the indices of the cells of the 3D grid crossed by the "
+            "segment; only its part inside the grid is rasterized" );
         module.def( "conservative_rasterize_segment2D",
-            &conservative_rasterize_segment< 2 > );
+            &conservative_rasterize_segment< 2 >, pybind11::arg( "grid" ),
+            pybind11::arg( "segment" ),
+            pybind11::call_guard< pybind11::gil_scoped_release >(),
+            "Return the indices of all the cells of the 2D grid touched by the "
+            "segment; only its part inside the grid is rasterized" );
         module.def( "conservative_rasterize_segment3D",
-            &conservative_rasterize_segment< 3 > );
+            &conservative_rasterize_segment< 3 >, pybind11::arg( "grid" ),
+            pybind11::arg( "segment" ),
+            pybind11::call_guard< pybind11::gil_scoped_release >(),
+            "Return the indices of all the cells of the 3D grid touched by the "
+            "segment; only its part inside the grid is rasterized" );
         module.def( "conservative_rasterize_triangle2D",
-            &conservative_rasterize_triangle< 2 > );
+            &conservative_rasterize_triangle< 2 >, pybind11::arg( "grid" ),
+            pybind11::arg( "triangle" ),
+            pybind11::call_guard< pybind11::gil_scoped_release >(),
+            "Return the indices of all the cells of the 2D grid touched by the "
+            "triangle; only its part inside the grid is rasterized" );
         module.def( "conservative_rasterize_triangle3D",
-            &conservative_rasterize_triangle< 3 > );
-        module.def( "rasterize_tetrahedron", &rasterize_tetrahedron );
-        module.def( "rasterize_closed_surface", &rasterize_closed_surface );
+            &conservative_rasterize_triangle< 3 >, pybind11::arg( "grid" ),
+            pybind11::arg( "triangle" ),
+            pybind11::call_guard< pybind11::gil_scoped_release >(),
+            "Return the indices of all the cells of the 3D grid touched by the "
+            "triangle; only its part inside the grid is rasterized" );
+        module.def( "rasterize_tetrahedron", &rasterize_tetrahedron,
+            pybind11::arg( "grid" ), pybind11::arg( "tetrahedron" ),
+            pybind11::call_guard< pybind11::gil_scoped_release >(),
+            "Return the indices of the cells of the 3D grid occupied by the "
+            "tetrahedron" );
+        module.def( "rasterize_closed_surface", &rasterize_closed_surface,
+            pybind11::arg( "grid" ), pybind11::arg( "closed_surface" ),
+            pybind11::call_guard< pybind11::gil_scoped_release >(),
+            "Return the indices of the cells of the 3D grid covered by the "
+            "closed triangulated surface, its interior included" );
     }
 
 } // namespace geode

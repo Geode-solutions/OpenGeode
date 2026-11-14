@@ -28,10 +28,14 @@
 #define PYTHON_SURFACE_EDGES_BUILDER( dimension )                              \
     const auto name##dimension =                                               \
         "SurfaceEdgesBuilder" + std::to_string( dimension ) + "D";             \
-    pybind11::class_< SurfaceEdgesBuilder##dimension##D >(                     \
-        module, name##dimension.c_str() )                                      \
+    pybind11::class_< SurfaceEdgesBuilder##dimension##D >( module,             \
+        name##dimension.c_str(),                                               \
+        "Builder to modify the edges of a surface mesh" )                      \
         .def( "delete_isolated_edges",                                         \
-            &SurfaceEdgesBuilder##dimension##D::delete_isolated_edges )
+            &SurfaceEdgesBuilder##dimension##D::delete_isolated_edges,         \
+            "Delete the edges that are not used by any polygon and return "    \
+            "the mapping from the old edge indices to the new ones, NO_ID "    \
+            "for a deleted edge" )
 
 namespace geode
 {

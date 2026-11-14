@@ -31,7 +31,17 @@ namespace geode
 {
     void define_external_time_series_io( pybind11::module& module )
     {
-        module.def( "save_external_time_series", &save_external_time_series );
-        module.def( "load_external_time_series", &load_external_time_series );
+        module.def( "save_external_time_series", &save_external_time_series,
+            pybind11::arg( "time_series" ), pybind11::arg( "filename" ),
+            pybind11::call_guard< pybind11::gil_scoped_release >(),
+            "Save the ExternalTimeSeries in a native file (extension "
+            "ExternalTimeSeries.native_extension_static()); raise an error if "
+            "the extension is different or the file cannot be written" );
+        module.def( "load_external_time_series", &load_external_time_series,
+            pybind11::arg( "filename" ),
+            pybind11::call_guard< pybind11::gil_scoped_release >(),
+            "Load an ExternalTimeSeries from a native file (extension "
+            "ExternalTimeSeries.native_extension_static()); raise an error if "
+            "the extension is different or the file cannot be read" );
     }
 } // namespace geode

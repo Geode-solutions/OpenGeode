@@ -67,9 +67,16 @@ namespace geode
     template < index_t dimension >
     Percentage is_raster_image_loadable( std::string_view filename )
     {
-        const auto input = detail::geode_object_input_reader<
-            RasterImageInputFactory< dimension > >( filename );
-        return input->is_loadable();
+        try
+        {
+            const auto input = detail::geode_object_input_reader<
+                RasterImageInputFactory< dimension > >( filename );
+            return input->is_loadable();
+        }
+        catch( ... )
+        {
+            return Percentage{ 0 };
+        }
     }
 
     template < index_t dimension >

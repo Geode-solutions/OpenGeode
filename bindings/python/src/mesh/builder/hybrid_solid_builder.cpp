@@ -22,6 +22,7 @@
  */
 
 #include "../../common.hpp"
+#include "../index_check.hpp"
 
 #include <geode/mesh/builder/hybrid_solid_builder.hpp>
 #include <geode/mesh/core/hybrid_solid.hpp>
@@ -30,16 +31,48 @@
     const auto name##dimension =                                               \
         "HybridSolidBuilder" + std::to_string( dimension ) + "D";              \
     pybind11::class_< HybridSolidBuilder##dimension##D,                        \
-        SolidMeshBuilder##dimension##D >( module, name##dimension.c_str() )    \
-        .def_static( "create", &HybridSolidBuilder##dimension##D::create )     \
+        SolidMeshBuilder##dimension##D >(                                      \
+        module, name##dimension.c_str(), "Builder to modify a hybrid solid" )  \
+        .def_static( "create",                                                 \
+            geode::builder_creator(                                            \
+                &HybridSolidBuilder##dimension##D::create ),                   \
+            pybind11::arg( "mesh" ), pybind11::keep_alive< 0, 1 >(),           \
+            "Return the builder to modify the hybrid solid, which keeps the "  \
+            "mesh alive" )                                                     \
         .def( "create_tetrahedron",                                            \
-            &HybridSolidBuilder##dimension##D::create_tetrahedron )            \
+            geode::checked_builder< HybridSolidBuilder##dimension##D,          \
+                SolidMesh< dimension > >( "create_tetrahedron",                \
+                &HybridSolidBuilder##dimension##D::create_tetrahedron,         \
+                geode::VertexCheck{} ),                                        \
+            "Create a tetrahedron from its four vertices and return its "      \
+            "index. "                                                          \
+            "Raise IndexError if a vertex is not in [0, nb_vertices)",         \
+            pybind11::arg( "vertices" ) )                                      \
         .def( "create_hexahedron",                                             \
-            &HybridSolidBuilder##dimension##D::create_hexahedron )             \
-        .def(                                                                  \
-            "create_prism", &HybridSolidBuilder##dimension##D::create_prism )  \
+            geode::checked_builder< HybridSolidBuilder##dimension##D,          \
+                SolidMesh< dimension > >( "create_hexahedron",                 \
+                &HybridSolidBuilder##dimension##D::create_hexahedron,          \
+                geode::VertexCheck{} ),                                        \
+            "Create a hexahedron from its eight vertices and return its "      \
+            "index. "                                                          \
+            "Raise IndexError if a vertex is not in [0, nb_vertices)",         \
+            pybind11::arg( "vertices" ) )                                      \
+        .def( "create_prism",                                                  \
+            geode::checked_builder< HybridSolidBuilder##dimension##D,          \
+                SolidMesh< dimension > >( "create_prism",                      \
+                &HybridSolidBuilder##dimension##D::create_prism,               \
+                geode::VertexCheck{} ),                                        \
+            "Create a prism from its six vertices and return its index. "      \
+            "Raise IndexError if a vertex is not in [0, nb_vertices)",         \
+            pybind11::arg( "vertices" ) )                                      \
         .def( "create_pyramid",                                                \
-            &HybridSolidBuilder##dimension##D::create_pyramid )
+            geode::checked_builder< HybridSolidBuilder##dimension##D,          \
+                SolidMesh< dimension > >( "create_pyramid",                    \
+                &HybridSolidBuilder##dimension##D::create_pyramid,             \
+                geode::VertexCheck{} ),                                        \
+            "Create a pyramid from its five vertices and return its index. "   \
+            "Raise IndexError if a vertex is not in [0, nb_vertices)",         \
+            pybind11::arg( "vertices" ) )
 
 namespace geode
 {

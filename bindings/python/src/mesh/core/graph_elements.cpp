@@ -31,13 +31,29 @@ namespace geode
 {
     void define_graph_elements( pybind11::module& module )
     {
-        define_string_representation(
-            pybind11::class_< EdgeVertex >( module, "EdgeVertex" ) )
-            .def( pybind11::init<>() )
-            .def( pybind11::init< index_t, index_t >() )
-            .def( pybind11::self == pybind11::self )
-            .def( pybind11::self != pybind11::self )
-            .def_readwrite( "edge_id", &EdgeVertex::edge_id )
-            .def_readwrite( "vertex_id", &EdgeVertex::vertex_id );
+        auto edge_vertex = define_string_representation(
+            pybind11::class_< EdgeVertex >( module, "EdgeVertex",
+                "Endpoint of a graph edge: the edge index and the endpoint "
+                "(0 or 1)" ),
+            []( const EdgeVertex& value ) {
+                return python_call_repr( "EdgeVertex",
+                    { "edge_id=" + python_repr( value.edge_id ),
+                        "vertex_id=" + python_repr( value.vertex_id ) } );
+            } );
+        edge_vertex
+            .def( pybind11::init<>(),
+                "Build an edge endpoint with invalid indices (NO_ID, NO_LID)" )
+            .def( pybind11::init< index_t, index_t >(),
+                pybind11::arg( "edge_id" ), pybind11::arg( "vertex_id" ),
+                "Build the endpoint vertex_id (0 or 1) of the edge edge_id" )
+            .def( pybind11::self == pybind11::self, pybind11::arg( "other" ) )
+            .def( pybind11::self != pybind11::self, pybind11::arg( "other" ) )
+            .def( "__hash__", []( const EdgeVertex& value ) {
+                return absl::HashOf( value.edge_id, value.vertex_id );
+            } );
+        def_readwrite_named(
+            edge_vertex, "edge_id", &EdgeVertex::edge_id, "Index of the edge" );
+        def_readwrite_named( edge_vertex, "vertex_id", &EdgeVertex::vertex_id,
+            "Endpoint of the edge (0 or 1)" );
     }
 } // namespace geode

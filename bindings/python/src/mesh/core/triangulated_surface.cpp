@@ -22,6 +22,7 @@
  */
 
 #include "../../common.hpp"
+#include "../index_check.hpp"
 
 #include <geode/geometry/basic_objects/triangle.hpp>
 #include <geode/mesh/core/triangulated_surface.hpp>
@@ -30,14 +31,25 @@
     const auto name##dimension =                                               \
         "TriangulatedSurface" + std::to_string( dimension ) + "D";             \
     pybind11::class_< TriangulatedSurface##dimension##D,                       \
-        SurfaceMesh##dimension##D, pybind11::smart_holder >(                   \
-        module, name##dimension.c_str() )                                      \
-        .def_static(                                                           \
-            "create", static_cast< std::unique_ptr<                            \
-                          TriangulatedSurface##dimension##D > ( * )() >(       \
-                          &TriangulatedSurface##dimension##D::create ) )       \
-        .def( "clone", &TriangulatedSurface##dimension##D::clone )             \
-        .def( "triangle", &TriangulatedSurface##dimension##D::triangle )
+        SurfaceMesh##dimension##D, pybind11::smart_holder >( module,           \
+        name##dimension.c_str(), "Surface mesh made of triangles only" )       \
+        .def_static( "create",                                                 \
+            static_cast< std::unique_ptr<                                      \
+                TriangulatedSurface##dimension##D > ( * )() >(                 \
+                &TriangulatedSurface##dimension##D::create ),                  \
+            "Create an empty triangulated surface with the default data "      \
+            "structure" )                                                      \
+        .def( "clone", &TriangulatedSurface##dimension##D::clone,              \
+            "Return a copy of the triangulated surface, with the same data "   \
+            "structure, name and identifier" )                                 \
+        .def( "triangle",                                                      \
+            geode::checked_snapshot( "triangle",                               \
+                &TriangulatedSurface##dimension##D::triangle,                  \
+                geode::PolygonCheck{} ),                                       \
+            pybind11::arg( "triangle_id" ),                                    \
+            "Return the geometric triangle of the given triangle of the "      \
+            "mesh, built from copies of the triangle points: later changes "   \
+            "of the mesh do not modify it" )
 
 namespace geode
 {

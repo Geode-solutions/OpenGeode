@@ -54,3 +54,20 @@ if __name__ == '__main__':
     concatener.concatenate( brep2 )
     check_concatenation( brep, nb_components )
     model.save_brep( brep, "concatenated_brep.og_brep" )
+    # A model cannot be concatenated into itself (it used to loop forever)
+    nb_corners = brep.nb_corners()
+    try:
+        concatener.concatenate( brep )
+    except opengeode.OpenGeodeDataError:
+        pass
+    else:
+        raise ValueError( "[Test] Concatenating a BRep into itself should raise an OpenGeodeDataError" )
+    if brep.nb_corners() != nb_corners:
+        raise ValueError( "[Test] The BRep should be unchanged after a rejected concatenation" )
+    section = model.Section()
+    try:
+        model.SectionConcatener( section ).concatenate( section )
+    except opengeode.OpenGeodeDataError:
+        pass
+    else:
+        raise ValueError( "[Test] Concatenating a Section into itself should raise an OpenGeodeDataError" )

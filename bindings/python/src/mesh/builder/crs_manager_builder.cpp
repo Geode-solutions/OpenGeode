@@ -31,29 +31,51 @@
     const auto name##dimension = "CoordinateReferenceSystemManagerBuilder"     \
                                  + std::to_string( dimension ) + "D";          \
     pybind11::class_< CoordinateReferenceSystemManagerBuilder##dimension##D >( \
-        module, name##dimension.c_str() )                                      \
+        module, name##dimension.c_str(),                                       \
+        "Builder to modify a coordinate reference system manager" )            \
         .def( pybind11::init<                                                  \
-            CoordinateReferenceSystemManager< dimension >& >() )               \
-        .def( "register_coordinate_reference_system",                          \
+                  CoordinateReferenceSystemManager< dimension >& >(),          \
+            pybind11::arg( "crs_manager" ), pybind11::keep_alive< 1, 2 >(),    \
+            "Build the builder of a coordinate reference system manager, "     \
+            "which is kept alive by the builder" )                             \
+        .def(                                                                  \
+            "register_coordinate_reference_system",                            \
             []( CoordinateReferenceSystemManagerBuilder< dimension >& manager, \
                 std::string_view name,                                         \
                 std::shared_ptr< CoordinateReferenceSystem< dimension > >&     \
                     crs ) {                                                    \
                 manager.register_coordinate_reference_system(                  \
                     name, std::move( crs ) );                                  \
-            } )                                                                \
+            },                                                                 \
+            "Register a coordinate reference system under this name; raise "   \
+            "an error if the name is already used",                            \
+            pybind11::arg( "name" ), pybind11::arg( "crs" ) )                  \
         .def( "delete_coordinate_reference_system",                            \
             &CoordinateReferenceSystemManagerBuilder<                          \
-                dimension >::delete_coordinate_reference_system )              \
+                dimension >::delete_coordinate_reference_system,               \
+            "Delete the coordinate reference system with this name (nothing "  \
+            "happens if there is none); if it was active, no coordinate "      \
+            "reference system is active anymore",                              \
+            pybind11::arg( "name" ) )                                          \
         .def( "set_active_coordinate_reference_system",                        \
             &CoordinateReferenceSystemManagerBuilder<                          \
-                dimension >::set_active_coordinate_reference_system )          \
+                dimension >::set_active_coordinate_reference_system,           \
+            "Make the coordinate reference system with this name the active "  \
+            "one; raise an error if there is none",                            \
+            pybind11::arg( "name" ) )                                          \
         .def( "active_coordinate_reference_system",                            \
             &CoordinateReferenceSystemManagerBuilder<                          \
-                dimension >::active_coordinate_reference_system )              \
+                dimension >::active_coordinate_reference_system,               \
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the active coordinate reference system to modify it; "     \
+            "raise an error if none is active" )                               \
         .def( "coordinate_reference_system",                                   \
             &CoordinateReferenceSystemManagerBuilder<                          \
-                dimension >::coordinate_reference_system )
+                dimension >::coordinate_reference_system,                      \
+            pybind11::arg( "name" ),                                           \
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the coordinate reference system with this name to modify " \
+            "it; raise an error if there is none" )
 
 namespace geode
 {

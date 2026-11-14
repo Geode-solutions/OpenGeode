@@ -31,9 +31,15 @@ namespace geode
 {
     void define_identifier_builder( pybind11::module& module )
     {
-        pybind11::class_< IdentifierBuilder >( module, "IdentifierBuilder" )
-            .def( pybind11::init< Identifier& >() )
-            .def( "set_id", &IdentifierBuilder::set_id )
-            .def( "set_name", &IdentifierBuilder::set_name );
+        pybind11::class_< IdentifierBuilder >( module, "IdentifierBuilder",
+            "Modifier of the id and name of an Identifier" )
+            .def( pybind11::init< Identifier& >(),
+                pybind11::keep_alive< 1, 2 >(), pybind11::arg( "identifier" ),
+                "Build a builder modifying the given identifier. The "
+                "identifier is kept alive by the builder" )
+            .def( "set_id", &IdentifierBuilder::set_id,
+                pybind11::arg( "unique_id" ), "Set the uuid of the object" )
+            .def( "set_name", &IdentifierBuilder::set_name,
+                pybind11::arg( "name" ), "Set the name of the object" );
     }
 } // namespace geode

@@ -22,6 +22,7 @@ add_geode_python_binding(
     NAME "py_mesh"
     SOURCES
         "mesh.cpp"
+        "numpy_access.cpp"
         "builder/crs_manager_builder.cpp"
         "builder/crs_managers_builder.cpp"
         "builder/grid_crs_manager_builder.cpp"
@@ -40,6 +41,7 @@ add_geode_python_binding(
         "builder/tetrahedral_solid_builder.cpp"
         "builder/triangulated_surface_builder.cpp"
         "builder/vertex_set_builder.cpp"
+        "core/bound_interface.cpp"
         "core/crs.cpp"
         "core/crs_manager.cpp"
         "core/crs_managers.cpp"
@@ -50,6 +52,7 @@ add_geode_python_binding(
         "core/grid.cpp"
         "core/hybrid_solid.cpp"
         "core/light_regular_grid.cpp"
+        "core/mesh_element.cpp"
         "core/mesh_id.cpp"
         "core/point_set.cpp"
         "core/polygonal_surface.cpp"

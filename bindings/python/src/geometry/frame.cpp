@@ -28,15 +28,36 @@
 
 #define PYTHON_FRAME( dimension )                                              \
     const auto name##dimension = "Frame" + std::to_string( dimension ) + "D";  \
-    define_string_representation( pybind11::class_< Frame##dimension##D >(     \
-                                      module, name##dimension.c_str() ) )      \
-        .def( pybind11::init<>() )                                             \
+    define_string_representation(                                              \
+        pybind11::class_< Frame##dimension##D >( module,                       \
+            name##dimension.c_str(), "Set of one direction vector per axis" ), \
+        []( const Frame##dimension##D& frame ) {                               \
+            std::array< Vector< dimension >, dimension > directions;           \
+            for( const auto i : LRange{ dimension } )                          \
+            {                                                                  \
+                directions[i] = frame.direction( i );                          \
+            }                                                                  \
+            return python_call_repr(                                           \
+                "Frame" #dimension "D", { python_repr( directions ) } );       \
+        } )                                                                    \
+        .def( pybind11::init<>(), "Build the canonical frame" )                \
         .def(                                                                  \
-            pybind11::init< std::array< Vector< dimension >, dimension > >() ) \
-        .def( "direction", &Frame##dimension##D::direction )                   \
-        .def( "set_direction", &Frame##dimension##D::set_direction )           \
-        .def( "inverse", &Frame##dimension##D::inverse )                       \
-        .def( "rescale", &Frame##dimension##D::rescale )
+            pybind11::init< std::array< Vector< dimension >, dimension > >(),  \
+            pybind11::arg( "directions" ),                                     \
+            "Build a frame from the directions of its axes" )                  \
+        .def( "direction", &Frame##dimension##D::direction,                    \
+            pybind11::arg( "index" ),                                          \
+            "Return the direction of the given axis" )                         \
+        .def( "set_direction", &Frame##dimension##D::set_direction,            \
+            pybind11::arg( "index" ), pybind11::arg( "direction" ),            \
+            "Set the direction of the given axis" )                            \
+        .def( "inverse", &Frame##dimension##D::inverse,                        \
+            "Return the inverse frame. Raise an error if the frame is not "    \
+            "invertible" )                                                     \
+        .def( "rescale", &Frame##dimension##D::rescale,                        \
+            pybind11::arg( "length" ),                                         \
+            "Return the frame whose directions are all multiplied by the "     \
+            "given factor (length)" )
 
 namespace geode
 {

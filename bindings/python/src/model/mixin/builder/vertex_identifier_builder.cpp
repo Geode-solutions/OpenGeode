@@ -22,6 +22,7 @@
  */
 
 #include "../../../common.hpp"
+#include "../../model_vertex_check.hpp"
 
 #include <geode/model/mixin/builder/vertex_identifier_builder.hpp>
 
@@ -34,50 +35,177 @@ namespace geode
 {
     void define_vertex_identifier_builder( pybind11::module& module )
     {
-        pybind11::class_< VertexIdentifierBuilder >(
-            module, "VertexIdentifierBuilder" )
-            .def( pybind11::init< VertexIdentifier& >() )
+        pybind11::class_< VertexIdentifierBuilder >( module,
+            "VertexIdentifierBuilder",
+            "Builder modifying the VertexIdentifier of a model" )
+            .def( pybind11::init< VertexIdentifier& >(),
+                pybind11::arg( "vertex_identifier" ),
+                pybind11::keep_alive< 1, 2 >(),
+                "Build a builder of the given VertexIdentifier, kept alive by "
+                "the builder" )
             .def( "register_block3D_component",
-                &VertexIdentifierBuilder::register_mesh_component< Block3D > )
+                &VertexIdentifierBuilder::register_mesh_component< Block3D >,
+                pybind11::arg( "component" ),
+                "Register the Block 3D so that its vertices can be identified "
+                "with unique vertices, and create the attribute storing the "
+                "identification on its mesh; raise an error if it is already "
+                "registered, which is the case of the components created "
+                "through the model builder (add_xxx)" )
             .def( "register_corner2D_component",
-                &VertexIdentifierBuilder::register_mesh_component< Corner2D > )
+                &VertexIdentifierBuilder::register_mesh_component< Corner2D >,
+                pybind11::arg( "component" ),
+                "Register the Corner 2D so that its vertices can be identified "
+                "with unique vertices, and create the attribute storing the "
+                "identification on its mesh; raise an error if it is already "
+                "registered, which is the case of the components created "
+                "through the model builder (add_xxx)" )
             .def( "register_corner3D_component",
-                &VertexIdentifierBuilder::register_mesh_component< Corner3D > )
+                &VertexIdentifierBuilder::register_mesh_component< Corner3D >,
+                pybind11::arg( "component" ),
+                "Register the Corner 3D so that its vertices can be identified "
+                "with unique vertices, and create the attribute storing the "
+                "identification on its mesh; raise an error if it is already "
+                "registered, which is the case of the components created "
+                "through the model builder (add_xxx)" )
             .def( "register_line2D_component",
-                &VertexIdentifierBuilder::register_mesh_component< Line2D > )
+                &VertexIdentifierBuilder::register_mesh_component< Line2D >,
+                pybind11::arg( "component" ),
+                "Register the Line 2D so that its vertices can be identified "
+                "with unique vertices, and create the attribute storing the "
+                "identification on its mesh; raise an error if it is already "
+                "registered, which is the case of the components created "
+                "through the model builder (add_xxx)" )
             .def( "register_line3D_component",
-                &VertexIdentifierBuilder::register_mesh_component< Line3D > )
+                &VertexIdentifierBuilder::register_mesh_component< Line3D >,
+                pybind11::arg( "component" ),
+                "Register the Line 3D so that its vertices can be identified "
+                "with unique vertices, and create the attribute storing the "
+                "identification on its mesh; raise an error if it is already "
+                "registered, which is the case of the components created "
+                "through the model builder (add_xxx)" )
             .def( "register_surface2D_component",
-                &VertexIdentifierBuilder::register_mesh_component< Surface2D > )
+                &VertexIdentifierBuilder::register_mesh_component< Surface2D >,
+                pybind11::arg( "component" ),
+                "Register the Surface 2D so that its vertices can be "
+                "identified with unique vertices, and create the attribute "
+                "storing the identification on its mesh; raise an error if it "
+                "is already registered, which is the case of the components "
+                "created through the model builder (add_xxx)" )
             .def( "register_surface3D_component",
-                &VertexIdentifierBuilder::register_mesh_component< Surface3D > )
+                &VertexIdentifierBuilder::register_mesh_component< Surface3D >,
+                pybind11::arg( "component" ),
+                "Register the Surface 3D so that its vertices can be "
+                "identified with unique vertices, and create the attribute "
+                "storing the identification on its mesh; raise an error if it "
+                "is already registered, which is the case of the components "
+                "created through the model builder (add_xxx)" )
             .def( "unregister_block3D_component",
-                &VertexIdentifierBuilder::unregister_mesh_component< Block3D > )
+                &VertexIdentifierBuilder::unregister_mesh_component< Block3D >,
+                pybind11::arg( "component" ),
+                "Unregister the Block 3D: its vertices are removed from their "
+                "unique vertices, which are kept even if no component vertex "
+                "remains, and the attribute storing the identification is "
+                "deleted from its mesh; raise an error if it is not "
+                "registered" )
             .def( "unregister_corner2D_component",
-                &VertexIdentifierBuilder::unregister_mesh_component<
-                    Corner2D > )
+                &VertexIdentifierBuilder::unregister_mesh_component< Corner2D >,
+                pybind11::arg( "component" ),
+                "Unregister the Corner 2D: its vertices are removed from their "
+                "unique vertices, which are kept even if no component vertex "
+                "remains, and the attribute storing the identification is "
+                "deleted from its mesh; raise an error if it is not "
+                "registered" )
             .def( "unregister_corner3D_component",
-                &VertexIdentifierBuilder::unregister_mesh_component<
-                    Corner3D > )
+                &VertexIdentifierBuilder::unregister_mesh_component< Corner3D >,
+                pybind11::arg( "component" ),
+                "Unregister the Corner 3D: its vertices are removed from their "
+                "unique vertices, which are kept even if no component vertex "
+                "remains, and the attribute storing the identification is "
+                "deleted from its mesh; raise an error if it is not "
+                "registered" )
             .def( "unregister_line2D_component",
-                &VertexIdentifierBuilder::unregister_mesh_component< Line2D > )
+                &VertexIdentifierBuilder::unregister_mesh_component< Line2D >,
+                pybind11::arg( "component" ),
+                "Unregister the Line 2D: its vertices are removed from their "
+                "unique vertices, which are kept even if no component vertex "
+                "remains, and the attribute storing the identification is "
+                "deleted from its mesh; raise an error if it is not "
+                "registered" )
             .def( "unregister_line3D_component",
-                &VertexIdentifierBuilder::unregister_mesh_component< Line3D > )
+                &VertexIdentifierBuilder::unregister_mesh_component< Line3D >,
+                pybind11::arg( "component" ),
+                "Unregister the Line 3D: its vertices are removed from their "
+                "unique vertices, which are kept even if no component vertex "
+                "remains, and the attribute storing the identification is "
+                "deleted from its mesh; raise an error if it is not "
+                "registered" )
             .def( "unregister_surface2D_component",
                 &VertexIdentifierBuilder::unregister_mesh_component<
-                    Surface2D > )
+                    Surface2D >,
+                pybind11::arg( "component" ),
+                "Unregister the Surface 2D: its vertices are removed from "
+                "their unique vertices, which are kept even if no component "
+                "vertex remains, and the attribute storing the identification "
+                "is deleted from its mesh; raise an error if it is not "
+                "registered" )
             .def( "unregister_surface3D_component",
                 &VertexIdentifierBuilder::unregister_mesh_component<
-                    Surface3D > )
+                    Surface3D >,
+                pybind11::arg( "component" ),
+                "Unregister the Surface 3D: its vertices are removed from "
+                "their unique vertices, which are kept even if no component "
+                "vertex remains, and the attribute storing the identification "
+                "is deleted from its mesh; raise an error if it is not "
+                "registered" )
             .def( "create_unique_vertex",
-                &VertexIdentifierBuilder::create_unique_vertex )
+                &VertexIdentifierBuilder::create_unique_vertex,
+                "Create a unique vertex identified with no component vertex "
+                "and return its index" )
             .def( "create_unique_vertices",
-                &VertexIdentifierBuilder::create_unique_vertices )
-            .def( "set_unique_vertex",
-                &VertexIdentifierBuilder::set_unique_vertex )
+                &VertexIdentifierBuilder::create_unique_vertices,
+                pybind11::arg( "nb" ),
+                "Create nb unique vertices identified with no component vertex "
+                "and return the index of the first one" )
+            .def(
+                "set_unique_vertex",
+                []( TypedObject< VertexIdentifierBuilder > self,
+                    const ComponentMeshVertex& component_vertex_id,
+                    index_t unique_vertex_id ) {
+                    if( pybind11::hasattr( self, "_model" ) )
+                    {
+                        const auto model = self.attr( "_model" );
+                        check_model_component_vertex(
+                            "set_unique_vertex", model, component_vertex_id );
+                        check_model_unique_vertex(
+                            "set_unique_vertex", model, unique_vertex_id );
+                    }
+                    self.cast< VertexIdentifierBuilder& >().set_unique_vertex(
+                        component_vertex_id, unique_vertex_id );
+                },
+                pybind11::arg( "component_vertex_id" ),
+                pybind11::arg( "unique_vertex_id" ),
+                "Identify the component vertex with the unique vertex, after "
+                "detaching it from the unique vertex it was identified with, "
+                "if any. For the builder of a BRep or a Section, raise an "
+                "OpenGeodeDataError if the component is not a mesh component "
+                "of the model and an IndexError if the vertex is not in its "
+                "mesh or the unique vertex does not exist; a "
+                "VertexIdentifierBuilder built alone does not know the "
+                "meshes: the component must be registered, the vertex must "
+                "exist in its mesh and the unique vertex must exist, the "
+                "result is undefined otherwise" )
             .def( "update_unique_vertices",
-                &VertexIdentifierBuilder::update_unique_vertices )
+                &VertexIdentifierBuilder::update_unique_vertices,
+                pybind11::arg( "component_id" ), pybind11::arg( "old2new" ),
+                "Update the identification after the mesh of the component "
+                "changed: the vertex i of the former mesh becomes old2new[i], "
+                "and is detached from its unique vertex if old2new[i] is "
+                "NO_ID. old2new needs one value per former vertex of the mesh" )
             .def( "delete_isolated_vertices",
-                &VertexIdentifierBuilder::delete_isolated_vertices );
+                &VertexIdentifierBuilder::delete_isolated_vertices,
+                "Delete the unique vertices identified with no component "
+                "vertex and return the mapping from the old to the new unique "
+                "vertex indices (NO_ID for the deleted ones, identity if there "
+                "was none)" );
     }
 } // namespace geode

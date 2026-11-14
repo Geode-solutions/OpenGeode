@@ -43,8 +43,28 @@ namespace geode
         pybind11::class_< BRep, Topology, Corners3D, Lines3D, Surfaces3D,
             Blocks3D, ModelBoundaries3D, CornerCollections3D, LineCollections3D,
             SurfaceCollections3D, BlockCollections3D, PhysicalProperties,
-            Identifier, pybind11::smart_holder >( module, "BRep" )
-            .def( pybind11::init<>() )
+            Identifier, pybind11::smart_holder >( module, "BRep",
+            "Boundary representation: a 3D model made of Corners, Lines, "
+            "Surfaces and Blocks linked by boundary relationships (a Line is "
+            "bounded by Corners, a Surface by Lines, a Block by Surfaces), "
+            "internal relationships, and organized by ModelBoundaries and "
+            "collections. A BRep is modified through BRepBuilder. Besides its "
+            "own methods it inherits those of the Topology, of the component "
+            "containers and of PhysicalProperties" )
+            .def( pybind11::init<>(), "Build an empty BRep" )
+            .def(
+                "__repr__",
+                []( const BRep& model ) {
+                    return identifier_repr( model, python_type_name( model ),
+                        { { "nb_corners", python_repr( model.nb_corners() ) },
+                            { "nb_lines", python_repr( model.nb_lines() ) },
+                            { "nb_surfaces",
+                                python_repr( model.nb_surfaces() ) },
+                            { "nb_blocks",
+                                python_repr( model.nb_blocks() ) } } );
+                },
+                "Return an unambiguous description of the model: its type, its "
+                "id, its name if it has one and its numbers of components" )
             .def(
                 "boundary_corners",
                 []( const BRep& brep, const Line3D& line ) {
@@ -55,7 +75,9 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference_internal )
+                pybind11::arg( "line" ),
+                pybind11::return_value_policy::reference_internal,
+                "Return the Corners bounding the Line (its end points)" )
             .def(
                 "boundary_lines",
                 []( const BRep& brep, const Surface3D& surface ) {
@@ -66,7 +88,9 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference_internal )
+                pybind11::arg( "surface" ),
+                pybind11::return_value_policy::reference_internal,
+                "Return the Lines bounding the Surface" )
             .def(
                 "boundary_surfaces",
                 []( const BRep& brep, const Block3D& block ) {
@@ -77,7 +101,9 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference_internal )
+                pybind11::arg( "block" ),
+                pybind11::return_value_policy::reference_internal,
+                "Return the Surfaces bounding the Block" )
             .def(
                 "incident_lines",
                 []( const BRep& brep, const Corner3D& corner ) {
@@ -88,7 +114,9 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference_internal )
+                pybind11::arg( "corner" ),
+                pybind11::return_value_policy::reference_internal,
+                "Return the Lines bounded by the Corner" )
             .def(
                 "incident_surfaces",
                 []( const BRep& brep, const Line3D& line ) {
@@ -99,7 +127,9 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference_internal )
+                pybind11::arg( "line" ),
+                pybind11::return_value_policy::reference_internal,
+                "Return the Surfaces bounded by the Line" )
             .def(
                 "incident_blocks",
                 []( const BRep& brep, const Surface3D& surface ) {
@@ -110,10 +140,15 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference_internal )
+                pybind11::arg( "surface" ),
+                pybind11::return_value_policy::reference_internal,
+                "Return the Blocks bounded by the Surface" )
             .def( "nb_internal_corners_of_line",
                 static_cast< index_t ( BRep::* )( const Line3D& ) const >(
-                    &BRep::nb_internal_corners ) )
+                    &BRep::nb_internal_corners ),
+                pybind11::arg( "line" ),
+                "Return the number of Corners internal to the Line, i.e. lying "
+                "on it without being one of its boundaries" )
             .def(
                 "internal_corners_of_line",
                 []( const BRep& brep, const Line3D& line ) {
@@ -124,10 +159,16 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference_internal )
+                pybind11::arg( "line" ),
+                pybind11::return_value_policy::reference_internal,
+                "Return the Corners internal to the Line, i.e. lying on it "
+                "without being one of its boundaries" )
             .def( "nb_internal_corners_of_surface",
                 static_cast< index_t ( BRep::* )( const Surface3D& ) const >(
-                    &BRep::nb_internal_corners ) )
+                    &BRep::nb_internal_corners ),
+                pybind11::arg( "surface" ),
+                "Return the number of Corners internal to the Surface, i.e. "
+                "lying on it without bounding any of its Lines" )
             .def(
                 "internal_corners_of_surface",
                 []( const BRep& brep, const Surface3D& surface ) {
@@ -139,10 +180,16 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference_internal )
+                pybind11::arg( "surface" ),
+                pybind11::return_value_policy::reference_internal,
+                "Return the Corners internal to the Surface, i.e. lying on it "
+                "without bounding any of its Lines" )
             .def( "nb_internal_lines_of_surface",
                 static_cast< index_t ( BRep::* )( const Surface3D& ) const >(
-                    &BRep::nb_internal_lines ) )
+                    &BRep::nb_internal_lines ),
+                pybind11::arg( "surface" ),
+                "Return the number of Lines internal to the Surface, i.e. "
+                "lying on it without being one of its boundaries" )
             .def(
                 "internal_lines_of_surface",
                 []( const BRep& brep, const Surface3D& surface ) {
@@ -154,10 +201,16 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference_internal )
+                pybind11::arg( "surface" ),
+                pybind11::return_value_policy::reference_internal,
+                "Return the Lines internal to the Surface, i.e. lying on it "
+                "without being one of its boundaries" )
             .def( "nb_internal_corners_of_block",
                 static_cast< index_t ( BRep::* )( const Block3D& ) const >(
-                    &BRep::nb_internal_corners ) )
+                    &BRep::nb_internal_corners ),
+                pybind11::arg( "block" ),
+                "Return the number of Corners internal to the Block, i.e. "
+                "inside it" )
             .def(
                 "internal_corners_of_block",
                 []( const BRep& brep, const Block3D& block ) {
@@ -169,10 +222,15 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference_internal )
+                pybind11::arg( "block" ),
+                pybind11::return_value_policy::reference_internal,
+                "Return the Corners internal to the Block, i.e. inside it" )
             .def( "nb_internal_lines_of_block",
                 static_cast< index_t ( BRep::* )( const Block3D& ) const >(
-                    &BRep::nb_internal_lines ) )
+                    &BRep::nb_internal_lines ),
+                pybind11::arg( "block" ),
+                "Return the number of Lines internal to the Block, i.e. inside "
+                "it" )
             .def(
                 "internal_lines_of_block",
                 []( const BRep& brep, const Block3D& block ) {
@@ -183,8 +241,13 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference_internal )
-            .def( "nb_internal_surfaces_of_block", &BRep::nb_internal_surfaces )
+                pybind11::arg( "block" ),
+                pybind11::return_value_policy::reference_internal,
+                "Return the Lines internal to the Block, i.e. inside it" )
+            .def( "nb_internal_surfaces_of_block", &BRep::nb_internal_surfaces,
+                pybind11::arg( "block" ),
+                "Return the number of Surfaces internal to the Block, i.e. "
+                "inside it without being one of its boundaries" )
             .def(
                 "internal_surfaces_of_block",
                 []( const BRep& brep, const Block3D& block ) {
@@ -196,10 +259,15 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference_internal )
+                pybind11::arg( "block" ),
+                pybind11::return_value_policy::reference_internal,
+                "Return the Surfaces internal to the Block, i.e. inside it "
+                "without being one of its boundaries" )
             .def( "nb_embedding_lines_of_corner",
                 static_cast< index_t ( BRep::* )( const Corner3D& ) const >(
-                    &BRep::nb_embedding_lines ) )
+                    &BRep::nb_embedding_lines ),
+                pybind11::arg( "corner" ),
+                "Return the number of Lines in which the Corner is internal" )
             .def(
                 "embedding_lines_of_corner",
                 []( const BRep& brep, const Corner3D& corner ) {
@@ -211,10 +279,15 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference_internal )
+                pybind11::arg( "corner" ),
+                pybind11::return_value_policy::reference_internal,
+                "Return the Lines in which the Corner is internal" )
             .def( "nb_embedding_surfaces_of_corner",
                 static_cast< index_t ( BRep::* )( const Corner3D& ) const >(
-                    &BRep::nb_embedding_surfaces ) )
+                    &BRep::nb_embedding_surfaces ),
+                pybind11::arg( "corner" ),
+                "Return the number of Surfaces in which the Corner is "
+                "internal" )
             .def(
                 "embedding_surfaces_of_corner",
                 []( const BRep& brep, const Corner3D& corner ) {
@@ -226,10 +299,14 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference_internal )
+                pybind11::arg( "corner" ),
+                pybind11::return_value_policy::reference_internal,
+                "Return the Surfaces in which the Corner is internal" )
             .def( "nb_embedding_surfaces_of_line",
                 static_cast< index_t ( BRep::* )( const Line3D& ) const >(
-                    &BRep::nb_embedding_surfaces ) )
+                    &BRep::nb_embedding_surfaces ),
+                pybind11::arg( "line" ),
+                "Return the number of Surfaces in which the Line is internal" )
             .def(
                 "embedding_surfaces_of_line",
                 []( const BRep& brep, const Line3D& line ) {
@@ -241,10 +318,14 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference_internal )
+                pybind11::arg( "line" ),
+                pybind11::return_value_policy::reference_internal,
+                "Return the Surfaces in which the Line is internal" )
             .def( "nb_embedding_blocks_of_corner",
                 static_cast< index_t ( BRep::* )( const Corner3D& ) const >(
-                    &BRep::nb_embedding_blocks ) )
+                    &BRep::nb_embedding_blocks ),
+                pybind11::arg( "corner" ),
+                "Return the number of Blocks in which the Corner is internal" )
             .def(
                 "embedding_blocks_of_corner",
                 []( const BRep& brep, const Corner3D& corner ) {
@@ -256,10 +337,14 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference_internal )
+                pybind11::arg( "corner" ),
+                pybind11::return_value_policy::reference_internal,
+                "Return the Blocks in which the Corner is internal" )
             .def( "nb_embedding_blocks_of_line",
                 static_cast< index_t ( BRep::* )( const Line3D& ) const >(
-                    &BRep::nb_embedding_blocks ) )
+                    &BRep::nb_embedding_blocks ),
+                pybind11::arg( "line" ),
+                "Return the number of Blocks in which the Line is internal" )
             .def(
                 "embedding_blocks_of_line",
                 []( const BRep& brep, const Line3D& line ) {
@@ -270,10 +355,14 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference_internal )
+                pybind11::arg( "line" ),
+                pybind11::return_value_policy::reference_internal,
+                "Return the Blocks in which the Line is internal" )
             .def( "nb_embedding_blocks_of_surface",
                 static_cast< index_t ( BRep::* )( const Surface3D& ) const >(
-                    &BRep::nb_embedding_blocks ) )
+                    &BRep::nb_embedding_blocks ),
+                pybind11::arg( "surface" ),
+                "Return the number of Blocks in which the Surface is internal" )
             .def(
                 "embedding_blocks_of_surface",
                 []( const BRep& brep, const Surface3D& surface ) {
@@ -285,7 +374,9 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference_internal )
+                pybind11::arg( "surface" ),
+                pybind11::return_value_policy::reference_internal,
+                "Return the Blocks in which the Surface is internal" )
             .def(
                 "model_boundary_items",
                 []( const BRep& brep, const ModelBoundary3D& boundary ) {
@@ -297,7 +388,9 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference_internal )
+                pybind11::arg( "boundary" ),
+                pybind11::return_value_policy::reference_internal,
+                "Return the Surfaces belonging to the ModelBoundary" )
             .def(
                 "corner_collection_items",
                 []( const BRep& brep, const CornerCollection3D& collection ) {
@@ -309,7 +402,9 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference_internal )
+                pybind11::arg( "collection" ),
+                pybind11::return_value_policy::reference_internal,
+                "Return the Corners belonging to the CornerCollection" )
             .def(
                 "line_collection_items",
                 []( const BRep& brep, const LineCollection3D& collection ) {
@@ -321,7 +416,9 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference_internal )
+                pybind11::arg( "collection" ),
+                pybind11::return_value_policy::reference_internal,
+                "Return the Lines belonging to the LineCollection" )
             .def(
                 "surface_collection_items",
                 []( const BRep& brep, const SurfaceCollection3D& collection ) {
@@ -333,7 +430,9 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference_internal )
+                pybind11::arg( "collection" ),
+                pybind11::return_value_policy::reference_internal,
+                "Return the Surfaces belonging to the SurfaceCollection" )
             .def(
                 "block_collection_items",
                 []( const BRep& brep, const BlockCollection3D& collection ) {
@@ -345,50 +444,92 @@ namespace geode
                     }
                     return components;
                 },
-                pybind11::return_value_policy::reference_internal )
+                pybind11::arg( "collection" ),
+                pybind11::return_value_policy::reference_internal,
+                "Return the Blocks belonging to the BlockCollection" )
             .def( "is_line_closed",
                 static_cast< bool ( BRep::* )( const Line3D& ) const >(
-                    &BRep::is_closed ) )
+                    &BRep::is_closed ),
+                pybind11::arg( "line" ),
+                "Return True if the Line has fewer than two boundary Corners "
+                "(it is a loop or has none), False otherwise" )
             .def( "is_surface_closed",
                 static_cast< bool ( BRep::* )( const Surface3D& ) const >(
-                    &BRep::is_closed ) )
+                    &BRep::is_closed ),
+                pybind11::arg( "surface" ),
+                "Return True if the Surface has no boundary Line, False "
+                "otherwise" )
             .def( "is_line_boundary",
                 static_cast< bool ( BRep::* )( const Corner3D&, const Line3D& )
-                        const >( &BRep::is_boundary ) )
+                        const >( &BRep::is_boundary ),
+                pybind11::arg( "corner" ), pybind11::arg( "line" ),
+                "Return True if the Corner is a boundary of the Line" )
             .def( "is_surface_boundary",
                 static_cast< bool ( BRep::* )( const Line3D&, const Surface3D& )
-                        const >( &BRep::is_boundary ) )
+                        const >( &BRep::is_boundary ),
+                pybind11::arg( "line" ), pybind11::arg( "surface" ),
+                "Return True if the Line is a boundary of the Surface" )
             .def( "is_block_boundary",
                 static_cast< bool ( BRep::* )( const Surface3D&,
-                    const Block3D& ) const >( &BRep::is_boundary ) )
+                    const Block3D& ) const >( &BRep::is_boundary ),
+                pybind11::arg( "surface" ), pybind11::arg( "block" ),
+                "Return True if the Surface is a boundary of the Block" )
             .def( "is_corner_in_line_internals",
                 static_cast< bool ( BRep::* )( const Corner3D&, const Line3D& )
-                        const >( &BRep::is_internal ) )
+                        const >( &BRep::is_internal ),
+                pybind11::arg( "corner" ), pybind11::arg( "line" ),
+                "Return True if the Corner is internal to the Line" )
             .def( "is_corner_in_surface_internals",
                 static_cast< bool ( BRep::* )( const Corner3D&,
-                    const Surface3D& ) const >( &BRep::is_internal ) )
+                    const Surface3D& ) const >( &BRep::is_internal ),
+                pybind11::arg( "corner" ), pybind11::arg( "surface" ),
+                "Return True if the Corner is internal to the Surface" )
             .def( "is_line_in_surface_internals",
                 static_cast< bool ( BRep::* )( const Line3D&, const Surface3D& )
-                        const >( &BRep::is_internal ) )
+                        const >( &BRep::is_internal ),
+                pybind11::arg( "line" ), pybind11::arg( "surface" ),
+                "Return True if the Line is internal to the Surface" )
             .def( "is_corner_in_block_internals",
                 static_cast< bool ( BRep::* )( const Corner3D&, const Block3D& )
-                        const >( &BRep::is_internal ) )
+                        const >( &BRep::is_internal ),
+                pybind11::arg( "corner" ), pybind11::arg( "block" ),
+                "Return True if the Corner is internal to the Block" )
             .def( "is_line_in_block_internals",
                 static_cast< bool ( BRep::* )( const Line3D&, const Block3D& )
-                        const >( &BRep::is_internal ) )
+                        const >( &BRep::is_internal ),
+                pybind11::arg( "line" ), pybind11::arg( "block" ),
+                "Return True if the Line is internal to the Block" )
             .def( "is_surface_in_block_internals",
                 static_cast< bool ( BRep::* )( const Surface3D&,
-                    const Block3D& ) const >( &BRep::is_internal ) )
-            .def( "is_model_boundary_item", &BRep::is_model_boundary_item )
-            .def(
-                "is_corner_collection_item", &BRep::is_corner_collection_item )
-            .def( "is_line_collection_item", &BRep::is_line_collection_item )
+                    const Block3D& ) const >( &BRep::is_internal ),
+                pybind11::arg( "surface" ), pybind11::arg( "block" ),
+                "Return True if the Surface is internal to the Block" )
+            .def( "is_model_boundary_item", &BRep::is_model_boundary_item,
+                pybind11::arg( "surface" ), pybind11::arg( "boundary" ),
+                "Return True if the Surface belongs to the ModelBoundary" )
+            .def( "is_corner_collection_item", &BRep::is_corner_collection_item,
+                pybind11::arg( "corner" ), pybind11::arg( "corner_collection" ),
+                "Return True if the Corner belongs to the CornerCollection" )
+            .def( "is_line_collection_item", &BRep::is_line_collection_item,
+                pybind11::arg( "line" ), pybind11::arg( "line_collection" ),
+                "Return True if the Line belongs to the LineCollection" )
             .def( "is_surface_collection_item",
-                &BRep::is_surface_collection_item )
-            .def( "is_block_collection_item", &BRep::is_block_collection_item )
-            .def( "bounding_box", &BRep::bounding_box )
-            .def( "native_extension", &BRep::native_extension )
+                &BRep::is_surface_collection_item, pybind11::arg( "surface" ),
+                pybind11::arg( "surface_collection" ),
+                "Return True if the Surface belongs to the SurfaceCollection" )
+            .def( "is_block_collection_item", &BRep::is_block_collection_item,
+                pybind11::arg( "block" ), pybind11::arg( "block_collection" ),
+                "Return True if the Block belongs to the BlockCollection" )
+            .def( "bounding_box", &BRep::bounding_box,
+                "Return the bounding box of the meshes of all the components, "
+                "active or not; raise an error if the model has no vertex" )
+            .def( "native_extension", &BRep::native_extension,
+                "Return the extension of the native file format of the class" )
             .def( "brep_component", &BRep::component,
-                pybind11::return_value_policy::reference_internal );
+                pybind11::arg( "component_id" ),
+                pybind11::return_value_policy::reference_internal,
+                "Return the component of the BRep with the given uuid, "
+                "whatever its type (an instance of its own class: Corner3D, "
+                "Block3D, ...); raise an error if the BRep has none" );
     }
 } // namespace geode

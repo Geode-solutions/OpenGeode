@@ -1,0 +1,272 @@
+/*
+ * Copyright (c) 2019 - 2026 Geode-solutions
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ */
+
+#pragma once
+
+#include "../common.hpp"
+
+#include <array>
+
+#include <geode/mesh/core/attribute_coordinate_reference_system.hpp>
+#include <geode/mesh/core/coordinate_reference_system.hpp>
+#include <geode/mesh/core/graph.hpp>
+#include <geode/mesh/core/solid_mesh.hpp>
+#include <geode/mesh/core/surface_mesh.hpp>
+#include <geode/mesh/core/vertex_set.hpp>
+
+namespace geode
+{
+    /*!
+     * Checks to give to checked(), checked_as() and checked_builder(): each
+     * one validates one argument of a mesh function against the size of the
+     * mesh.
+     */
+    struct VertexCheck
+    {
+        template < typename Mesh >
+        void operator()(
+            std::string_view name, const Mesh& mesh, index_t vertex ) const
+        {
+            check_index( name, "vertex", vertex, mesh.nb_vertices() );
+        }
+
+        template < typename Mesh, size_t nb_vertices >
+        void operator()( std::string_view name,
+            const Mesh& mesh,
+            const std::array< index_t, nb_vertices >& vertices ) const
+        {
+            for( const auto vertex : vertices )
+            {
+                ( *this )( name, mesh, vertex );
+            }
+        }
+
+        template < typename Mesh >
+        void operator()( std::string_view name,
+            const Mesh& mesh,
+            absl::Span< const index_t > vertices ) const
+        {
+            for( const auto vertex : vertices )
+            {
+                ( *this )( name, mesh, vertex );
+            }
+        }
+    };
+
+    struct EdgeCheck
+    {
+        template < typename Mesh >
+        void operator()(
+            std::string_view name, const Mesh& mesh, index_t edge ) const
+        {
+            check_index( name, "edge", edge, mesh.nb_edges() );
+        }
+    };
+
+    struct EdgeVertexCheck
+    {
+        template < typename Mesh >
+        void operator()( std::string_view name,
+            const Mesh& mesh,
+            const EdgeVertex& edge_vertex ) const
+        {
+            EdgeCheck{}( name, mesh, edge_vertex.edge_id );
+            check_index( name, "local vertex", edge_vertex.vertex_id, 2 );
+        }
+    };
+
+    /*!
+     * Facet of the SolidFacets of a solid
+     */
+    struct FacetCheck
+    {
+        template < typename Facets >
+        void operator()(
+            std::string_view name, const Facets& facets, index_t facet ) const
+        {
+            check_index( name, "facet", facet, facets.nb_facets() );
+        }
+    };
+
+    struct PolygonCheck
+    {
+        template < typename Mesh >
+        void operator()(
+            std::string_view name, const Mesh& mesh, index_t polygon ) const
+        {
+            check_index( name, "polygon", polygon, mesh.nb_polygons() );
+        }
+    };
+
+    struct PolygonVertexCheck
+    {
+        template < typename Mesh >
+        void operator()( std::string_view name,
+            const Mesh& mesh,
+            const PolygonVertex& polygon_vertex ) const
+        {
+            PolygonCheck{}( name, mesh, polygon_vertex.polygon_id );
+            check_index( name, "local vertex", polygon_vertex.vertex_id,
+                mesh.nb_polygon_vertices( polygon_vertex.polygon_id ) );
+        }
+    };
+
+    struct PolygonEdgeCheck
+    {
+        template < typename Mesh >
+        void operator()( std::string_view name,
+            const Mesh& mesh,
+            const PolygonEdge& polygon_edge ) const
+        {
+            PolygonCheck{}( name, mesh, polygon_edge.polygon_id );
+            check_index( name, "local edge", polygon_edge.edge_id,
+                mesh.nb_polygon_edges( polygon_edge.polygon_id ) );
+        }
+    };
+
+    struct PolyhedronCheck
+    {
+        template < typename Mesh >
+        void operator()(
+            std::string_view name, const Mesh& mesh, index_t polyhedron ) const
+        {
+            check_index( name, "polyhedron", polyhedron, mesh.nb_polyhedra() );
+        }
+    };
+
+    struct PolyhedronVertexCheck
+    {
+        template < typename Mesh >
+        void operator()( std::string_view name,
+            const Mesh& mesh,
+            const PolyhedronVertex& polyhedron_vertex ) const
+        {
+            PolyhedronCheck{}( name, mesh, polyhedron_vertex.polyhedron_id );
+            check_index( name, "local vertex", polyhedron_vertex.vertex_id,
+                mesh.nb_polyhedron_vertices(
+                    polyhedron_vertex.polyhedron_id ) );
+        }
+    };
+
+    struct PolyhedronFacetCheck
+    {
+        template < typename Mesh >
+        void operator()( std::string_view name,
+            const Mesh& mesh,
+            const PolyhedronFacet& polyhedron_facet ) const
+        {
+            PolyhedronCheck{}( name, mesh, polyhedron_facet.polyhedron_id );
+            check_index( name, "local facet", polyhedron_facet.facet_id,
+                mesh.nb_polyhedron_facets( polyhedron_facet.polyhedron_id ) );
+        }
+    };
+
+    struct PolyhedronFacetVertexCheck
+    {
+        template < typename Mesh >
+        void operator()( std::string_view name,
+            const Mesh& mesh,
+            const PolyhedronFacetVertex& facet_vertex ) const
+        {
+            PolyhedronFacetCheck{}( name, mesh, facet_vertex.polyhedron_facet );
+            check_index( name, "local facet vertex", facet_vertex.vertex_id,
+                mesh.nb_polyhedron_facet_vertices(
+                    facet_vertex.polyhedron_facet ) );
+        }
+    };
+
+    /*!
+     * Return a geometric element of a mesh (Segment, Triangle, Tetrahedron)
+     * as a snapshot: rebuilt by its Python constructor from copies of the
+     * mesh points, which it keeps alive, it is neither modified nor
+     * invalidated by later changes of the mesh.
+     */
+    template < typename Geometry >
+    TypedObject< Geometry > geometry_snapshot( const Geometry& geometry )
+    {
+        const auto& vertices = geometry.vertices();
+        using Point = std::decay_t< decltype( vertices[0].get() ) >;
+        pybind11::tuple points( vertices.size() );
+        for( size_t vertex = 0; vertex < vertices.size(); vertex++ )
+        {
+            points[vertex] = pybind11::cast( Point{ vertices[vertex].get() } );
+        }
+        return pybind11::reinterpret_steal< TypedObject< Geometry > >(
+            pybind11::type::of< Geometry >()( *points ).release() );
+    }
+
+    /*!
+     * Same as checked() for a method returning a geometric element, which is
+     * returned as a snapshot (see geometry_snapshot()).
+     */
+    template < typename Mesh, typename Return, typename Arg, typename Check >
+    auto checked_snapshot( std::string_view name,
+        Return ( Mesh::*method )( Arg ) const,
+        Check check )
+    {
+        auto accessor = checked( name, method, check );
+        return [accessor]( const Mesh& mesh, Arg argument ) {
+            return geometry_snapshot( accessor( mesh, argument ) );
+        };
+    }
+
+    /*!
+     * Wrap the texture_manager() of a mesh: the returned manager stores in
+     * `_nb_elements` the method of the mesh giving the number of elements
+     * that carry the texture coordinates (nb_edges, nb_polygons or
+     * nb_polyhedra), given by the manager to its textures to check the
+     * elements (see texture.cpp).
+     */
+    template < typename Mesh, typename Manager >
+    auto texture_manager_with_elements(
+        Manager ( Mesh::*method )() const, const char* nb_elements )
+    {
+        return [method, nb_elements]( const TypedObject< Mesh >& self ) {
+            auto manager =
+                pybind11::reinterpret_steal< TypedObject< Manager > >(
+                    pybind11::cast(
+                        ( self.template cast< const Mesh& >().*method )() )
+                        .release() );
+            manager.attr( "_nb_elements" ) = self.attr( nb_elements );
+            return manager;
+        };
+    }
+
+    /*!
+     * Raise an IndexError if the point is out of range for a coordinate
+     * reference system storing one point per vertex (an attribute CRS): the
+     * other ones do not know their size.
+     */
+    template < index_t dimension >
+    void check_crs_point( std::string_view name,
+        const CoordinateReferenceSystem< dimension >& crs,
+        index_t point_id )
+    {
+        if( const auto* attribute_crs = dynamic_cast<
+                const AttributeCoordinateReferenceSystem< dimension >* >(
+                &crs ) )
+        {
+            check_index( name, "point", point_id, attribute_crs->nb_points() );
+        }
+    }
+} // namespace geode

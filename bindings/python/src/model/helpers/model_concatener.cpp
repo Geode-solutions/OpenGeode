@@ -32,12 +32,34 @@ namespace geode
 {
     void define_model_concatener( pybind11::module& module )
     {
-        pybind11::class_< BRepConcatener >( module, "BRepConcatener" )
-            .def( pybind11::init< BRep& >() )
-            .def( "concatenate", &BRepConcatener::concatenate );
+        pybind11::class_< BRepConcatener >( module, "BRepConcatener",
+            "Add the content of other BRep to a BRep" )
+            .def( pybind11::init< BRep& >(), pybind11::arg( "model" ),
+                pybind11::keep_alive< 1, 2 >(),
+                "Build a concatener adding to the BRep, which is kept alive by "
+                "it" )
+            .def( "concatenate", &BRepConcatener::concatenate,
+                pybind11::arg( "other_model" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Copy all the components of other_model into the BRep with new "
+                "uuids, together with their geometry and relationships, and "
+                "return the ModelCopyMapping from the uuids of other_model to "
+                "the new ones; raise an OpenGeodeDataError if other_model is "
+                "the BRep itself" );
 
-        pybind11::class_< SectionConcatener >( module, "SectionConcatener" )
-            .def( pybind11::init< Section& >() )
-            .def( "concatenate", &SectionConcatener::concatenate );
+        pybind11::class_< SectionConcatener >( module, "SectionConcatener",
+            "Add the content of other Sections to a Section" )
+            .def( pybind11::init< Section& >(), pybind11::arg( "model" ),
+                pybind11::keep_alive< 1, 2 >(),
+                "Build a concatener adding to the Section, which is kept alive "
+                "by it" )
+            .def( "concatenate", &SectionConcatener::concatenate,
+                pybind11::arg( "other_model" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Copy all the components of other_model into the Section with "
+                "new uuids, together with their geometry and relationships, "
+                "and return the ModelCopyMapping from the uuids of other_model "
+                "to the new ones; raise an OpenGeodeDataError if other_model "
+                "is the Section itself" );
     }
 } // namespace geode

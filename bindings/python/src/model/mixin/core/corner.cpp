@@ -30,12 +30,18 @@
 #define PYTHON_CORNER( dimension )                                             \
     const auto name##dimension = "Corner" + std::to_string( dimension ) + "D"; \
     pybind11::class_< Corner##dimension##D, Component##dimension##D,           \
-        pybind11::smart_holder >( module, name##dimension.c_str() )            \
+        pybind11::smart_holder >( module, name##dimension.c_str(),             \
+        "Geometric component of a model described by a PointSet mesh" )        \
         .def( "mesh", &Corner##dimension##D::mesh,                             \
-            pybind11::return_value_policy::reference_internal )                \
-        .def( "component_id", &Corner##dimension##D::component_id )            \
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the PointSet mesh of the corner; modify it through the "   \
+            "mesh builder given by the model builder (corner_mesh_builder)" )  \
+        .def( "component_id", &Corner##dimension##D::component_id,             \
+            "Return the ComponentID (type and uuid) of the component" )        \
         .def_static( "component_type_static",                                  \
-            &Corner##dimension##D::component_type_static )
+            &Corner##dimension##D::component_type_static,                      \
+            "Return the ComponentType of all the Corners, without needing an " \
+            "instance" )
 
 namespace geode
 {

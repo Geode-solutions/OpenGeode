@@ -26,6 +26,7 @@
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/attribute_time_series.hpp>
 #include <geode/basic/constant_attribute.hpp>
+#include <geode/basic/range.hpp>
 #include <geode/basic/sparse_attribute.hpp>
 #include <geode/basic/variable_attribute.hpp>
 
@@ -47,11 +48,55 @@ namespace geode
                 return attribute_manager.create_attribute< Attribute, type >(
                     attribute_name, std::move( values ), properties );
             },
-            pybind11::arg( "name" ), pybind11::arg( "default_value" ),
+            pybind11::arg( "attribute_name" ), pybind11::arg( "default_value" ),
             pybind11::arg_v(
                 "properties", AttributeProperties{}, "AttributeProperties()" ),
             "Create an attribute from its name and default value and return "
             "its uuid" );
+    }
+
+    template < template < typename > class Attribute, typename type >
+    void python_attribute_kind( pybind11::class_< AttributeManager >& manager,
+        const std::string& kind,
+        const std::string& suffix )
+    {
+        const auto create_suffix =
+            absl::StrCat( "create_attribute_", kind, "_", suffix );
+        manager.def( create_suffix.c_str(),
+            static_cast< geode::uuid ( AttributeManager::* )( std::string_view,
+                AttributeValues< type >, AttributeProperties ) >(
+                &AttributeManager::create_attribute< Attribute, type > ),
+            pybind11::arg( "attribute_name" ),
+            pybind11::arg( "default_values" ), pybind11::arg( "properties" ),
+            "Create an attribute from its name, default values and "
+            "properties and return its uuid" );
+        manager.def( create_suffix.c_str(),
+            static_cast< void ( AttributeManager::* )( std::string_view,
+                const uuid&, AttributeValues< type >, AttributeProperties ) >(
+                &AttributeManager::create_attribute< Attribute, type > ),
+            pybind11::arg( "attribute_name" ), pybind11::arg( "attribute_id" ),
+            pybind11::arg( "default_values" ), pybind11::arg( "properties" ),
+            "Create an attribute with the given uuid from its name, default "
+            "values and properties" );
+        python_attribute_creation_from_default_value< Attribute, type >(
+            manager, create_suffix );
+        const auto find_suffix =
+            absl::StrCat( "find_attribute_", kind, "_", suffix );
+        manager.def( find_suffix.c_str(),
+            static_cast< std::shared_ptr< Attribute< type > > (
+                AttributeManager::* )( const geode::uuid& ) >(
+                &AttributeManager::find_attribute< Attribute, type > ),
+            pybind11::arg( "attribute_id" ),
+            "Return the attribute with the given id. Raise an error if it "
+            "does not exist or is not of this kind and type" );
+        const auto time_step_suffix =
+            absl::StrCat( "create_time_step_attribute_", kind, "_", suffix );
+        manager.def( time_step_suffix.c_str(),
+            &AttributeManager::create_time_step_attribute< Attribute, type >,
+            pybind11::arg( "attribute_name" ), pybind11::arg( "time" ),
+            pybind11::arg( "default_values" ), pybind11::arg( "properties" ),
+            "Create an attribute which is the step at the given time of the "
+            "time series called attribute_name and return its uuid" );
     }
 
     template < typename type >
@@ -61,84 +106,34 @@ namespace geode
         const auto read_suffix =
             absl::StrCat( "find_read_only_attribute_", suffix );
         manager.def( read_suffix.c_str(),
-            &AttributeManager::find_read_only_attribute< type > );
-        const auto create_constant_suffix =
-            absl::StrCat( "create_attribute_constant_", suffix );
-        manager.def( create_constant_suffix.c_str(),
-            static_cast< geode::uuid ( AttributeManager::* )( std::string_view,
-                AttributeValues< type >, AttributeProperties ) >(
-                &AttributeManager::create_attribute< ConstantAttribute,
-                    type > ) );
-        manager.def( create_constant_suffix.c_str(),
-            static_cast< void ( AttributeManager::* )( std::string_view,
-                const uuid&, AttributeValues< type >, AttributeProperties ) >(
-                &AttributeManager::create_attribute< ConstantAttribute,
-                    type > ) );
-        python_attribute_creation_from_default_value< ConstantAttribute, type >(
-            manager, create_constant_suffix );
-        const auto find_constant_suffix =
-            absl::StrCat( "find_attribute_constant_", suffix );
-        manager.def( find_constant_suffix.c_str(),
-            static_cast< std::shared_ptr< ConstantAttribute< type > > (
-                AttributeManager::* )( const geode::uuid& ) >(
-                &AttributeManager::find_attribute< ConstantAttribute,
-                    type > ) );
-        const auto create_variable_suffix =
-            absl::StrCat( "create_attribute_variable_", suffix );
-        manager.def( create_variable_suffix.c_str(),
-            static_cast< geode::uuid ( AttributeManager::* )( std::string_view,
-                AttributeValues< type >, AttributeProperties ) >(
-                &AttributeManager::create_attribute< VariableAttribute,
-                    type > ) );
-        manager.def( create_variable_suffix.c_str(),
-            static_cast< void ( AttributeManager::* )( std::string_view,
-                const uuid&, AttributeValues< type >, AttributeProperties ) >(
-                &AttributeManager::create_attribute< VariableAttribute,
-                    type > ) );
-        python_attribute_creation_from_default_value< VariableAttribute, type >(
-            manager, create_variable_suffix );
-        const auto find_variable_suffix =
-            absl::StrCat( "find_attribute_variable_", suffix );
-        manager.def( find_variable_suffix.c_str(),
-            static_cast< std::shared_ptr< VariableAttribute< type > > (
-                AttributeManager::* )( const geode::uuid& ) >(
-                &AttributeManager::find_attribute< VariableAttribute,
-                    type > ) );
-        const auto create_sparse_suffix =
-            absl::StrCat( "create_attribute_sparse_", suffix );
-        manager.def( create_sparse_suffix.c_str(),
-            static_cast< geode::uuid ( AttributeManager::* )( std::string_view,
-                AttributeValues< type >, AttributeProperties ) >(
-                &AttributeManager::create_attribute< SparseAttribute,
-                    type > ) );
-        manager.def( create_sparse_suffix.c_str(),
-            static_cast< void ( AttributeManager::* )( std::string_view,
-                const uuid&, AttributeValues< type >, AttributeProperties ) >(
-                &AttributeManager::create_attribute< SparseAttribute,
-                    type > ) );
-        python_attribute_creation_from_default_value< SparseAttribute, type >(
-            manager, create_sparse_suffix );
-        const auto find_sparse_suffix =
-            absl::StrCat( "find_attribute_sparse_", suffix );
-        manager.def( find_sparse_suffix.c_str(),
-            static_cast< std::shared_ptr< SparseAttribute< type > > (
-                AttributeManager::* )( const geode::uuid& ) >(
-                &AttributeManager::find_attribute< SparseAttribute, type > ) );
-        const auto create_time_step_constant_suffix =
-            absl::StrCat( "create_time_step_attribute_constant_", suffix );
-        manager.def( create_time_step_constant_suffix.c_str(),
-            &AttributeManager::create_time_step_attribute< ConstantAttribute,
-                type > );
-        const auto create_time_step_variable_suffix =
-            absl::StrCat( "create_time_step_attribute_variable_", suffix );
-        manager.def( create_time_step_variable_suffix.c_str(),
-            &AttributeManager::create_time_step_attribute< VariableAttribute,
-                type > );
-        const auto create_time_step_sparse_suffix =
-            absl::StrCat( "create_time_step_attribute_sparse_", suffix );
-        manager.def( create_time_step_sparse_suffix.c_str(),
-            &AttributeManager::create_time_step_attribute< SparseAttribute,
-                type > );
+            &AttributeManager::find_read_only_attribute< type >,
+            pybind11::arg( "attribute_id" ),
+            "Return the attribute with the given id as a read-only "
+            "attribute. Raise an error if it does not exist or has another "
+            "type" );
+        python_attribute_kind< ConstantAttribute, type >(
+            manager, "constant", suffix );
+        python_attribute_kind< VariableAttribute, type >(
+            manager, "variable", suffix );
+        python_attribute_kind< SparseAttribute, type >(
+            manager, "sparse", suffix );
+    }
+
+    /*!
+     * Only the variable attributes have a size: constant attributes have the
+     * same value for all elements and sparse attributes return their default
+     * value.
+     */
+    template < typename type >
+    void check_time_series_element( std::string_view name,
+        const ReadOnlyAttribute< type >& attribute,
+        index_t element )
+    {
+        if( const auto* variable =
+                dynamic_cast< const VariableAttribute< type >* >( &attribute ) )
+        {
+            check_index( name, "element", element, variable->size() );
+        }
     }
 
     template < typename type >
@@ -146,58 +141,148 @@ namespace geode
         pybind11::module& module, const std::string& typestr )
     {
         const auto name = absl::StrCat( "AttributeTimeSeries", typestr );
-        pybind11::class_< AttributeTimeSeries< type > >( module, name.c_str() )
-            .def(
-                pybind11::init< const AttributeManager&, std::string_view >() )
-            .def( "nb_time_steps", &AttributeTimeSeries< type >::nb_time_steps )
-            .def( "time", &AttributeTimeSeries< type >::time )
+        pybind11::class_< AttributeTimeSeries< type > >( module, name.c_str(),
+            "Values of the attributes of a time series, ordered by time" )
+            .def( pybind11::init< const AttributeManager&, std::string_view >(),
+                pybind11::arg( "manager" ), pybind11::arg( "name" ),
+                "Gather the steps of the time series called name in manager" )
+            .def( "nb_time_steps", &AttributeTimeSeries< type >::nb_time_steps,
+                "Return the number of time steps" )
+            .def( "time", &AttributeTimeSeries< type >::time,
+                pybind11::arg( "step" ),
+                "Return the time of the step (steps are ordered by time)" )
             .def( "step_attribute",
                 &AttributeTimeSeries< type >::step_attribute,
-                pybind11::return_value_policy::reference_internal )
-            .def( "value", &AttributeTimeSeries< type >::value )
-            .def( "element_values",
-                &AttributeTimeSeries< type >::element_values );
+                pybind11::return_value_policy::reference_internal,
+                pybind11::arg( "step" ), "Return the attribute of the step" )
+            .def(
+                "value",
+                []( const AttributeTimeSeries< type >& series, index_t step,
+                    index_t element ) -> const type& {
+                    check_index(
+                        "value", "step", step, series.nb_time_steps() );
+                    check_time_series_element(
+                        "value", series.step_attribute( step ), element );
+                    return series.value( step, element );
+                },
+                pybind11::arg( "step" ), pybind11::arg( "element" ),
+                "Return the value of the element at the step. Raise "
+                "IndexError if the step is not in [0, nb_time_steps) or the "
+                "element is out of range of a variable step attribute" )
+            .def(
+                "element_values",
+                []( const AttributeTimeSeries< type >& series,
+                    index_t element ) {
+                    for( const auto step : Range{ series.nb_time_steps() } )
+                    {
+                        check_time_series_element( "element_values",
+                            series.step_attribute( step ), element );
+                    }
+                    return series.element_values( element );
+                },
+                pybind11::arg( "element" ),
+                "Return the values of the element at all the steps. Raise "
+                "IndexError if the element is out of range of a variable "
+                "step attribute" );
     }
 
     void define_attribute_manager( pybind11::module& module )
     {
-        pybind11::class_< AttributeTimeStep >( module, "AttributeTimeStep" )
-            .def_readonly( "time", &AttributeTimeStep::time )
-            .def_readonly( "attribute_id", &AttributeTimeStep::attribute_id );
-        pybind11::class_< AttributeManager > manager(
-            module, "AttributeManager" );
-        manager.def( pybind11::init<>() )
-            .def( "find_generic_attribute",
+        pybind11::class_< AttributeTimeStep >( module, "AttributeTimeStep",
+            "Step of a time series: a time and the attribute holding its "
+            "values" )
+            .def_readonly(
+                "time", &AttributeTimeStep::time, "Time of the step" )
+            .def_readonly( "attribute_id", &AttributeTimeStep::attribute_id,
+                "Uuid of the attribute holding the values of the step" );
+        pybind11::class_< AttributeManager > manager( module,
+            "AttributeManager",
+            "Container of the attributes of a set of elements (vertices, "
+            "polygons...). All the attributes have one value per element" );
+        manager
+            .def( pybind11::init<>(),
+                "Build a manager without attributes nor elements" )
+            .def(
+                "find_generic_attribute",
                 // std::optional makes the generated stub return
                 // `AttributeBase | None`: a null shared_ptr becomes None
-                []( const AttributeManager& attribute_manager,
+                []( const TypedObject< AttributeManager >& self,
                     const uuid& attribute_id )
-                    -> std::optional< std::shared_ptr< AttributeBase > > {
-                    if( auto attribute =
-                            attribute_manager.find_generic_attribute(
-                                attribute_id ) )
+                    -> std::optional< TypedObject< AttributeBase > > {
+                    auto attribute =
+                        self.cast< const AttributeManager& >()
+                            .find_generic_attribute( attribute_id );
+                    if( !attribute )
                     {
-                        return attribute;
+                        return std::nullopt;
                     }
-                    return std::nullopt;
-                } )
-            .def( "attribute_ids", &AttributeManager::attribute_ids )
-            .def( "attribute_type", &AttributeManager::attribute_type )
-            .def( "attribute_exists", &AttributeManager::attribute_exists )
-            .def( "nb_elements", &AttributeManager::nb_elements )
-            .def( "reserve", &AttributeManager::reserve )
-            .def( "resize", &AttributeManager::resize )
-            .def( "clear", &AttributeManager::clear )
-            .def( "clear_attributes", &AttributeManager::clear_attributes )
-            .def( "delete_attribute", &AttributeManager::delete_attribute )
-            .def( "copy_attribute", &AttributeManager::copy_attribute )
+                    auto result = pybind11::reinterpret_steal<
+                        TypedObject< AttributeBase > >(
+                        pybind11::cast( std::move( attribute ) ).release() );
+                    // Gives the number of elements of an attribute whose type
+                    // has no binding, see AttributeBase.generic_value
+                    result.attr( "_manager" ) = self;
+                    return result;
+                },
+                pybind11::arg( "attribute_id" ),
+                "Return the attribute with the given id whatever its type, "
+                "or None if there is none" )
+            .def( "attribute_ids", &AttributeManager::attribute_ids,
+                "Return the ids of all the attributes" )
+            .def( "attribute_type", &AttributeManager::attribute_type,
+                pybind11::arg( "attribute_id" ),
+                "Return the C++ type id name of the values of the attribute "
+                "(for example \"i\" for int), or \"undefined\" if there is no "
+                "such attribute" )
+            .def( "attribute_exists", &AttributeManager::attribute_exists,
+                pybind11::arg( "attribute_id" ),
+                "Return True if an attribute has the given id" )
+            .def( "nb_elements", &AttributeManager::nb_elements,
+                "Return the number of elements of the attributes" )
+            .def( "reserve", &AttributeManager::reserve,
+                pybind11::arg( "capacity" ),
+                "Reserve memory for capacity elements" )
+            .def( "resize", &AttributeManager::resize, pybind11::arg( "size" ),
+                "Set the number of elements of all the attributes" )
+            .def( "clear", &AttributeManager::clear,
+                "Delete all the attributes and set the number of elements to "
+                "0" )
+            .def( "clear_attributes", &AttributeManager::clear_attributes,
+                "Remove all the elements of all the attributes, which are "
+                "kept, and set the number of elements to 0" )
+            .def( "delete_attribute", &AttributeManager::delete_attribute,
+                pybind11::arg( "attribute_id" ),
+                "Delete the attribute with the given id, if it exists" )
+            .def( "copy_attribute", &AttributeManager::copy_attribute,
+                pybind11::arg( "attribute_id" ),
+                pybind11::arg( "new_attribute_id" ),
+                "Create the attribute new_attribute_id as a copy of the "
+                "attribute attribute_id. Raise an error if attribute_id does "
+                "not exist, new_attribute_id already exists or attribute_id is "
+                "a step of a time series" )
             .def( "set_attribute_properties",
-                &AttributeManager::set_attribute_properties )
-            .def( "delete_elements", &AttributeManager::delete_elements )
+                &AttributeManager::set_attribute_properties,
+                pybind11::arg( "attribute_id" ),
+                pybind11::arg( "new_properties" ),
+                "Replace all the properties of the attribute, time included. "
+                "Raise an error if the attribute does not exist or if the time "
+                "is already used by another step of the same time series" )
+            .def( "delete_elements", &AttributeManager::delete_elements,
+                pybind11::arg( "to_delete" ),
+                "Delete the elements e for which to_delete[e] is True and "
+                "shift the following ones. to_delete must have nb_elements() "
+                "items" )
             .def( "attribute_ids_matching_name",
-                &AttributeManager::attribute_ids_matching_name )
-            .def( "time_steps", &AttributeManager::time_steps )
-            .def( "time_series_names", &AttributeManager::time_series_names );
+                &AttributeManager::attribute_ids_matching_name,
+                pybind11::arg( "name" ),
+                "Return the ids of the attributes called name, or None if "
+                "there is none" )
+            .def( "time_steps", &AttributeManager::time_steps,
+                pybind11::arg( "attribute_name" ),
+                "Return the steps (time and attribute id) of the time series "
+                "called attribute_name, ordered by increasing time" )
+            .def( "time_series_names", &AttributeManager::time_series_names,
+                "Return the names of all the time series" );
         python_attribute_class< bool >( manager, "bool" );
         python_attribute_class< int >( manager, "int" );
         python_attribute_class< unsigned int >( manager, "uint" );

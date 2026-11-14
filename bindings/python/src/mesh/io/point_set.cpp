@@ -33,29 +33,53 @@
 #define PYTHON_POINT_SET_IO( dimension )                                       \
     const auto save##dimension =                                               \
         "save_point_set" + std::to_string( dimension ) + "D";                  \
-    module.def( save##dimension.c_str(), &save_point_set< dimension > );       \
+    module.def( save##dimension.c_str(), &save_point_set< dimension >,         \
+        pybind11::arg( "point_set" ), pybind11::arg( "filename" ),             \
+        pybind11::call_guard< pybind11::gil_scoped_release >(),                \
+        "Save the point set in the file, whose extension selects the format, " \
+        "and return the list of the written files; raise an error if the "     \
+        "format is not supported" );                                           \
     const auto load##dimension =                                               \
         "load_point_set" + std::to_string( dimension ) + "D";                  \
     module.def( load##dimension.c_str(),                                       \
         static_cast<                                                           \
             std::vector< std::unique_ptr< PointSet< dimension > > > ( * )(     \
-                std::string_view ) >( &load_point_set< dimension > ) );        \
+                std::string_view ) >( &load_point_set< dimension > ),          \
+        pybind11::arg( "filename" ),                                           \
+        pybind11::call_guard< pybind11::gil_scoped_release >(),                \
+        "Load the point set objects of the file, with the default data "       \
+        "structure, and return them as a list; raise an error if the file "    \
+        "cannot be read" );                                                    \
     const auto priority##dimension =                                           \
         "point_set_object_priority" + std::to_string( dimension ) + "D";       \
     module.def( priority##dimension.c_str(),                                   \
-        &point_set_object_priority< dimension > );                             \
+        &point_set_object_priority< dimension >, pybind11::arg( "filename" ),  \
+        pybind11::call_guard< pybind11::gil_scoped_release >(),                \
+        "Return the priority of the loader chosen for the file, used to "      \
+        "select the geode object type when several can load it; raise an "     \
+        "error if no loader handles the file" );                               \
     const auto loadable##dimension =                                           \
         "is_point_set_loadable" + std::to_string( dimension ) + "D";           \
-    module.def(                                                                \
-        loadable##dimension.c_str(), &is_point_set_loadable< dimension > );    \
+    module.def( loadable##dimension.c_str(),                                   \
+        &is_point_set_loadable< dimension >, pybind11::arg( "filename" ),      \
+        pybind11::call_guard< pybind11::gil_scoped_release >(),                \
+        "Return a Percentage of how well the file can be loaded as a point "   \
+        "set, 0 if it cannot" );                                               \
     const auto check##dimension =                                              \
         "point_set_additional_files" + std::to_string( dimension ) + "D";      \
-    module.def(                                                                \
-        check##dimension.c_str(), &point_set_additional_files< dimension > );  \
+    module.def( check##dimension.c_str(),                                      \
+        &point_set_additional_files< dimension >, pybind11::arg( "filename" ), \
+        pybind11::call_guard< pybind11::gil_scoped_release >(),                \
+        "Return the additional files used when loading the file; raise an "    \
+        "error if no loader handles the file" );                               \
     const auto saveable##dimension =                                           \
         "is_point_set_saveable" + std::to_string( dimension ) + "D";           \
-    module.def(                                                                \
-        saveable##dimension.c_str(), &is_point_set_saveable< dimension > );    \
+    module.def( saveable##dimension.c_str(),                                   \
+        &is_point_set_saveable< dimension >, pybind11::arg( "point_set" ),     \
+        pybind11::arg( "filename" ),                                           \
+        pybind11::call_guard< pybind11::gil_scoped_release >(),                \
+        "Return True if the point set can be saved in the file format given "  \
+        "by the filename" );                                                   \
     PYTHON_FACTORY_CLASS( PointSetInputFactory##dimension##D );                \
     PYTHON_FACTORY_CLASS( PointSetOutputFactory##dimension##D )
 

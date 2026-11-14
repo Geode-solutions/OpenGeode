@@ -29,14 +29,22 @@
 namespace
 {
     template < typename Type >
-    void define_mesh_id( pybind11::module& module, const char* name )
+    void define_mesh_id( pybind11::module& module,
+        const char* name,
+        const char* class_doc,
+        const char* init_doc )
     {
-        define_string_representation(
-            pybind11::class_< Type >( module, name ), &Type::get )
-            .def( pybind11::init< std::string >() )
-            .def( "get", &Type::get )
-            .def( pybind11::self == pybind11::self )
-            .def( pybind11::self != pybind11::self )
+        geode::define_string_representation(
+            pybind11::class_< Type >( module, name, class_doc ), &Type::get,
+            [name]( const Type& id ) {
+                return geode::python_call_repr(
+                    name, { geode::python_repr( id.get() ) } );
+            } )
+            .def( pybind11::init< std::string >(), pybind11::arg( "value" ),
+                init_doc )
+            .def( "get", &Type::get, "Return the name as a string" )
+            .def( pybind11::self == pybind11::self, pybind11::arg( "other" ) )
+            .def( pybind11::self != pybind11::self, pybind11::arg( "other" ) )
             .def( "__hash__", []( const Type& id ) {
                 return std::hash< Type >{}( id );
             } );
@@ -47,12 +55,24 @@ namespace geode
 {
     void define_mesh_id( pybind11::module& module )
     {
-        ::define_mesh_id< MeshImpl >( module, "MeshImpl" );
-        ::define_mesh_id< MeshType >( module, "MeshType" );
+        ::define_mesh_id< MeshImpl >( module, "MeshImpl",
+            "Name of a mesh data structure, for example the one used to "
+            "create a mesh",
+            "Build the name of a data structure from a string" );
+        ::define_mesh_id< MeshType >( module, "MeshType",
+            "Name of a mesh type, for example the one of a PointSet or of a "
+            "TriangulatedSurface",
+            "Build the name of a mesh type from a string" );
         pybind11::class_< MeshFactory,
             std::unique_ptr< MeshFactory, pybind11::nodelete > >(
-            module, "MeshFactory" )
-            .def_static( "type", &MeshFactory::type )
-            .def_static( "default_impl", &MeshFactory::default_impl );
+            module, "MeshFactory", "Registry of the mesh data structures" )
+            .def_static( "type", &MeshFactory::type,
+                "Return the mesh type implemented by the data structure; raise "
+                "an error if the data structure is unknown",
+                pybind11::arg( "key" ) )
+            .def_static( "default_impl", &MeshFactory::default_impl,
+                "Return the default data structure of the mesh type; raise an "
+                "error if there is none",
+                pybind11::arg( "type" ) );
     }
 } // namespace geode

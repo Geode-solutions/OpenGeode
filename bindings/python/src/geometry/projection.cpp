@@ -34,15 +34,21 @@
     const auto point_segment_projection##dimension =                           \
         "point_segment_projection" + std::to_string( dimension ) + "D";        \
     module.def( point_segment_projection##dimension.c_str(),                   \
-        &point_segment_projection< dimension > );                              \
+        &point_segment_projection< dimension >, pybind11::arg( "point" ),      \
+        pybind11::arg( "segment" ),                                            \
+        "Return the projection of a point on a segment" );                     \
     const auto point_line_projection##dimension =                              \
         "point_line_projection" + std::to_string( dimension ) + "D";           \
     module.def( point_line_projection##dimension.c_str(),                      \
-        &point_line_projection< dimension > );                                 \
+        &point_line_projection< dimension >, pybind11::arg( "point" ),         \
+        pybind11::arg( "line" ),                                               \
+        "Return the projection of a point on an infinite line" );              \
     const auto point_triangle_projection##dimension =                          \
         "point_triangle_projection" + std::to_string( dimension ) + "D";       \
     module.def( point_triangle_projection##dimension.c_str(),                  \
-        &point_triangle_projection< dimension > )
+        &point_triangle_projection< dimension >, pybind11::arg( "point" ),     \
+        pybind11::arg( "triangle" ),                                           \
+        "Return the projection of a point on a triangle" )
 
 namespace geode
 {
@@ -50,6 +56,8 @@ namespace geode
     {
         PYTHON_PROJECTION( 2 );
         PYTHON_PROJECTION( 3 );
-        module.def( "point_plane_projection", &point_plane_projection );
+        module.def( "point_plane_projection", &point_plane_projection,
+            pybind11::arg( "point" ), pybind11::arg( "plane" ),
+            "Return the projection of a point on a plane" );
     }
 } // namespace geode

@@ -36,19 +36,36 @@ namespace
             geode::GridCoordinateReferenceSystemManagerBuilder< dimension >;
         const auto name = absl::StrCat(
             "GridCoordinateReferenceSystemManagerBuilder", dimension, "D" );
-        pybind11::class_< Builder >( module, name.c_str() )
-            .def( pybind11::init< geode::LightRegularGrid< dimension >& >() )
-            .def( "register_coordinate_reference_system",
+        pybind11::class_< Builder >( module, name.c_str(),
+            "Builder to modify the grid coordinate reference systems of a "
+            "light regular grid" )
+            .def( pybind11::init< geode::LightRegularGrid< dimension >& >(),
+                pybind11::arg( "grid" ), pybind11::keep_alive< 1, 2 >(),
+                "Build the builder of the grid coordinate reference systems of "
+                "a light regular grid, which is kept alive by the builder" )
+            .def(
+                "register_coordinate_reference_system",
                 []( Builder& builder, std::string_view crs_name,
                     std::shared_ptr< geode::GridCoordinateReferenceSystem<
                         dimension > >& crs ) {
                     builder.register_coordinate_reference_system(
                         crs_name, std::move( crs ) );
-                } )
+                },
+                "Register a grid coordinate reference system under this name; "
+                "raise an error if the name is already used",
+                pybind11::arg( "name" ), pybind11::arg( "crs" ) )
             .def( "delete_coordinate_reference_system",
-                &Builder::delete_coordinate_reference_system )
+                &Builder::delete_coordinate_reference_system,
+                "Delete the coordinate reference system with this name "
+                "(nothing happens if there is none); if it was active, no "
+                "coordinate reference system is active anymore",
+                pybind11::arg( "name" ) )
             .def( "set_active_coordinate_reference_system",
-                &Builder::set_active_coordinate_reference_system );
+                &Builder::set_active_coordinate_reference_system,
+                "Make the grid coordinate reference system with this name the "
+                "active one and move the grid geometry to its coordinate "
+                "system; raise an error if there is none",
+                pybind11::arg( "name" ) );
     }
 } // namespace
 

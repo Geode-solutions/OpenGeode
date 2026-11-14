@@ -40,34 +40,49 @@
         static_cast< IntersectionResult<                                       \
             absl::InlinedVector< Point< dimension >, 2 > > ( * )(              \
             const InfiniteLine< dimension >&, const Sphere< dimension >& ) >(  \
-            &line_sphere_intersection ) );                                     \
+            &line_sphere_intersection ),                                       \
+        pybind11::arg( "line" ), pybind11::arg( "sphere" ),                    \
+        "Intersect an infinite line and a sphere and return an "               \
+        "IntersectionResult holding the intersection points" );                \
     const auto segment_sphere##dimension =                                     \
         "segment_sphere_intersection" + std::to_string( dimension ) + "D";     \
     module.def( segment_sphere##dimension.c_str(),                             \
         static_cast< IntersectionResult<                                       \
             absl::InlinedVector< Point< dimension >, 2 > > ( * )(              \
             const Segment< dimension >&, const Sphere< dimension >& ) >(       \
-            &segment_sphere_intersection ) )
+            &segment_sphere_intersection ),                                    \
+        pybind11::arg( "segment" ), pybind11::arg( "sphere" ),                 \
+        "Intersect a segment and a sphere and return an IntersectionResult "   \
+        "holding the intersection points" )
 
 #define PYTHON_INTERSECTION_RESULT( Type )                                     \
     const auto result##Type = std::string( "IntersectionResult" ) + #Type;     \
-    pybind11::class_< IntersectionResult< Type > >(                            \
-        module, result##Type.c_str() )                                         \
+    pybind11::class_< IntersectionResult< Type > >( module,                    \
+        result##Type.c_str(),                                                  \
+        "Result of an intersection computation: type, and the intersection "   \
+        "when there is one" )                                                  \
         .def( "has_intersection",                                              \
-            &IntersectionResult< Type >::has_intersection )                    \
-        .def_readonly( "result", &IntersectionResult< Type >::result )         \
-        .def_readonly( "type", &IntersectionResult< Type >::type );
+            &IntersectionResult< Type >::has_intersection,                     \
+            "Return True if the objects intersect" )                           \
+        .def_readonly( "result", &IntersectionResult< Type >::result,          \
+            "Intersection point(s), meaningful only if has_intersection()" )   \
+        .def_readonly( "type", &IntersectionResult< Type >::type,              \
+            "Kind of result: none, intersect, parallel or incorrect" );
 
 namespace geode
 {
     void define_intersection( pybind11::module& module )
     {
-        pybind11::enum_< INTERSECTION_TYPE >( module, "INTERSECTION_TYPE" )
+        pybind11::native_enum< INTERSECTION_TYPE >( module, "IntersectionType",
+            "enum.Enum",
+            "Outcome of an intersection computation: none (too far), "
+            "intersect, parallel (no unique point) or incorrect (computed "
+            "points are not within the global epsilon of the objects)" )
             .value( "none", INTERSECTION_TYPE::none )
             .value( "intersect", INTERSECTION_TYPE::intersect )
             .value( "parallel", INTERSECTION_TYPE::parallel )
             .value( "incorrect", INTERSECTION_TYPE::incorrect )
-            .export_values();
+            .finalize();
 
         PYTHON_INTERSECTION_RESULT( Point2D );
         PYTHON_INTERSECTION_RESULT( Point3D );
@@ -78,31 +93,53 @@ namespace geode
         PYTHON_INTERSECTION_RESULT( InfiniteLine3D );
         PYTHON_INTERSECTION( 2 );
         PYTHON_INTERSECTION( 3 );
-        module.def( "line_plane_intersection3D", &line_plane_intersection );
-        module.def(
-            "line_sphere_intersection2D", &line_sphere_intersection< 2 > );
-        module.def(
-            "line_sphere_intersection3D", &line_sphere_intersection< 3 > );
-        module.def( "segment_sphere_intersection2D",
-            &segment_sphere_intersection< 2 > );
-        module.def( "segment_sphere_intersection3D",
-            &segment_sphere_intersection< 3 > );
-        module.def(
-            "segment_plane_intersection3D", &segment_plane_intersection );
-        module.def(
-            "segment_triangle_intersection3D", &segment_triangle_intersection );
-        module.def(
-            "line_triangle_intersection3D", &line_triangle_intersection );
-        module.def( "line_line_intersection2D", &line_line_intersection );
-        module.def(
-            "segment_segment_intersection2D", &segment_segment_intersection );
-        module.def( "segment_line_intersection2D", &segment_line_intersection );
-        module.def(
-            "segment_cylinder_intersection3D", &segment_cylinder_intersection );
-        module.def(
-            "line_cylinder_intersection3D", &line_cylinder_intersection );
-        module.def(
-            "triangle_circle_intersection3D", &triangle_circle_intersection );
-        module.def( "plane_circle_intersection3D", &plane_circle_intersection );
+        module.def( "line_plane_intersection3D", &line_plane_intersection,
+            pybind11::arg( "line" ), pybind11::arg( "plane" ),
+            "Intersect an infinite line and a plane and return an "
+            "IntersectionResult holding the point" );
+        module.def( "segment_plane_intersection3D", &segment_plane_intersection,
+            pybind11::arg( "segment" ), pybind11::arg( "plane" ),
+            "Intersect a segment and a plane and return an IntersectionResult "
+            "holding the point (no point if the segment lies in the plane)" );
+        module.def( "segment_triangle_intersection3D",
+            &segment_triangle_intersection, pybind11::arg( "segment" ),
+            pybind11::arg( "triangle" ),
+            "Intersect a segment and a triangle and return an "
+            "IntersectionResult holding the point" );
+        module.def( "line_triangle_intersection3D", &line_triangle_intersection,
+            pybind11::arg( "line" ), pybind11::arg( "triangle" ),
+            "Intersect an infinite line and a triangle and return an "
+            "IntersectionResult holding the point" );
+        module.def( "line_line_intersection2D", &line_line_intersection,
+            pybind11::arg( "line0" ), pybind11::arg( "line1" ),
+            "Intersect two 2D infinite lines and return an IntersectionResult "
+            "holding the point" );
+        module.def( "segment_segment_intersection2D",
+            &segment_segment_intersection, pybind11::arg( "segment0" ),
+            pybind11::arg( "segment1" ),
+            "Intersect two 2D segments and return an IntersectionResult "
+            "holding the point" );
+        module.def( "segment_line_intersection2D", &segment_line_intersection,
+            pybind11::arg( "segment" ), pybind11::arg( "line" ),
+            "Intersect a 2D segment and an infinite line and return an "
+            "IntersectionResult holding the point" );
+        module.def( "segment_cylinder_intersection3D",
+            &segment_cylinder_intersection, pybind11::arg( "segment" ),
+            pybind11::arg( "cylinder" ),
+            "Intersect a segment and a cylinder and return an "
+            "IntersectionResult holding the intersection points" );
+        module.def( "line_cylinder_intersection3D", &line_cylinder_intersection,
+            pybind11::arg( "line" ), pybind11::arg( "cylinder" ),
+            "Intersect an infinite line and a cylinder and return an "
+            "IntersectionResult holding the intersection points" );
+        module.def( "triangle_circle_intersection3D",
+            &triangle_circle_intersection, pybind11::arg( "triangle" ),
+            pybind11::arg( "circle" ),
+            "Intersect a triangle and a circle and return an "
+            "IntersectionResult holding the intersection points" );
+        module.def( "plane_circle_intersection3D", &plane_circle_intersection,
+            pybind11::arg( "plane" ), pybind11::arg( "circle" ),
+            "Intersect a plane and a circle and return an IntersectionResult "
+            "holding the intersection points" );
     }
 } // namespace geode

@@ -25,6 +25,7 @@ add_geode_python_binding(
         "attribute.cpp"
         "attribute_manager.cpp"
         "cell_array.cpp"
+        "exception.cpp"
         "identifier.cpp"
         "identifier_builder.cpp"
         "input.cpp"

@@ -163,7 +163,9 @@ namespace geode
         /*!
          * Permute polyhedra to match the given order.
          * @param[in] permutation Vector of size solid_mesh_.nb_polyhedra().
-         * Each value corresponds to the destination position.
+         * permutation[new_index] is the old index of the polyhedron that is
+         * moved to new_index. It must be a permutation of the indices,
+         * otherwise an OpenGeodeException of type data is thrown.
          * @return the mapping between old polyhedron indices to new ones.
          */
         std::vector< index_t > permute_polyhedra(

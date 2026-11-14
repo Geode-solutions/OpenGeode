@@ -160,6 +160,11 @@ namespace geode
     std::vector< index_t > GraphBuilder::delete_edges(
         const std::vector< bool >& to_delete )
     {
+        OpenGeodeMeshException::check_exception(
+            to_delete.size() == graph_.nb_edges(), nullptr,
+            OpenGeodeException::TYPE::data,
+            "[GraphBuilder::delete_edges] to_delete should have one value per "
+            "edge" );
         const auto old2new = mapping_after_deletion( to_delete );
         if( absl::c_find( to_delete, true ) == to_delete.end() )
         {
@@ -174,6 +179,11 @@ namespace geode
     std::vector< index_t > GraphBuilder::permute_edges(
         absl::Span< const index_t > permutation )
     {
+        OpenGeodeMeshException::check_exception(
+            permutation.size() == graph_.nb_edges(), nullptr,
+            OpenGeodeException::TYPE::data,
+            "[GraphBuilder::permute_edges] permutation should have one value "
+            "per edge" );
         const auto old2new = old2new_permutation( permutation );
         graph_.update_edges_around_vertices( old2new, Graph::GraphKey{} );
         graph_.edge_attribute_manager().permute_elements( permutation );

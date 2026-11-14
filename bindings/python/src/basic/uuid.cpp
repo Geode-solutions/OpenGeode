@@ -27,15 +27,29 @@
 
 namespace geode
 {
+    // std::optional< uuid > fields are copies accepting None
+    static_assert( !detail::optional_field< std::optional< uuid > >::is_live );
+    static_assert(
+        detail::optional_field< std::optional< Point3D > >::is_live );
+
     void define_uuid( pybind11::module& module )
     {
         define_string_representation(
-            pybind11::class_< uuid >( module, "uuid" ) )
-            .def( pybind11::init<>() )
-            .def( pybind11::init< std::string_view >() )
-            .def( pybind11::self == pybind11::self )
-            .def( pybind11::self != pybind11::self )
-            .def( pybind11::self < pybind11::self )
+            pybind11::class_< uuid >(
+                module, "uuid", "Universally unique identifier of an object" ),
+            []( const uuid& id ) {
+                return python_call_repr(
+                    "uuid", { python_repr( id.string() ) } );
+            } )
+            .def( pybind11::init<>(), "Generate a new unique uuid (version 7, "
+                                      "ordered by creation time)" )
+            .def( pybind11::init< std::string_view >(),
+                pybind11::arg( "string" ),
+                "Build a uuid from its 36 characters string representation. "
+                "Raise an error if the string is not a valid uuid" )
+            .def( pybind11::self == pybind11::self, pybind11::arg( "other" ) )
+            .def( pybind11::self != pybind11::self, pybind11::arg( "other" ) )
+            .def( pybind11::self < pybind11::self, pybind11::arg( "other" ) )
             .def( "__hash__", []( const uuid& id ) {
                 return std::hash< uuid >{}( id );
             } );

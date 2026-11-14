@@ -68,6 +68,20 @@ add_geode_python_test(
         ${PROJECT_NAME}::py_model
 )
 add_geode_python_test(
+    SOURCE "test-py-model-lifetime.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_geometry
+        ${PROJECT_NAME}::py_model
+)
+add_geode_python_test(
+    SOURCE "test-py-model-has-components.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_geometry
+        ${PROJECT_NAME}::py_model
+)
+add_geode_python_test(
     SOURCE "test-py-model-crs.py"
     DEPENDENCIES
         ${PROJECT_NAME}::py_basic
@@ -84,6 +98,59 @@ add_geode_python_test(
     DEPENDENCIES
         ${PROJECT_NAME}::py_basic
         ${PROJECT_NAME}::py_geometry
+        ${PROJECT_NAME}::py_mesh
+        ${PROJECT_NAME}::py_model
+)
+add_geode_python_test(
+    SOURCE "test-py-hash.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_geometry
+        ${PROJECT_NAME}::py_image
+        ${PROJECT_NAME}::py_mesh
+        ${PROJECT_NAME}::py_model
+)
+add_geode_python_test(
+    SOURCE "test-py-enums.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_geometry
+        ${PROJECT_NAME}::py_model
+)
+add_geode_python_test(
+    SOURCE "test-py-statics.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_geometry
+        ${PROJECT_NAME}::py_image
+        ${PROJECT_NAME}::py_mesh
+        ${PROJECT_NAME}::py_model
+)
+add_geode_python_test(
+    SOURCE "test-py-import-error.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_mesh
+        ${PROJECT_NAME}::py_model
+)
+add_geode_python_test(
+    SOURCE "test-py-unique-vertex-checks.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_geometry
+        ${PROJECT_NAME}::py_model
+)
+add_geode_python_test(
+    SOURCE "test-py-mesh-element-types.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_mesh
+        ${PROJECT_NAME}::py_model
+)
+add_geode_python_test(
+    SOURCE "test-py-mappings.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
         ${PROJECT_NAME}::py_mesh
         ${PROJECT_NAME}::py_model
 )

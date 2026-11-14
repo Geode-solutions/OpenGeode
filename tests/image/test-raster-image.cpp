@@ -204,6 +204,21 @@ void test_io( std::array< geode::index_t, dimension > cells_number )
     }
 }
 
+void test_unknown_extension( const geode::RasterImage2D& raster )
+{
+    // Same behavior as the other types: no exception for an unknown format
+    geode::OpenGeodeImageException::test(
+        geode::is_raster_image_loadable< 2 >( "test.unknown_extension" ).value()
+            == 0,
+        "[TEST] An unknown extension should not be loadable" );
+    geode::OpenGeodeImageException::test(
+        !geode::is_raster_image_saveable( raster, "test.unknown_extension" ),
+        "[TEST] An unknown extension should not be saveable" );
+    geode::OpenGeodeImageException::test(
+        geode::is_raster_image_saveable( raster, "test.og_img2d" ),
+        "[TEST] The native extension should be saveable" );
+}
+
 void test()
 {
     geode::OpenGeodeImageLibrary::initialize();
@@ -221,6 +236,7 @@ void test()
             filename_with_spaces );
     test_raster( reload );
     test_save_failure( raster );
+    test_unknown_extension( raster );
     test_io< 1 >( { 7 } );
     test_io< 3 >( { 2, 3, 4 } );
     test_missing_colors();

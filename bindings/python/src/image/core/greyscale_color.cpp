@@ -30,14 +30,31 @@ namespace geode
     void define_greyscale_color( pybind11::module& module )
     {
         define_string_representation(
-            pybind11::class_< GreyscaleColor >( module, "GreyscaleColor" ) )
-            .def( pybind11::init<>() )
-            .def( pybind11::init< local_index_t >() )
-            .def( "value", &GreyscaleColor::value )
-            .def( "set_value", &GreyscaleColor::set_value )
-            .def( pybind11::self == pybind11::self )
-            .def( pybind11::self != pybind11::self )
-            .def( pybind11::self + pybind11::self )
-            .def( pybind11::self += pybind11::self );
+            pybind11::class_< GreyscaleColor >( module, "GreyscaleColor",
+                "Grey level of a pixel, between 0 and 255" ),
+            []( const GreyscaleColor& color ) {
+                return python_call_repr(
+                    "GreyscaleColor", { python_repr( color.value() ) } );
+            } )
+            .def( pybind11::init<>(), "Build a black color" )
+            .def( pybind11::init< local_index_t >(), pybind11::arg( "value" ),
+                "Build a color from its grey level (0 to 255)" )
+            .def( "value", &GreyscaleColor::value,
+                "Return the grey level (0 to 255)" )
+            .def( "set_value", &GreyscaleColor::set_value,
+                pybind11::arg( "greyscale" ), "Set the grey level (0 to 255)" )
+            .def( pybind11::self == pybind11::self, pybind11::arg( "other" ) )
+            .def( pybind11::self != pybind11::self, pybind11::arg( "other" ) )
+            .def( "__hash__",
+                []( const GreyscaleColor& value ) {
+                    return absl::HashOf( value.value() );
+                } )
+            .def( pybind11::self + pybind11::self, pybind11::arg( "other" ),
+                "Return the mix of the two colors: the grey level is the "
+                "average of the grey levels of the two colors (rounded down)" )
+            .def( pybind11::self += pybind11::self, pybind11::arg( "other" ),
+                "Replace the color by the mix of the two colors: the grey "
+                "level is the average of the grey levels of the two colors "
+                "(rounded down)" );
     }
 } // namespace geode
