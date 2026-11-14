@@ -196,6 +196,41 @@ namespace geode
     };
 
     /*!
+     * Return a geometric element of a mesh (Segment, Triangle, Tetrahedron)
+     * as a snapshot: rebuilt by its Python constructor from copies of the
+     * mesh points, which it keeps alive, it is neither modified nor
+     * invalidated by later changes of the mesh.
+     */
+    template < typename Geometry >
+    TypedObject< Geometry > geometry_snapshot( const Geometry& geometry )
+    {
+        const auto& vertices = geometry.vertices();
+        using Point = std::decay_t< decltype( vertices[0].get() ) >;
+        pybind11::tuple points( vertices.size() );
+        for( size_t vertex = 0; vertex < vertices.size(); vertex++ )
+        {
+            points[vertex] = pybind11::cast( Point{ vertices[vertex].get() } );
+        }
+        return pybind11::reinterpret_steal< TypedObject< Geometry > >(
+            pybind11::type::of< Geometry >()( *points ).release() );
+    }
+
+    /*!
+     * Same as checked() for a method returning a geometric element, which is
+     * returned as a snapshot (see geometry_snapshot()).
+     */
+    template < typename Mesh, typename Return, typename Arg, typename Check >
+    auto checked_snapshot( std::string_view name,
+        Return ( Mesh::*method )( Arg ) const,
+        Check check )
+    {
+        auto accessor = checked( name, method, check );
+        return [accessor]( const Mesh& mesh, Arg argument ) {
+            return geometry_snapshot( accessor( mesh, argument ) );
+        };
+    }
+
+    /*!
      * Wrap the texture_manager() of a mesh: the returned manager stores in
      * `_nb_elements` the method of the mesh giving the number of elements
      * that carry the texture coordinates (nb_edges, nb_polygons or

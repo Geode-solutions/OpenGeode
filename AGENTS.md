@@ -79,8 +79,9 @@ package read `help(opengeode)`, whose text is `bindings/python/opengeode_doc.txt
 - Value classes (Point, Vector, uuid, ...) are hashable by value and have an
   eval-able `__repr__` (`define_string_representation`, `python_call_repr`).
 - Geometry objects built from Points share the Python Point objects (mutating a
-  point mutates the geometry); geometry returned by a mesh refers to the mesh
-  and may be invalidated by later topology edits: keep it documented.
+  point mutates the geometry); geometry returned by a mesh is a snapshot built
+  from copies of the mesh points (`checked_snapshot` in `mesh/index_check.hpp`):
+  never return geometry referring to mesh storage, which any edit reallocates.
 - Registry: `register_type(cls, load=..., save=..., builder=..., ...)` in the
   pure-Python module of the binding (see `mesh.py`, `model.py`) for each new
   type; `extend_type` to add operations; `resolve` maps an object to its most

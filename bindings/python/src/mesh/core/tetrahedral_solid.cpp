@@ -44,19 +44,21 @@
             "Return a copy of the tetrahedral solid, with the same data "      \
             "structure, name and identifier" )                                 \
         .def( "tetrahedron",                                                   \
-            geode::checked( "tetrahedron",                                     \
+            geode::checked_snapshot( "tetrahedron",                            \
                 &TetrahedralSolid##dimension##D::tetrahedron,                  \
                 geode::PolyhedronCheck{} ),                                    \
-            pybind11::arg( "tetrahedron_id" ), pybind11::keep_alive< 0, 1 >(), \
+            pybind11::arg( "tetrahedron_id" ),                                 \
             "Return the geometric tetrahedron of the given tetrahedron of "    \
-            "the mesh" )                                                       \
+            "the mesh, built from copies of the tetrahedron points: later "    \
+            "changes of the mesh do not modify it" )                           \
         .def( "triangle",                                                      \
-            geode::checked( "triangle",                                        \
+            geode::checked_snapshot( "triangle",                               \
                 &TetrahedralSolid##dimension##D::triangle,                     \
                 geode::PolyhedronFacetCheck{} ),                               \
-            pybind11::arg( "facet" ), pybind11::keep_alive< 0, 1 >(),          \
+            pybind11::arg( "facet" ),                                          \
             "Return the geometric triangle of the given tetrahedron facet of " \
-            "the mesh" )
+            "the mesh, built from copies of the facet points: later changes "  \
+            "of the mesh do not modify it" )
 
 namespace geode
 {

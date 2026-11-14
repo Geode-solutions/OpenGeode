@@ -210,9 +210,9 @@ Good to know
   through the class (opengeode.Logger.Level.info), not at module level.
 - Geometry objects (Segment3D, Triangle3D, ...) built from Point objects keep
   those very Python Point objects: mutating a point mutates the geometry.
-  Geometry returned by a mesh (e.g. surface.triangle(0)) describes the mesh at
-  the time of the call: a later topology change of the mesh (removing vertices
-  or polygons, compressing) can invalidate it, so do not keep it across edits.
+  Geometry returned by a mesh (e.g. surface.triangle(0)) is a snapshot built
+  from copies of the mesh points: later changes of the mesh (moving, adding or
+  removing vertices, deleting the mesh) do not modify it.
 - Value classes (Point3D, Vector3D, uuid, ...) are mutable but hashable by
   value: do not mutate an object that is used as a dict key or a set member.
 - An object returned by a mesh (an attribute manager, an attribute, a builder)

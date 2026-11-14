@@ -114,7 +114,7 @@ def create_solid():
     return solid
 
 
-def test_mesh_elements_keep_mesh_alive():
+def test_mesh_elements_outlive_mesh():
     segment = create_curve().segment(0)
     triangle = create_surface().triangle(0)
     tetrahedron = create_solid().tetrahedron(0)
@@ -191,11 +191,97 @@ def test_texture_image_reference():
     check(raster.nb_cells() == 4, "Texture image should have 4 cells")
 
 
+def coordinates(geometry, dimension):
+    return [[point.value(axis) for axis in range(dimension)] for point in geometry.vertices()]
+
+
+def snapshot_case(dimension, kind):
+    point = getattr(geom, "Point%dD" % dimension)
+    if kind == "segment":
+        target = getattr(mesh, "EdgedCurve%dD" % dimension).create()
+        builder = getattr(mesh, "EdgedCurveBuilder%dD" % dimension).create(target)
+    else:
+        target = getattr(mesh, "TriangulatedSurface%dD" % dimension).create()
+        builder = getattr(mesh, "TriangulatedSurfaceBuilder%dD" % dimension).create(target)
+    for values in [[0, 0, 0], [1, 0, 0], [0, 1, 0]]:
+        builder.create_point(point(values[:dimension]))
+    if kind == "segment":
+        builder.create_edge_with_vertices(1, 2)
+        return target, builder, point, lambda mesh_object: mesh_object.segment(0)
+    builder.create_triangle([0, 1, 2])
+    return target, builder, point, lambda mesh_object: mesh_object.triangle(0)
+
+
+def solid_case(kind):
+    target = create_solid()
+    builder = mesh.TetrahedralSolidBuilder3D.create(target)
+    if kind == "tetrahedron":
+        return target, builder, geom.Point3D, lambda solid: solid.tetrahedron(0)
+    return (
+        target,
+        builder,
+        geom.Point3D,
+        lambda solid: solid.triangle(mesh.PolyhedronFacet(0, 1)),
+    )
+
+
+def test_mesh_geometry_is_a_snapshot():
+    # Geometry returned by a mesh is built from copies of its points: later
+    # changes of the mesh (moving, adding or removing vertices, deleting the
+    # mesh) do not modify it
+    factories = [
+        lambda dimension=dimension, kind=kind: snapshot_case(dimension, kind)
+        for dimension in [2, 3]
+        for kind in ["segment", "triangle"]
+    ] + [lambda: solid_case("tetrahedron"), lambda: solid_case("triangle")]
+    for factory in factories:
+        target, builder, point, accessor = factory()
+        geometry = accessor(target)
+        label = type(geometry).__name__ + " of " + type(target).__name__
+        dimension = int(point.__name__[len("Point")])
+        expected = coordinates(geometry, dimension)
+        check(expected == coordinates(accessor(target), dimension), label + " coordinates")
+        check(
+            all(isinstance(vertex, point) for vertex in geometry.vertices()),
+            label + " vertices are points",
+        )
+        # Moving a vertex
+        for vertex in range(target.nb_vertices()):
+            builder.set_point(vertex, point([9.0] * dimension))
+        check(coordinates(geometry, dimension) == expected, label + " after set_point")
+        check(
+            coordinates(accessor(target), dimension) == [[9.0] * dimension] * len(expected),
+            label + " new geometry after set_point",
+        )
+        # Adding many vertices reallocates the coordinates of the mesh
+        for _ in range(100000):
+            builder.create_point(point([7.0] * dimension))
+        junk = allocate_junk()
+        check(coordinates(geometry, dimension) == expected, label + " after create_point")
+        for elements in ["edges", "polygons", "polyhedra"]:
+            if hasattr(builder, "delete_" + elements):
+                getattr(builder, "delete_" + elements)(
+                    [True] * getattr(target, "nb_" + elements)()
+                )
+        builder.delete_vertices([True] * target.nb_vertices())
+        check(target.nb_vertices() == 0, label + " vertices deleted")
+        junk = allocate_junk()
+        check(coordinates(geometry, dimension) == expected, label + " after delete_vertices")
+        # Deleting the mesh
+        target_ref = weakref.ref(target)
+        del target, builder
+        gc.collect()
+        check(target_ref() is None, label + " does not keep the mesh alive")
+        junk = allocate_junk()
+        check(coordinates(geometry, dimension) == expected, label + " after deleting the mesh")
+
+
 if __name__ == "__main__":
     mesh.OpenGeodeMeshLibrary.initialize()
     test_builder_keeps_mesh_alive()
     test_solid_sub_builders_keep_mesh_alive()
-    test_mesh_elements_keep_mesh_alive()
+    test_mesh_elements_outlive_mesh()
+    test_mesh_geometry_is_a_snapshot()
     test_texture_manager_keeps_mesh_alive()
     test_crs_builder_returns_reference()
     test_texture_image_reference()

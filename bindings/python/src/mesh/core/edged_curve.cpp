@@ -63,10 +63,11 @@
         .def( "bounding_box", &EdgedCurve##dimension##D::bounding_box,         \
             "Return the bounding box of the vertices of the edged curve" )     \
         .def( "segment",                                                       \
-            geode::checked( "segment", &EdgedCurve##dimension##D::segment,     \
-                geode::EdgeCheck{} ),                                          \
-            pybind11::arg( "edge_id" ), pybind11::keep_alive< 0, 1 >(),        \
-            "Return the segment geometry of the edge" )                        \
+            geode::checked_snapshot( "segment",                                \
+                &EdgedCurve##dimension##D::segment, geode::EdgeCheck{} ),      \
+            pybind11::arg( "edge_id" ),                                        \
+            "Return the segment geometry of the edge, built from copies of "   \
+            "the edge points: later changes of the mesh do not modify it" )    \
         .def( "vertices_around_vertex",                                        \
             geode::checked( "vertices_around_vertex",                          \
                 &EdgedCurve##dimension##D::vertices_around_vertex,             \

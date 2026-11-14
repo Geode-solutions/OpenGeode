@@ -43,12 +43,13 @@
             "Return a copy of the triangulated surface, with the same data "   \
             "structure, name and identifier" )                                 \
         .def( "triangle",                                                      \
-            geode::checked( "triangle",                                        \
+            geode::checked_snapshot( "triangle",                               \
                 &TriangulatedSurface##dimension##D::triangle,                  \
                 geode::PolygonCheck{} ),                                       \
-            pybind11::arg( "triangle_id" ), pybind11::keep_alive< 0, 1 >(),    \
+            pybind11::arg( "triangle_id" ),                                    \
             "Return the geometric triangle of the given triangle of the "      \
-            "mesh" )
+            "mesh, built from copies of the triangle points: later changes "   \
+            "of the mesh do not modify it" )
 
 namespace geode
 {
