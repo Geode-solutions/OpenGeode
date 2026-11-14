@@ -24,24 +24,3 @@ add_subdirectory(image)
 add_subdirectory(mesh)
 add_subdirectory(model)
 add_subdirectory(gdal)
-
-# Helpers shared by the bindings, installed for the bindings of the downstream
-# projects: #include <geode/bindings/python/common.hpp> (the include directory
-# of the OpenGeode targets)
-set(helpers_destination "${CMAKE_INSTALL_INCLUDEDIR}/geode/bindings/python")
-install(FILES "common.hpp" "numpy_access.hpp"
-    DESTINATION "${helpers_destination}"
-    COMPONENT public
-)
-install(FILES "basic/factory.hpp" "basic/mapping.hpp"
-    DESTINATION "${helpers_destination}/basic"
-    COMPONENT public
-)
-install(FILES "mesh/index_check.hpp"
-    DESTINATION "${helpers_destination}/mesh"
-    COMPONENT public
-)
-install(FILES "model/model_vertex_check.hpp" "model/model_mapping.hpp"
-    DESTINATION "${helpers_destination}/model"
-    COMPONENT public
-)

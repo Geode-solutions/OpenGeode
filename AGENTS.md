@@ -36,7 +36,8 @@ package read `help(opengeode)`, whose text is `bindings/python/opengeode_doc.txt
   `PYBIND11_MODULE` and import the OpenGeode modules with
   `geode::import_binding_dependency`. Keep these headers project-agnostic and
   their includes relative (`"../common.hpp"`); a new reusable header is added to
-  the install list of `bindings/python/src/CMakeLists.txt`.
+  the install list of `bindings/python/helpers/CMakeLists.txt` (installed by
+  every configure, even with `OPENGEODE_WITH_PYTHON` OFF).
 - `bindings/python/opengeode_doc.txt`: the package docstring (see Documentation).
 - `bindings/python/tests/<module>/test-py-*.py`: one script per topic.
 - `cmake/PythonTargets.cmake`: `add_geode_python_binding`, `add_geode_python_test`,

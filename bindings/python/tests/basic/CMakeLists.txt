@@ -101,9 +101,18 @@ add_geode_python_test(
     SOURCE "test-py-installed-helpers.py"
     ARGUMENTS
         "${CMAKE_COMMAND}"
-        "${PROJECT_BINARY_DIR}/bindings/python/src/cmake_install.cmake"
+        "${PROJECT_BINARY_DIR}/bindings/python/helpers/cmake_install.cmake"
         "${PROJECT_SOURCE_DIR}/bindings/python/src"
         "${helpers_flags}"
+        "${CMAKE_GENERATOR}"
+)
+add_geode_python_test(
+    SOURCE "test-py-helpers-python-off.py"
+    ARGUMENTS
+        "${CMAKE_COMMAND}"
+        "${PROJECT_SOURCE_DIR}/bindings/python/helpers"
+        "${PROJECT_SOURCE_DIR}/bindings/python/src"
+        "${PROJECT_SOURCE_DIR}/cmake/OpenGeode.cmake"
         "${CMAKE_GENERATOR}"
 )
 add_geode_python_test(

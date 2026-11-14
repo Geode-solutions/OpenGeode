@@ -22,13 +22,15 @@
 
 """The reusable helpers of the bindings are installed for the bindings of the
 downstream projects, in include/geode/bindings/python: the install script of
-bindings/python/src is run in a temporary prefix, and every relative include
-of an installed helper must be installed too. Then each helper is compiled
-alone from that prefix, as a downstream binding includes it
-(<geode/bindings/python/...>, without the OpenGeode sources of the bindings),
-in a small CMake project using the compile flags of a downstream binding.
-Arguments: the cmake executable, the cmake_install.cmake of bindings/python/src,
-that source directory, the file of the compile flags and the CMake generator."""
+bindings/python/helpers (which lists the installed helpers) is run in a
+temporary prefix, and every relative include of an installed helper must be
+installed too. Then each helper is compiled alone from that prefix, as a
+downstream binding includes it (<geode/bindings/python/...>, without the
+OpenGeode sources of the bindings), in a small CMake project using the compile
+flags of a downstream binding.
+Arguments: the cmake executable, the cmake_install.cmake of
+bindings/python/helpers, the source directory of the helpers
+(bindings/python/src), the file of the compile flags and the CMake generator."""
 
 import os
 import re

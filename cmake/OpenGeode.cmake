@@ -113,6 +113,9 @@ if(OPENGEODE_WITH_TESTS)
     add_subdirectory(tests)
 endif()
 
+# The binding helpers (header-only) are installed whatever the Python option
+add_subdirectory(bindings/python/helpers)
+
 if(OPENGEODE_WITH_PYTHON)
     message(STATUS "Configuring OpenGeode with Python bindings")
     add_subdirectory(bindings/python)
