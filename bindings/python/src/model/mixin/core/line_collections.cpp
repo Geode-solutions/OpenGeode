@@ -36,6 +36,12 @@
         .def( "nb_line_collections",                                           \
             &LineCollections##dimension##D::nb_line_collections,               \
             "Return the number of LineCollection components of the model" )    \
+        .def( "has_line_collection",                                           \
+            &LineCollections##dimension##D::has_line_collection,               \
+            pybind11::arg( "id" ),                                             \
+            "Return True if the model has a LineCollection with the given "    \
+            "uuid "                                                            \
+            "(False once it is removed)" )                                     \
         .def( "line_collection",                                               \
             &LineCollections##dimension##D::line_collection,                   \
             pybind11::arg( "id" ),                                             \

@@ -35,6 +35,10 @@
         "model class" )                                                        \
         .def( "nb_surfaces", &Surfaces##dimension##D::nb_surfaces,             \
             "Return the number of Surface components of the model" )           \
+        .def( "has_surface", &Surfaces##dimension##D::has_surface,             \
+            pybind11::arg( "id" ),                                             \
+            "Return True if the model has a Surface with the given uuid "      \
+            "(False once it is removed)" )                                     \
         .def( "surface", &Surfaces##dimension##D::surface,                     \
             pybind11::arg( "id" ),                                             \
             pybind11::return_value_policy::reference_internal,                 \

@@ -87,6 +87,47 @@ namespace geode
                 "unique vertex; raise an IndexError if unique_vertex_id is not "
                 "in [0, nb_unique_vertices)" )
             .def(
+                "is_unique_vertex_isolated",
+                []( const VertexIdentifier& identifier,
+                    index_t unique_vertex_id ) {
+                    check_index( "is_unique_vertex_isolated", "unique vertex",
+                        unique_vertex_id, identifier.nb_unique_vertices() );
+                    return identifier.is_unique_vertex_isolated(
+                        unique_vertex_id );
+                },
+                pybind11::arg( "unique_vertex_id" ),
+                "Return True if no component vertex is identified with the "
+                "unique vertex (e.g. after the removal of its components); "
+                "raise an IndexError if unique_vertex_id is not in [0, "
+                "nb_unique_vertices)" )
+            .def(
+                "has_component_mesh_vertices",
+                []( const VertexIdentifier& identifier,
+                    index_t unique_vertex_id, const ComponentType& type ) {
+                    check_index( "has_component_mesh_vertices", "unique vertex",
+                        unique_vertex_id, identifier.nb_unique_vertices() );
+                    return identifier.has_component_mesh_vertices(
+                        unique_vertex_id, type );
+                },
+                pybind11::arg( "unique_vertex_id" ), pybind11::arg( "type" ),
+                "Return True if a vertex of a component of the given type is "
+                "identified with the unique vertex; raise an IndexError if "
+                "unique_vertex_id is not in [0, nb_unique_vertices)" )
+            .def(
+                "has_component_mesh_vertices",
+                []( const VertexIdentifier& identifier,
+                    index_t unique_vertex_id, const uuid& component_id ) {
+                    check_index( "has_component_mesh_vertices", "unique vertex",
+                        unique_vertex_id, identifier.nb_unique_vertices() );
+                    return identifier.has_component_mesh_vertices(
+                        unique_vertex_id, component_id );
+                },
+                pybind11::arg( "unique_vertex_id" ),
+                pybind11::arg( "component_id" ),
+                "Return True if a vertex of the component of the given uuid "
+                "is identified with the unique vertex; raise an IndexError if "
+                "unique_vertex_id is not in [0, nb_unique_vertices)" )
+            .def(
                 "unique_vertex",
                 []( TypedObject< VertexIdentifier > self,
                     const ComponentMeshVertex& component_vertex ) {

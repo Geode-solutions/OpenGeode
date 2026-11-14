@@ -36,6 +36,12 @@
         .def( "nb_model_boundaries",                                           \
             &ModelBoundaries##dimension##D::nb_model_boundaries,               \
             "Return the number of ModelBoundary components of the model" )     \
+        .def( "has_model_boundary",                                            \
+            &ModelBoundaries##dimension##D::has_model_boundary,                \
+            pybind11::arg( "id" ),                                             \
+            "Return True if the model has a ModelBoundary with the given "     \
+            "uuid "                                                            \
+            "(False once it is removed)" )                                     \
         .def( "model_boundary",                                                \
             &ModelBoundaries##dimension##D::model_boundary,                    \
             pybind11::arg( "id" ),                                             \

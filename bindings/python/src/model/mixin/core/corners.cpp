@@ -35,6 +35,10 @@
         "class" )                                                              \
         .def( "nb_corners", &Corners##dimension##D::nb_corners,                \
             "Return the number of Corner components of the model" )            \
+        .def( "has_corner", &Corners##dimension##D::has_corner,                \
+            pybind11::arg( "id" ),                                             \
+            "Return True if the model has a Corner with the given uuid "       \
+            "(False once it is removed)" )                                     \
         .def( "corner", &Corners##dimension##D::corner, pybind11::arg( "id" ), \
             pybind11::return_value_policy::reference_internal,                 \
             "Return the Corner with the given uuid; raise an error if the "    \

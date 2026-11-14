@@ -34,6 +34,10 @@
         "class" )                                                              \
         .def( "nb_blocks", &Blocks##dimension##D::nb_blocks,                   \
             "Return the number of Block components of the model" )             \
+        .def( "has_block", &Blocks##dimension##D::has_block,                   \
+            pybind11::arg( "id" ),                                             \
+            "Return True if the model has a Block with the given uuid "        \
+            "(False once it is removed)" )                                     \
         .def( "block", &Blocks##dimension##D::block, pybind11::arg( "id" ),    \
             pybind11::return_value_policy::reference_internal,                 \
             "Return the Block with the given uuid; raise an error if the "     \

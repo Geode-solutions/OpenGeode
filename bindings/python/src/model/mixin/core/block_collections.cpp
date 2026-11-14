@@ -36,6 +36,12 @@
         .def( "nb_block_collections",                                          \
             &BlockCollections##dimension##D::nb_block_collections,             \
             "Return the number of BlockCollection components of the model" )   \
+        .def( "has_block_collection",                                          \
+            &BlockCollections##dimension##D::has_block_collection,             \
+            pybind11::arg( "id" ),                                             \
+            "Return True if the model has a BlockCollection with the given "   \
+            "uuid "                                                            \
+            "(False once it is removed)" )                                     \
         .def( "block_collection",                                              \
             &BlockCollections##dimension##D::block_collection,                 \
             pybind11::arg( "id" ),                                             \

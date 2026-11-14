@@ -36,6 +36,12 @@
         .def( "nb_surface_collections",                                        \
             &SurfaceCollections##dimension##D::nb_surface_collections,         \
             "Return the number of SurfaceCollection components of the model" ) \
+        .def( "has_surface_collection",                                        \
+            &SurfaceCollections##dimension##D::has_surface_collection,         \
+            pybind11::arg( "id" ),                                             \
+            "Return True if the model has a SurfaceCollection with the given " \
+            "uuid "                                                            \
+            "(False once it is removed)" )                                     \
         .def( "surface_collection",                                            \
             &SurfaceCollections##dimension##D::surface_collection,             \
             pybind11::arg( "id" ),                                             \

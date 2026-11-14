@@ -34,6 +34,10 @@
         "class" )                                                              \
         .def( "nb_lines", &Lines##dimension##D::nb_lines,                      \
             "Return the number of Line components of the model" )              \
+        .def( "has_line", &Lines##dimension##D::has_line,                      \
+            pybind11::arg( "id" ),                                             \
+            "Return True if the model has a Line with the given uuid "         \
+            "(False once it is removed)" )                                     \
         .def( "line", &Lines##dimension##D::line, pybind11::arg( "id" ),       \
             pybind11::return_value_policy::reference_internal,                 \
             "Return the Line with the given uuid; raise an error if the "      \

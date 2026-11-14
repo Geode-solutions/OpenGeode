@@ -36,6 +36,12 @@
         .def( "nb_corner_collections",                                         \
             &CornerCollections##dimension##D::nb_corner_collections,           \
             "Return the number of CornerCollection components of the model" )  \
+        .def( "has_corner_collection",                                         \
+            &CornerCollections##dimension##D::has_corner_collection,           \
+            pybind11::arg( "id" ),                                             \
+            "Return True if the model has a CornerCollection with the given "  \
+            "uuid "                                                            \
+            "(False once it is removed)" )                                     \
         .def( "corner_collection",                                             \
             &CornerCollections##dimension##D::corner_collection,               \
             pybind11::arg( "id" ),                                             \
