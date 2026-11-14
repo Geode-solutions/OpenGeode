@@ -101,29 +101,30 @@ namespace geode
 {
     /*!
      * Import the extension module defining the types used by a binding module.
-     * In the build tree the modules are top-level modules; in the wheel they
-     * live at the root of a package (opengeode.opengeode_py_basic...): when the
-     * top-level module does not exist, the module of the same name in the
-     * package of the module being initialized is imported. Only the
-     * dependencies of the same package are resolved this way: a module of
-     * another package (an upstream project) must be imported by its package
-     * (pybind11::module_::import( "opengeode" )). Any other error (the
-     * dependency is found but fails to import) is not masked.
+     * The name is the one of the module ("opengeode_py_basic") or, for a
+     * module of another package (an upstream project), its fully qualified
+     * name ("opengeode.opengeode_py_basic").
+     * In the build trees the modules are top-level modules: the top-level
+     * module of that name (the last part of a qualified name) is imported
+     * first. In the wheels they live at the root of their package: when the
+     * top-level module does not exist, the qualified name is imported, or for
+     * an unqualified name, the module of the same name in the package of the
+     * module being initialized. Any other error (the dependency is found but
+     * fails to import) is not masked.
      */
     inline void import_binding_dependency(
         const pybind11::module_& module, const std::string& name )
     {
+        const auto last_dot = name.rfind( '.' );
+        const auto top_level =
+            last_dot == std::string::npos ? name : name.substr( last_dot + 1 );
         try
         {
-            pybind11::module_::import( name.c_str() );
+            pybind11::module_::import( top_level.c_str() );
         }
         catch( pybind11::error_already_set& error )
         {
-            const auto package =
-                module.attr( "__name__" ).cast< std::string >();
-            const auto dot = package.rfind( '.' );
-            if( dot == std::string::npos
-                || !error.matches( PyExc_ModuleNotFoundError ) )
+            if( !error.matches( PyExc_ModuleNotFoundError ) )
             {
                 throw;
             }
@@ -131,7 +132,19 @@ namespace geode
             // hand
             const auto missing = error.value().attr( "name" );
             if( !pybind11::isinstance< pybind11::str >( missing )
-                || missing.cast< std::string >() != name )
+                || missing.cast< std::string >() != top_level )
+            {
+                throw;
+            }
+            if( last_dot != std::string::npos )
+            {
+                pybind11::module_::import( name.c_str() );
+                return;
+            }
+            const auto package =
+                module.attr( "__name__" ).cast< std::string >();
+            const auto dot = package.rfind( '.' );
+            if( dot == std::string::npos )
             {
                 throw;
             }

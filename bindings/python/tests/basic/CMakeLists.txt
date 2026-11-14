@@ -110,6 +110,23 @@ add_geode_python_test(
     SOURCE "test-py-python-environments.py"
     ARGUMENTS "${CMAKE_COMMAND}" "${PROJECT_SOURCE_DIR}/cmake/PythonTargets.cmake"
 )
+# Test module standing for a downstream binding (import_binding_dependency of
+# a module of another package), built aside the binding modules
+pybind11_add_module(geode_test_import_dependency MODULE
+    "import_dependency_module.cpp"
+)
+target_link_libraries(geode_test_import_dependency PRIVATE ${PROJECT_NAME}::basic)
+set_target_properties(geode_test_import_dependency
+    PROPERTIES
+        LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/python_test_modules"
+        FOLDER "Bindings/Python/Tests"
+)
+add_geode_python_test(
+    SOURCE "test-py-import-dependency.py"
+    ARGUMENTS "$<TARGET_FILE:geode_test_import_dependency>"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+)
 add_geode_python_test(
     SOURCE "test-py-signatures.py"
     DEPENDENCIES
