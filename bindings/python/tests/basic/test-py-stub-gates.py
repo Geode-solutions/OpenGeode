@@ -424,6 +424,19 @@ def test_fix_unhashable_class():
             raise ValueError("[Test] Wrong fix of the bare ClassVar:\n" + fixed)
 
 
+def test_imported_modules_without_stubs():
+    # A module alone, whose stub imports other extension modules without
+    # stubs (the upstream modules of a downstream project in a build tree):
+    # their stubs are generated so that mypy resolves the types
+    status, output = run(
+        ["modules", "opengeode_py_mesh", "--mypy-config-file", MYPY_CONFIG]
+    )
+    if status != 0:
+        raise ValueError("[Test] opengeode_py_mesh alone rejected:\n" + output)
+    if "Checked 1 stub files" not in output:
+        raise ValueError("[Test] Only the given module should be checked:\n" + output)
+
+
 def test_real_binding_stubs():
     # The stubs of a real binding are accepted ...
     status, output = run(["modules", "opengeode_py_basic", "--mypy-config-file", MYPY_CONFIG])
@@ -538,3 +551,4 @@ if __name__ == "__main__":
     test_fix_unhashable_class()
     test_stubtest_detects_a_wrong_stub()
     test_real_binding_stubs()
+    test_imported_modules_without_stubs()

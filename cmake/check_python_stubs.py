@@ -38,6 +38,11 @@ without __hash__ is unhashable (pybind11 sets __hash__ to None), written
 override of object.__hash__: the line gets `# type: ignore[assignment]`, as in
 typeshed for the unhashable builtins. `modules` applies it.
 
+`modules` generates the stubs of the given modules, and of the extension modules
+without stubs that they import (e.g. the top-level modules of the upstream
+projects in a build tree: opengeode_py_geometry), so that mypy resolves their
+types; only the stubs of the given modules are checked.
+
 `stubs` fails if a stub contains
   - a parameter named arg0, arg1... (a binding without pybind11::arg),
   - an unresolved annotation (`...` other than in Callable[..., R] or
@@ -59,6 +64,8 @@ of the package, its data...), are copied aside and put on the MYPYPATH.
 
 import argparse
 import ast
+import importlib.machinery
+import importlib.util
 import os
 import re
 import shutil
@@ -314,29 +321,91 @@ def run_stubtest(modules, extra_arguments):
     return 1 if remaining else 0
 
 
+def generate_stubs(module, directory):
+    command = [
+        sys.executable,
+        "-m",
+        "pybind11_stubgen",
+        "--exit-code",
+        "-o",
+        directory,
+        module,
+    ]
+    if subprocess.run(command).returncode:
+        print("error: pybind11-stubgen failed on %s" % module)
+        return False
+    return True
+
+
+def imported_modules(path):
+    """Top-level names of the modules imported by a stub."""
+    with open(path, encoding="utf-8") as stub:
+        tree = ast.parse(stub.read(), filename=path)
+    names = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            names.update(alias.name.split(".")[0] for alias in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module and not node.level:
+            names.add(node.module.split(".")[0])
+    return names
+
+
+def needs_generated_stubs(name):
+    """An importable extension module without stubs: mypy cannot read it.
+    A module of a package has the stubs of its package (shipped in the wheel)
+    or is found through its own stub file."""
+    try:
+        spec = importlib.util.find_spec(name)
+    except (ImportError, ValueError):
+        return False
+    if spec is None or not spec.origin or spec.submodule_search_locations:
+        return False
+    if not spec.origin.endswith(tuple(importlib.machinery.EXTENSION_SUFFIXES)):
+        return False
+    stub = os.path.join(os.path.dirname(spec.origin), name + ".pyi")
+    return not os.path.isfile(stub)
+
+
+def generate_dependency_stubs(directory, generated):
+    """Generate the stubs of the extension modules imported by the stubs of
+    the directory (e.g. the top-level modules of the upstream projects in a
+    build tree) until every one is resolved: they are put on the MYPYPATH
+    with the checked stubs, but are not checked themselves."""
+    while True:
+        missing = set()
+        for path in stub_files([directory]):
+            for name in imported_modules(path):
+                if name not in generated and needs_generated_stubs(name):
+                    missing.add(name)
+        if not missing:
+            return True
+        for name in sorted(missing):
+            generated.add(name)
+            if not generate_stubs(name, directory):
+                return False
+
+
 def run_modules(modules, allowed, config, stubtest):
     """Generate the stubs of the importable modules, then run both gates."""
     with tempfile.TemporaryDirectory() as directory:
+        checked = os.path.join(directory, "checked")
+        dependencies = os.path.join(directory, "dependencies")
         for module in modules:
-            command = [
-                sys.executable,
-                "-m",
-                "pybind11_stubgen",
-                "--exit-code",
-                "-o",
-                directory,
-                module,
-            ]
-            if subprocess.run(command).returncode:
-                print("error: pybind11-stubgen failed on %s" % module)
+            if not generate_stubs(module, checked):
                 return 1
-        fix_stubs([directory])
-        status = run_stubs([directory], allowed)
+        fix_stubs([checked])
+        generated = set(name.split(".")[0] for name in modules)
+        os.makedirs(dependencies, exist_ok=True)
+        copy_stubs(checked, dependencies)
+        if not generate_dependency_stubs(dependencies, generated):
+            return 1
+        fix_stubs([dependencies])
+        status = run_stubs([checked], allowed)
         if not stubtest:
             return status
         environment = os.environ.get("MYPYPATH")
         os.environ["MYPYPATH"] = os.pathsep.join(
-            [directory] + ([environment] if environment else [])
+            [dependencies] + ([environment] if environment else [])
         )
         extra = ["--mypy-config-file", config] if config else []
         return run_stubtest(modules, extra) or status
