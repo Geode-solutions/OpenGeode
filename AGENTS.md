@@ -198,6 +198,13 @@ To run a script or an interactive session by hand, take that environment from
 CI builds with assertions on (a Release build skips them: run an assertions-on
 build before pushing C++ changes). The `wheel` target builds the wheel, generates
 the stubs and runs the stub gates on the whole package.
+It then publishes the wheel next to the CMake files (`<config dir>/python_wheels`),
+where the downstream projects look for it (`<Package>_DIR/python_wheels`). With
+`add_geode_python_wheel(SUPERBUILD)` (OpenGeode) that is the install tree. Without
+it (the downstream projects built standalone) it is the build tree: `install`
+copies the published wheels to the install tree (own `python_wheels` component,
+so the C++ packages of the `public`/`private` components do not carry them), and `wheel` also publishes there
+when the project is already installed, so either order works.
 Editing `opengeode_doc.txt` re-runs CMake (the text is copied into the generated
 `__init__.py`, which must not contain `"""` or backslashes).
 

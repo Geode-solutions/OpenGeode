@@ -107,6 +107,13 @@ add_geode_python_test(
         "${CMAKE_GENERATOR}"
 )
 add_geode_python_test(
+    SOURCE "test-py-installed-wheels.py"
+    ARGUMENTS
+        "${CMAKE_COMMAND}"
+        "${PROJECT_SOURCE_DIR}/cmake/PythonTargets.cmake"
+        "${CMAKE_GENERATOR}"
+)
+add_geode_python_test(
     SOURCE "test-py-python-environments.py"
     ARGUMENTS "${CMAKE_COMMAND}" "${PROJECT_SOURCE_DIR}/cmake/PythonTargets.cmake"
 )

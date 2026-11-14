@@ -508,6 +508,28 @@ function(add_geode_python_stub_test)
     )
 endfunction()
 
+# Built without superbuild, the wheel target publishes the wheel in the build
+# tree (${publish_directory}), but the downstream projects usually find the
+# CMake files of the install tree and look for the wheel next to them
+# (<Package>_DIR/python_wheels): the published wheels are installed there
+# (component python_wheels), and ${output} is the command of the wheel target
+# publishing the wheel there directly when the project is already installed
+# (see publish --if-installed of geode_python_package.py).
+function(_geode_python_publish_in_install publish_directory wheel_file python package_script output)
+    file(MAKE_DIRECTORY "${publish_directory}")
+    # Own component: installed by a plain install, but not in the C++
+    # packages (cpack of the public and private components)
+    install(DIRECTORY "${publish_directory}/"
+        DESTINATION "${CMAKE_CONFIG_DESTINATION}/python_wheels"
+        COMPONENT python_wheels
+    )
+    set(${output}
+        COMMAND ${python} "${package_script}" publish --if-installed "${wheel_file}"
+            "${CMAKE_INSTALL_PREFIX}/${CMAKE_CONFIG_DESTINATION}/python_wheels"
+        PARENT_SCOPE
+    )
+endfunction()
+
 function(add_geode_python_wheel)
     cmake_parse_arguments(GEODE_WHEEL
         "SUPERBUILD"
@@ -645,6 +667,12 @@ print(name + version + '-' + name + version + '-' + platform)"
     geode_python_geode_packages(geode_packages without_local_wheel)
     # Where the downstream projects find this wheel, next to the CMake files
     set(publish_directory "${wheel_build_directory}/${CMAKE_CONFIG_DESTINATION}/python_wheels")
+    set(install_publish_command)
+    if(NOT ${GEODE_WHEEL_SUPERBUILD})
+        _geode_python_publish_in_install("${publish_directory}" "${wheel_file}"
+            "${venv_bin}/python" "${package_script}" install_publish_command
+        )
+    endif()
     # Dependencies of the wheel: requirements.txt (pinned by the CI, not in a
     # fresh checkout), else requirements.in
     add_custom_target(wheel
@@ -667,6 +695,7 @@ print(name + version + '-' + name + version + '-' + platform)"
         COMMAND ${venv_bin}/python "${package_script}" check "${wheel_output_directory}" "${binary_folder}"
         COMMAND ${venv_bin}/python -m build
         COMMAND ${venv_bin}/python "${package_script}" publish "${wheel_file}" "${publish_directory}"
+        ${install_publish_command}
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/wheel
     )
     string(CONCAT import_test "import " "${project_name}")

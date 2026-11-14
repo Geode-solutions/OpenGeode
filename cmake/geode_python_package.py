@@ -31,7 +31,7 @@ projects (cmake/PythonTargets.cmake).
                             [--package <distribution> <version> <wheel directory>
                                        <CMake directory>]...
                             [--missing error|warn] [--dry-run]
-    geode_python_package.py publish <wheel> <wheel directory>
+    geode_python_package.py publish [--if-installed] <wheel> <wheel directory>
     geode_python_package.py wheel-requirements <output> <requirements file>...
 
 layout: moves the extension modules of the package (<package>_py_*) copied in the
@@ -70,7 +70,10 @@ CMake files) importable by this Python, without its dependencies, in this order:
 
 publish: copies the wheel in the directory where the downstream projects look
 for it (install-geode), replacing the previous wheel of the same package for
-the same platform.
+the same platform. With --if-installed, the wheel directory is the one of an
+install tree (built without superbuild, the wheel is also published there): the
+wheel is only published if the parent directory (the CMake files) exists, and a
+copy that fails (an install not writable) is a warning.
 
 wheel-requirements: copies the first existing requirements file to the output
 (the dependencies of the wheel): the requirements.txt pinned by the CI when it
@@ -409,7 +412,17 @@ def run_install_geode(packages, exclude, missing, dry_run):
     return 0
 
 
-def run_publish(wheel, directory):
+def run_publish(wheel, directory, if_installed=False):
+    if if_installed:
+        parent = os.path.dirname(os.path.abspath(directory))
+        if not os.path.isdir(parent):
+            print("Not published in %s: the project is not installed there" % directory)
+            return 0
+        try:
+            return run_publish(wheel, directory)
+        except OSError as error:
+            print("Warning: cannot publish the wheel in %s: %s" % (directory, error))
+            return 0
     os.makedirs(directory, exist_ok=True)
     name = wheel_distribution(wheel)
     tags = wheel_tags(wheel)
@@ -463,6 +476,7 @@ def main():
     install_geode.add_argument("--missing", choices=("error", "warn"), default="error")
     install_geode.add_argument("--dry-run", action="store_true")
     publish = sub.add_parser("publish")
+    publish.add_argument("--if-installed", action="store_true")
     publish.add_argument("wheel")
     publish.add_argument("directory")
     wheel_requirements = sub.add_parser("wheel-requirements")
@@ -485,7 +499,7 @@ def main():
         )
     if arguments.command == "wheel-requirements":
         return run_wheel_requirements(arguments.output, arguments.files)
-    return run_publish(arguments.wheel, arguments.directory)
+    return run_publish(arguments.wheel, arguments.directory, arguments.if_installed)
 
 if __name__ == "__main__":
     sys.exit(main())

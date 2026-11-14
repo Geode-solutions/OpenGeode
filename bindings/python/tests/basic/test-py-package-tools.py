@@ -619,6 +619,54 @@ def test_publish():
         expect(os.listdir(os.path.join(directory, "new")), "published", output)
 
 
+def test_publish_if_installed():
+    # The wheel of a project built without superbuild is also published in
+    # the install tree, where the downstream projects find the CMake files,
+    # but only once the project is installed there
+    with tempfile.TemporaryDirectory() as directory:
+        wheel = make_wheel(
+            os.path.join(directory, "dist"), "OpenGeode-core", "new", tags="cp313-cp313-linux_x86_64"
+        )
+        config = os.path.join(directory, "install", "lib", "cmake", "OpenGeode")
+        published = os.path.join(config, "python_wheels")
+        status, output = run(["publish", "--if-installed", wheel, published])
+        expect(status == 0, "publish without install should succeed", output)
+        expect(not os.path.exists(os.path.join(directory, "install")), "nothing created", output)
+        expect("not installed" in output, "skip explained", output)
+        os.makedirs(config)
+        status, output = run(["publish", "--if-installed", wheel, published])
+        expect(status == 0, "publish in the install tree should succeed", output)
+        expect(
+            os.listdir(published) == [os.path.basename(wheel)],
+            "published in the install tree: %s" % os.listdir(published),
+            output,
+        )
+        # Not writable (an install owned by another user): a warning only
+        if hasattr(os, "geteuid") and os.geteuid() != 0:
+            os.remove(os.path.join(published, os.path.basename(wheel)))
+            os.chmod(published, 0o500)
+            try:
+                status, output = run(["publish", "--if-installed", wheel, published])
+            finally:
+                os.chmod(published, 0o700)
+            expect(status == 0, "publish in a read-only install is a warning", output)
+            expect("Warning" in output, "warning shown", output)
+            expect(not os.listdir(published), "nothing published", output)
+        # Without the option, a missing directory is created and an error fails
+        other = os.path.join(directory, "other", "python_wheels")
+        status, output = run(["publish", wheel, other])
+        expect(status == 0, "publish creates the directory", output)
+        expect(os.listdir(other) == [os.path.basename(wheel)], "published in the new directory", output)
+        if hasattr(os, "geteuid") and os.geteuid() != 0:
+            os.remove(os.path.join(other, os.path.basename(wheel)))
+            os.chmod(other, 0o500)
+            try:
+                status, output = run(["publish", wheel, other])
+            finally:
+                os.chmod(other, 0o700)
+            expect(status != 0, "publish in a read-only directory fails without the option", output)
+
+
 def test_layout_removes_published_wheels():
     with tempfile.TemporaryDirectory() as directory:
         package = os.path.join(directory, "opengeode")
@@ -650,6 +698,7 @@ if __name__ == "__main__":
     test_install_geode_excluded()
     test_installed()
     test_publish()
+    test_publish_if_installed()
     test_layout_removes_published_wheels()
     test_layout()
     test_layout_only_moves_own_modules()
