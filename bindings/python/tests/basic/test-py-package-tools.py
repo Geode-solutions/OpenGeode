@@ -339,6 +339,53 @@ def test_requirements_empty():
     expect(kept == [] and geode == [], "no file: %s %s" % (kept, geode))
 
 
+def test_wheel_requirements():
+    with tempfile.TemporaryDirectory() as directory:
+        pinned = os.path.join(directory, "requirements.txt")
+        source = os.path.join(directory, "requirements.in")
+        output = os.path.join(directory, "wheel", "requirements.txt")
+        write(source, "numpy>=2\nOpenGeode-core\n")
+        # Fresh checkout: no requirements.txt, requirements.in is used
+        status, log = run(["wheel-requirements", output, pinned, source])
+        expect(status == 0, "fresh checkout", log)
+        with open(output) as file:
+            expect(file.read() == "numpy>=2\nOpenGeode-core\n", "requirements.in copied", log)
+        # CI: the pinned requirements.txt wins
+        write(pinned, "numpy==2.1.0\nopengeode-core==15.0.0\n")
+        status, log = run(["wheel-requirements", output, pinned, source])
+        expect(status == 0, "pinned requirements", log)
+        with open(output) as file:
+            expect(
+                file.read() == "numpy==2.1.0\nopengeode-core==15.0.0\n",
+                "requirements.txt copied",
+                log,
+            )
+        # No file at all: an empty list of dependencies, replacing the previous one
+        status, log = run(
+            ["wheel-requirements", output, os.path.join(directory, "missing.txt")]
+        )
+        expect(status == 0, "no requirements file", log)
+        with open(output) as file:
+            expect(file.read() == "", "empty requirements", log)
+
+
+def test_wheel_target_requirements():
+    # The wheel target must not copy a file that only the CI generates
+    with open(os.path.join(os.path.dirname(SCRIPT), "PythonTargets.cmake")) as file:
+        content = file.read()
+    expect(
+        "-E copy \"${CMAKE_SOURCE_DIR}/bindings/python/requirements.txt\"" not in content
+        and "wheel-requirements" in content,
+        "the wheel target copies requirements.txt unconditionally",
+    )
+    # In a superbuild CMAKE_SOURCE_DIR is the superbuild: the wheel files
+    # come from the source of the project
+    expect(
+        "${CMAKE_SOURCE_DIR}" not in content,
+        "PythonTargets.cmake should use PROJECT_SOURCE_DIR",
+    )
+
+
 def make_wheel(directory, distribution, module, tags="py3-none-any"):
     """A minimal valid wheel of a pure-Python module."""
     import zipfile
@@ -598,6 +645,8 @@ if __name__ == "__main__":
     test_install_geode_preinstalled()
     test_install_geode_pinned_index()
     test_install_geode_missing()
+    test_wheel_requirements()
+    test_wheel_target_requirements()
     test_install_geode_excluded()
     test_installed()
     test_publish()

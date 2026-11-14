@@ -32,6 +32,7 @@ projects (cmake/PythonTargets.cmake).
                                        <CMake directory>]...
                             [--missing error|warn] [--dry-run]
     geode_python_package.py publish <wheel> <wheel directory>
+    geode_python_package.py wheel-requirements <output> <requirements file>...
 
 layout: moves the extension modules of the package (<package>_py_*) copied in the
 binary folder (lib, lib64 or bin, with the shared libraries) to the root of the
@@ -70,6 +71,11 @@ CMake files) importable by this Python, without its dependencies, in this order:
 publish: copies the wheel in the directory where the downstream projects look
 for it (install-geode), replacing the previous wheel of the same package for
 the same platform.
+
+wheel-requirements: copies the first existing requirements file to the output
+(the dependencies of the wheel): the requirements.txt pinned by the CI when it
+exists, else the requirements.in of every checkout. Writes an empty file when
+none exists.
 """
 
 import argparse
@@ -415,6 +421,22 @@ def run_publish(wheel, directory):
     return 0
 
 
+def run_wheel_requirements(output, files):
+    content = ""
+    for path in files:
+        if os.path.isfile(path):
+            with open(path, encoding="utf-8") as requirements:
+                content = requirements.read()
+            print("Wheel requirements from %s" % path)
+            break
+    else:
+        print("No requirements file for the wheel among: %s" % ", ".join(files))
+    os.makedirs(os.path.dirname(os.path.abspath(output)), exist_ok=True)
+    with open(output, "w", encoding="utf-8") as file:
+        file.write(content)
+    return 0
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     sub = parser.add_subparsers(dest="command", required=True)
@@ -443,6 +465,9 @@ def main():
     publish = sub.add_parser("publish")
     publish.add_argument("wheel")
     publish.add_argument("directory")
+    wheel_requirements = sub.add_parser("wheel-requirements")
+    wheel_requirements.add_argument("output")
+    wheel_requirements.add_argument("files", nargs="*")
     arguments = parser.parse_args()
     if arguments.command == "layout":
         return run_layout(arguments.package, arguments.binary_folder)
@@ -458,6 +483,8 @@ def main():
         return run_install_geode(
             arguments.package, arguments.exclude, arguments.missing, arguments.dry_run
         )
+    if arguments.command == "wheel-requirements":
+        return run_wheel_requirements(arguments.output, arguments.files)
     return run_publish(arguments.wheel, arguments.directory)
 
 if __name__ == "__main__":

@@ -645,9 +645,14 @@ print(name + version + '-' + name + version + '-' + platform)"
     geode_python_geode_packages(geode_packages without_local_wheel)
     # Where the downstream projects find this wheel, next to the CMake files
     set(publish_directory "${wheel_build_directory}/${CMAKE_CONFIG_DESTINATION}/python_wheels")
+    # Dependencies of the wheel: requirements.txt (pinned by the CI, not in a
+    # fresh checkout), else requirements.in
     add_custom_target(wheel
-        COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/README.md" "${wheel_output_path}"
-        COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_SOURCE_DIR}/bindings/python/requirements.txt" "${wheel_output_path}"
+        COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/README.md" "${wheel_output_path}"
+        COMMAND ${venv_bin}/python "${package_script}" wheel-requirements
+            "${wheel_output_path}/requirements.txt"
+            "${PROJECT_SOURCE_DIR}/bindings/python/requirements.txt"
+            "${PROJECT_SOURCE_DIR}/bindings/python/requirements.in"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/${binary_folder}/${wheel_config_folder}" "${wheel_output_directory}/${binary_folder}"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${wheel_build_directory}/share" "${wheel_output_directory}/share"
         COMMAND ${venv_bin}/python "${package_script}" layout "${wheel_output_directory}" "${binary_folder}"
