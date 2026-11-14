@@ -86,6 +86,16 @@ namespace geode
 }
 """,
 }
+# Every helper brings the stl casters (list_creators of PYTHON_FACTORY_CLASS
+# returns a list of str, ...): without them, a translation unit including only
+# that helper binds std::vector< std::string > as an unregistered class (wrong
+# return value at run time, and an ODR violation with the units including
+# pybind11/stl.h)
+STL_CHECK = """
+static_assert( !std::is_base_of_v< pybind11::detail::type_caster_generic,
+                   pybind11::detail::make_caster< std::vector< std::string > > >,
+    "the helper must provide the stl casters" );
+"""
 PROJECT = """cmake_minimum_required(VERSION 3.15)
 include("{flags}")
 project(InstalledHelpersCheck CXX)
@@ -112,7 +122,9 @@ def compile_helpers(prefix):
     for index, (helper, use) in enumerate(UNITS.items()):
         source = "unit%d.cpp" % index
         with open(os.path.join(project, source), "w") as file:
-            file.write("#include <geode/bindings/python/%s>\n%s" % (helper, use))
+            file.write(
+                "#include <geode/bindings/python/%s>\n%s%s" % (helper, STL_CHECK, use)
+            )
         sources.append(source)
     with open(os.path.join(project, "CMakeLists.txt"), "w") as file:
         file.write(
