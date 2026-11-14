@@ -63,6 +63,12 @@ package read `help(opengeode)`, whose text is `bindings/python/opengeode_doc.txt
   an argument in `self` gets `keep_alive<1, 2>()`. Builders keep their mesh
   alive and remember it in `_mesh` (`builder_with_mesh`, used by every `create`
   wrapper) so that they can check indices.
+- Model components are returned by reference (`reference_internal`, keeping the
+  model alive, not the component): removing a component (`remove_corner`, ...)
+  leaves its Python objects (and those of its mesh) dangling, and they cannot be
+  invalidated safely (several Python objects, of several bound types, can refer
+  to one component). Document it on every operation removing components and
+  prefer uuid-taking APIs for them (`remove_corners(ids)`, `has_corner(id)`).
 - Indices: Python never reaches undefined behavior. Wrap a method with
   `checked< Mesh >("name", &Mesh::method, VertexCheck{}, ...)` (const methods,
   `checked_as` for CRS managers, `checked_builder` for builders), or call

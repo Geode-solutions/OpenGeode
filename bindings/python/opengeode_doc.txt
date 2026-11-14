@@ -218,6 +218,13 @@ Good to know
 - An object returned by a mesh (an attribute manager, an attribute, a builder)
   keeps its mesh alive; concurrent reads and modifications of the same mesh
   from several threads are not supported.
+- A model component object (brep.corner(id), brep.surfaces(), its mesh()...)
+  refers to the component stored in the model and keeps the model alive, but
+  not the component: once the component is removed (BRepBuilder.remove_corner,
+  remove_corners, ...), these objects refer to freed memory and must not be
+  used anymore. Keep uuids across removals: remove by uuid (remove_corners
+  takes a list of uuids), check with has_corner(id), and fetch the component
+  again with corner(id).
 - Long operations (loading, saving, the numpy functions, nearest neighbor searches) release the GIL, so
   other Python threads keep running while they work.
 - The stubs shipped with the package (.pyi, py.typed) give the signatures and

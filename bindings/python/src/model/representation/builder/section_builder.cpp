@@ -126,39 +126,111 @@ namespace geode
                 "Remove the corner from the model with all its relationships "
                 "and the identification of its vertices; the unique vertices "
                 "left without any component vertex are kept "
-                "(delete_isolated_vertices removes them)" )
+                "(delete_isolated_vertices removes them)"
+                ". The object passed, and every other Python object of this "
+                "Corner or of its mesh (from corner(), corners(), mesh()...), "
+                "refer to freed memory afterwards and must not be used: keep "
+                "its uuid instead (has_corner)" )
             .def( "remove_line", &SectionBuilder::remove_line,
                 pybind11::arg( "line" ),
                 "Remove the line from the model with all its relationships and "
                 "the identification of its vertices; the unique vertices left "
                 "without any component vertex are kept "
-                "(delete_isolated_vertices removes them)" )
+                "(delete_isolated_vertices removes them)"
+                ". The object passed, and every other Python object of this "
+                "Line or of its mesh (from line(), lines(), mesh()...), refer "
+                "to freed memory afterwards and must not be used: keep its "
+                "uuid instead (has_line)" )
             .def( "remove_surface", &SectionBuilder::remove_surface,
                 pybind11::arg( "surface" ),
                 "Remove the surface from the model with all its relationships "
                 "and the identification of its vertices; the unique vertices "
                 "left without any component vertex are kept "
-                "(delete_isolated_vertices removes them)" )
+                "(delete_isolated_vertices removes them)"
+                ". The object passed, and every other Python object of this "
+                "Surface or of its mesh (from surface(), surfaces(), "
+                "mesh()...), refer to freed memory afterwards and must not be "
+                "used: keep its uuid instead (has_surface)" )
+            .def(
+                "remove_corners",
+                []( SectionBuilder& builder, const std::vector< uuid >& ids ) {
+                    builder.remove_corners( ids );
+                },
+                pybind11::arg( "ids" ),
+                "Remove the Corners of the given uuids, as remove_corner does "
+                "for "
+                "each one, without needing their Python objects (a repeated "
+                "uuid is removed once). Raise an error, before removing "
+                "anything, if the model has no Corner with one of the uuids"
+                ". The Python objects of the removed Corners and of their "
+                "meshes (from corner(), corners(), mesh()...) refer to freed "
+                "memory afterwards and must not be used" )
+            .def(
+                "remove_lines",
+                []( SectionBuilder& builder, const std::vector< uuid >& ids ) {
+                    builder.remove_lines( ids );
+                },
+                pybind11::arg( "ids" ),
+                "Remove the Lines of the given uuids, as remove_line does for "
+                "each one, without needing their Python objects (a repeated "
+                "uuid is removed once). Raise an error, before removing "
+                "anything, if the model has no Line with one of the uuids"
+                ". The Python objects of the removed Lines and of their meshes "
+                "(from line(), lines(), mesh()...) refer to freed memory "
+                "afterwards and must not be used" )
+            .def(
+                "remove_surfaces",
+                []( SectionBuilder& builder, const std::vector< uuid >& ids ) {
+                    builder.remove_surfaces( ids );
+                },
+                pybind11::arg( "ids" ),
+                "Remove the Surfaces of the given uuids, as remove_surface "
+                "does for "
+                "each one, without needing their Python objects (a repeated "
+                "uuid is removed once). Raise an error, before removing "
+                "anything, if the model has no Surface with one of the uuids"
+                ". The Python objects of the removed Surfaces and of their "
+                "meshes (from surface(), surfaces(), mesh()...) refer to freed "
+                "memory afterwards and must not be used" )
             .def( "remove_model_boundary",
                 &SectionBuilder::remove_model_boundary,
                 pybind11::arg( "boundary" ),
                 "Remove the ModelBoundary and its relationships; its items are "
-                "kept" )
+                "kept"
+                ". The object passed, and every other Python object of this "
+                "ModelBoundary (from model_boundary(), model_boundaries()...), "
+                "refer to freed memory afterwards and must not be used: keep "
+                "its uuid instead (has_model_boundary)" )
             .def( "remove_corner_collection",
                 &SectionBuilder::remove_corner_collection,
                 pybind11::arg( "collection" ),
                 "Remove the CornerCollection and its relationships; its items "
-                "are kept" )
+                "are kept"
+                ". The object passed, and every other Python object of this "
+                "CornerCollection (from corner_collection(), "
+                "corner_collections()...), refer to freed memory afterwards "
+                "and must not be used: keep its uuid instead "
+                "(has_corner_collection)" )
             .def( "remove_line_collection",
                 &SectionBuilder::remove_line_collection,
                 pybind11::arg( "collection" ),
                 "Remove the LineCollection and its relationships; its items "
-                "are kept" )
+                "are kept"
+                ". The object passed, and every other Python object of this "
+                "LineCollection (from line_collection(), "
+                "line_collections()...), refer to freed memory afterwards and "
+                "must not be used: keep its uuid instead "
+                "(has_line_collection)" )
             .def( "remove_surface_collection",
                 &SectionBuilder::remove_surface_collection,
                 pybind11::arg( "collection" ),
                 "Remove the SurfaceCollection and its relationships; its items "
-                "are kept" )
+                "are kept"
+                ". The object passed, and every other Python object of this "
+                "SurfaceCollection (from surface_collection(), "
+                "surface_collections()...), refer to freed memory afterwards "
+                "and must not be used: keep its uuid instead "
+                "(has_surface_collection)" )
             .def( "add_corner_line_boundary_relationship",
                 &SectionBuilder::add_corner_line_boundary_relationship,
                 pybind11::arg( "corner" ), pybind11::arg( "line" ),
