@@ -105,8 +105,36 @@ def test_component_mesh_vertex():
     check("MeshVertex" in model.ComponentMeshVertex.mesh_vertex.__doc__, "mesh_vertex documented")
 
 
+def test_component_mesh_element():
+    component = model.ComponentID(model.ComponentType("Surface"), basic.uuid())
+    other = model.ComponentID(model.ComponentType("Line"), component.id)
+    first = model.ComponentMeshElement(component, 3)
+    second = model.ComponentMeshElement(component_id=component, element_id=3)
+    check(first.component_id == component and first.element_id == 3, "fields")
+    check(first == second and not first != second, "equal")
+    check(hash(first) == hash(second) and len({first, second}) == 1, "hash")
+    check({first: 1}[second] == 1, "dict key")
+    for different in (
+        model.ComponentMeshElement(component, 4),
+        # Same uuid, another component type: different, as in C++
+        model.ComponentMeshElement(other, 3),
+    ):
+        check(first != different and not first == different, "different " + repr(different))
+    check(len({first, model.ComponentMeshElement(component, 4)}) == 2, "distinct in a set")
+    element = first.mesh_element()
+    check(type(element) is mesh.MeshElement, "mesh_element returns a MeshElement")
+    check(element == mesh.MeshElement(component.id, 3), "mesh_element is (uuid, element)")
+    first.element_id = 9
+    first.component_id = other
+    check(first == model.ComponentMeshElement(other, 9), "modifiable fields")
+    default = model.ComponentMeshElement()
+    check(default.element_id == basic.NO_ID, "default element is NO_ID")
+    check(default.component_id.type == model.ComponentType("undefined"), "default type")
+
+
 if __name__ == "__main__":
     test_construction()
     test_repr_and_str()
     test_comparison_and_hash()
     test_component_mesh_vertex()
+    test_component_mesh_element()

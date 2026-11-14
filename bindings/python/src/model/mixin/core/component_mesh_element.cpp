@@ -29,20 +29,40 @@ namespace geode
 {
     void define_component_mesh_element( pybind11::module& module )
     {
-        define_string_representation(
+        auto element = define_string_representation(
             pybind11::class_< ComponentMeshElement >( module,
                 "ComponentMeshElement",
                 "Identify an element (an edge, a polygon, a polyhedron...) of "
                 "the mesh of a model component by the component and the "
-                "element index in its mesh" ),
+                "element index in its mesh. Hashable: do not modify the fields "
+                "of a ComponentMeshElement used as a dict key or in a set" ),
             []( const ComponentMeshElement& element ) {
                 return python_call_repr( "ComponentMeshElement",
                     { "component_id=" + python_repr( element.component_id ),
                         "element_id=" + python_repr( element.element_id ) } );
-            } )
+            } );
+        element
+            .def( pybind11::init<>(),
+                "Build an identifier with an undefined ComponentID (type "
+                "'undefined' and a newly generated uuid) and an invalid index "
+                "(NO_ID)" )
             .def( pybind11::init< ComponentID, index_t >(),
                 pybind11::arg( "component_id" ), pybind11::arg( "element_id" ),
                 "Build the identifier of the element element_id of the mesh of "
-                "the component" );
+                "the component" )
+            .def( "mesh_element", &ComponentMeshElement::mesh_element,
+                "Return the MeshElement of this element: the uuid of the "
+                "component (also the uuid of its mesh) and the element index" )
+            .def( pybind11::self == pybind11::self, pybind11::arg( "other" ) )
+            .def( pybind11::self != pybind11::self, pybind11::arg( "other" ) )
+            .def( "__hash__", []( const ComponentMeshElement& value ) {
+                return std::hash< ComponentMeshElement >{}( value );
+            } );
+        def_readwrite_named( element, "component_id",
+            &ComponentMeshElement::component_id,
+            "Component whose mesh holds the element" );
+        def_readwrite_named( element, "element_id",
+            &ComponentMeshElement::element_id,
+            "Index of the element in the mesh of the component" );
     }
 } // namespace geode
