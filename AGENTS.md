@@ -66,6 +66,25 @@ package read `help(opengeode)`, whose text is `bindings/python/opengeode_doc.txt
   an argument in `self` gets `keep_alive<1, 2>()`. Builders keep their mesh
   alive and remember it in `_mesh` (`builder_with_mesh`, used by every `create`
   wrapper) so that they can check indices.
+- Fields: bind them with `def_readwrite_named`, which picks the semantics from
+  the type of the field:
+  - a bound class: returned by reference (`reference_internal`, keeping its
+    object alive);
+  - `std::optional` of a bound class: None or a live reference to the
+    contained value (`obj.field.x = 1` modifies `obj`). The setter takes the
+    value type, so None is refused (`TypeError`: resetting the optional would
+    destroy an object Python references), and an engaged optional is
+    copy-assigned in place: the references held by Python stay valid and show
+    the new value. The docstring says so;
+  - value-like bound classes are excluded: `is_python_value_type<T>` (in
+    `common.hpp`, specialized for `uuid`; specialize it for the value classes
+    of other projects) keeps `std::optional<T>` a copy accepting None, like
+    the optional of scalars or of any non-class caster;
+  - scalars, strings and enums: plain values, no docstring suffix;
+  - any other type (containers...): a copy, with the suffix "(returned as a
+    copy: assign the field to change it)": their casters pass the reference
+    policy to their values, which would refer to storage freed by the next
+    assignment.
 - Model components are returned by reference (`reference_internal`, keeping the
   model alive, not the component): removing a component (`remove_corner`, ...)
   leaves its Python objects (and those of its mesh) dangling, and they cannot be

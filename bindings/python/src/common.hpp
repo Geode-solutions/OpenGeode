@@ -24,9 +24,12 @@
 #pragma once
 
 #include <cmath>
+#include <functional>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <tuple>
+#include <type_traits>
 #include <utility>
 
 #include <pybind11/native_enum.h>
@@ -460,8 +463,68 @@ namespace geode
     }
 
     /*!
+     * Bound class types with value semantics in Python: a std::optional field
+     * of such a type is returned as a copy and can be set to None (see
+     * def_readwrite_named). Specialize it (std::true_type) for the value
+     * classes of other projects.
+     */
+    template < typename T >
+    struct is_python_value_type : std::false_type
+    {
+    };
+
+    template <>
+    struct is_python_value_type< uuid > : std::true_type
+    {
+    };
+
+    namespace detail
+    {
+        template < typename Member >
+        struct optional_field
+        {
+            static constexpr bool is_live = false;
+        };
+
+        template < typename Value >
+        struct optional_field< std::optional< Value > >
+        {
+            static constexpr bool is_live =
+                std::is_base_of_v< pybind11::detail::type_caster_generic,
+                    pybind11::detail::make_caster< Value > >
+                && !is_python_value_type< Value >::value;
+        };
+
+        template < typename Member >
+        inline constexpr bool is_plain_value_field =
+            std::is_arithmetic_v< Member > || std::is_enum_v< Member >
+            || std::is_same_v< Member, std::string >;
+
+        template < typename Member >
+        struct is_optional : std::false_type
+        {
+        };
+
+        template < typename Value >
+        struct is_optional< std::optional< Value > > : std::true_type
+        {
+        };
+    } // namespace detail
+
+    /*!
      * Same as pybind11::class_::def_readwrite, but the setter argument is
-     * called "value" instead of "arg0" in the Python signatures.
+     * called "value" instead of "arg0" in the Python signatures, and the
+     * fields are returned according to their type:
+     * - a bound class (type_caster_generic): by reference, keeping its object
+     * alive;
+     * - a std::optional of a bound class (except is_python_value_type): None
+     * or a reference to the contained value, keeping its object alive. The
+     * setter refuses None (TypeError) and copy-assigns an engaged optional in
+     * place, so that the references held by Python stay valid;
+     * - scalars, strings, enums and the other std::optional: by value;
+     * - any other type (containers...): as a copy, which its docstring says:
+     * their casters forward the reference policy to the contained values,
+     * which would refer to storage freed by the next assignment.
      */
     template < typename Class,
         typename Member,
@@ -473,18 +536,86 @@ namespace geode
         Member Owner::* member,
         const char* doc )
     {
-        const pybind11::cpp_function getter(
-            [member]( const Class& object ) -> const Member& {
-                return object.*member;
-            },
-            pybind11::is_method( python_class ) );
-        const pybind11::cpp_function setter(
-            [member]( Class& object, const Member& value ) {
-                object.*member = value;
-            },
-            pybind11::is_method( python_class ), pybind11::arg( "value" ) );
-        python_class.def_property( name, getter, setter,
-            pybind11::return_value_policy::reference_internal, doc );
+        constexpr bool by_reference =
+            std::is_base_of_v< pybind11::detail::type_caster_generic,
+                pybind11::detail::make_caster< Member > >;
+        if constexpr( by_reference )
+        {
+            const pybind11::cpp_function getter(
+                [member]( const Class& object ) -> const Member& {
+                    return object.*member;
+                },
+                pybind11::is_method( python_class ) );
+            const pybind11::cpp_function setter(
+                [member]( Class& object, const Member& value ) {
+                    object.*member = value;
+                },
+                pybind11::is_method( python_class ), pybind11::arg( "value" ) );
+            python_class.def_property( name, getter, setter,
+                pybind11::return_value_policy::reference_internal, doc );
+        }
+        else if constexpr( detail::optional_field< Member >::is_live )
+        {
+            using Value = typename Member::value_type;
+            const pybind11::cpp_function getter(
+                [member]( const Class& object )
+                    -> std::optional< std::reference_wrapper< const Value > > {
+                    const auto& field = object.*member;
+                    if( !field )
+                    {
+                        return std::nullopt;
+                    }
+                    return std::cref( field.value() );
+                },
+                pybind11::is_method( python_class ) );
+            const pybind11::cpp_function setter(
+                [member]( Class& object, const Value& value ) {
+                    auto& field = object.*member;
+                    if( field )
+                    {
+                        field.value() = value;
+                    }
+                    else
+                    {
+                        field.emplace( value );
+                    }
+                },
+                pybind11::is_method( python_class ),
+                pybind11::arg( "value" ).none( false ) );
+            const auto live_doc = absl::StrCat( doc,
+                " (a live reference that can be modified in place; it cannot "
+                "be set to None from Python: the stored object would be "
+                "destroyed while Python references it)" );
+            python_class.def_property( name, getter, setter,
+                pybind11::return_value_policy::reference_internal,
+                live_doc.c_str() );
+        }
+        else
+        {
+            const pybind11::cpp_function getter(
+                [member]( const Class& object ) -> Member {
+                    return object.*member;
+                },
+                pybind11::is_method( python_class ) );
+            const pybind11::cpp_function setter(
+                [member]( Class& object, const Member& value ) {
+                    object.*member = value;
+                },
+                pybind11::is_method( python_class ), pybind11::arg( "value" ) );
+            if constexpr( detail::is_plain_value_field< Member >
+                          || detail::is_optional< Member >::value )
+            {
+                python_class.def_property( name, getter, setter,
+                    pybind11::return_value_policy::move, doc );
+            }
+            else
+            {
+                const auto copy_doc = absl::StrCat( doc,
+                    " (returned as a copy: assign the field to change it)" );
+                python_class.def_property( name, getter, setter,
+                    pybind11::return_value_policy::move, copy_doc.c_str() );
+            }
+        }
     }
 
     /*!

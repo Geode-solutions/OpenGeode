@@ -27,6 +27,11 @@
 
 namespace geode
 {
+    // std::optional< uuid > fields are copies accepting None
+    static_assert( !detail::optional_field< std::optional< uuid > >::is_live );
+    static_assert(
+        detail::optional_field< std::optional< Point3D > >::is_live );
+
     void define_uuid( pybind11::module& module )
     {
         define_string_representation(
