@@ -160,10 +160,34 @@ def test_model_mappings():
           "corner mapping enumerates the corners")
     check(len(copy.at(surface_type)) == 1 and copy.at(surface_type).has_mapping_input(surface),
           "surface mapping")
-    # at() is modifiable
+    # at() returns a copy: the mapping is modified in place by type
     extra = basic.uuid()
     copy.at(corner_type).map(extra, extra)
-    check(len(copy.at(corner_type)) == 3, "at() modifies the mapping")
+    check(len(copy.at(corner_type)) == 2, "modifying the copy of at() changes nothing")
+    copy.map(corner_type, extra, extra)
+    check(len(copy.at(corner_type)) == 3, "map by type")
+    check(copy.in2out(corner_type, extra) == extra and copy.out2in(type=corner_type, output=extra) == extra,
+          "lookups by type")
+    check(copy.has_mapping_input(corner_type, extra) and copy.has_mapping_output(corner_type, extra),
+          "has_mapping_input/output by type")
+    line_type = model.ComponentType("NoMapping")
+    check(not copy.has_mapping_type(line_type), "type without mapping")
+    check(not copy.has_mapping_input(line_type, extra) and not copy.has_mapping_output(line_type, extra),
+          "no mapping for the type: not mapped")
+    check_raises(lambda: copy.in2out(line_type, extra), KeyError, "in2out of a type without mapping")
+    check_raises(lambda: copy.out2in(corner_type, basic.uuid()), KeyError, "out2in of an unmapped value")
+    copy.erase_in(corner_type, extra)
+    check(len(copy.at(corner_type)) == 2, "erase_in by type")
+    copy.map(corner_type, extra, extra)
+    copy.erase_out(type=corner_type, output=extra)
+    check(len(copy.at(corner_type)) == 2, "erase_out by type")
+    copy.erase_in(line_type, extra)
+    copy.erase_out(line_type, extra)
+    check(not copy.has_mapping_type(line_type), "erase on a type without mapping does nothing")
+    copy.map(line_type, extra, corners[0])
+    check(copy.has_mapping_type(line_type) and copy.in2out(line_type, extra) == corners[0],
+          "map creates the mapping of a new type")
+    check(not hasattr(copy, "unmap"), "no unmap on a bijective model mapping")
     copy.remove(corner_type)
     check(not copy.has_mapping_type(corner_type), "remove")
     copy.remove(type=corner_type)
@@ -183,6 +207,13 @@ def test_model_mappings():
     generic.emplace(corner_type, uuids)
     check(generic.component_types() == [corner_type], "generic component types")
     check(generic.at(corner_type).in2out(corners[0]) == [corners[1], extra], "generic at")
+    generic.map(corner_type, corners[0], corners[0])
+    check(generic.in2out(corner_type, corners[0]) == [corners[1], extra, corners[0]], "generic map")
+    generic.unmap(corner_type, corners[0], extra)
+    check(generic.out2in(corner_type, corners[1]) == [corners[0]]
+          and generic.in2out(corner_type, corners[0]) == [corners[1], corners[0]], "generic unmap")
+    generic.unmap(line_type, corners[0], extra)
+    check(not generic.has_mapping_type(line_type), "unmap on a type without mapping does nothing")
     moved = model.ModelGenericMapping(generic)
     check(moved.has_mapping_type(corner_type) and generic.component_types() == [],
           "model mapping move constructor empties the source")
@@ -229,6 +260,11 @@ def test_mesh_mappings():
     vertices.emplace(corner_type, vertex_mapping)
     check(vertices.component_types() == [corner_type], "ModelMeshesVertexMapping types")
     check(vertices.at(corner_type).size_in() == 1, "ModelMeshesVertexMapping at")
+    vertices.map(corner_type, mesh.MeshVertex(surface.id, 2), mesh.MeshVertex(line.id, 1))
+    check(vertices.out2in(corner_type, mesh.MeshVertex(line.id, 1))
+          == [mesh.MeshVertex(surface.id, 0), mesh.MeshVertex(surface.id, 2)], "mesh mapping by type")
+    check_raises(lambda: vertices.map(corner_type, mesh.MeshElement(), mesh.MeshVertex()), TypeError,
+                 "ModelMeshesVertexMapping.map takes MeshVertex")
     check("MeshVertexMapping" in model.ModelMeshesVertexMapping.at.__doc__, "at doc")
     elements = model.ModelMeshesElementMapping()
     check(elements.component_types() == [], "ModelMeshesElementMapping empty")
@@ -242,8 +278,11 @@ def test_mesh_mappings():
     check(listed == identifiers, "ModelComponentUuidsMapping at")
     listed.append(basic.uuid())
     check(len(uuids.at(corner_type)) == 2, "at returns a copy of the list")
-    check("copy" in model.ModelComponentUuidsMapping.at.__doc__, "at doc says copy")
+    check("copy" in model.ModelComponentUuidsMapping.at.__doc__
+          and "does not change this mapping" in model.ModelComponentUuidsMapping.at.__doc__,
+          "at doc says copy")
     check_raises(lambda: uuids.at(model.Line3D.component_type_static()), KeyError, "at KeyError")
+    check(not hasattr(uuids, "map") and not hasattr(uuids, "in2out"), "no per-type lookups for lists")
 
     mappings = model.ModelMappings()
     for field, field_type in (
@@ -263,9 +302,33 @@ def test_mesh_mappings():
     check(mappings.added_components.at(corner_type) == identifiers, "fields are references")
     mappings.component_mapping.emplace(corner_type, basic.GenericMappinguuid())
     check(mappings.component_mapping.has_mapping_type(corner_type), "component_mapping reference")
-    mappings.component_mapping.at(corner_type).map(identifiers[0], identifiers[1])
-    check(mappings.component_mapping.at(corner_type).in2out(identifiers[0]) == [identifiers[1]],
+    mappings.component_mapping.map(corner_type, identifiers[0], identifiers[1])
+    check(mappings.component_mapping.in2out(corner_type, identifiers[0]) == [identifiers[1]],
           "nested modification")
+
+
+def test_no_dangling_reference():
+    # The mappings of the types live in a hash map: emplace (rehash) and
+    # remove move them. at() returns a copy, which stays valid.
+    for mapping in (model.ModelGenericMapping(), model.ModelMappings().component_mapping):
+        first = model.ComponentType("t0")
+        uuids = basic.GenericMappinguuid()
+        for _ in range(50):
+            uuids.map(basic.uuid(), basic.uuid())
+        mapping.emplace(first, uuids)
+        reference = mapping.at(first)
+        for index in range(1, 200):
+            mapping.emplace(model.ComponentType("t%d" % index), basic.GenericMappinguuid())
+        check(reference.size_in() == 50 and mapping.at(first).size_in() == 50, "after emplace")
+        mapping.remove(first)
+        check(reference.size_in() == 50 and len(reference.in2out_map()) == 50, "after remove")
+    # A moved model mapping: the copy does not depend on the source
+    source = model.ModelGenericMapping()
+    source.emplace(model.ComponentType("t"), uuids)
+    copy = source.at(model.ComponentType("t"))
+    moved = model.ModelGenericMapping(source)
+    del moved
+    check(copy.size_in() == 50, "after move")
 
 
 if __name__ == "__main__":
@@ -281,3 +344,4 @@ if __name__ == "__main__":
     test_conversion_mappings()
     test_model_mappings()
     test_mesh_mappings()
+    test_no_dangling_reference()

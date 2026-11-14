@@ -74,7 +74,7 @@ namespace geode
     void define_external_time_series( pybind11::module& );
     void define_section( pybind11::module& );
     void define_copy_mapping( pybind11::module& );
-    void define_generic_mapping( pybind11::module& );
+    void define_model_generic_mapping( pybind11::module& );
     void define_model_mappings( pybind11::module& );
 
     void define_brep_builder( pybind11::module& );
@@ -167,7 +167,7 @@ PYBIND11_MODULE( opengeode_py_model, module )
     geode::define_external_time_series( module );
     geode::define_section( module );
     geode::define_copy_mapping( module );
-    geode::define_generic_mapping( module );
+    geode::define_model_generic_mapping( module );
     geode::define_model_mappings( module );
 
     geode::define_brep_builder( module );

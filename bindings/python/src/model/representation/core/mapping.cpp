@@ -35,7 +35,7 @@ namespace geode
             "components of a source model and the uuids of their copies",
             "BijectiveMappinguuid" );
     }
-    void define_generic_mapping( pybind11::module& module )
+    void define_model_generic_mapping( pybind11::module& module )
     {
         define_model_mapping< GenericMapping< uuid > >( module,
             "ModelGenericMapping",
