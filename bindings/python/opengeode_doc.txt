@@ -139,18 +139,25 @@ Errors of the C++ library are Python exceptions, all deriving OpenGeodeError
 
     OpenGeodeDataError      the data is invalid or unsupported (unknown file
                             extension when loading or saving, corrupted file, no attribute of that name)
-    OpenGeodeInternalError  an unexpected failure (std::exception), e.g. a
+    OpenGeodeInternalError  an unexpected failure of the library, e.g. a
                             file that cannot be written
     OpenGeodeResultError    a Result holding an error was accessed
 
 They carry type, project, library, message and details, and the underlying
-error, if any, is chained in __cause__:
+error, if any, is chained in __cause__ (a C++ standard exception caught by the
+library is chained as an OpenGeodeInternalError whose message starts with
+"std::exception:"):
 
     >>> try:
     ...     opengeode.load(opengeode.TriangulatedSurface3D, "mesh.unknown_extension")
     ... except opengeode.OpenGeodeDataError as error:
     ...     print(error.type, error.project, "unknown_extension" in error.message)
     data OpenGeode True
+
+A C++ standard exception that the library does not catch is not an
+OpenGeodeError: it keeps the translation of pybind11, RuntimeError for
+std::runtime_error and most others, IndexError for std::out_of_range,
+ValueError for std::invalid_argument and MemoryError for std::bad_alloc.
 
 An index out of range raises the standard IndexError, a wrong type a TypeError
 or a ValueError:

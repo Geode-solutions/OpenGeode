@@ -23,6 +23,10 @@
 
 #include "../common.hpp"
 
+#include <new>
+#include <stdexcept>
+#include <string_view>
+
 #include <absl/strings/ascii.h>
 
 #include <geode/basic/assert.hpp>
@@ -146,5 +150,25 @@ namespace geode
                     "[Test] outer failure" );
             }
         } );
+        // Internal, test-only: raises a C++ standard exception of the given
+        // kind, not caught by the library.
+        module.def(
+            "_throw_standard_exception_for_test",
+            []( std::string_view kind ) {
+                if( kind == "out_of_range" )
+                {
+                    throw std::out_of_range{ "out of range" };
+                }
+                if( kind == "invalid_argument" )
+                {
+                    throw std::invalid_argument{ "invalid argument" };
+                }
+                if( kind == "bad_alloc" )
+                {
+                    throw std::bad_alloc{};
+                }
+                throw std::runtime_error{ "runtime error" };
+            },
+            pybind11::arg( "kind" ) );
     }
 } // namespace geode

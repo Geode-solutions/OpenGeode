@@ -76,7 +76,40 @@ def check_cause_chain():
     raise ValueError("[Test] _throw_nested_exception_for_test should raise")
 
 
+def check_standard_exceptions():
+    # A C++ standard exception that the library does not catch keeps the
+    # translation of pybind11: it is not an OpenGeodeError
+    documentation = opengeode.__doc__
+    for kind, expected in [
+        ("runtime_error", RuntimeError),
+        ("out_of_range", IndexError),
+        ("invalid_argument", ValueError),
+        ("bad_alloc", MemoryError),
+    ]:
+        try:
+            opengeode_py_basic._throw_standard_exception_for_test(kind)
+        except opengeode.OpenGeodeError as error:
+            raise ValueError("[Test] std::%s should not be an OpenGeodeError" % kind)
+        except Exception as error:
+            if type(error) is not expected:
+                raise ValueError(
+                    "[Test] std::%s should be a %s, got %s"
+                    % (kind, expected.__name__, type(error).__name__)
+                )
+        else:
+            raise ValueError("[Test] _throw_standard_exception_for_test should raise")
+        claim = "%s for std::%s" % (expected.__name__, kind)
+        if claim not in " ".join(documentation.split()):
+            raise ValueError("[Test] The package documentation should say " + claim)
+    if "(std::exception)" in documentation:
+        raise ValueError(
+            "[Test] The documentation should not say that OpenGeodeInternalError "
+            "is any std::exception"
+        )
+
+
 if __name__ == "__main__":
     check_data_error()
     check_subclasses()
     check_cause_chain()
+    check_standard_exceptions()
