@@ -331,6 +331,15 @@ def test_no_dangling_reference():
     check(copy.size_in() == 50, "after move")
 
 
+def test_generic_bool():
+    mapping = basic.GenericMappinguuid()
+    check(not mapping, "empty GenericMapping is falsy")
+    mapping.map(basic.uuid(), basic.uuid())
+    check(bool(mapping), "non-empty GenericMapping is truthy")
+    mapping.clear()
+    check(not mapping, "cleared GenericMapping is falsy")
+
+
 if __name__ == "__main__":
     uuids = [basic.uuid() for _ in range(4)]
     test_bijective(uuids, basic.BijectiveMappinguuid)
@@ -345,3 +354,4 @@ if __name__ == "__main__":
     test_model_mappings()
     test_mesh_mappings()
     test_no_dangling_reference()
+    test_generic_bool()

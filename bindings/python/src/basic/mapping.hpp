@@ -145,6 +145,12 @@ namespace geode
             .def( "size_out", &Mapping::size_out,
                 "Return the number of mapped outputs" )
             .def(
+                "__bool__",
+                []( const Mapping& self ) {
+                    return self.size_in() > 0;
+                },
+                "Return True if the mapping has at least one pair" )
+            .def(
                 "in2out_map",
                 []( const Mapping& self ) {
                     return detail::mapping_dict< T1,
