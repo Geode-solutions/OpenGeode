@@ -21,6 +21,10 @@
  *
  */
 
+#pragma once
+
+#include <pybind11/pybind11.h>
+
 #include <geode/basic/factory.hpp>
 
 #define PYTHON_FACTORY_CLASS( type )                                           \

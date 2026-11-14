@@ -23,6 +23,18 @@ package read `help(opengeode)`, whose text is `bindings/python/opengeode_doc.txt
   `python_call_repr`, ...). `src/mesh/index_check.hpp` has the index checks of
   meshes; `src/numpy_access.hpp` and `src/mesh/numpy_access.cpp` the numpy bulk
   access.
+- Installed helpers: `common.hpp`, `numpy_access.hpp`, `basic/factory.hpp`
+  (`PYTHON_FACTORY_CLASS`), `mesh/index_check.hpp` and
+  `model/model_vertex_check.hpp` are installed with the C++ package in
+  `<prefix>/include/geode/bindings/python/` (the include directory of the
+  OpenGeode targets). The bindings of the downstream projects include them as
+  `#include <geode/bindings/python/common.hpp>` (or `.../mesh/index_check.hpp`,
+  ...) instead of copying them; their own modules call
+  `geode::document_missing_constructors( module )` at the end of the
+  `PYBIND11_MODULE` and import the OpenGeode modules with
+  `geode::import_binding_dependency`. Keep these headers project-agnostic and
+  their includes relative (`"../common.hpp"`); a new reusable header is added to
+  the install list of `bindings/python/src/CMakeLists.txt`.
 - `bindings/python/opengeode_doc.txt`: the package docstring (see Documentation).
 - `bindings/python/tests/<module>/test-py-*.py`: one script per topic.
 - `cmake/PythonTargets.cmake`: `add_geode_python_binding`, `add_geode_python_test`,
