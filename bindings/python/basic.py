@@ -598,6 +598,7 @@ class _LogBridge:
         self._console_output = True
         self._listeners = []
         self._thread = None
+        self._stopped = False
 
     def forward(self, logger_name):
         with self._lock:
@@ -635,11 +636,24 @@ class _LogBridge:
             self.stop_forwarding()
             self._listeners.clear()
             self._configure()
+            self._stopped = True
+            thread = self._thread
+        # The thread must end before the interpreter finalization: a daemon
+        # thread taking the GIL back in C++ code (Logger._wait) during the
+        # finalization is killed by CPython < 3.14, which aborts the process
+        Logger._stop_waiting()
+        if thread is not None:
+            thread.join(self._WAIT_TIMEOUT)
 
     def _configure(self):
         Logger._set_bridge(self._logger is not None, bool(self._listeners))
-        if self._thread is None and (self._logger is not None or self._listeners):
-            # Never stopped: idle, it only waits on the C++ queue without the GIL
+        if (
+            self._thread is None
+            and not self._stopped
+            and (self._logger is not None or self._listeners)
+        ):
+            # Idle, it only waits on the C++ queue without the GIL; stopped
+            # at interpreter exit
             self._thread = _threading.Thread(
                 target=self._run, name="opengeode-log-bridge", daemon=True
             )
@@ -647,7 +661,7 @@ class _LogBridge:
             _atexit.register(self._shutdown)
 
     def _run(self):
-        while True:
+        while not self._stopped:
             if Logger._wait(self._WAIT_TIMEOUT):
                 # Events are only taken under the lock: stop_forwarding and
                 # remove_listener flush every event queued before them

@@ -72,7 +72,9 @@ package read `help(opengeode)`, whose text is `bindings/python/opengeode_doc.txt
   happen with the GIL held: numpy functions validate and copy the arrays first,
   then release the GIL for the C++ work (`numpy_access.hpp`). C++ clients that
   may run on worker threads (the logger, progress logger) only push events in a
-  queue; Python drains them from a daemon thread. Do not add locks on hot read
+  queue; Python drains them from a daemon thread, which the atexit handler
+  stops and joins: a daemon thread taking the GIL back in C++ code during the
+  interpreter finalization aborts the process on CPython < 3.14. Do not add locks on hot read
   accessors: concurrent reads and modifications of one mesh are unsupported.
 - Typed wrappers: functions returning a pybind11 `object` use `TypedObject<T>`
   so that the stubs say `T` instead of `object`.

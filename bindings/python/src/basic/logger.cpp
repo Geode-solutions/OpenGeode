@@ -117,11 +117,12 @@ namespace
         bool wait( double timeout )
         {
             std::unique_lock< std::mutex > lock{ mutex_ };
-            return condition_.wait_for( lock,
+            condition_.wait_for( lock,
                 std::chrono::duration< double >( std::max( timeout, 0. ) ),
                 [this] {
-                    return !events_.empty();
+                    return !events_.empty() || stopped_;
                 } );
+            return !events_.empty();
         }
 
         std::deque< Event > drain( double timeout )
@@ -130,9 +131,23 @@ namespace
             condition_.wait_for( lock,
                 std::chrono::duration< double >( std::max( timeout, 0. ) ),
                 [this] {
-                    return !events_.empty();
+                    return !events_.empty() || stopped_;
                 } );
             return std::exchange( events_, {} );
+        }
+
+        /*!
+         * Wake the threads waiting for events and make the next waits return
+         * at once: the bridge thread must end before the interpreter
+         * finalization
+         */
+        void stop_waiting()
+        {
+            {
+                const std::lock_guard< std::mutex > lock{ mutex_ };
+                stopped_ = true;
+            }
+            condition_.notify_all();
         }
 
     private:
@@ -145,6 +160,7 @@ namespace
         std::deque< Event > events_;
         bool forward_logs_{ false };
         bool forward_progress_{ false };
+        bool stopped_{ false };
     };
 
     class PythonLoggerClient : public geode::LoggerClient
@@ -389,10 +405,19 @@ namespace geode
                 },
                 pybind11::arg( "timeout" ),
                 "Wait up to timeout seconds, without the GIL, for log and "
-                "progress events and return True if there are some" )
+                "progress events and return True if there are some; return "
+                "at once after _stop_waiting" )
             .def_static( "_drain", &drain_events, pybind11::arg( "timeout" ),
                 "Wait up to timeout seconds, without the GIL, for log and "
-                "progress events and return them" );
+                "progress events and return them" )
+            .def_static(
+                "_stop_waiting",
+                [] {
+                    PythonLogBridge::instance().stop_waiting();
+                },
+                "Internal: wake the threads waiting for events (_wait, "
+                "_drain) and make the next waits return at once; called at "
+                "interpreter exit to end the bridge thread" );
 
         pybind11::class_< ProgressLogger >( module, "ProgressLogger",
             "Report the progress of a long task to the registered clients" )

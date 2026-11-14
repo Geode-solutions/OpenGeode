@@ -231,6 +231,50 @@ def check_flush_at_exit():
                 )
 
 
+SLOW_EXIT_SCRIPT = """
+import logging
+import time
+
+import basic as opengeode
+
+logging.getLogger("opengeode").addHandler(logging.NullHandler())
+opengeode.forward_logs_to_python()
+opengeode.add_progress_listener(lambda event: None)
+for index in range(100):
+    opengeode.Logger.info("message %d" % index)
+
+
+class SlowFinalizer:
+    # Destroyed during the interpreter finalization: it releases the GIL
+    # longer than the bridge thread waits for events, so that a running
+    # bridge thread would wake up and take the GIL back during the
+    # finalization
+    def __del__(self, sleep=time.sleep, delay=2 * opengeode._log_bridge._WAIT_TIMEOUT):
+        sleep(delay)
+
+
+finalizer = SlowFinalizer()
+"""
+
+
+def check_slow_exit():
+    # The bridge thread is stopped before the interpreter finalization: a
+    # daemon thread taking the GIL back in C++ code (Logger._wait) during the
+    # finalization is killed by CPython < 3.14, which aborts the process
+    # (std::terminate)
+    for run in range(3):
+        result = subprocess.run(
+            [sys.executable, "-c", SLOW_EXIT_SCRIPT],
+            capture_output=True,
+            text=True,
+            timeout=TIMEOUT,
+        )
+        if result.returncode != 0 or "terminate" in result.stderr:
+            raise ValueError(
+                f"[Test] Slow exit {run} failed ({result.returncode}): {result.stderr}"
+            )
+
+
 def check_module_functions():
     # Module functions, typed in the generated stubs (attributes added from
     # Python to the pybind11 classes were invisible to type checkers)
@@ -378,6 +422,7 @@ if __name__ == "__main__":
     check_raising_filter(Logger, handler)
     check_raising_listener(Logger)
     check_flush_at_exit()
+    check_slow_exit()
     check_stop_forwarding(Logger, handler)
     check_preserved_console_state(Logger)
     opengeode.forward_logs_to_python("opengeode.test")
