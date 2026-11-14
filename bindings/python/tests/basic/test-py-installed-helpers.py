@@ -41,8 +41,10 @@ HELPERS = [
     "common.hpp",
     "numpy_access.hpp",
     "basic/factory.hpp",
+    "basic/mapping.hpp",
     "mesh/index_check.hpp",
     "model/model_vertex_check.hpp",
+    "model/model_mapping.hpp",
 ]
 # Each translation unit includes one helper first, then uses it
 UNITS = {
@@ -58,8 +60,29 @@ namespace geode
     }
 }
 """,
+    "basic/mapping.hpp": """
+#include <geode/mesh/core/mesh_element.hpp>
+namespace geode
+{
+    void define( pybind11::module& module )
+    {
+        define_generic_mapping< MeshVertex >( module, "A", "doc" );
+        define_bijective_mapping< MeshVertex, index_t >( module, "B", "doc" );
+    }
+}
+""",
     "mesh/index_check.hpp": "",
     "model/model_vertex_check.hpp": "",
+    "model/model_mapping.hpp": """
+namespace geode
+{
+    void define( pybind11::module& module )
+    {
+        define_model_mapping< GenericMapping< MeshVertex > >(
+            module, "A", "doc", "B" );
+    }
+}
+""",
 }
 PROJECT = """cmake_minimum_required(VERSION 3.15)
 include("{flags}")

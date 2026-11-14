@@ -24,8 +24,10 @@ package read `help(opengeode)`, whose text is `bindings/python/opengeode_doc.txt
   meshes; `src/numpy_access.hpp` and `src/mesh/numpy_access.cpp` the numpy bulk
   access.
 - Installed helpers: `common.hpp`, `numpy_access.hpp`, `basic/factory.hpp`
-  (`PYTHON_FACTORY_CLASS`), `mesh/index_check.hpp` and
-  `model/model_vertex_check.hpp` are installed with the C++ package in
+  (`PYTHON_FACTORY_CLASS`), `basic/mapping.hpp` (`define_bijective_mapping`,
+  `define_generic_mapping`: the whole API of a mapping, sizes and dicts
+  included), `mesh/index_check.hpp`, `model/model_vertex_check.hpp` and
+  `model/model_mapping.hpp` (`define_model_mapping`) are installed with the C++ package in
   `<prefix>/include/geode/bindings/python/` (the include directory of the
   OpenGeode targets). The bindings of the downstream projects include them as
   `#include <geode/bindings/python/common.hpp>` (or `.../mesh/index_check.hpp`,

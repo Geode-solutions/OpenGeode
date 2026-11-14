@@ -33,7 +33,7 @@ install(FILES "common.hpp" "numpy_access.hpp"
     DESTINATION "${helpers_destination}"
     COMPONENT public
 )
-install(FILES "basic/factory.hpp"
+install(FILES "basic/factory.hpp" "basic/mapping.hpp"
     DESTINATION "${helpers_destination}/basic"
     COMPONENT public
 )
@@ -41,7 +41,7 @@ install(FILES "mesh/index_check.hpp"
     DESTINATION "${helpers_destination}/mesh"
     COMPONENT public
 )
-install(FILES "model/model_vertex_check.hpp"
+install(FILES "model/model_vertex_check.hpp" "model/model_mapping.hpp"
     DESTINATION "${helpers_destination}/model"
     COMPONENT public
 )

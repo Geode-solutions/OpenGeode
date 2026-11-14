@@ -21,80 +21,17 @@
  *
  */
 
-#include "../common.hpp"
+#include "mapping.hpp"
 
-#include <geode/basic/mapping.hpp>
 #include <geode/basic/uuid.hpp>
-
-#define PYTHON_MAPPING( type )                                                 \
-    const auto bijective##type = absl::StrCat( "BijectiveMapping", #type );    \
-    pybind11::class_< BijectiveMapping< type > >( module,                      \
-        bijective##type.c_str(),                                               \
-        "One-to-one mapping between input and output values" )                 \
-        .def( pybind11::init<>(), "Build an empty mapping" )                   \
-        .def( pybind11::init( []( BijectiveMapping< type >& mapping ) {        \
-            return BijectiveMapping< type >{ std::move( mapping ) };           \
-        } ),                                                                   \
-            pybind11::arg( "mapping" ),                                        \
-            "Move constructor: take the content of mapping" )                  \
-        .def( "has_mapping_input",                                             \
-            &BijectiveMapping< type >::has_mapping_input,                      \
-            pybind11::arg( "input" ),                                          \
-            "Return True if the value is mapped as an input" )                 \
-        .def( "has_mapping_output",                                            \
-            &BijectiveMapping< type >::has_mapping_output,                     \
-            pybind11::arg( "output" ),                                         \
-            "Return True if the value is mapped as an output" )                \
-        .def( "in2out",                                                        \
-            mapping_lookup< BijectiveMapping< type > >( "in2out",              \
-                &BijectiveMapping< type >::has_mapping_input,                  \
-                &BijectiveMapping< type >::in2out ),                           \
-            pybind11::arg( "input" ),                                          \
-            "Return the output mapped to the input. Raise KeyError if there "  \
-            "is none" )                                                        \
-        .def( "out2in",                                                        \
-            mapping_lookup< BijectiveMapping< type > >( "out2in",              \
-                &BijectiveMapping< type >::has_mapping_output,                 \
-                &BijectiveMapping< type >::out2in ),                           \
-            pybind11::arg( "output" ),                                         \
-            "Return the input mapped to the output. Raise KeyError if there "  \
-            "is none" );                                                       \
-                                                                               \
-    const auto generic##type = absl::StrCat( "GenericMapping", #type );        \
-    pybind11::class_< GenericMapping< type > >( module, generic##type.c_str(), \
-        "Many-to-many mapping between input and output values" )               \
-        .def( pybind11::init<>(), "Build an empty mapping" )                   \
-        .def( pybind11::init( []( GenericMapping< type >& mapping ) {          \
-            return GenericMapping< type >{ std::move( mapping ) };             \
-        } ),                                                                   \
-            pybind11::arg( "mapping" ),                                        \
-            "Move constructor: take the content of mapping" )                  \
-        .def( "has_mapping_input", &GenericMapping< type >::has_mapping_input, \
-            pybind11::arg( "input" ),                                          \
-            "Return True if the value is mapped as an input" )                 \
-        .def( "has_mapping_output",                                            \
-            &GenericMapping< type >::has_mapping_output,                       \
-            pybind11::arg( "output" ),                                         \
-            "Return True if the value is mapped as an output" )                \
-        .def( "in2out",                                                        \
-            mapping_lookup< GenericMapping< type > >( "in2out",                \
-                &GenericMapping< type >::has_mapping_input,                    \
-                &GenericMapping< type >::in2out ),                             \
-            pybind11::arg( "input" ),                                          \
-            "Return the outputs mapped to the input. Raise KeyError if "       \
-            "there is none" )                                                  \
-        .def( "out2in",                                                        \
-            mapping_lookup< GenericMapping< type > >( "out2in",                \
-                &GenericMapping< type >::has_mapping_output,                   \
-                &GenericMapping< type >::out2in ),                             \
-            pybind11::arg( "output" ),                                         \
-            "Return the inputs mapped to the output. Raise KeyError if "       \
-            "there is none" )
 
 namespace geode
 {
     void define_mapping( pybind11::module& module )
     {
-        PYTHON_MAPPING( uuid );
+        define_bijective_mapping< uuid >( module, "BijectiveMappinguuid",
+            "One-to-one mapping between input and output uuids" );
+        define_generic_mapping< uuid >( module, "GenericMappinguuid",
+            "Many-to-many mapping between input and output uuids" );
     }
 } // namespace geode

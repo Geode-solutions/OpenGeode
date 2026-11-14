@@ -21,7 +21,7 @@
  *
  */
 
-#include "../../common.hpp"
+#include "../../basic/mapping.hpp"
 
 #include <geode/model/helpers/convert_to_mesh.hpp>
 
@@ -35,50 +35,17 @@
 #include <geode/model/representation/core/brep.hpp>
 #include <geode/model/representation/core/section.hpp>
 
-namespace
-{
-    template < typename Mapping >
-    void define_model_mesh_mapping(
-        pybind11::module& module, const char* name, const char* doc )
-    {
-        pybind11::class_< Mapping >( module, name, doc )
-            .def( "has_mapping_input", &Mapping::has_mapping_input,
-                pybind11::arg( "input" ),
-                "Return True if the input is mapped to an output" )
-            .def( "has_mapping_output", &Mapping::has_mapping_output,
-                pybind11::arg( "output" ),
-                "Return True if the output is mapped to an input" )
-            .def( "in2out",
-                geode::mapping_lookup< Mapping >(
-                    "in2out", &Mapping::has_mapping_input, &Mapping::in2out ),
-                pybind11::arg( "input" ),
-                "Return the output mapped to the input; raise KeyError if "
-                "there is none" )
-            .def( "out2in",
-                geode::mapping_lookup< Mapping >(
-                    "out2in", &Mapping::has_mapping_output, &Mapping::out2in ),
-                pybind11::arg( "output" ),
-                "Return the input mapped to the output; raise KeyError if "
-                "there is none" )
-            .def( "size", &Mapping::size,
-                "Return the number of mapped input and output pairs" );
-    }
-} // namespace
-
 namespace geode
 {
     void define_convert_to_mesh( pybind11::module& module )
     {
-        using ElementMapping = ModelToMeshMappings::MeshElementToIndexMapping;
-        using IndexMapping = BijectiveMapping< index_t >;
-        define_model_mesh_mapping< ElementMapping >( module,
+        define_bijective_mapping< MeshElement, index_t >( module,
             "MeshElementToIndexMapping",
             "One-to-one mapping between the elements of the model meshes "
             "(the input, a mesh element being the uuid of a component and an "
             "element index in its mesh) and the indices of the elements of "
             "the output mesh" );
-        define_model_mesh_mapping< IndexMapping >( module,
-            "IndexToIndexMapping",
+        define_bijective_mapping< index_t >( module, "IndexToIndexMapping",
             "One-to-one mapping between the unique vertices of the model "
             "(the input) and the vertices of the output mesh" );
         pybind11::class_< ModelToMeshMappings >( module, "ModelToMeshMappings",
