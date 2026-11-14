@@ -24,6 +24,8 @@
 #include "../../../common.hpp"
 #include "../../model_vertex_check.hpp"
 
+#include <geode/mesh/core/mesh_element.hpp>
+
 #include <geode/model/mixin/core/vertex_identifier.hpp>
 
 namespace geode
@@ -48,6 +50,10 @@ namespace geode
                     "of the component" )
                 .def(
                     pybind11::self == pybind11::self, pybind11::arg( "other" ) )
+                .def( "mesh_vertex", &ComponentMeshVertex::mesh_vertex,
+                    "Return the MeshVertex of this vertex: the uuid of the "
+                    "component (also the uuid of its mesh) and the vertex "
+                    "index" )
                 .def( "__hash__",
                     []( const ComponentMeshVertex& value ) {
                         return absl::HashOf(

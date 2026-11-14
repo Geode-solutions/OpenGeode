@@ -283,6 +283,11 @@ def test_mesh_elements():
         mesh.MeshElement(identifier, 8),
         f"MeshElement(mesh_id=uuid('{identifier.string()}'), element_id=8)",
     )
+    for typed in (mesh.MeshVertex, mesh.MeshEdge, mesh.MeshPolygon):
+        check_repr(
+            typed(identifier, 9),
+            f"{typed.__name__}(mesh_id=uuid('{identifier.string()}'), element_id=9)",
+        )
     for value in (
         mesh.PolygonVertex(1, 2),
         mesh.PolygonEdge(3, 0),
@@ -292,6 +297,9 @@ def test_mesh_elements():
         mesh.PolyhedronFacetVertex(facet, 3),
         mesh.PolyhedronFacetEdge(facet, 1),
         mesh.MeshElement(identifier, 8),
+        mesh.MeshVertex(identifier, 9),
+        mesh.MeshEdge(identifier, 9),
+        mesh.MeshPolygon(identifier, 9),
     ):
         check_roundtrip(value)
         check_str_unchanged(value)
