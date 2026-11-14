@@ -602,7 +602,9 @@ class _LogBridge:
 
     def forward(self, logger_name):
         with self._lock:
-            if self._logger is None:
+            # Once stopped at interpreter exit, nothing drains the events: the
+            # console output stays as it is
+            if self._logger is None and not self._stopped:
                 self._console_output = Logger._is_console_output_enabled()
                 Logger._set_console_output(False)
             self._logger = _logging.getLogger(logger_name)
@@ -615,7 +617,8 @@ class _LogBridge:
             self._flush()
             self._logger = None
             self._configure()
-            Logger._set_console_output(self._console_output)
+            if not self._stopped:
+                Logger._set_console_output(self._console_output)
 
     def add_listener(self, listener):
         with self._lock:
@@ -646,6 +649,10 @@ class _LogBridge:
             thread.join(self._WAIT_TIMEOUT)
 
     def _configure(self):
+        if self._stopped:
+            # Without the thread, queued events would never be dispatched
+            Logger._set_bridge(False, False)
+            return
         Logger._set_bridge(self._logger is not None, bool(self._listeners))
         if (
             self._thread is None
@@ -710,7 +717,9 @@ _log_bridge = _LogBridge()
 def forward_logs_to_python(logger_name: str = "opengeode") -> None:
     """Send the OpenGeode messages to logging.getLogger(logger_name) instead
     of the console. OpenGeode levels map to the logging ones, trace being
-    TRACE (5). Calling it again only changes the target logger."""
+    TRACE (5). Calling it again only changes the target logger. Once the
+    forwarding stopped at interpreter exit (from a later atexit handler), it
+    has no effect: the messages stay on the console."""
     _log_bridge.forward(logger_name)
 
 

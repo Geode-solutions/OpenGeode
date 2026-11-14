@@ -231,6 +231,65 @@ def check_flush_at_exit():
                 )
 
 
+
+LATE_EXIT_SCRIPT = """
+import atexit
+import logging
+import sys
+
+import basic as opengeode
+
+
+def late_handler():
+    # Runs after the bridge stopped (atexit handlers run in reverse order):
+    # nothing drains the events any more, so the messages stay on the console
+    opengeode.forward_logs_to_python()
+    opengeode.add_progress_listener(lambda event: print("late listener called"))
+    opengeode.Logger.info("late message forwarded")
+    progress = opengeode.ProgressLogger(opengeode.Logger.Level.info, "late progress", 1)
+    progress.increment()
+    del progress
+    opengeode.stop_forwarding_logs()
+    opengeode.Logger.info("late message after stop")
+    opengeode.Logger._set_console_output(False)
+    opengeode.forward_logs_to_python()
+    opengeode.stop_forwarding_logs()
+    print("console kept disabled", not opengeode.Logger._is_console_output_enabled())
+    sys.stdout.flush()
+
+
+atexit.register(late_handler)
+logging.getLogger("opengeode").addHandler(logging.NullHandler())
+opengeode.forward_logs_to_python()
+opengeode.Logger.info("early message")
+"""
+
+
+def check_forwarding_after_exit_shutdown():
+    # forward_logs_to_python called by an atexit handler run after the bridge
+    # stopped must not turn the console off: no thread would drain the events
+    result = subprocess.run(
+        [sys.executable, "-c", LATE_EXIT_SCRIPT],
+        capture_output=True,
+        text=True,
+        timeout=TIMEOUT,
+    )
+    if result.returncode != 0:
+        raise ValueError(f"[Test] Late exit script failed: {result.stderr}")
+    for message in [
+        "late message forwarded",
+        "late progress",
+        "late message after stop",
+        "console kept disabled True",
+    ]:
+        if message not in result.stdout:
+            raise ValueError(
+                f"[Test] '{message}' lost after the bridge stopped: {result.stdout}"
+            )
+    if "late listener called" in result.stdout:
+        raise ValueError("[Test] Listener called after the bridge stopped")
+
+
 SLOW_EXIT_SCRIPT = """
 import logging
 import time
@@ -423,6 +482,7 @@ if __name__ == "__main__":
     check_raising_listener(Logger)
     check_flush_at_exit()
     check_slow_exit()
+    check_forwarding_after_exit_shutdown()
     check_stop_forwarding(Logger, handler)
     check_preserved_console_state(Logger)
     opengeode.forward_logs_to_python("opengeode.test")
