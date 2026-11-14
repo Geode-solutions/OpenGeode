@@ -22,6 +22,7 @@
  */
 
 #include "../../common.hpp"
+#include "../index_check.hpp"
 
 #include <geode/mesh/builder/tetrahedral_solid_builder.hpp>
 #include <geode/mesh/core/tetrahedral_solid.hpp>
@@ -39,9 +40,12 @@
             "Return the builder to modify the tetrahedral solid, which keeps " \
             "the mesh alive" )                                                 \
         .def( "create_tetrahedron",                                            \
-            &TetrahedralSolidBuilder##dimension##D::create_tetrahedron,        \
+            geode::checked_builder< TetrahedralSolidBuilder##dimension##D,     \
+                SolidMesh< dimension > >( "create_tetrahedron",                \
+                &TetrahedralSolidBuilder##dimension##D::create_tetrahedron,    \
+                geode::VertexCheck{} ),                                        \
             "Create a tetrahedron from its four vertices and return its "      \
-            "index",                                                           \
+            "index. Raise IndexError if a vertex is not in [0, nb_vertices)",  \
             pybind11::arg( "vertices" ) )
 
 namespace geode

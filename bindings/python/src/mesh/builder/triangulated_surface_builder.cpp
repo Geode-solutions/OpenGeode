@@ -22,6 +22,7 @@
  */
 
 #include "../../common.hpp"
+#include "../index_check.hpp"
 
 #include <geode/mesh/builder/triangulated_surface_builder.hpp>
 #include <geode/mesh/core/triangulated_surface.hpp>
@@ -39,8 +40,12 @@
             "Return the builder to modify the triangulated surface, which "    \
             "keeps the mesh alive" )                                           \
         .def( "create_triangle",                                               \
-            &TriangulatedSurfaceBuilder##dimension##D::create_triangle,        \
-            "Create a triangle from its three vertices and return its index",  \
+            geode::checked_builder< TriangulatedSurfaceBuilder##dimension##D,  \
+                SurfaceMesh< dimension > >( "create_triangle",                 \
+                &TriangulatedSurfaceBuilder##dimension##D::create_triangle,    \
+                geode::VertexCheck{} ),                                        \
+            "Create a triangle from its three vertices and return its index. " \
+            "Raise IndexError if a vertex is not in [0, nb_vertices)",         \
             pybind11::arg( "vertices" ) )
 
 namespace geode

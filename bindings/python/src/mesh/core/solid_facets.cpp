@@ -22,6 +22,7 @@
  */
 
 #include "../../common.hpp"
+#include "../index_check.hpp"
 
 #include <geode/basic/attribute_manager.hpp>
 
@@ -36,7 +37,10 @@
         "enable_facets()" )                                                    \
         .def( "nb_facets", &SolidFacets##dimension##D::nb_facets,              \
             "Return the number of facets" )                                    \
-        .def( "facet_vertices", &SolidFacets##dimension##D::facet_vertices,    \
+        .def( "facet_vertices",                                                \
+            geode::checked( "facet_vertices",                                  \
+                &SolidFacets##dimension##D::facet_vertices,                    \
+                geode::FacetCheck{} ),                                         \
             "Return the indices of the vertices of the facet",                 \
             pybind11::arg( "facet_id" ) )                                      \
         .def( "facet_from_vertices",                                           \

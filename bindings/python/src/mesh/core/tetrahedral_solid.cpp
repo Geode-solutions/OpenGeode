@@ -22,6 +22,7 @@
  */
 
 #include "../../common.hpp"
+#include "../index_check.hpp"
 
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
@@ -42,11 +43,17 @@
         .def( "clone", &TetrahedralSolid##dimension##D::clone,                 \
             "Return a copy of the tetrahedral solid, with the same data "      \
             "structure, name and identifier" )                                 \
-        .def( "tetrahedron", &TetrahedralSolid##dimension##D::tetrahedron,     \
+        .def( "tetrahedron",                                                   \
+            geode::checked( "tetrahedron",                                     \
+                &TetrahedralSolid##dimension##D::tetrahedron,                  \
+                geode::PolyhedronCheck{} ),                                    \
             pybind11::arg( "tetrahedron_id" ), pybind11::keep_alive< 0, 1 >(), \
             "Return the geometric tetrahedron of the given tetrahedron of "    \
             "the mesh" )                                                       \
-        .def( "triangle", &TetrahedralSolid##dimension##D::triangle,           \
+        .def( "triangle",                                                      \
+            geode::checked( "triangle",                                        \
+                &TetrahedralSolid##dimension##D::triangle,                     \
+                geode::PolyhedronFacetCheck{} ),                               \
             pybind11::arg( "facet" ), pybind11::keep_alive< 0, 1 >(),          \
             "Return the geometric triangle of the given tetrahedron facet of " \
             "the mesh" )

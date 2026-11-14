@@ -32,6 +32,21 @@
 
 #include <geode/mesh/core/grid.hpp>
 
+namespace geode
+{
+    template < index_t dimension >
+    void check_grid_vertex_arguments( std::string_view name,
+        const Grid< dimension >& grid,
+        const typename Grid< dimension >::VertexIndices& index,
+        index_t direction )
+    {
+        check_direction( name, direction, dimension );
+        check_grid_indices( name, "vertex index", index, [&grid]( index_t d ) {
+            return grid.nb_vertices_in_direction( d );
+        } );
+    }
+} // namespace geode
+
 #define PYTHON_GRID( dimension )                                               \
     const auto name##dimension = "Grid" + std::to_string( dimension ) + "D";   \
     pybind11::class_< Grid##dimension##D, CellArray##dimension##D,             \
@@ -44,9 +59,15 @@
             "cell directions" )                                                \
         .def( "nb_cell_vertices", &Grid##dimension##D::nb_cell_vertices,       \
             "Return the number of vertices of a cell: 4 in 2D, 8 in 3D" )      \
-        .def( "cell_length_in_direction",                                      \
-            &Grid##dimension##D::cell_length_in_direction,                     \
-            "Return the length of a cell along the direction",                 \
+        .def(                                                                  \
+            "cell_length_in_direction",                                        \
+            []( const Grid##dimension##D& grid, index_t direction ) {          \
+                check_direction(                                               \
+                    "cell_length_in_direction", direction, dimension );        \
+                return grid.cell_length_in_direction( direction );             \
+            },                                                                 \
+            "Return the length of a cell along the direction. Raise "          \
+            "IndexError if the direction is not in [0, dimension)",            \
             pybind11::arg( "direction" ) )                                     \
         .def( "cell_size", &Grid##dimension##D::cell_size,                     \
             "Return the size of a cell: its area in 2D, its volume in 3D, "    \
@@ -57,10 +78,16 @@
             pybind11::arg( "index" ) )                                         \
         .def( "nb_grid_vertices", &Grid##dimension##D::nb_grid_vertices,       \
             "Return the total number of grid vertices" )                       \
-        .def( "nb_vertices_in_direction",                                      \
-            &Grid##dimension##D::nb_vertices_in_direction,                     \
+        .def(                                                                  \
+            "nb_vertices_in_direction",                                        \
+            []( const Grid##dimension##D& grid, index_t direction ) {          \
+                check_direction(                                               \
+                    "nb_vertices_in_direction", direction, dimension );        \
+                return grid.nb_vertices_in_direction( direction );             \
+            },                                                                 \
             "Return the number of grid vertices along the direction, i.e. "    \
-            "the number of cells plus one",                                    \
+            "the number of cells plus one. Raise IndexError if the direction " \
+            "is not in [0, dimension)",                                        \
             pybind11::arg( "direction" ) )                                     \
         .def( "nb_vertices_on_borders",                                        \
             &Grid##dimension##D::nb_vertices_on_borders,                       \
@@ -75,17 +102,46 @@
         .def( "cell_vertices", &Grid##dimension##D::cell_vertices,             \
             "Return the indices of all the vertices of the cell",              \
             pybind11::arg( "cell_id" ) )                                       \
-        .def( "cell_vertex_indices", &Grid##dimension##D::cell_vertex_indices, \
+        .def(                                                                  \
+            "cell_vertex_indices",                                             \
+            []( const Grid##dimension##D& grid,                                \
+                const Grid##dimension##D::CellIndices& cell_id,                \
+                local_index_t vertex_id ) {                                    \
+                check_index( "cell_vertex_indices", "local vertex", vertex_id, \
+                    grid.nb_cell_vertices() );                                 \
+                return grid.cell_vertex_indices( cell_id, vertex_id );         \
+            },                                                                 \
             "Return the indices of a vertex of the cell, vertex_id being the " \
-            "local index of the vertex in the cell",                           \
+            "local index of the vertex in the cell. Raise IndexError if "      \
+            "vertex_id is not in [0, nb_cell_vertices)",                       \
             pybind11::arg( "cell_id" ), pybind11::arg( "vertex_id" ) )         \
-        .def( "next_vertex", &Grid##dimension##D::next_vertex,                 \
+        .def(                                                                  \
+            "next_vertex",                                                     \
+            []( const Grid##dimension##D& grid,                                \
+                const Grid##dimension##D::VertexIndices& index,                \
+                index_t direction ) {                                          \
+                check_grid_vertex_arguments(                                   \
+                    "next_vertex", grid, index, direction );                   \
+                return grid.next_vertex( index, direction );                   \
+            },                                                                 \
             "Return the indices of the next grid vertex along the direction, " \
-            "or None at the end of the grid",                                  \
+            "or None at the end of the grid. Raise IndexError if the "         \
+            "direction is not in [0, dimension) or an index is not in [0, "    \
+            "nb_vertices_in_direction)",                                       \
             pybind11::arg( "index" ), pybind11::arg( "direction" ) )           \
-        .def( "previous_vertex", &Grid##dimension##D::previous_vertex,         \
+        .def(                                                                  \
+            "previous_vertex",                                                 \
+            []( const Grid##dimension##D& grid,                                \
+                const Grid##dimension##D::VertexIndices& index,                \
+                index_t direction ) {                                          \
+                check_grid_vertex_arguments(                                   \
+                    "previous_vertex", grid, index, direction );               \
+                return grid.previous_vertex( index, direction );               \
+            },                                                                 \
             "Return the indices of the previous grid vertex along the "        \
-            "direction, or None at the start of the grid",                     \
+            "direction, or None at the start of the grid. Raise IndexError "   \
+            "if the direction is not in [0, dimension) or an index is not in " \
+            "[0, nb_vertices_in_direction)",                                   \
             pybind11::arg( "index" ), pybind11::arg( "direction" ) )           \
         .def( "is_grid_vertex_on_border",                                      \
             &Grid##dimension##D::is_grid_vertex_on_border,                     \

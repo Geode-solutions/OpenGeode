@@ -22,30 +22,12 @@
  */
 
 #include "../../common.hpp"
+#include "../index_check.hpp"
 
 #include <geode/geometry/point.hpp>
 
 #include <geode/mesh/core/attribute_coordinate_reference_system.hpp>
 #include <geode/mesh/core/coordinate_reference_system.hpp>
-
-namespace geode
-{
-    /*!
-     * Only the CRS storing one point per attribute element knows its size.
-     */
-    template < index_t dimension >
-    void check_crs_point( std::string_view name,
-        const CoordinateReferenceSystem< dimension >& crs,
-        index_t point_id )
-    {
-        if( const auto* attribute_crs = dynamic_cast<
-                const AttributeCoordinateReferenceSystem< dimension >* >(
-                &crs ) )
-        {
-            check_index( name, "point", point_id, attribute_crs->nb_points() );
-        }
-    }
-} // namespace geode
 
 #define PYTHON_CRS( dimension )                                                \
     const auto name##dimension =                                               \

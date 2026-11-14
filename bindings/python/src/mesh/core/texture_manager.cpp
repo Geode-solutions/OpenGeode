@@ -28,22 +28,58 @@
 #include <geode/mesh/core/texture3d.hpp>
 #include <geode/mesh/core/texture_manager.hpp>
 
+namespace geode
+{
+    /*!
+     * Return the texture to Python, keeping the manager alive, and give it the
+     * `_nb_elements` of the manager to check the elements (see texture.cpp)
+     */
+    template < index_t dimension >
+    TypedObject< Texture< dimension > > texture_with_elements(
+        const TypedObject< TextureManager< dimension > >& manager,
+        const Texture< dimension >& texture )
+    {
+        auto result =
+            pybind11::reinterpret_steal< TypedObject< Texture< dimension > > >(
+                pybind11::cast( &texture,
+                    pybind11::return_value_policy::reference_internal, manager )
+                    .release() );
+        if( pybind11::hasattr( manager, "_nb_elements" ) )
+        {
+            result.attr( "_nb_elements" ) = manager.attr( "_nb_elements" );
+        }
+        return result;
+    }
+} // namespace geode
+
 #define PYTHON_TEXTURE_MANAGER( dimension )                                    \
     const auto name##dimension =                                               \
         "TextureManager" + std::to_string( dimension ) + "D";                  \
-    pybind11::class_< TextureManager< dimension > >(                           \
-        module, name##dimension.c_str(), "Named textures of a mesh" )          \
-        .def( "find_or_create_texture",                                        \
-            &TextureManager< dimension >::find_or_create_texture,              \
+    pybind11::class_< TextureManager< dimension > >( module,                   \
+        name##dimension.c_str(), pybind11::dynamic_attr(),                     \
+        "Named textures of a mesh" )                                           \
+        .def(                                                                  \
+            "find_or_create_texture",                                          \
+            []( const TypedObject< TextureManager< dimension > >& self,        \
+                std::string_view name ) {                                      \
+                return texture_with_elements(                                  \
+                    self, self.cast< TextureManager< dimension >& >()          \
+                              .find_or_create_texture( name ) );               \
+            },                                                                 \
             pybind11::arg( "name" ),                                           \
-            pybind11::return_value_policy::reference_internal,                 \
             "Return the texture with this name, creating it if it does not "   \
-            "exist" )                                                          \
-        .def( "find_texture", &TextureManager< dimension >::find_texture,      \
+            "exist. The texture keeps the manager alive" )                     \
+        .def(                                                                  \
+            "find_texture",                                                    \
+            []( const TypedObject< TextureManager< dimension > >& self,        \
+                std::string_view name ) {                                      \
+                return texture_with_elements(                                  \
+                    self, self.cast< const TextureManager< dimension >& >()    \
+                              .find_texture( name ) );                         \
+            },                                                                 \
             pybind11::arg( "name" ),                                           \
-            pybind11::return_value_policy::reference_internal,                 \
             "Return the texture with this name; raise an error if there is "   \
-            "none" )                                                           \
+            "none. The texture keeps the manager alive" )                      \
         .def( "texture_names", &TextureManager< dimension >::texture_names,    \
             "Return the names of the textures" )                               \
         .def( "texture_exists", &TextureManager< dimension >::texture_exists,  \

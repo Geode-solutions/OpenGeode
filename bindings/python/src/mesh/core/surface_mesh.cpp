@@ -278,7 +278,9 @@
             "Return True if some polygon around the vertex is on the border; " \
             "the polygon adjacencies must be computed",                        \
             pybind11::arg( "vertex_id" ) )                                     \
-        .def( "texture_manager", &SurfaceMesh##dimension##D::texture_manager,  \
+        .def( "texture_manager",                                               \
+            geode::texture_manager_with_elements(                              \
+                &SurfaceMesh##dimension##D::texture_manager, "nb_polygons" ),  \
             pybind11::keep_alive< 0, 1 >(),                                    \
             "Return the manager of the textures of the surface mesh, which "   \
             "keeps the mesh alive" )                                           \

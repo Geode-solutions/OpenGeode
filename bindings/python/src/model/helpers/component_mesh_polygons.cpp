@@ -22,9 +22,11 @@
  */
 
 #include "../../common.hpp"
+#include "../../mesh/index_check.hpp"
 
 #include <geode/model/helpers/component_mesh_polygons.hpp>
 
+#include <geode/mesh/core/edged_curve.hpp>
 #include <geode/mesh/core/solid_mesh.hpp>
 #include <geode/mesh/core/surface_mesh.hpp>
 
@@ -36,6 +38,26 @@
 
 namespace geode
 {
+    /*!
+     * Wrap a function whose last argument is an index in the mesh of its
+     * argument at component_position (a model component), checked by check
+     */
+    template < size_t component_position,
+        typename Check,
+        typename Return,
+        typename... Args >
+    auto checked_component_index(
+        std::string_view name, Return ( *function )( Args... ), Check check )
+    {
+        return [name = std::string{ name }, function, check](
+                   Args... args ) -> Return {
+            const auto arguments = std::tie( args... );
+            check( name, std::get< component_position >( arguments ).mesh(),
+                std::get< sizeof...( Args ) - 1 >( arguments ) );
+            return function( args... );
+        };
+    }
+
     void define_component_mesh_polygons( pybind11::module& module )
     {
         auto cls_BlockPolyhedronFacet =
@@ -135,49 +157,74 @@ namespace geode
 
         module
             .def( "block_polygon_unique_vertices",
-                static_cast< PolygonVertices ( * )( const BRep&, const Block3D&,
-                    const PolyhedronFacet& ) >( &polygon_unique_vertices ),
+                checked_component_index< 1 >( "block_polygon_unique_vertices",
+                    static_cast< PolygonVertices ( * )(
+                        const BRep&, const Block3D&, const PolyhedronFacet& ) >(
+                        &polygon_unique_vertices ),
+                    PolyhedronFacetCheck{} ),
                 pybind11::arg( "model" ), pybind11::arg( "block" ),
                 pybind11::arg( "facet" ),
                 "Return the unique vertex of each vertex of the polyhedron "
                 "facet of the Block mesh, NO_ID for a vertex without unique "
-                "vertex" )
+                "vertex; raise IndexError if facet is not a facet of the Block "
+                "mesh" )
             .def( "surface_polygon_unique_vertices",
-                static_cast< PolygonVertices ( * )( const BRep&,
-                    const Surface3D&, index_t ) >( &polygon_unique_vertices ),
+                checked_component_index< 1 >( "surface_polygon_unique_vertices",
+                    static_cast< PolygonVertices ( * )(
+                        const BRep&, const Surface3D&, index_t ) >(
+                        &polygon_unique_vertices ),
+                    PolygonCheck{} ),
                 pybind11::arg( "model" ), pybind11::arg( "surface" ),
                 pybind11::arg( "polygon_id" ),
                 "Return the unique vertex of each vertex of the polygon of the "
-                "Surface mesh, NO_ID for a vertex without unique vertex" )
+                "Surface mesh, NO_ID for a vertex without unique vertex; raise "
+                "IndexError if polygon_id is not a polygon of the Surface "
+                "mesh" )
             .def( "block_mesh_polyhedra_from_surface_polygon",
-                &block_mesh_polyhedra_from_surface_polygon,
+                checked_component_index< 2 >(
+                    "block_mesh_polyhedra_from_surface_polygon",
+                    &block_mesh_polyhedra_from_surface_polygon,
+                    PolygonCheck{} ),
                 pybind11::arg( "model" ), pybind11::arg( "block" ),
                 pybind11::arg( "surface" ), pybind11::arg( "polygon_id" ),
                 "Return the polyhedron facets of the Block mesh whose vertices "
                 "are identified with those of the Surface polygon (0 to 2 "
                 "facets); only triangles and quadrangles are supported, other "
-                "polygons raise an error" )
+                "polygons raise an error; raise IndexError if polygon_id is "
+                "not a polygon of the Surface mesh" )
             .def( "block_vertices_from_surface_polygon",
-                &block_vertices_from_surface_polygon, pybind11::arg( "model" ),
-                pybind11::arg( "block" ), pybind11::arg( "surface" ),
-                pybind11::arg( "polygon_id" ),
+                checked_component_index< 2 >(
+                    "block_vertices_from_surface_polygon",
+                    &block_vertices_from_surface_polygon, PolygonCheck{} ),
+                pybind11::arg( "model" ), pybind11::arg( "block" ),
+                pybind11::arg( "surface" ), pybind11::arg( "polygon_id" ),
                 "Return the BlockPolyhedronFacet coincident with the Surface "
                 "polygon (0 to 2): each gives the polyhedron facet and, in "
                 "'vertices', the Block mesh vertices matching the polygon "
                 "vertices in the polygon order; only triangles and quadrangles "
-                "are supported, other polygons raise an error" )
+                "are supported, other polygons raise an error; raise "
+                "IndexError if polygon_id is not a polygon of the Surface "
+                "mesh" )
             .def( "oriented_block_vertices_from_surface_polygon",
-                &oriented_block_vertices_from_surface_polygon,
+                checked_component_index< 2 >(
+                    "oriented_block_vertices_from_surface_polygon",
+                    &oriented_block_vertices_from_surface_polygon,
+                    PolygonCheck{} ),
                 pybind11::arg( "model" ), pybind11::arg( "block" ),
                 pybind11::arg( "surface" ), pybind11::arg( "polygon_id" ),
                 "Same as block_vertices_from_surface_polygon, the facets being "
                 "sorted: oriented_polyhedron_facet is the one with the same "
                 "orientation as the Surface polygon, opposite_polyhedron_facet "
-                "the one with the opposite orientation (None if absent)" )
+                "the one with the opposite orientation (None if absent); raise "
+                "IndexError if polygon_id is not a polygon of the Surface "
+                "mesh" )
             .def( "brep_surface_vertices_from_line_edge",
-                static_cast< absl::InlinedVector< SurfacePolygonEdge, 2 > ( * )(
-                    const BRep&, const Surface3D&, const Line3D&, index_t ) >(
-                    &surface_vertices_from_line_edge ),
+                checked_component_index< 2 >(
+                    "brep_surface_vertices_from_line_edge",
+                    static_cast< absl::InlinedVector< SurfacePolygonEdge,
+                        2 > ( * )( const BRep&, const Surface3D&, const Line3D&,
+                        index_t ) >( &surface_vertices_from_line_edge ),
+                    EdgeCheck{} ),
                 pybind11::arg( "model" ), pybind11::arg( "surface" ),
                 pybind11::arg( "line" ), pybind11::arg( "edge_id" ),
                 "Return the SurfacePolygonEdge of the Surface coincident with "
@@ -185,21 +232,30 @@ namespace geode
                 "(in 'facet') and, in 'vertices', the Surface mesh vertices "
                 "matching the Line edge vertices in the edge order; the edge "
                 "vertices must be identified with Surface vertices (unique "
-                "vertices)" )
+                "vertices); raise IndexError if edge_id is not a edge of the "
+                "Line mesh" )
             .def( "brep_oriented_surface_vertices_from_line_edge",
-                static_cast< SurfacePolygonsEdgeVertices ( * )(
-                    const BRep&, const Surface3D&, const Line3D&, index_t ) >(
-                    &oriented_surface_vertices_from_line_edge ),
+                checked_component_index< 2 >(
+                    "brep_oriented_surface_vertices_from_line_edge",
+                    static_cast< SurfacePolygonsEdgeVertices ( * )( const BRep&,
+                        const Surface3D&, const Line3D&, index_t ) >(
+                        &oriented_surface_vertices_from_line_edge ),
+                    EdgeCheck{} ),
                 pybind11::arg( "model" ), pybind11::arg( "surface" ),
                 pybind11::arg( "line" ), pybind11::arg( "edge_id" ),
                 "Same as brep_surface_vertices_from_line_edge, the edges being "
                 "sorted: oriented_edge is the one with the same orientation as "
                 "the Line edge, opposite_edge the one with the opposite "
-                "orientation (None if absent)" )
+                "orientation (None if absent); raise IndexError if edge_id is "
+                "not a edge of the Line mesh" )
             .def( "section_surface_vertices_from_line_edge",
-                static_cast< absl::InlinedVector< SurfacePolygonEdge, 2 > ( * )(
-                    const Section&, const Surface2D&, const Line2D&,
-                    index_t ) >( &surface_vertices_from_line_edge ),
+                checked_component_index< 2 >(
+                    "section_surface_vertices_from_line_edge",
+                    static_cast< absl::InlinedVector< SurfacePolygonEdge,
+                        2 > ( * )( const Section&, const Surface2D&,
+                        const Line2D&, index_t ) >(
+                        &surface_vertices_from_line_edge ),
+                    EdgeCheck{} ),
                 pybind11::arg( "model" ), pybind11::arg( "surface" ),
                 pybind11::arg( "line" ), pybind11::arg( "edge_id" ),
                 "Return the SurfacePolygonEdge of the Surface coincident with "
@@ -207,16 +263,22 @@ namespace geode
                 "(in 'facet') and, in 'vertices', the Surface mesh vertices "
                 "matching the Line edge vertices in the edge order; the edge "
                 "vertices must be identified with Surface vertices (unique "
-                "vertices)" )
+                "vertices); raise IndexError if edge_id is not a edge of the "
+                "Line mesh" )
             .def( "section_oriented_surface_vertices_from_line_edge",
-                static_cast< SurfacePolygonsEdgeVertices ( * )( const Section&,
-                    const Surface2D&, const Line2D&, index_t ) >(
-                    &oriented_surface_vertices_from_line_edge ),
+                checked_component_index< 2 >(
+                    "section_oriented_surface_vertices_from_line_edge",
+                    static_cast< SurfacePolygonsEdgeVertices ( * )(
+                        const Section&, const Surface2D&, const Line2D&,
+                        index_t ) >(
+                        &oriented_surface_vertices_from_line_edge ),
+                    EdgeCheck{} ),
                 pybind11::arg( "model" ), pybind11::arg( "surface" ),
                 pybind11::arg( "line" ), pybind11::arg( "edge_id" ),
                 "Same as section_surface_vertices_from_line_edge, the edges "
                 "being sorted: oriented_edge is the one with the same "
                 "orientation as the Line edge, opposite_edge the one with the "
-                "opposite orientation (None if absent)" );
+                "opposite orientation (None if absent); raise IndexError if "
+                "edge_id is not a edge of the Line mesh" );
     }
 } // namespace geode

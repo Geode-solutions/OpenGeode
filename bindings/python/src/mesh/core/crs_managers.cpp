@@ -22,6 +22,7 @@
  */
 
 #include "../../common.hpp"
+#include "../index_check.hpp"
 
 #include <geode/geometry/point.hpp>
 
@@ -69,10 +70,21 @@
             pybind11::return_value_policy::reference_internal,                 \
             "Return the coordinate reference system manager with the "         \
             "dimension of the mesh" )                                          \
-        .def( "point",                                                         \
-            &CoordinateReferenceSystemManagers##dimension##D::point,           \
+        .def(                                                                  \
+            "point",                                                           \
+            []( const CoordinateReferenceSystemManagers##dimension##D&         \
+                    managers,                                                  \
+                index_t vertex ) {                                             \
+                check_crs_point( "point",                                      \
+                    managers.main_coordinate_reference_system_manager()        \
+                        .active_coordinate_reference_system(),                 \
+                    vertex );                                                  \
+                return managers.point( vertex );                               \
+            },                                                                 \
             "Return the coordinates of a vertex in the active coordinate "     \
-            "reference system of the main manager",                            \
+            "reference system of the main manager. Raise IndexError if the "   \
+            "vertex is out of range for a coordinate reference system "        \
+            "storing one point per vertex",                                    \
             pybind11::arg( "vertex" ) )
 
 namespace geode

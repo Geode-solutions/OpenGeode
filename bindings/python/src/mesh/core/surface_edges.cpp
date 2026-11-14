@@ -22,6 +22,7 @@
  */
 
 #include "../../common.hpp"
+#include "../index_check.hpp"
 
 #include <geode/basic/attribute_manager.hpp>
 
@@ -36,7 +37,10 @@
         "enable_edges()" )                                                     \
         .def( "nb_edges", &SurfaceEdges##dimension##D::nb_edges,               \
             "Return the number of edges" )                                     \
-        .def( "edge_vertices", &SurfaceEdges##dimension##D::edge_vertices,     \
+        .def( "edge_vertices",                                                 \
+            geode::checked( "edge_vertices",                                   \
+                &SurfaceEdges##dimension##D::edge_vertices,                    \
+                geode::EdgeCheck{} ),                                          \
             "Return the indices of the two vertices of the edge",              \
             pybind11::arg( "edge_id" ) )                                       \
         .def( "edge_from_vertices",                                            \

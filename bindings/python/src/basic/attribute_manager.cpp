@@ -26,6 +26,7 @@
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/attribute_time_series.hpp>
 #include <geode/basic/constant_attribute.hpp>
+#include <geode/basic/range.hpp>
 #include <geode/basic/sparse_attribute.hpp>
 #include <geode/basic/variable_attribute.hpp>
 
@@ -118,6 +119,23 @@ namespace geode
             manager, "sparse", suffix );
     }
 
+    /*!
+     * Only the variable attributes have a size: constant attributes have the
+     * same value for all elements and sparse attributes return their default
+     * value.
+     */
+    template < typename type >
+    void check_time_series_element( std::string_view name,
+        const ReadOnlyAttribute< type >& attribute,
+        index_t element )
+    {
+        if( const auto* variable =
+                dynamic_cast< const VariableAttribute< type >* >( &attribute ) )
+        {
+            check_index( name, "element", element, variable->size() );
+        }
+    }
+
     template < typename type >
     void python_attribute_time_series_class(
         pybind11::module& module, const std::string& typestr )
@@ -137,13 +155,35 @@ namespace geode
                 &AttributeTimeSeries< type >::step_attribute,
                 pybind11::return_value_policy::reference_internal,
                 pybind11::arg( "step" ), "Return the attribute of the step" )
-            .def( "value", &AttributeTimeSeries< type >::value,
+            .def(
+                "value",
+                []( const AttributeTimeSeries< type >& series, index_t step,
+                    index_t element ) -> const type& {
+                    check_index(
+                        "value", "step", step, series.nb_time_steps() );
+                    check_time_series_element(
+                        "value", series.step_attribute( step ), element );
+                    return series.value( step, element );
+                },
                 pybind11::arg( "step" ), pybind11::arg( "element" ),
-                "Return the value of the element at the step" )
-            .def( "element_values",
-                &AttributeTimeSeries< type >::element_values,
+                "Return the value of the element at the step. Raise "
+                "IndexError if the step is not in [0, nb_time_steps) or the "
+                "element is out of range of a variable step attribute" )
+            .def(
+                "element_values",
+                []( const AttributeTimeSeries< type >& series,
+                    index_t element ) {
+                    for( const auto step : Range{ series.nb_time_steps() } )
+                    {
+                        check_time_series_element( "element_values",
+                            series.step_attribute( step ), element );
+                    }
+                    return series.element_values( element );
+                },
                 pybind11::arg( "element" ),
-                "Return the values of the element at all the steps" );
+                "Return the values of the element at all the steps. Raise "
+                "IndexError if the element is out of range of a variable "
+                "step attribute" );
     }
 
     void define_attribute_manager( pybind11::module& module )
@@ -166,16 +206,23 @@ namespace geode
                 "find_generic_attribute",
                 // std::optional makes the generated stub return
                 // `AttributeBase | None`: a null shared_ptr becomes None
-                []( const AttributeManager& attribute_manager,
+                []( const TypedObject< AttributeManager >& self,
                     const uuid& attribute_id )
-                    -> std::optional< std::shared_ptr< AttributeBase > > {
-                    if( auto attribute =
-                            attribute_manager.find_generic_attribute(
-                                attribute_id ) )
+                    -> std::optional< TypedObject< AttributeBase > > {
+                    auto attribute =
+                        self.cast< const AttributeManager& >()
+                            .find_generic_attribute( attribute_id );
+                    if( !attribute )
                     {
-                        return attribute;
+                        return std::nullopt;
                     }
-                    return std::nullopt;
+                    auto result = pybind11::reinterpret_steal<
+                        TypedObject< AttributeBase > >(
+                        pybind11::cast( std::move( attribute ) ).release() );
+                    // Gives the number of elements of an attribute whose type
+                    // has no binding, see AttributeBase.generic_value
+                    result.attr( "_manager" ) = self;
+                    return result;
                 },
                 pybind11::arg( "attribute_id" ),
                 "Return the attribute with the given id whatever its type, "

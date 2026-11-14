@@ -27,6 +27,8 @@
 
 #include <array>
 
+#include <geode/mesh/core/attribute_coordinate_reference_system.hpp>
+#include <geode/mesh/core/coordinate_reference_system.hpp>
 #include <geode/mesh/core/graph.hpp>
 #include <geode/mesh/core/solid_mesh.hpp>
 #include <geode/mesh/core/surface_mesh.hpp>
@@ -35,9 +37,9 @@
 namespace geode
 {
     /*!
-     * Checks to give to checked() and checked(), checked_as() and
-     * checked_builder(): each one validates one argument of a mesh function
-     * against the size of the mesh.
+     * Checks to give to checked(), checked_as() and checked_builder(): each
+     * one validates one argument of a mesh function against the size of the
+     * mesh.
      */
     struct VertexCheck
     {
@@ -48,10 +50,10 @@ namespace geode
             check_index( name, "vertex", vertex, mesh.nb_vertices() );
         }
 
-        template < typename Mesh >
+        template < typename Mesh, size_t nb_vertices >
         void operator()( std::string_view name,
             const Mesh& mesh,
-            const std::array< index_t, 2 >& vertices ) const
+            const std::array< index_t, nb_vertices >& vertices ) const
         {
             for( const auto vertex : vertices )
             {
@@ -90,6 +92,19 @@ namespace geode
         {
             EdgeCheck{}( name, mesh, edge_vertex.edge_id );
             check_index( name, "local vertex", edge_vertex.vertex_id, 2 );
+        }
+    };
+
+    /*!
+     * Facet of the SolidFacets of a solid
+     */
+    struct FacetCheck
+    {
+        template < typename Facets >
+        void operator()(
+            std::string_view name, const Facets& facets, index_t facet ) const
+        {
+            check_index( name, "facet", facet, facets.nb_facets() );
         }
     };
 
@@ -179,4 +194,44 @@ namespace geode
                     facet_vertex.polyhedron_facet ) );
         }
     };
+
+    /*!
+     * Wrap the texture_manager() of a mesh: the returned manager stores in
+     * `_nb_elements` the method of the mesh giving the number of elements
+     * that carry the texture coordinates (nb_edges, nb_polygons or
+     * nb_polyhedra), given by the manager to its textures to check the
+     * elements (see texture.cpp).
+     */
+    template < typename Mesh, typename Manager >
+    auto texture_manager_with_elements(
+        Manager ( Mesh::*method )() const, const char* nb_elements )
+    {
+        return [method, nb_elements]( const TypedObject< Mesh >& self ) {
+            auto manager =
+                pybind11::reinterpret_steal< TypedObject< Manager > >(
+                    pybind11::cast(
+                        ( self.template cast< const Mesh& >().*method )() )
+                        .release() );
+            manager.attr( "_nb_elements" ) = self.attr( nb_elements );
+            return manager;
+        };
+    }
+
+    /*!
+     * Raise an IndexError if the point is out of range for a coordinate
+     * reference system storing one point per vertex (an attribute CRS): the
+     * other ones do not know their size.
+     */
+    template < index_t dimension >
+    void check_crs_point( std::string_view name,
+        const CoordinateReferenceSystem< dimension >& crs,
+        index_t point_id )
+    {
+        if( const auto* attribute_crs = dynamic_cast<
+                const AttributeCoordinateReferenceSystem< dimension >* >(
+                &crs ) )
+        {
+            check_index( name, "point", point_id, attribute_crs->nb_points() );
+        }
+    }
 } // namespace geode

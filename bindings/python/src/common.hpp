@@ -357,6 +357,38 @@ namespace geode
         }
     }
 
+    /*!
+     * Raise a Python IndexError if @a direction is not in [0, dimension[.
+     */
+    inline void check_direction(
+        std::string_view context, index_t direction, index_t dimension )
+    {
+        check_index( context, "direction", direction, dimension );
+    }
+
+    /*!
+     * Raise a Python IndexError if one of the indices (one per direction) is
+     * not in [0, size( direction )[.
+     * @param[in] what Kind of the indices (cell index, vertex index...).
+     */
+    template < typename Indices, typename Size >
+    void check_grid_indices( std::string_view context,
+        std::string_view what,
+        const Indices& indices,
+        Size size )
+    {
+        for( index_t direction = 0; direction < indices.size(); direction++ )
+        {
+            const index_t nb = size( direction );
+            if( indices[direction] >= nb )
+            {
+                throw pybind11::index_error( absl::StrCat( "[", context, "] ",
+                    what, " ", indices[direction], " out of range [0, ", nb,
+                    ") in direction ", direction ) );
+            }
+        }
+    }
+
     namespace detail
     {
         template < typename Mesh,

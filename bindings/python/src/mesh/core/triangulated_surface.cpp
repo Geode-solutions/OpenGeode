@@ -22,6 +22,7 @@
  */
 
 #include "../../common.hpp"
+#include "../index_check.hpp"
 
 #include <geode/geometry/basic_objects/triangle.hpp>
 #include <geode/mesh/core/triangulated_surface.hpp>
@@ -41,7 +42,10 @@
         .def( "clone", &TriangulatedSurface##dimension##D::clone,              \
             "Return a copy of the triangulated surface, with the same data "   \
             "structure, name and identifier" )                                 \
-        .def( "triangle", &TriangulatedSurface##dimension##D::triangle,        \
+        .def( "triangle",                                                      \
+            geode::checked( "triangle",                                        \
+                &TriangulatedSurface##dimension##D::triangle,                  \
+                geode::PolygonCheck{} ),                                       \
             pybind11::arg( "triangle_id" ), pybind11::keep_alive< 0, 1 >(),    \
             "Return the geometric triangle of the given triangle of the "      \
             "mesh" )

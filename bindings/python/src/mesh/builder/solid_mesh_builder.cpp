@@ -108,10 +108,15 @@
             "Return the builder of the facets of the solid, which keeps this " \
             "builder alive" )                                                  \
         .def( "associate_polyhedron_vertex_to_vertex",                         \
-            &SolidMeshBuilder##dimension##D::                                  \
-                associate_polyhedron_vertex_to_vertex,                         \
+            geode::checked_builder< SolidMeshBuilder##dimension##D,            \
+                SolidMesh< dimension > >(                                      \
+                "associate_polyhedron_vertex_to_vertex",                       \
+                &SolidMeshBuilder##dimension##D::                              \
+                    associate_polyhedron_vertex_to_vertex,                     \
+                geode::PolyhedronVertexCheck{}, geode::VertexCheck{} ),        \
             "Record that the vertex is used by the polyhedron vertex, "        \
-            "without modifying the polyhedron",                                \
+            "without modifying the polyhedron. Raise IndexError if the "       \
+            "polyhedron vertex or the vertex does not exist",                  \
             pybind11::arg( "polyhedron_vertex" ),                              \
             pybind11::arg( "vertex_id" ) )
 namespace geode

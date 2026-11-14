@@ -283,7 +283,9 @@
             "polyhedra" )                                                      \
         .def( "bounding_box", &SolidMesh##dimension##D::bounding_box,          \
             "Return the bounding box of the vertices of the solid mesh" )      \
-        .def( "texture_manager", &SolidMesh##dimension##D::texture_manager,    \
+        .def( "texture_manager",                                               \
+            geode::texture_manager_with_elements(                              \
+                &SolidMesh##dimension##D::texture_manager, "nb_polyhedra" ),   \
             pybind11::keep_alive< 0, 1 >(),                                    \
             "Return the manager of the textures of the solid mesh, which "     \
             "keeps the mesh alive" )                                           \

@@ -22,6 +22,7 @@
  */
 
 #include "../../common.hpp"
+#include "../index_check.hpp"
 
 #include <geode/geometry/point.hpp>
 
@@ -66,11 +67,21 @@
             pybind11::keep_alive< 0, 1 >(),                                    \
             "Return the builder of the coordinate reference system manager "   \
             "with the dimension of the mesh, which keeps this builder alive" ) \
-        .def( "set_point",                                                     \
-            &CoordinateReferenceSystemManagersBuilder##dimension##D::          \
-                set_point,                                                     \
+        .def(                                                                  \
+            "set_point",                                                       \
+            []( CoordinateReferenceSystemManagersBuilder##dimension##D&        \
+                    builder,                                                   \
+                index_t vertex, Point< dimension > point ) {                   \
+                check_crs_point( "set_point",                                  \
+                    builder.main_coordinate_reference_system_manager_builder() \
+                        .active_coordinate_reference_system(),                 \
+                    vertex );                                                  \
+                builder.set_point( vertex, std::move( point ) );               \
+            },                                                                 \
             "Set the coordinates of a vertex in the active coordinate "        \
-            "reference system; the vertex must have been created before",      \
+            "reference system; the vertex must have been created before. "     \
+            "Raise IndexError if the vertex is out of range for a coordinate " \
+            "reference system storing one point per vertex",                   \
             pybind11::arg( "vertex" ), pybind11::arg( "point" ) )
 
 namespace geode

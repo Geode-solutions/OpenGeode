@@ -27,6 +27,7 @@
 #include <cmath>
 
 #include <geode/basic/attribute.hpp>
+#include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/constant_attribute.hpp>
 #include <geode/basic/sparse_attribute.hpp>
 #include <geode/basic/variable_attribute.hpp>
@@ -278,6 +279,67 @@ namespace geode
                 "attribute" );
     }
 
+    /*!
+     * Size of a variable attribute of one of the given types, 0 for
+     * another attribute of these types (constant and sparse attributes accept
+     * any element), nothing for an attribute of another type
+     */
+    template < typename Type, typename... Others >
+    std::optional< index_t > bound_attribute_size(
+        const AttributeBase& attribute )
+    {
+        if( const auto* variable =
+                dynamic_cast< const VariableAttribute< Type >* >( &attribute ) )
+        {
+            return variable->size();
+        }
+        if( dynamic_cast< const ReadOnlyAttribute< Type >* >( &attribute ) )
+        {
+            return NO_ID;
+        }
+        if constexpr( sizeof...( Others ) > 0 )
+        {
+            return bound_attribute_size< Others... >( attribute );
+        }
+        return std::nullopt;
+    }
+
+    /*!
+     * Raise IndexError if the element is out of range of a variable
+     * attribute. The size of an attribute of a type without binding is the
+     * number of elements of the manager that find_generic_attribute stored in
+     * its `_manager` attribute.
+     */
+    inline void check_generic_element(
+        std::string_view name, const pybind11::object& self, index_t element )
+    {
+        const auto& attribute = self.cast< const AttributeBase& >();
+        if( const auto size =
+                bound_attribute_size< bool, int, unsigned int, float, double,
+                    std::array< double, 2 >, std::array< double, 3 > >(
+                    attribute ) )
+        {
+            check_index( name, "element", element, size.value() );
+            return;
+        }
+        if( !pybind11::hasattr( self, "_manager" ) )
+        {
+            throw pybind11::value_error( absl::StrCat( "[", name,
+                "] the element cannot be checked: the attribute does not "
+                "come from AttributeManager.find_generic_attribute" ) );
+        }
+        const auto& manager =
+            self.attr( "_manager" ).cast< const AttributeManager& >();
+        if( manager.find_generic_attribute( attribute.id() ).get()
+            != &attribute )
+        {
+            throw pybind11::value_error( absl::StrCat( "[", name,
+                "] the element cannot be checked: the attribute is no longer "
+                "in its attribute manager" ) );
+        }
+        check_index( name, "element", element, manager.nb_elements() );
+    }
+
     template < typename type >
     void python_attribute_values_class(
         pybind11::module& module, const std::string& typestr )
@@ -329,16 +391,38 @@ namespace geode
             module, "ArrayDouble3" );
 
         pybind11::class_< AttributeBase, std::shared_ptr< AttributeBase > >(
-            module, "AttributeBase",
+            module, "AttributeBase", pybind11::dynamic_attr(),
             "Common interface of the attributes, whatever their value type" )
-            .def( "generic_value", &AttributeBase::generic_value,
+            .def(
+                "generic_value",
+                []( const TypedObject< AttributeBase >& self,
+                    index_t element ) {
+                    check_generic_element( "generic_value", self, element );
+                    return self.cast< const AttributeBase& >().generic_value(
+                        element );
+                },
                 pybind11::arg( "element" ),
-                "Return the value of the element converted to a float. "
-                "Only valid if is_genericable()" )
-            .def( "generic_item_value", &AttributeBase::generic_item_value,
+                "Return the value of the element converted to a float, 0 if "
+                "the values cannot be converted (is_genericable() is False). "
+                "Raise IndexError if the element is out of range of a "
+                "variable attribute" )
+            .def(
+                "generic_item_value",
+                []( const TypedObject< AttributeBase >& self, index_t element,
+                    local_index_t item ) {
+                    check_generic_element(
+                        "generic_item_value", self, element );
+                    const auto& attribute = self.cast< const AttributeBase& >();
+                    check_index( "generic_item_value", "item", item,
+                        attribute.nb_items() );
+                    return attribute.generic_item_value( element, item );
+                },
                 pybind11::arg( "element" ), pybind11::arg( "item" ),
                 "Return one component (item) of the value of the element "
-                "converted to a float. Only valid if is_genericable()" )
+                "converted to a float, 0 if the values cannot be converted "
+                "(is_genericable() is False). Raise IndexError if the element "
+                "is out of range of a variable attribute or the item is not in "
+                "[0, nb_items)" )
             .def( "properties", &AttributeBase::properties,
                 "Return the properties of the attribute" )
             .def( "is_genericable", &AttributeBase::is_genericable,

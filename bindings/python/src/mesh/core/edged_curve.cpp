@@ -73,7 +73,9 @@
                 geode::VertexCheck{} ),                                        \
             "Return the vertices linked to the vertex by an edge",             \
             pybind11::arg( "vertex_id" ) )                                     \
-        .def( "texture_manager", &EdgedCurve##dimension##D::texture_manager,   \
+        .def( "texture_manager",                                               \
+            geode::texture_manager_with_elements(                              \
+                &EdgedCurve##dimension##D::texture_manager, "nb_edges" ),      \
             pybind11::keep_alive< 0, 1 >(),                                    \
             "Return the manager of the textures of the edged curve, which "    \
             "keeps the mesh alive" )

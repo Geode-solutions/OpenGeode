@@ -26,6 +26,21 @@
 #include <geode/basic/cell_array.hpp>
 #include <geode/basic/range.hpp>
 
+namespace geode
+{
+    template < index_t dimension >
+    void check_cell_array_arguments( std::string_view name,
+        const CellArray< dimension >& array,
+        const typename CellArray< dimension >::CellIndices& index,
+        index_t direction )
+    {
+        check_direction( name, direction, dimension );
+        check_grid_indices( name, "cell index", index, [&array]( index_t d ) {
+            return array.nb_cells_in_direction( d );
+        } );
+    }
+} // namespace geode
+
 #define PYTHON_ARRAY( dimension )                                              \
     const auto name##dimension =                                               \
         "CellArray" + std::to_string( dimension ) + "D";                       \
@@ -39,10 +54,16 @@
             "direction)" )                                                     \
         .def( "nb_cells", &CellArray##dimension##D::nb_cells,                  \
             "Return the total number of cells" )                               \
-        .def( "nb_cells_in_direction",                                         \
-            &CellArray##dimension##D::nb_cells_in_direction,                   \
+        .def(                                                                  \
+            "nb_cells_in_direction",                                           \
+            []( const CellArray##dimension##D& array, index_t direction ) {    \
+                check_direction(                                               \
+                    "nb_cells_in_direction", direction, dimension );           \
+                return array.nb_cells_in_direction( direction );               \
+            },                                                                 \
             pybind11::arg( "direction" ),                                      \
-            "Return the number of cells in the given direction" )              \
+            "Return the number of cells in the given direction. Raise "        \
+            "IndexError if the direction is not in [0, dimension)" )           \
         .def(                                                                  \
             "cell_index",                                                      \
             []( const CellArray##dimension##D& array,                          \
@@ -72,16 +93,34 @@
             pybind11::arg( "index" ),                                          \
             "Return the indices (one per direction) of the cell with the "     \
             "given cell index. Raise an error if it is out of range" )         \
-        .def( "next_cell", &CellArray##dimension##D::next_cell,                \
+        .def(                                                                  \
+            "next_cell",                                                       \
+            []( const CellArray##dimension##D& array,                          \
+                const CellArray##dimension##D::CellIndices& index,             \
+                index_t direction ) {                                          \
+                check_cell_array_arguments(                                    \
+                    "next_cell", array, index, direction );                    \
+                return array.next_cell( index, direction );                    \
+            },                                                                 \
             pybind11::arg( "index" ), pybind11::arg( "direction" ),            \
             "Return the indices of the next cell in the direction, or None "   \
-            "if the cell is the last one in this direction. The indices must " \
-            "be valid" )                                                       \
-        .def( "previous_cell", &CellArray##dimension##D::previous_cell,        \
+            "if the cell is the last one in this direction. Raise IndexError " \
+            "if the direction is not in [0, dimension) or an index is not in " \
+            "[0, nb_cells_in_direction)" )                                     \
+        .def(                                                                  \
+            "previous_cell",                                                   \
+            []( const CellArray##dimension##D& array,                          \
+                const CellArray##dimension##D::CellIndices& index,             \
+                index_t direction ) {                                          \
+                check_cell_array_arguments(                                    \
+                    "previous_cell", array, index, direction );                \
+                return array.previous_cell( index, direction );                \
+            },                                                                 \
             pybind11::arg( "index" ), pybind11::arg( "direction" ),            \
             "Return the indices of the previous cell in the direction, or "    \
-            "None if the cell is the first one in this direction. The "        \
-            "indices must be valid" )                                          \
+            "None if the cell is the first one in this direction. Raise "      \
+            "IndexError if the direction is not in [0, dimension) or an "      \
+            "index is not in [0, nb_cells_in_direction)" )                     \
         .def( "is_cell_on_border",                                             \
             &CellArray##dimension##D::is_cell_on_border,                       \
             pybind11::arg( "cell_indices" ),                                   \
