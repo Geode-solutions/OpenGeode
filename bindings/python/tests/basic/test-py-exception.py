@@ -22,6 +22,9 @@
 
 import geode_test_env
 
+import os
+import tempfile
+
 import opengeode
 import opengeode_py_basic
 
@@ -108,8 +111,85 @@ def check_standard_exceptions():
         )
 
 
+def expect_save_error(save, filename, expected, cause, words):
+    try:
+        save(filename)
+    except opengeode.OpenGeodeError as error:
+        if type(error) is not expected:
+            raise ValueError(
+                "[Test] Saving %s should raise %s, got %s: %s"
+                % (filename, expected.__name__, type(error).__name__, error.message)
+            )
+        if not error.message.startswith("Cannot save"):
+            raise ValueError("[Test] Wrong save message: " + error.message)
+        for word in words:
+            if word not in error.message:
+                raise ValueError("[Test] %s not in the message: %s" % (word, error.message))
+        if cause is None:
+            if error.__cause__ is not None:
+                raise ValueError("[Test] Unexpected __cause__ for " + filename)
+        else:
+            if type(error.__cause__) is not cause:
+                raise ValueError(
+                    "[Test] The error of the writer should be the __cause__ (%s), got %r"
+                    % (cause.__name__, error.__cause__)
+                )
+            if error.__cause__.message not in error.message:
+                raise ValueError("[Test] The message should contain the writer error")
+        return
+    raise ValueError("[Test] Saving %s should raise" % filename)
+
+
+def check_save_errors():
+    # The error of a writer keeps its type: a file that cannot be opened is a
+    # data error, not an internal one
+    surface = opengeode.TriangulatedSurface3D.create()
+    brep = opengeode.BRep()
+    savers = [
+        (lambda name: opengeode.save_triangulated_surface3D(surface, name), "og_tsf3d"),
+        (lambda name: opengeode.save(surface, name), "og_tsf3d"),
+        (lambda name: opengeode.save_point_set3D(opengeode.PointSet3D.create(), name), "og_pts3d"),
+        # The zip writer of the models reports the move of its archive onto
+        # a directory as an internal OpenGeodeException: kept internal
+        (lambda name: opengeode.save_brep(brep, name), None),
+    ]
+    with tempfile.TemporaryDirectory() as directory:
+        not_a_directory = os.path.join(directory, "file")
+        open(not_a_directory, "w").close()
+        for index, (save, extension) in enumerate(savers):
+            if extension is not None:
+                # A directory in place of the file: the writer cannot open it
+                occupied = os.path.join(directory, "occupied%d.%s" % (index, extension))
+                os.mkdir(occupied)
+                expect_save_error(
+                    save, occupied, opengeode.OpenGeodeDataError,
+                    opengeode.OpenGeodeDataError, [occupied, "Failed to open file"],
+                )
+            else:
+                extension = "og_brep"
+                occupied = os.path.join(directory, "occupied%d.%s" % (index, extension))
+                os.mkdir(occupied)
+                expect_save_error(
+                    save, occupied, opengeode.OpenGeodeInternalError,
+                    opengeode.OpenGeodeInternalError, [occupied, "ZipFile"],
+                )
+            # Unknown extension: data error, raised by the factory
+            unknown = os.path.join(directory, "file%d.unknown_extension" % index)
+            expect_save_error(
+                save, unknown, opengeode.OpenGeodeDataError,
+                opengeode.OpenGeodeDataError, ["unknown_extension"],
+            )
+            # A standard exception (the folder cannot be created) is not an
+            # OpenGeodeException: unchanged, an internal error without cause
+            nested = os.path.join(not_a_directory, "sub", "file%d.%s" % (index, extension))
+            expect_save_error(
+                save, nested, opengeode.OpenGeodeInternalError, None, ["sub"]
+            )
+
+
 if __name__ == "__main__":
     check_data_error()
+    check_save_errors()
     check_subclasses()
     check_cause_chain()
     check_standard_exceptions()
