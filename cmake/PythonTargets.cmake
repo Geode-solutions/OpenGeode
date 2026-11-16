@@ -651,9 +651,20 @@ print(name + version + '-' + name + version + '-' + platform)"
     if(NOT "${python_error}" STREQUAL "")
         message(ERROR "=== Python Error === ${python_error}")
     endif()
+    execute_process(
+        COMMAND ${venv_bin}/python -c
+            "from packaging.version import Version; print(Version('${WHEEL_VERSION}'))"
+        OUTPUT_VARIABLE wheel_version
+        ERROR_VARIABLE python_error
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_STRIP_TRAILING_WHITESPACE
+    )
+    if(NOT "${python_error}" STREQUAL "")
+        message(ERROR "=== Python Error === ${python_error}")
+    endif()
     string(TOLOWER ${GEODE_WHEEL_NAME} wheel_name)
     string(REGEX REPLACE "-" "_" wheel_name ${wheel_name})
-    set(wheel_file "${wheel_output_path}/dist/${wheel_name}-${WHEEL_VERSION}-${wheel_suffix}.whl")
+    set(wheel_file "${wheel_output_path}/dist/${wheel_name}-${wheel_version}-${wheel_suffix}.whl")
     message(STATUS "Wheel file: ${wheel_file}")
     if(${GEODE_WHEEL_SUPERBUILD})
         set(wheel_config_folder "")
