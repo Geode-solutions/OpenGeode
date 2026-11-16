@@ -32,11 +32,13 @@
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Grid );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Octree );
     FORWARD_DECLARATION_DIMENSION_CLASS( PolygonalSurface );
     FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
     FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMeshBuilder );
     FORWARD_DECLARATION_DIMENSION_CLASS( TriangulatedSurface );
     ALIAS_2D_AND_3D( Grid );
+    ALIAS_2D_AND_3D( Octree );
     ALIAS_2D_AND_3D( PolygonalSurface );
     ALIAS_2D_AND_3D( SurfaceMesh );
     ALIAS_2D_AND_3D( TriangulatedSurface );
@@ -60,6 +62,19 @@ namespace geode
 
     [[nodiscard]] std::unique_ptr< PolygonalSurface2D > opengeode_mesh_api
         convert_grid_into_polygonal_surface( const Grid2D& grid );
+
+    /*!
+     * Convert an Octree into a PolygonalSurface with one quadrangle per leaf
+     * cell (in the order given by Octree::leaves()). Vertices are the leaf
+     * corners, shared between leaves when they have the same position on the
+     * octree lattice. The octree attributes of the leaves are transferred to
+     * the polygon attributes.
+     * @warning The mesh is non-conforming at level jumps: hanging vertices are
+     * not inserted in the coarser cells, so adjacencies across level jumps
+     * are missing. It is meant for visualization and export.
+     */
+    [[nodiscard]] std::unique_ptr< PolygonalSurface2D > opengeode_mesh_api
+        convert_octree_into_polygonal_surface( const Octree2D& octree );
 
     [[nodiscard]] std::unique_ptr< TriangulatedSurface2D > opengeode_mesh_api
         convert_grid_into_densified_triangulated_surface( const Grid2D& grid,

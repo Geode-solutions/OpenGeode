@@ -33,10 +33,12 @@ namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( SolidMesh );
     FORWARD_DECLARATION_DIMENSION_CLASS( Grid );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Octree );
     FORWARD_DECLARATION_DIMENSION_CLASS( TetrahedralSolid );
     FORWARD_DECLARATION_DIMENSION_CLASS( HybridSolid );
     ALIAS_3D( SolidMesh );
     ALIAS_3D( Grid );
+    ALIAS_3D( Octree );
     ALIAS_3D( TetrahedralSolid );
     ALIAS_3D( HybridSolid );
 } // namespace geode
@@ -52,6 +54,19 @@ namespace geode
 
     [[nodiscard]] std::unique_ptr< HybridSolid3D >
         opengeode_mesh_api convert_grid_into_hybrid_solid( const Grid3D& grid );
+
+    /*!
+     * Convert an Octree into a HybridSolid with one hexahedron per leaf cell
+     * (in the order given by Octree::leaves()). Vertices are the leaf corners,
+     * shared between leaves when they have the same position on the octree
+     * lattice. The octree attributes of the leaves are transferred to the
+     * polyhedra attributes.
+     * @warning The mesh is non-conforming at level jumps: hanging vertices are
+     * not inserted in the coarser cells, so adjacencies across level jumps
+     * are missing. It is meant for visualization and export.
+     */
+    [[nodiscard]] std::unique_ptr< HybridSolid3D > opengeode_mesh_api
+        convert_octree_into_hybrid_solid( const Octree3D& octree );
 
     [[nodiscard]] std::unique_ptr< TetrahedralSolid3D > opengeode_mesh_api
         convert_grid_into_densified_tetrahedral_solid( const Grid3D& grid,
