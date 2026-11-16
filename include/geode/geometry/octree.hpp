@@ -28,6 +28,8 @@
 #include <optional>
 #include <vector>
 
+#include <absl/container/inlined_vector.h>
+
 #include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/pimpl.hpp>
 
@@ -81,6 +83,34 @@ namespace geode
 
     public:
         static constexpr index_t NB_CHILDREN{ 1u << dimension };
+
+        /*!
+         * Side of a cell face along an axis: lower (minimal coordinate) or
+         * upper (maximal coordinate).
+         */
+        enum struct FACE_SIDE
+        {
+            lower,
+            upper
+        };
+
+        /*!
+         * Adjacency considered by balance(): leaves sharing a face, or
+         * leaves sharing a face, an edge or a vertex (in 2D: a face or a
+         * vertex).
+         */
+        enum struct BALANCE_TYPE
+        {
+            faces,
+            full
+        };
+
+        /*!
+         * Leaves returned by face_neighbor_leaves(), inline up to the
+         * 2^(dimension-1) finer leaves of a one-level-finer neighbor.
+         */
+        using FaceNeighbors =
+            absl::InlinedVector< index_t, 1u << ( dimension - 1 ) >;
 
         /*!
          * Creates an empty octree (no cell).
@@ -207,6 +237,31 @@ namespace geode
          * already at max_depth().
          */
         index_t refine( index_t leaf );
+
+        /*!
+         * Leaves sharing a part (with positive measure) of the given face of
+         * the cell, found by lattice lookups only (no geometry).
+         * The cell may be a leaf or an internal cell: in both cases, the
+         * returned leaves are outside the cell and touch the given face:
+         * - the same-size leaf on the other side of the face if it exists,
+         * - else the coarser leaf containing the neighboring region if this
+         * region is not refined down to the cell level,
+         * - else all the finer leaves (at any depth) touching the face, in
+         * depth-first order, children in index order.
+         * @return Empty on the domain border.
+         */
+        [[nodiscard]] FaceNeighbors face_neighbor_leaves(
+            index_t cell, local_index_t axis, FACE_SIDE side ) const;
+
+        /*!
+         * Refines leaves until any two adjacent leaves (see BALANCE_TYPE)
+         * differ by at most one level (2:1 balance). Only coarser leaves are
+         * refined, never coarsened: existing indices are unchanged and new
+         * cells are appended and inherit attribute values as in refine().
+         * Leaves are processed in a FIFO queue seeded in index order, hence
+         * the result is deterministic.
+         */
+        void balance( BALANCE_TYPE type );
 
         /*!
          * Attributes on all cells (internal cells included).

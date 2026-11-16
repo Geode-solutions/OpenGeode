@@ -21,6 +21,7 @@
  *
  */
 
+#include <algorithm>
 #include <cmath>
 #include <cstdio>
 #include <fstream>
@@ -735,6 +736,373 @@ namespace
     }
 
     template < geode::index_t dimension >
+    geode::BoundingBox< dimension > non_cubic_box()
+    {
+        // 3x2x1 root cells in 3D, 2x1 in 2D.
+        auto max = uniform_point< dimension >( 1. );
+        max.set_value( 0, 3. );
+        max.set_value( 1, 1.5 );
+        return { uniform_point< dimension >( 0. ), max };
+    }
+
+    /*!
+     * Deterministic pseudo-random refinement (fixed LCG, platform
+     * independent).
+     */
+    template < geode::index_t dimension >
+    void refine_randomly( geode::Octree< dimension >& octree,
+        geode::index_t nb_refinements,
+        geode::local_index_t max_level )
+    {
+        uint64_t state{ 42 };
+        for( const auto step : geode::Range{ nb_refinements } )
+        {
+            geode_unused( step );
+            state = state * 6364136223846793005ULL + 1442695040888963407ULL;
+            const auto leaves = octree.leaves();
+            const auto leaf = leaves[( state >> 33 ) % leaves.size()];
+            if( octree.level( leaf ) < max_level )
+            {
+                octree.refine( leaf );
+            }
+        }
+    }
+
+    /*!
+     * True if the box b is on the given side of the box a along the axis and
+     * shares a part of the corresponding face of a with positive measure.
+     */
+    template < geode::index_t dimension >
+    bool shares_face( const geode::BoundingBox< dimension >& a,
+        const geode::BoundingBox< dimension >& b,
+        geode::local_index_t axis,
+        typename geode::Octree< dimension >::FACE_SIDE side )
+    {
+        using FACE_SIDE = typename geode::Octree< dimension >::FACE_SIDE;
+        if( side == FACE_SIDE::upper
+                ? b.min().value( axis ) != a.max().value( axis )
+                : b.max().value( axis ) != a.min().value( axis ) )
+        {
+            return false;
+        }
+        for( const auto d : geode::LRange{ dimension } )
+        {
+            if( d == axis )
+            {
+                continue;
+            }
+            if( std::min( a.max().value( d ), b.max().value( d ) )
+                <= std::max( a.min().value( d ), b.min().value( d ) ) )
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /*!
+     * Brute-force face neighbors: leaves sharing a part of the face, in
+     * depth-first traversal order.
+     */
+    template < geode::index_t dimension >
+    std::vector< geode::index_t > brute_force_face_neighbors(
+        const geode::Octree< dimension >& octree,
+        geode::index_t cell,
+        geode::local_index_t axis,
+        typename geode::Octree< dimension >::FACE_SIDE side )
+    {
+        using FACE_SIDE = typename geode::Octree< dimension >::FACE_SIDE;
+        const auto cell_box = octree.cell_bounding_box( cell );
+        const auto face = side == FACE_SIDE::upper
+                              ? cell_box.max().value( axis )
+                              : cell_box.min().value( axis );
+        std::vector< geode::index_t > result;
+        octree.traverse(
+            [&]( geode::index_t /*unused*/,
+                const geode::BoundingBox< dimension >& box ) {
+                return box.min().value( axis ) <= face
+                       && face <= box.max().value( axis );
+            },
+            [&]( geode::index_t leaf ) {
+                if( shares_face( cell_box, octree.cell_bounding_box( leaf ),
+                        axis, side ) )
+                {
+                    result.push_back( leaf );
+                }
+            } );
+        return result;
+    }
+
+    template < geode::index_t dimension >
+    void check_face_neighbors( const geode::Octree< dimension >& octree,
+        geode::index_t cell,
+        geode::local_index_t axis,
+        typename geode::Octree< dimension >::FACE_SIDE side,
+        const std::vector< geode::index_t >& expected )
+    {
+        const auto neighbors = octree.face_neighbor_leaves( cell, axis, side );
+        geode::OpenGeodeGeometryException::test(
+            neighbors.size() == expected.size()
+                && std::equal(
+                    neighbors.begin(), neighbors.end(), expected.begin() ),
+            "[Test] Wrong face neighbors of cell ", cell, " axis ", axis,
+            " side ", side == geode::Octree< dimension >::FACE_SIDE::upper,
+            " (found ", neighbors.size(), ", expected ", expected.size(), ")" );
+    }
+
+    template < geode::index_t dimension >
+    void test_face_neighbors()
+    {
+        geode::Logger::info( "Test face neighbors ", dimension, "D" );
+        using FACE_SIDE = typename geode::Octree< dimension >::FACE_SIDE;
+        constexpr auto nb_children = geode::Octree< dimension >::NB_CHILDREN;
+        // Explicit cases on 3 root cells along axis 0.
+        auto max = uniform_point< dimension >( 1. );
+        max.set_value( 0, 3. );
+        geode::Octree< dimension > octree{ { uniform_point< dimension >( 0. ),
+            max } };
+        check_face_neighbors( octree, 0, 0, FACE_SIDE::upper, { 1 } );
+        check_face_neighbors( octree, 1, 0, FACE_SIDE::lower, { 0 } );
+        check_face_neighbors( octree, 0, 0, FACE_SIDE::lower, {} );
+        check_face_neighbors( octree, 2, 0, FACE_SIDE::upper, {} );
+        for( const auto d : geode::LRange{ 1, dimension } )
+        {
+            for( const auto side : { FACE_SIDE::lower, FACE_SIDE::upper } )
+            {
+                check_face_neighbors( octree, 1, d, side, {} );
+            }
+        }
+        const auto children = octree.refine( 1 );
+        const auto grand_children = octree.refine( children );
+        // Finer leaves over 2 levels, depth-first order.
+        std::vector< geode::index_t > expected;
+        for( const auto c : geode::Range{ nb_children } )
+        {
+            if( ( c & 1 ) == 0 )
+            {
+                expected.push_back( grand_children + c );
+            }
+        }
+        for( const auto c : geode::Range{ 1, nb_children } )
+        {
+            if( ( c & 1 ) == 0 )
+            {
+                expected.push_back( children + c );
+            }
+        }
+        check_face_neighbors( octree, 0, 0, FACE_SIDE::upper, expected );
+        // Same level across a root boundary.
+        check_face_neighbors(
+            octree, children + 1, 0, FACE_SIDE::upper, { 2 } );
+        // Coarser leaves.
+        check_face_neighbors(
+            octree, children + 2, 0, FACE_SIDE::lower, { 0 } );
+        check_face_neighbors(
+            octree, grand_children + 1, 0, FACE_SIDE::upper, { children + 1 } );
+        check_face_neighbors(
+            octree, grand_children, 0, FACE_SIDE::lower, { 0 } );
+        // Same level inside a root.
+        check_face_neighbors( octree, grand_children, 1, FACE_SIDE::upper,
+            { grand_children + 2 } );
+        check_face_neighbors( octree, grand_children, 1, FACE_SIDE::lower, {} );
+        // Internal cell: its own children are not its neighbors.
+        check_face_neighbors(
+            octree, children, 0, FACE_SIDE::upper, { children + 1 } );
+
+        // Brute force on a randomly refined non-cubic octree.
+        geode::Octree< dimension > random{ non_cubic_box< dimension >() };
+        refine_randomly( random, 150, 6 );
+        for( const auto cell : geode::Range{ random.nb_cells() } )
+        {
+            for( const auto axis : geode::LRange{ dimension } )
+            {
+                for( const auto side : { FACE_SIDE::lower, FACE_SIDE::upper } )
+                {
+                    check_face_neighbors( random, cell, axis, side,
+                        brute_force_face_neighbors(
+                            random, cell, axis, side ) );
+                }
+            }
+        }
+    }
+
+    /*!
+     * Brute-force 2:1 check over all leaf pairs: boxes touching (closed
+     * intersection) along all axes; they share a face if they overlap with
+     * positive measure along all axes but one.
+     */
+    template < geode::index_t dimension >
+    bool is_balanced( const geode::Octree< dimension >& octree,
+        typename geode::Octree< dimension >::BALANCE_TYPE type )
+    {
+        using BALANCE_TYPE = typename geode::Octree< dimension >::BALANCE_TYPE;
+        const auto leaves = octree.leaves();
+        std::vector< geode::BoundingBox< dimension > > boxes;
+        boxes.reserve( leaves.size() );
+        for( const auto leaf : leaves )
+        {
+            boxes.push_back( octree.cell_bounding_box( leaf ) );
+        }
+        for( const auto i : geode::Indices{ leaves } )
+        {
+            for( const auto j : geode::Range{ i + 1, leaves.size() } )
+            {
+                const auto level_i = octree.level( leaves[i] );
+                const auto level_j = octree.level( leaves[j] );
+                if( std::max( level_i, level_j ) - std::min( level_i, level_j )
+                    <= 1 )
+                {
+                    continue;
+                }
+                bool touch{ true };
+                geode::index_t nb_contacts{ 0 };
+                for( const auto d : geode::LRange{ dimension } )
+                {
+                    const auto low = std::max(
+                        boxes[i].min().value( d ), boxes[j].min().value( d ) );
+                    const auto high = std::min(
+                        boxes[i].max().value( d ), boxes[j].max().value( d ) );
+                    if( low > high )
+                    {
+                        touch = false;
+                    }
+                    else if( low == high )
+                    {
+                        nb_contacts++;
+                    }
+                }
+                if( touch
+                    && ( type == BALANCE_TYPE::full || nb_contacts == 1 ) )
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    template < geode::index_t dimension >
+    geode::Octree< dimension > unbalanced_octree()
+    {
+        geode::Octree< dimension > octree{ non_cubic_box< dimension >() };
+        // Deep refinement of the upper corner of the first root, touching the
+        // second root (face) and the other roots (edges/vertices).
+        geode::index_t cell{ 0 };
+        for( const auto level : geode::Range{ 5 } )
+        {
+            geode_unused( level );
+            cell = octree.refine( cell )
+                   + geode::Octree< dimension >::NB_CHILDREN - 1;
+        }
+        refine_randomly( octree, 30, 7 );
+        return octree;
+    }
+
+    template < geode::index_t dimension >
+    void test_balance( typename geode::Octree< dimension >::BALANCE_TYPE type )
+    {
+        using BALANCE_TYPE = typename geode::Octree< dimension >::BALANCE_TYPE;
+        geode::Logger::info( "Test balance ", dimension, "D ",
+            type == BALANCE_TYPE::full ? "full" : "faces" );
+        auto octree = unbalanced_octree< dimension >();
+        geode::OpenGeodeGeometryException::test( !is_balanced( octree, type ),
+            "[Test] Octree should be unbalanced before balance" );
+        geode::AttributeProperties properties;
+        properties.assignable = false;
+        properties.interpolable = false;
+        geode::AttributeValues< double > values;
+        values.default_value = -1;
+        values.no_value = -1;
+        const auto attribute_id =
+            octree.cell_attribute_manager()
+                .template create_attribute< geode::VariableAttribute, double >(
+                    "value", values, properties );
+        auto attribute =
+            octree.cell_attribute_manager()
+                .template find_attribute< geode::VariableAttribute, double >(
+                    attribute_id );
+        const auto old_nb_cells = octree.nb_cells();
+        std::vector< std::array< uint32_t, dimension > > old_anchors;
+        std::vector< geode::local_index_t > old_levels;
+        std::vector< std::optional< geode::index_t > > old_children;
+        for( const auto cell : geode::Range{ old_nb_cells } )
+        {
+            attribute->set_value( cell, cell );
+            old_anchors.push_back( octree.cell_anchor( cell ) );
+            old_levels.push_back( octree.level( cell ) );
+            old_children.push_back( octree.children( cell ) );
+        }
+        octree.balance( type );
+        geode::OpenGeodeGeometryException::test(
+            octree.nb_cells() > old_nb_cells,
+            "[Test] BALANCE_TYPE should have refined cells" );
+        geode::OpenGeodeGeometryException::test(
+            is_balanced( octree, type ), "[Test] Octree is not balanced" );
+        if( type == BALANCE_TYPE::faces )
+        {
+            geode::OpenGeodeGeometryException::test(
+                !is_balanced( octree, BALANCE_TYPE::full ),
+                "[Test] Faces balance should not imply full balance here" );
+        }
+        geode::OpenGeodeGeometryException::test(
+            octree.cell_attribute_manager().nb_elements() == octree.nb_cells(),
+            "[Test] Wrong attribute manager size after balance" );
+        for( const auto cell : geode::Range{ old_nb_cells } )
+        {
+            geode::OpenGeodeGeometryException::test(
+                octree.cell_anchor( cell ) == old_anchors[cell]
+                    && octree.level( cell ) == old_levels[cell]
+                    && ( !old_children[cell]
+                         || octree.children( cell ) == old_children[cell] )
+                    && attribute->value( cell ) == cell,
+                "[Test] BALANCE_TYPE changed existing cell ", cell );
+        }
+        for( const auto cell : geode::Range{ old_nb_cells, octree.nb_cells() } )
+        {
+            const auto parent = octree.parent( cell );
+            geode::OpenGeodeGeometryException::test(
+                parent
+                    && attribute->value( cell )
+                           == attribute->value( parent.value() ),
+                "[Test] BALANCE_TYPE-created cell ", cell,
+                " did not inherit its parent value" );
+            geode::OpenGeodeGeometryException::test(
+                attribute->value( cell ) < old_nb_cells
+                    && attribute->value( cell ) >= 0,
+                "[Test] BALANCE_TYPE-created cell ", cell,
+                " has no inherited value" );
+        }
+        check_cell_consistency( octree );
+        const auto balanced_nb_cells = octree.nb_cells();
+        octree.balance( type );
+        geode::OpenGeodeGeometryException::test(
+            octree.nb_cells() == balanced_nb_cells,
+            "[Test] BALANCE_TYPE is not idempotent" );
+        // Determinism: same input, same output.
+        auto other = unbalanced_octree< dimension >();
+        other.balance( type );
+        geode::OpenGeodeGeometryException::test(
+            other.nb_cells() == octree.nb_cells(),
+            "[Test] BALANCE_TYPE is not deterministic" );
+        for( const auto cell : geode::Range{ other.nb_cells() } )
+        {
+            geode::OpenGeodeGeometryException::test(
+                other.cell_anchor( cell ) == octree.cell_anchor( cell )
+                    && other.level( cell ) == octree.level( cell ),
+                "[Test] BALANCE_TYPE is not deterministic" );
+        }
+        // An already balanced octree is unchanged.
+        geode::Octree< dimension > uniform{ non_cubic_box< dimension >() };
+        uniform.refine( 0 );
+        uniform.balance( type );
+        geode::OpenGeodeGeometryException::test(
+            uniform.nb_cells()
+                == geode::Octree< dimension >::NB_CHILDREN
+                       + ( dimension == 3 ? 6 : 2 ),
+            "[Test] BALANCE_TYPE refined a balanced octree" );
+    }
+
+    template < geode::index_t dimension >
     void do_test()
     {
         test_construction< dimension >();
@@ -745,6 +1113,11 @@ namespace
         test_max_depth< dimension >();
         test_serialization< dimension >();
         test_domain_snapping< dimension >();
+        test_face_neighbors< dimension >();
+        test_balance< dimension >(
+            geode::Octree< dimension >::BALANCE_TYPE::faces );
+        test_balance< dimension >(
+            geode::Octree< dimension >::BALANCE_TYPE::full );
     }
 } // namespace
 

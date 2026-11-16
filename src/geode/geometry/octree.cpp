@@ -28,6 +28,7 @@
 #include <limits>
 
 #include <absl/container/flat_hash_map.h>
+#include <absl/container/inlined_vector.h>
 
 #include <bitsery/brief_syntax/array.h>
 #include <bitsery/brief_syntax/vector.h>
@@ -315,6 +316,88 @@ namespace geode
             return cell_attribute_manager_;
         }
 
+        FaceNeighbors face_neighbor_leaves(
+            index_t cell, local_index_t axis, FACE_SIDE side ) const
+        {
+            OpenGeodeGeometryException::check_assertion( axis < dimension,
+                "[Octree::face_neighbor_leaves] Invalid axis ", axis );
+            const auto& cell_node = node( cell );
+            Offset offset{};
+            offset[axis] = side == FACE_SIDE::lower ? -1 : 1;
+            FaceNeighbors result;
+            const auto anchor = shifted_anchor( cell_node, offset );
+            if( !anchor )
+            {
+                return result;
+            }
+            const auto neighbor =
+                enclosing_cell( cell_node.level, anchor.value() );
+            // Children of the neighbor touching the face are on the opposite
+            // side along the axis.
+            const index_t face_bit = side == FACE_SIDE::lower ? 1 : 0;
+            absl::InlinedVector< index_t, 16 > stack{ neighbor };
+            while( !stack.empty() )
+            {
+                const auto current = stack.back();
+                stack.pop_back();
+                const auto first_child = nodes_[current].first_child;
+                if( first_child == NO_ID )
+                {
+                    result.push_back( current );
+                    continue;
+                }
+                for( auto c = NB_CHILDREN; c-- > 0; )
+                {
+                    if( ( ( c >> axis ) & 1 ) == face_bit )
+                    {
+                        stack.push_back( first_child + c );
+                    }
+                }
+            }
+            return result;
+        }
+
+        void balance( BALANCE_TYPE type )
+        {
+            const auto offsets = neighbor_offsets( type );
+            auto queue = leaves();
+            for( index_t head = 0; head < queue.size(); head++ )
+            {
+                // Copy: refine() may reallocate the nodes.
+                const auto leaf_node = nodes_[queue[head]];
+                if( leaf_node.first_child != NO_ID || leaf_node.level < 2 )
+                {
+                    continue;
+                }
+                for( const auto& offset : offsets )
+                {
+                    const auto anchor = shifted_anchor( leaf_node, offset );
+                    if( !anchor )
+                    {
+                        continue;
+                    }
+                    // Probe the level just coarser than the leaf first: if
+                    // it exists, the neighbor is fine enough.
+                    const auto probe_level =
+                        static_cast< local_index_t >( leaf_node.level - 1 );
+                    while( true )
+                    {
+                        const auto neighbor =
+                            enclosing_cell( probe_level, anchor.value() );
+                        if( nodes_[neighbor].level + 1 >= leaf_node.level )
+                        {
+                            break;
+                        }
+                        const auto first_child = refine( neighbor );
+                        for( const auto c : Range{ NB_CHILDREN } )
+                        {
+                            queue.push_back( first_child + c );
+                        }
+                    }
+                }
+            }
+        }
+
     private:
         friend class bitsery::Access;
         template < typename Archive >
@@ -421,6 +504,101 @@ namespace geode
                 }
             }
             return code;
+        }
+
+        using Offset = std::array< int, dimension >;
+
+        /*!
+         * Offsets (-1, 0 or 1 along each axis) toward the neighbors to
+         * balance: faces only, or faces, edges and vertices.
+         */
+        static std::vector< Offset > neighbor_offsets( BALANCE_TYPE type )
+        {
+            // 3^dimension combinations of -1, 0 and 1.
+            constexpr index_t nb_combinations{ dimension == 3 ? 27u : 9u };
+            std::vector< Offset > offsets;
+            for( const auto combination : Range{ nb_combinations } )
+            {
+                Offset offset;
+                index_t nb_non_zeros{ 0 };
+                auto remainder = combination;
+                for( const auto d : LRange{ dimension } )
+                {
+                    offset[d] = static_cast< int >( remainder % 3 ) - 1;
+                    remainder /= 3;
+                    if( offset[d] != 0 )
+                    {
+                        nb_non_zeros++;
+                    }
+                }
+                if( nb_non_zeros == 0
+                    || ( type == BALANCE_TYPE::faces && nb_non_zeros != 1 ) )
+                {
+                    continue;
+                }
+                offsets.push_back( offset );
+            }
+            return offsets;
+        }
+
+        /*!
+         * Anchor of the cell of the same level shifted by the offset (in
+         * number of cells), std::nullopt if outside the domain.
+         */
+        std::optional< std::array< uint32_t, dimension > > shifted_anchor(
+            const Node& cell_node, const Offset& offset ) const
+        {
+            const auto size = cell_size( cell_node.level );
+            auto anchor = cell_node.anchor;
+            for( const auto d : LRange{ dimension } )
+            {
+                if( offset[d] < 0 )
+                {
+                    if( anchor[d] == 0 )
+                    {
+                        return std::nullopt;
+                    }
+                    anchor[d] -= size;
+                }
+                else if( offset[d] > 0 )
+                {
+                    if( anchor[d] + size >= lattice_extent( d ) )
+                    {
+                        return std::nullopt;
+                    }
+                    anchor[d] += size;
+                }
+            }
+            return anchor;
+        }
+
+        /*!
+         * Finest existing cell, at the given level or coarser, containing the
+         * cell of the given level and anchor (inside the domain). If it is
+         * coarser than the given level, it is a leaf.
+         */
+        index_t enclosing_cell( local_index_t level,
+            std::array< uint32_t, dimension > anchor ) const
+        {
+            for( auto current_level = level + 1; current_level-- > 0; )
+            {
+                const auto mask = ~(
+                    cell_size( static_cast< local_index_t >( current_level ) )
+                    - 1 );
+                for( const auto d : LRange{ dimension } )
+                {
+                    anchor[d] &= mask;
+                }
+                const auto it = lookup_.find( key(
+                    static_cast< local_index_t >( current_level ), anchor ) );
+                if( it != lookup_.end() )
+                {
+                    return it->second;
+                }
+            }
+            throw OpenGeodeGeometryException{ nullptr,
+                OpenGeodeException::TYPE::data,
+                "[Octree] No root cell contains the given anchor" };
         }
 
         index_t root_index( local_index_t axis, double value ) const
@@ -584,6 +762,20 @@ namespace geode
     index_t Octree< dimension >::refine( index_t leaf )
     {
         return impl_->refine( leaf );
+    }
+
+    template < index_t dimension >
+    auto Octree< dimension >::face_neighbor_leaves(
+        index_t cell, local_index_t axis, FACE_SIDE side ) const
+        -> FaceNeighbors
+    {
+        return impl_->face_neighbor_leaves( cell, axis, side );
+    }
+
+    template < index_t dimension >
+    void Octree< dimension >::balance( BALANCE_TYPE type )
+    {
+        impl_->balance( type );
     }
 
     template < index_t dimension >
