@@ -34,9 +34,9 @@ def run_test_brep():
     brep_filename = os.path.join(data_dir, "test_mesh3.og_brep")
     brep = opengeode.load_one(model.load_brep(brep_filename), brep_filename)
 
-    curve = model.convert_brep_into_curve(brep)
-    surface = model.convert_brep_into_surface(brep)
-    solid = model.convert_brep_into_solid(brep)
+    curve, curve_mappings = model.convert_brep_into_curve(brep)
+    surface, surface_mappings = model.convert_brep_into_surface(brep)
+    solid, solid_mappings = model.convert_brep_into_solid(brep)
     if curve.nb_vertices() != 154:
         raise ValueError("[Test] BRep - Wrong number of curve vertices")
     if curve.nb_edges() != 162:
@@ -53,14 +53,30 @@ def run_test_brep():
         raise ValueError("[Test] BRep - Wrong number of solid polyhedra")
 
 
+    if curve_mappings.line_edges_mapping.size() != curve.nb_edges():
+        raise ValueError("[Test] BRep - Wrong number of curve edge mappings")
+    if surface_mappings.surface_polygons_mapping.size() != surface.nb_polygons():
+        raise ValueError("[Test] BRep - Wrong number of surface polygon mappings")
+    if solid_mappings.solid_polyhedra_mapping.size() != solid.nb_polyhedra():
+        raise ValueError("[Test] BRep - Wrong number of solid polyhedron mappings")
+    if solid_mappings.unique_vertices_mapping.size() == 0:
+        raise ValueError("[Test] BRep - Missing unique vertices mapping")
+
+    element = solid_mappings.solid_polyhedra_mapping.out2in(0)
+    if solid_mappings.solid_polyhedra_mapping.in2out(element) != 0:
+        raise ValueError("[Test] BRep - Mapping should be bijective")
+    if brep.block(element.mesh_id).id() != element.mesh_id:
+        raise ValueError("[Test] BRep - Mapped element should come from a block")
+
+
 def run_test_section():
     test_dir = os.path.dirname(__file__)
     data_dir = os.path.abspath(os.path.join(test_dir, "../../../../tests/data"))
     section_filename = os.path.join(data_dir, "quad.og_sctn")
     section = opengeode.load_one(model.load_section(section_filename), section_filename)
 
-    curve = model.convert_section_into_curve(section)
-    surface = model.convert_section_into_surface(section)
+    curve, curve_mappings = model.convert_section_into_curve(section)
+    surface, surface_mappings = model.convert_section_into_surface(section)
     if curve.nb_vertices() != 0:
         raise ValueError("[Test] Section - Wrong number of curve vertices")
     if curve.nb_edges() != 0:
@@ -70,6 +86,10 @@ def run_test_section():
         raise ValueError("[Test] Section - Wrong number of surface vertices")
     if surface.nb_polygons() != 1:
         raise ValueError("[Test] Section - Wrong number of surface polygons")
+    if surface_mappings.surface_polygons_mapping.size() != 1:
+        raise ValueError("[Test] Section - Wrong number of polygon mappings")
+    if curve_mappings.line_edges_mapping.size() != 0:
+        raise ValueError("[Test] Section - Wrong number of edge mappings")
 
 
 if __name__ == "__main__":

@@ -38,7 +38,7 @@ namespace geode
 namespace geode
 {
     /*!
-     * Collection component describing a Boundary.
+     * Collection component grouping Lines of a model.
      */
     template < index_t dimension >
     class LineCollection : public Component< dimension >

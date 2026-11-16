@@ -74,7 +74,8 @@ namespace geode
     void define_external_time_series( pybind11::module& );
     void define_section( pybind11::module& );
     void define_copy_mapping( pybind11::module& );
-    void define_generic_mapping( pybind11::module& );
+    void define_model_generic_mapping( pybind11::module& );
+    void define_model_mappings( pybind11::module& );
 
     void define_brep_builder( pybind11::module& );
     void define_section_builder( pybind11::module& );
@@ -97,20 +98,28 @@ namespace geode
 
 PYBIND11_MODULE( opengeode_py_model, module )
 {
-    try
-    {
-        pybind11::module::import( "opengeode_py_basic" );
-        pybind11::module::import( "opengeode_py_mesh" );
-    }
-    catch( ... )
-    {
-        pybind11::module::import( "opengeode" );
-    }
+    geode::import_binding_dependency( module, "opengeode_py_basic" );
+    geode::import_binding_dependency( module, "opengeode_py_geometry" );
+    geode::import_binding_dependency( module, "opengeode_py_mesh" );
     pybind11::add_ostream_redirect( module );
-    module.doc() = "OpenGeode Python binding for model";
-    pybind11::class_< geode::OpenGeodeModelLibrary >(
-        module, "OpenGeodeModelLibrary" )
-        .def( "initialize", &geode::OpenGeodeModelLibrary::initialize );
+    module.doc() =
+        "Models of OpenGeode: BRep (3D) and Section (2D), the boundary "
+        "representations made of Corners, Lines, Surfaces and Blocks, with "
+        "their ModelBoundaries and collections, the relationships between "
+        "components (boundary/incidence, internal/embedding, "
+        "item/collection) and the unique vertices identifying the vertices "
+        "of the component meshes. A model is modified only through its "
+        "builder (BRepBuilder, SectionBuilder). The module also provides the "
+        "functions loading and saving models (load_brep, save_section...), "
+        "converting them (convert_brep_into_section, convert_brep_into_solid, "
+        "...), measuring components (block_volume, surface_area3D...), "
+        "locating points (BRepRayTracing) and the helpers on the coordinate "
+        "reference systems. Call OpenGeodeModelLibrary.initialize() before "
+        "using the module.";
+    geode::define_library< geode::OpenGeodeModelLibrary >( module,
+        "OpenGeodeModelLibrary", "Initialization of the model module",
+        "Initialize the model module and the modules it depends on; call "
+        "it before using models" );
     geode::define_component_type( module );
     geode::define_component( module );
     geode::define_component_mesh_element( module );
@@ -157,7 +166,8 @@ PYBIND11_MODULE( opengeode_py_model, module )
     geode::define_external_time_series( module );
     geode::define_section( module );
     geode::define_copy_mapping( module );
-    geode::define_generic_mapping( module );
+    geode::define_model_generic_mapping( module );
+    geode::define_model_mappings( module );
 
     geode::define_brep_builder( module );
     geode::define_section_builder( module );
@@ -176,4 +186,6 @@ PYBIND11_MODULE( opengeode_py_model, module )
     geode::define_model_coordinate_reference_system( module );
     geode::define_model_ray_tracing( module );
     geode::define_simplicial_brep_creator( module );
+
+    geode::document_missing_constructors( module );
 }

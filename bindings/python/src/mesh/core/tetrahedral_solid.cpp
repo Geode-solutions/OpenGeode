@@ -22,6 +22,7 @@
  */
 
 #include "../../common.hpp"
+#include "../index_check.hpp"
 
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
@@ -31,14 +32,33 @@
     const auto name##dimension =                                               \
         "TetrahedralSolid" + std::to_string( dimension ) + "D";                \
     pybind11::class_< TetrahedralSolid##dimension##D, SolidMesh##dimension##D, \
-        pybind11::smart_holder >( module, name##dimension.c_str() )            \
+        pybind11::smart_holder >( module, name##dimension.c_str(),             \
+        "Solid mesh made of tetrahedra only" )                                 \
         .def_static( "create",                                                 \
             static_cast<                                                       \
                 std::unique_ptr< TetrahedralSolid##dimension##D > ( * )() >(   \
-                &TetrahedralSolid##dimension##D::create ) )                    \
-        .def( "clone", &TetrahedralSolid##dimension##D::clone )                \
-        .def( "tetrahedron", &TetrahedralSolid##dimension##D::tetrahedron )    \
-        .def( "triangle", &TetrahedralSolid##dimension##D::triangle )
+                &TetrahedralSolid##dimension##D::create ),                     \
+            "Create an empty tetrahedral solid with the default data "         \
+            "structure" )                                                      \
+        .def( "clone", &TetrahedralSolid##dimension##D::clone,                 \
+            "Return a copy of the tetrahedral solid, with the same data "      \
+            "structure, name and identifier" )                                 \
+        .def( "tetrahedron",                                                   \
+            geode::checked_snapshot( "tetrahedron",                            \
+                &TetrahedralSolid##dimension##D::tetrahedron,                  \
+                geode::PolyhedronCheck{} ),                                    \
+            pybind11::arg( "tetrahedron_id" ),                                 \
+            "Return the geometric tetrahedron of the given tetrahedron of "    \
+            "the mesh, built from copies of the tetrahedron points: later "    \
+            "changes of the mesh do not modify it" )                           \
+        .def( "triangle",                                                      \
+            geode::checked_snapshot( "triangle",                               \
+                &TetrahedralSolid##dimension##D::triangle,                     \
+                geode::PolyhedronFacetCheck{} ),                               \
+            pybind11::arg( "facet" ),                                          \
+            "Return the geometric triangle of the given tetrahedron facet of " \
+            "the mesh, built from copies of the facet points: later changes "  \
+            "of the mesh do not modify it" )
 
 namespace geode
 {

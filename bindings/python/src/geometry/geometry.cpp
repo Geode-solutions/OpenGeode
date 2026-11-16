@@ -53,10 +53,18 @@ namespace geode
 PYBIND11_MODULE( opengeode_py_geometry, module )
 {
     pybind11::add_ostream_redirect( module );
-    module.doc() = "OpenGeode Python binding for geometry";
-    pybind11::class_< geode::OpenGeodeGeometryLibrary >(
-        module, "OpenGeodeGeometryLibrary" )
-        .def( "initialize", &geode::OpenGeodeGeometryLibrary::initialize );
+    module.doc() =
+        "Geometry of OpenGeode: Point, Vector, Frame, CoordinateSystem, Angle, "
+        "BoundingBox, basic objects (Segment, Triangle, Tetrahedron, Plane, "
+        "Sphere, Circle, Cylinder, InfiniteLine, Ray), nearest neighbor "
+        "search (NNSearch) and the geometric predicates and computations "
+        "on them (distance, projection, intersection, position, sign, "
+        "mensuration, quality, barycentric coordinates). Functions and "
+        "classes depending on the dimension end with 2D or 3D";
+    geode::define_library< geode::OpenGeodeGeometryLibrary >( module,
+        "OpenGeodeGeometryLibrary",
+        "Initialization of the OpenGeode geometry library",
+        "Initialize the library: must be called once before using it" );
     geode::define_point( module );
     geode::define_vector( module );
     geode::define_frame( module );
@@ -77,4 +85,6 @@ PYBIND11_MODULE( opengeode_py_geometry, module )
     geode::define_rotation( module );
     geode::define_sign( module );
     geode::define_coordinate_system( module );
+
+    geode::document_missing_constructors( module );
 }

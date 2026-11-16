@@ -25,25 +25,62 @@
 
 #include <geode/geometry/point.hpp>
 
+namespace
+{
+    template < geode::index_t dimension >
+    size_t point_hash( const geode::Point< dimension >& point )
+    {
+        return absl::HashOf( point );
+    }
+} // namespace
+
 #define PYTHON_POINT( dimension )                                              \
     const auto name##dimension = "Point" + std::to_string( dimension ) + "D";  \
-    define_string_representation( pybind11::class_< Point##dimension##D >(     \
-                                      module, name##dimension.c_str() ) )      \
-        .def( pybind11::init<>() )                                             \
-        .def( pybind11::init< std::array< double, dimension > >() )            \
-        .def( "inexact_equal", &Point##dimension##D::inexact_equal )           \
-        .def( pybind11::self == pybind11::self )                               \
-        .def( pybind11::self != pybind11::self )                               \
-        .def( pybind11::self* double() )                                       \
-        .def( pybind11::self / double() )                                      \
-        .def( pybind11::self + pybind11::self )                                \
-        .def( pybind11::self - pybind11::self )                                \
-        .def( pybind11::self *= double() )                                     \
-        .def( pybind11::self /= double() )                                     \
-        .def( pybind11::self += pybind11::self )                               \
-        .def( pybind11::self -= pybind11::self )                               \
-        .def( "value", &Point##dimension##D::value )                           \
-        .def( "set_value", &Point##dimension##D::set_value )
+    define_string_representation(                                              \
+        pybind11::class_< Point##dimension##D >( module,                       \
+            name##dimension.c_str(),                                           \
+            "Point of the space, defined by its coordinates" ),                \
+        []( const Point##dimension##D& point ) {                               \
+            return python_call_repr(                                           \
+                "Point" #dimension "D", { coordinates_repr( point ) } );       \
+        } )                                                                    \
+        .def( pybind11::init<>(), "Build a point at the origin" )              \
+        .def( pybind11::init< std::array< double, dimension > >(),             \
+            pybind11::arg( "values" ), "Build a point from its coordinates" )  \
+        .def( "inexact_equal", &Point##dimension##D::inexact_equal,            \
+            pybind11::arg( "other" ),                                          \
+            "Return True if the two points are identical up to the global "    \
+            "epsilon" )                                                        \
+        .def( pybind11::self == pybind11::self, pybind11::arg( "other" ) )     \
+        .def( pybind11::self != pybind11::self, pybind11::arg( "other" ) )     \
+        .def( "__hash__", &point_hash< dimension > )                           \
+        .def( pybind11::self* double(), pybind11::arg( "scalar" ) )            \
+        .def( pybind11::self / double(), pybind11::arg( "scalar" ) )           \
+        .def( pybind11::self + pybind11::self, pybind11::arg( "other" ) )      \
+        .def( pybind11::self - pybind11::self, pybind11::arg( "other" ) )      \
+        .def( pybind11::self *= double(), pybind11::arg( "scalar" ) )          \
+        .def( pybind11::self /= double(), pybind11::arg( "scalar" ) )          \
+        .def( pybind11::self += pybind11::self, pybind11::arg( "other" ) )     \
+        .def( pybind11::self -= pybind11::self, pybind11::arg( "other" ) )     \
+        .def(                                                                  \
+            "value",                                                           \
+            []( const Point##dimension##D& point, local_index_t index ) {      \
+                check_index( "value", "axis", index, dimension );              \
+                return point.value( index );                                   \
+            },                                                                 \
+            pybind11::arg( "index" ),                                          \
+            "Return the coordinate of the given axis (0 for x, 1 for y...). "  \
+            "Raise IndexError if the axis is not in [0, dimension)" )          \
+        .def(                                                                  \
+            "set_value",                                                       \
+            []( Point##dimension##D& point, local_index_t index,               \
+                double coordinate ) {                                          \
+                check_index( "set_value", "axis", index, dimension );          \
+                point.set_value( index, coordinate );                          \
+            },                                                                 \
+            pybind11::arg( "index" ), pybind11::arg( "coordinate" ),           \
+            "Set the coordinate of the given axis (0 for x, 1 for y...). "     \
+            "Raise IndexError if the axis is not in [0, dimension)" )
 
 namespace geode
 {

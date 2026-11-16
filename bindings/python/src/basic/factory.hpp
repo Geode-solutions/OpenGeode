@@ -21,9 +21,18 @@
  *
  */
 
+#pragma once
+
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+
 #include <geode/basic/factory.hpp>
 
 #define PYTHON_FACTORY_CLASS( type )                                           \
-    pybind11::class_< type >( module, #type )                                  \
-        .def( "list_creators", &type::list_creators )                          \
-        .def( "has_creator", &type::has_creator )
+    pybind11::class_< type >( module, #type,                                   \
+        "Registry of the file formats, identified by their extension" )        \
+        .def_static( "list_creators", &type::list_creators,                    \
+            "Return the extensions of the registered file formats" )           \
+        .def_static( "has_creator", &type::has_creator,                        \
+            pybind11::arg( "key" ),                                            \
+            "Return True if a file format is registered for this extension" )

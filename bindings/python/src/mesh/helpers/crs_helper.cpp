@@ -39,7 +39,15 @@
     const auto name##mesh##dimension = absl::StrCat(                           \
         "create_", #mesh, "_coordinate_system", dimension, "D" );              \
     module.def( name##mesh##dimension.c_str(),                                 \
-        &create_##mesh##_coordinate_system< dimension > )
+        &create_##mesh##_coordinate_system< dimension >,                       \
+        pybind11::arg( "mesh" ), pybind11::arg( "builder" ),                   \
+        pybind11::arg( "new_coordinate_system_name" ),                         \
+        pybind11::arg( "input" ), pybind11::arg( "output" ),                   \
+        pybind11::call_guard< pybind11::gil_scoped_release >(),                \
+        "Register and activate a coordinate reference system named "           \
+        "new_coordinate_system_name, whose points are the mesh points with "   \
+        "their first two coordinates converted from the input coordinate "     \
+        "system to the output one" )
 
 namespace geode
 {

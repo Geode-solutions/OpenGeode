@@ -29,10 +29,17 @@
     const auto name##dimension =                                               \
         "Component" + std::to_string( dimension ) + "D";                       \
     pybind11::class_< Component##dimension##D, Identifier,                     \
-        pybind11::smart_holder >( module, name##dimension.c_str() )            \
-        .def( "component_type", &Component##dimension##D::component_type )     \
-        .def( "component_id", &Component##dimension##D::component_id )         \
-        .def( "is_active", &Component##dimension##D::is_active )
+        pybind11::smart_holder >( module, name##dimension.c_str(),             \
+        "Base class of the components of a model (Corner, Line, Surface, "     \
+        "Block, ModelBoundary and the collections): it has a uuid, an "        \
+        "optional name, a component type and an active flag" )                 \
+        .def( "component_type", &Component##dimension##D::component_type,      \
+            "Return the type of the component, for instance 'Surface'" )       \
+        .def( "component_id", &Component##dimension##D::component_id,          \
+            "Return the ComponentID (type and uuid) of the component" )        \
+        .def( "is_active", &Component##dimension##D::is_active,                \
+            "Return True if the component is active, which is the case by "    \
+            "default" )
 
 namespace geode
 {

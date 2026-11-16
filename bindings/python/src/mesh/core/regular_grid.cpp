@@ -33,14 +33,20 @@
     const auto name##dimension =                                               \
         "RegularGrid" + std::to_string( dimension ) + "D";                     \
     pybind11::class_< RegularGrid##dimension##D, Base##dimension##D,           \
-        Grid##dimension##D, pybind11::smart_holder >(                          \
-        module, name##dimension.c_str() )                                      \
+        Grid##dimension##D, pybind11::smart_holder >( module,                  \
+        name##dimension.c_str(),                                               \
+        "Regular grid stored as a mesh: a surface mesh in 2D, a solid mesh "   \
+        "in 3D, with one cell per polygon or polyhedron" )                     \
         .def_static( "create",                                                 \
             static_cast<                                                       \
                 std::unique_ptr< RegularGrid##dimension##D > ( * )() >(        \
-                &RegularGrid##dimension##D::create ) )                         \
-        .def( "clone", &RegularGrid##dimension##D::clone )                     \
-        .def( "bounding_box", &RegularGrid##dimension##D::bounding_box )
+                &RegularGrid##dimension##D::create ),                          \
+            "Create an empty regular grid with the default data structure" )   \
+        .def( "clone", &RegularGrid##dimension##D::clone,                      \
+            "Return a copy of the regular grid, with the same data "           \
+            "structure, name and identifier" )                                 \
+        .def( "bounding_box", &RegularGrid##dimension##D::bounding_box,        \
+            "Return the bounding box of the grid" )
 
 namespace geode
 {

@@ -94,6 +94,9 @@ install(
         "cmake/CppTargets.cmake"
         "cmake/PythonTargets.cmake"
         "cmake/geode_test_env.py"
+        "cmake/check_python_stubs.py"
+        "cmake/geode_python_package.py"
+        "cmake/stubtest_mypy.ini"
     DESTINATION 
         ${CMAKE_CONFIG_DESTINATION}
     COMPONENT
@@ -109,6 +112,9 @@ if(OPENGEODE_WITH_TESTS)
     enable_testing()
     add_subdirectory(tests)
 endif()
+
+# The binding helpers (header-only) are installed whatever the Python option
+add_subdirectory(bindings/python/helpers)
 
 if(OPENGEODE_WITH_PYTHON)
     message(STATUS "Configuring OpenGeode with Python bindings")

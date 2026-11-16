@@ -34,9 +34,19 @@ import opengeode
 
 def find_uuid_in_list(uuids, uuid):
     for cur_uuid in uuids:
-        if cur_uuid.string() != uuid.string():
+        if cur_uuid.string() == uuid.string():
             return True
     return False
+
+
+def check_find_uuid_in_list():
+    uuids = [basic.uuid() for _ in range(3)]
+    if not find_uuid_in_list(uuids, uuids[1]):
+        raise ValueError("[Test] A uuid of the list should be found")
+    if find_uuid_in_list(uuids, basic.uuid()):
+        raise ValueError("[Test] A uuid not in the list should not be found")
+    if find_uuid_in_list([], uuids[0]):
+        raise ValueError("[Test] Nothing is found in an empty list")
 
 
 def add_corners(brep, builder):
@@ -804,11 +814,11 @@ def test_clone(brep):
 
 
 def test_physical_properties(brep, attribute_id):
-    if not brep.has_physical_property(model.PHYSICAL_PROPERTY_NAME.porosity):
+    if not brep.has_physical_property(model.PhysicalPropertyName.porosity):
         raise ValueError("[Test] BRep should have porosity physical property")
-    if brep.has_physical_property(model.PHYSICAL_PROPERTY_NAME.permeability):
+    if brep.has_physical_property(model.PhysicalPropertyName.permeability):
         raise ValueError("[Test] BRep should not have permeability physical property")
-    info = brep.physical_property_info(model.PHYSICAL_PROPERTY_NAME.porosity)
+    info = brep.physical_property_info(model.PhysicalPropertyName.porosity)
     if info.component_type.get() != model.Block3D.component_type_static().get():
         raise ValueError("[Test] Wrong porosity physical property component type")
     if info.attribute_id.string() != attribute_id.string():
@@ -943,6 +953,7 @@ def test_components_keep_brep_alive():
 
 if __name__ == "__main__":
     model.OpenGeodeModelLibrary.initialize()
+    check_find_uuid_in_list()
     brep = model.BRep()
     builder = model.BRepBuilder(brep)
 
@@ -999,7 +1010,7 @@ if __name__ == "__main__":
             "porosity", physical_attribute_id, porosity_values, basic.AttributeProperties()
         )
     builder.set_physical_property(
-        model.PHYSICAL_PROPERTY_NAME.porosity,
+        model.PhysicalPropertyName.porosity,
         model.Block3D.component_type_static(),
         physical_attribute_id,
     )

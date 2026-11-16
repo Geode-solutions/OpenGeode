@@ -22,6 +22,7 @@
  */
 
 #include "../../common.hpp"
+#include "../index_check.hpp"
 
 #include <geode/geometry/point.hpp>
 
@@ -33,9 +34,24 @@
         "PointSetBuilder" + std::to_string( dimension ) + "D";                 \
     pybind11::class_< PointSetBuilder##dimension##D, VertexSetBuilder,         \
         CoordinateReferenceSystemManagersBuilder##dimension##D >(              \
-        module, name##dimension.c_str() )                                      \
-        .def_static( "create", &PointSetBuilder##dimension##D::create )        \
-        .def( "create_point", &PointSetBuilder##dimension##D::create_point )
+        module, name##dimension.c_str(), "Builder to modify a point set" )     \
+        .def_static( "create",                                                 \
+            geode::builder_creator( &PointSetBuilder##dimension##D::create ),  \
+            pybind11::arg( "mesh" ), pybind11::keep_alive< 0, 1 >(),           \
+            "Return the builder to modify the point set, which keeps the "     \
+            "mesh alive" )                                                     \
+        .def( "set_point",                                                     \
+            geode::checked_builder< PointSetBuilder##dimension##D,             \
+                VertexSet >( "set_point",                                      \
+                &CoordinateReferenceSystemManagersBuilder<                     \
+                    dimension >::set_point,                                    \
+                geode::VertexCheck{} ),                                        \
+            "Set the coordinates of an existing vertex in the active "         \
+            "coordinate reference system",                                     \
+            pybind11::arg( "vertex" ), pybind11::arg( "point" ) )              \
+        .def( "create_point", &PointSetBuilder##dimension##D::create_point,    \
+            "Create a vertex with these coordinates and return its index",     \
+            pybind11::arg( "point" ) )
 
 namespace geode
 {

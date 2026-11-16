@@ -34,24 +34,63 @@ namespace geode
 {
     void define_model_ray_tracing( pybind11::module& module )
     {
+        auto cls_RayTracingResult =
+            pybind11::class_< RayTracingResult >( module, "RayTracingResult",
+                "Result of a point-in-block query: its position is outside, "
+                "inside or on_border; the result is True (bool) only when the "
+                "position is inside" )
+                .def(
+                    "__repr__",
+                    []( const RayTracingResult& object ) {
+                        return python_call_repr( "RayTracingResult",
+                            { "position=RayTracingResult.Position."
+                                + pybind11::cast( object.position )
+                                    .attr( "name" )
+                                    .cast< std::string >() } );
+                    },
+                    "Return an unambiguous description of the result: its type "
+                    "and its position" )
+                .def( pybind11::init<>(),
+                    "Build a result whose position is outside" )
+                .def( "__bool__", &RayTracingResult::operator bool );
         pybind11::native_enum< RayTracingResult::POSITION >(
-            module, "POSITION", "enum.Enum" )
+            cls_RayTracingResult, "Position", "enum.Enum",
+            "Position of a point relative to a block: outside, inside or "
+            "on_border (on one of its boundary surfaces)" )
             .value( "outside", RayTracingResult::POSITION::outside )
             .value( "inside", RayTracingResult::POSITION::inside )
             .value( "on_border", RayTracingResult::POSITION::on_border )
-            .export_values()
             .finalize();
 
-        pybind11::class_< RayTracingResult >( module, "RayTracingResult" )
-            .def( pybind11::init<>() )
-            .def_readwrite( "position", &RayTracingResult::position )
-            .def( "__bool__", &RayTracingResult::operator bool );
+        def_readwrite_named( cls_RayTracingResult, "position",
+            &RayTracingResult::position,
+            "Position of the point relative to the block: outside, inside or "
+            "on_border" );
 
-        pybind11::class_< BRepRayTracing >( module, "BRepRayTracing" )
-            .def( pybind11::init< const BRep& >() )
+        pybind11::class_< BRepRayTracing >( module, "BRepRayTracing",
+            "Locate points in the Blocks of a BRep by casting rays against the "
+            "boundary Surfaces; the acceleration structures of the Surfaces "
+            "are built on first use and kept, so create a new object after "
+            "modifying the BRep" )
+            .def( pybind11::init< const BRep& >(), pybind11::arg( "brep" ),
+                pybind11::keep_alive< 1, 2 >(),
+                "Build a ray tracing of the BRep, which is kept alive by the "
+                "object" )
             .def( "is_point_inside_block",
-                &BRepRayTracing::is_point_inside_block )
+                &BRepRayTracing::is_point_inside_block,
+                pybind11::arg( "point" ), pybind11::arg( "block" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Return the RayTracingResult of the point in the Block, "
+                "deduced from the number of intersections of rays with its "
+                "boundary Surfaces (they must enclose the Block); the result "
+                "is True only for 'inside', not for 'on_border'. Raise an "
+                "error if the position remains ambiguous" )
             .def( "block_containing_point",
-                &BRepRayTracing::block_containing_point );
+                &BRepRayTracing::block_containing_point,
+                pybind11::arg( "point" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Return the uuid of the first Block of the BRep that strictly "
+                "contains the point (not on its border), or None if there is "
+                "none" );
     }
 } // namespace geode

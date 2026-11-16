@@ -30,12 +30,24 @@
     const auto name##dimension =                                               \
         "BlockCollections" + std::to_string( dimension ) + "D";                \
     pybind11::class_< BlockCollections##dimension##D,                          \
-        pybind11::smart_holder >( module, name##dimension.c_str() )            \
+        pybind11::smart_holder >( module, name##dimension.c_str(),             \
+        "Storage of the BlockCollection components of a model, read through "  \
+        "the model class" )                                                    \
         .def( "nb_block_collections",                                          \
-            &BlockCollections##dimension##D::nb_block_collections )            \
+            &BlockCollections##dimension##D::nb_block_collections,             \
+            "Return the number of BlockCollection components of the model" )   \
+        .def( "has_block_collection",                                          \
+            &BlockCollections##dimension##D::has_block_collection,             \
+            pybind11::arg( "id" ),                                             \
+            "Return True if the model has a BlockCollection with the given "   \
+            "uuid "                                                            \
+            "(False once it is removed)" )                                     \
         .def( "block_collection",                                              \
             &BlockCollections##dimension##D::block_collection,                 \
-            pybind11::return_value_policy::reference_internal )                \
+            pybind11::arg( "id" ),                                             \
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the BlockCollection with the given uuid; raise an error "  \
+            "if the model has none" )                                          \
         .def(                                                                  \
             "block_collections",                                               \
             []( const BlockCollections##dimension##D& self ) {                 \
@@ -47,7 +59,8 @@
                 }                                                              \
                 return components;                                             \
             },                                                                 \
-            pybind11::return_value_policy::reference_internal )
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the list of the BlockCollection components of the model" )
 
 namespace geode
 {

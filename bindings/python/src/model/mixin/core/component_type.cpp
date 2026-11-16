@@ -30,33 +30,62 @@ namespace geode
     void define_component_type( pybind11::module& module )
     {
         define_string_representation(
-            pybind11::class_< ComponentType >( module, "ComponentType" ),
+            pybind11::class_< ComponentType >( module, "ComponentType",
+                "Type of a model component, given by a name such as 'Corner', "
+                "'Line', 'Surface', 'Block' or 'ModelBoundary'" ),
             []( const ComponentType& type ) {
                 return std::string{ type.get() };
+            },
+            []( const ComponentType& type ) {
+                return python_call_repr(
+                    "ComponentType", { python_repr( type.get() ) } );
             } )
-            .def( pybind11::init<>() )
-            .def( pybind11::init< std::string >() )
-            .def( "get", &ComponentType::get )
-            .def( "matches", &ComponentType::operator== )
-            .def( pybind11::self == pybind11::self )
-            .def( pybind11::self != pybind11::self )
+            .def(
+                pybind11::init<>(), "Build a ComponentType with an empty name" )
+            .def( pybind11::init< std::string >(), pybind11::arg( "value" ),
+                "Build a ComponentType from its name" )
+            .def( "get", &ComponentType::get, "Return the name of the type" )
+            .def( "matches", &ComponentType::operator==,
+                pybind11::arg( "other" ),
+                "Return True if both types have the same name" )
+            .def( pybind11::self == pybind11::self, pybind11::arg( "other" ) )
+            .def( pybind11::self != pybind11::self, pybind11::arg( "other" ) )
             .def( "__hash__", []( const ComponentType& type ) {
                 return std::hash< ComponentType >{}( type );
             } );
 
-        define_string_representation(
-            pybind11::class_< ComponentID >( module, "ComponentID",
-                "Hashable: do not modify type or id of a ComponentID used as a "
-                "dict key or in a set" ) )
-            .def( pybind11::init<>() )
-            .def( pybind11::init< ComponentType, uuid >() )
-            .def_readwrite( "type", &ComponentID::type )
-            .def_readwrite( "id", &ComponentID::id )
-            .def( pybind11::self == pybind11::self )
-            .def( pybind11::self != pybind11::self )
-            .def( pybind11::self < pybind11::self )
-            .def( "__hash__", []( const ComponentID& id ) {
-                return std::hash< ComponentID >{}( id );
-            } );
+        auto cls_ComponentID =
+            define_string_representation(
+                pybind11::class_< ComponentID >( module, "ComponentID",
+                    "Identifier of a component of a model: its type "
+                    "(ComponentType) and its uuid. Hashable: do not modify "
+                    "type or id of a ComponentID used as a dict key or in a "
+                    "set" ),
+                []( const ComponentID& id ) {
+                    return python_call_repr( "ComponentID",
+                        { python_repr( id.type ), python_repr( id.id ) } );
+                } )
+                .def( pybind11::init<>(),
+                    "Build an undefined ComponentID: type 'undefined' and a "
+                    "newly generated uuid" )
+                .def( pybind11::init< ComponentType, uuid >(),
+                    pybind11::arg( "component_type" ),
+                    pybind11::arg( "input_id" ),
+                    "Build the identifier of the component of the given type "
+                    "and uuid" )
+
+                .def(
+                    pybind11::self == pybind11::self, pybind11::arg( "other" ) )
+                .def(
+                    pybind11::self != pybind11::self, pybind11::arg( "other" ) )
+                .def(
+                    pybind11::self < pybind11::self, pybind11::arg( "other" ) )
+                .def( "__hash__", []( const ComponentID& id ) {
+                    return std::hash< ComponentID >{}( id );
+                } );
+        def_readwrite_named( cls_ComponentID, "type", &ComponentID::type,
+            "Type of the component" );
+        def_readwrite_named(
+            cls_ComponentID, "id", &ComponentID::id, "Uuid of the component" );
     }
 } // namespace geode

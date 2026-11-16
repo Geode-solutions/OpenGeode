@@ -30,12 +30,18 @@
 #define PYTHON_LINE( dimension )                                               \
     const auto name##dimension = "Line" + std::to_string( dimension ) + "D";   \
     pybind11::class_< Line##dimension##D, Component##dimension##D,             \
-        pybind11::smart_holder >( module, name##dimension.c_str() )            \
+        pybind11::smart_holder >( module, name##dimension.c_str(),             \
+        "Geometric component of a model described by an EdgedCurve mesh" )     \
         .def( "mesh", &Line##dimension##D::mesh,                               \
-            pybind11::return_value_policy::reference_internal )                \
-        .def( "component_id", &Line##dimension##D::component_id )              \
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the EdgedCurve mesh of the line; modify it through the "   \
+            "mesh builder given by the model builder (line_mesh_builder)" )    \
+        .def( "component_id", &Line##dimension##D::component_id,               \
+            "Return the ComponentID (type and uuid) of the component" )        \
         .def_static( "component_type_static",                                  \
-            &Line##dimension##D::component_type_static )
+            &Line##dimension##D::component_type_static,                        \
+            "Return the ComponentType of all the Lines, without needing an "   \
+            "instance" )
 
 namespace geode
 {

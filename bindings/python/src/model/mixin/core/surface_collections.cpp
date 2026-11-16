@@ -30,12 +30,24 @@
     const auto name##dimension =                                               \
         "SurfaceCollections" + std::to_string( dimension ) + "D";              \
     pybind11::class_< SurfaceCollections##dimension##D,                        \
-        pybind11::smart_holder >( module, name##dimension.c_str() )            \
+        pybind11::smart_holder >( module, name##dimension.c_str(),             \
+        "Storage of the SurfaceCollection components of a model, read "        \
+        "through the model class" )                                            \
         .def( "nb_surface_collections",                                        \
-            &SurfaceCollections##dimension##D::nb_surface_collections )        \
+            &SurfaceCollections##dimension##D::nb_surface_collections,         \
+            "Return the number of SurfaceCollection components of the model" ) \
+        .def( "has_surface_collection",                                        \
+            &SurfaceCollections##dimension##D::has_surface_collection,         \
+            pybind11::arg( "id" ),                                             \
+            "Return True if the model has a SurfaceCollection with the given " \
+            "uuid "                                                            \
+            "(False once it is removed)" )                                     \
         .def( "surface_collection",                                            \
             &SurfaceCollections##dimension##D::surface_collection,             \
-            pybind11::return_value_policy::reference_internal )                \
+            pybind11::arg( "id" ),                                             \
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the SurfaceCollection with the given uuid; raise an "      \
+            "error if the model has none" )                                    \
         .def(                                                                  \
             "surface_collections",                                             \
             []( const SurfaceCollections##dimension##D& self ) {               \
@@ -47,7 +59,9 @@
                 }                                                              \
                 return components;                                             \
             },                                                                 \
-            pybind11::return_value_policy::reference_internal )
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the list of the SurfaceCollection components of the "      \
+            "model" )
 
 namespace geode
 {

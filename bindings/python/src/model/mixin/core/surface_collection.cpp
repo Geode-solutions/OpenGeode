@@ -29,11 +29,16 @@
     const auto name##dimension =                                               \
         "SurfaceCollection" + std::to_string( dimension ) + "D";               \
     pybind11::class_< SurfaceCollection##dimension##D,                         \
-        Component##dimension##D, pybind11::smart_holder >(                     \
-        module, name##dimension.c_str() )                                      \
-        .def( "component_id", &SurfaceCollection##dimension##D::component_id ) \
+        Component##dimension##D, pybind11::smart_holder >( module,             \
+        name##dimension.c_str(),                                               \
+        "Collection component grouping Surfaces; its items are given by "      \
+        "surface_collection_items()" )                                         \
+        .def( "component_id", &SurfaceCollection##dimension##D::component_id,  \
+            "Return the ComponentID (type and uuid) of the component" )        \
         .def_static( "component_type_static",                                  \
-            &SurfaceCollection##dimension##D::component_type_static )
+            &SurfaceCollection##dimension##D::component_type_static,           \
+            "Return the ComponentType of all the SurfaceCollections, without " \
+            "needing an instance" )
 
 namespace geode
 {

@@ -28,6 +28,20 @@ import opengeode_py_image as image
 import opengeode
 
 
+def test_unknown_extension(raster):
+    # As for the other types, an unknown format is reported without error
+    for dimension in ["1D", "2D", "3D"]:
+        loadable = getattr(image, "is_raster_image_loadable" + dimension)("a.unknown")
+        if loadable.value() != 0:
+            raise ValueError("[Test] Unknown extension should not be loadable")
+    if image.is_raster_image_saveable2D(raster, "a.unknown"):
+        raise ValueError("[Test] Unknown extension should not be saveable")
+    if not image.is_raster_image_saveable2D(raster, "a.og_img2d"):
+        raise ValueError("[Test] Native extension should be saveable")
+    if image.is_raster_image_loadable2D("a.og_img2d").value() != 1:
+        raise ValueError("[Test] Native extension should be loadable")
+
+
 def test_raster(raster):
     if raster.nb_cells() != 100:
         raise ValueError("[Test] Wrong number of cells")
@@ -68,6 +82,7 @@ if __name__ == "__main__":
     reload = opengeode.load_one(image.load_raster_image2D("test.og_img2d"), "test.og_img2d")
     test_raster(reload)
     test_out_of_bounds(raster)
+    test_unknown_extension(raster)
     raster1d = image.RasterImage1D([7])
     raster1d.set_color(3, image.RGBColor(1, 2, 3))
     image.save_raster_image1D(raster1d, "test.og_img1d")

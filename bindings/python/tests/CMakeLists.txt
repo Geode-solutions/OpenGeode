@@ -23,3 +23,43 @@ add_subdirectory(geometry)
 add_subdirectory(image)
 add_subdirectory(mesh)
 add_subdirectory(model)
+
+# The stubs of every binding module must pass the quality gates (named
+# parameters, no unresolved or raw C++ types, stubtest)
+add_geode_python_stub_test(
+    MODULES
+        opengeode_py_basic
+        opengeode_py_geometry
+        opengeode_py_image
+        opengeode_py_gdal
+        opengeode_py_mesh
+        opengeode_py_model
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_geometry
+        ${PROJECT_NAME}::py_image
+        ${PROJECT_NAME}::py_gdal
+        ${PROJECT_NAME}::py_mesh
+        ${PROJECT_NAME}::py_model
+)
+
+# The pure-Python modules (their stubs are only generated and checked: stubtest
+# is run on the whole package by the wheel target)
+add_geode_python_stub_test(
+    NAME test-py-wrapper-stubs
+    NO_STUBTEST
+    MODULES
+        basic
+        geometry
+        image
+        mesh
+        model
+        gdal
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_geometry
+        ${PROJECT_NAME}::py_image
+        ${PROJECT_NAME}::py_gdal
+        ${PROJECT_NAME}::py_mesh
+        ${PROJECT_NAME}::py_model
+)

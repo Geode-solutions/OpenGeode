@@ -29,6 +29,9 @@ namespace geode
 {
     void define_rotation( pybind11::module& module )
     {
-        module.def( "rotate", &rotate );
+        module.def( "rotate", &rotate, pybind11::arg( "point" ),
+            pybind11::arg( "axis" ), pybind11::arg( "angle" ),
+            "Rotate a 3D point around an axis (not necessarily normalized) by "
+            "an angle in radians" );
     }
 } // namespace geode

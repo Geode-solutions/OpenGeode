@@ -29,11 +29,20 @@ namespace geode
 {
     void define_component_registry( pybind11::module& module )
     {
-        pybind11::class_< ComponentRegistry, pybind11::smart_holder >(
-            module, "ComponentRegistry" )
-            .def( pybind11::init<>() )
-            .def( "mesh_components", &ComponentRegistry::mesh_components )
+        pybind11::class_< ComponentRegistry, pybind11::smart_holder >( module,
+            "ComponentRegistry",
+            "Registry of the uuids of the components of a model, by component "
+            "type, separating the components described by a mesh from the "
+            "collections" )
+            .def( pybind11::init<>(), "Build an empty registry" )
+            .def( "mesh_components", &ComponentRegistry::mesh_components,
+                "Return a dict giving, for each type of mesh component "
+                "(Corner, Line, Surface, Block), the list of the uuids of the "
+                "components of this type" )
             .def( "collection_components",
-                &ComponentRegistry::collection_components );
+                &ComponentRegistry::collection_components,
+                "Return a dict giving, for each type of collection component "
+                "(ModelBoundary and the collections), the list of the uuids of "
+                "the components of this type" );
     }
 } // namespace geode

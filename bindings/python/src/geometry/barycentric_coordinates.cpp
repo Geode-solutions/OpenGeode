@@ -34,11 +34,17 @@
         "triangle_barycentric_coordinates" + std::to_string( dimension )       \
         + "D";                                                                 \
     module.def( triangle_barycentric_coordinates##dimension.c_str(),           \
-        &triangle_barycentric_coordinates< dimension > );                      \
+        &triangle_barycentric_coordinates< dimension >,                        \
+        pybind11::arg( "point" ), pybind11::arg( "triangle" ),                 \
+        "Return the barycentric coordinates of a point in a triangle, one "    \
+        "per vertex. Raise an error if the triangle area is null" );           \
     const auto segment_barycentric_coordinates##dimension =                    \
         "segment_barycentric_coordinates" + std::to_string( dimension ) + "D"; \
     module.def( segment_barycentric_coordinates##dimension.c_str(),            \
-        &segment_barycentric_coordinates< dimension > )
+        &segment_barycentric_coordinates< dimension >,                         \
+        pybind11::arg( "point" ), pybind11::arg( "segment" ),                  \
+        "Return the barycentric coordinates of a point on a segment, one per " \
+        "vertex. Raise an error if the segment is degenerated" )
 
 namespace geode
 {
@@ -47,6 +53,9 @@ namespace geode
         PYTHON_BARYCENTRIC( 2 );
         PYTHON_BARYCENTRIC( 3 );
         module.def( "tetrahedron_barycentric_coordinates",
-            &tetrahedron_barycentric_coordinates );
+            &tetrahedron_barycentric_coordinates, pybind11::arg( "point" ),
+            pybind11::arg( "tetrahedron" ),
+            "Return the barycentric coordinates of a point in a tetrahedron, "
+            "one per vertex. Raise an error if the volume is null" );
     }
 } // namespace geode

@@ -39,5 +39,9 @@ if __name__ == '__main__':
         raise ValueError("[Test] uuid should be usable as dict key")
     if not ((id < other) != (other < id)):
         raise ValueError("[Test] uuids should be ordered")
-    if str(id) != id.string() or repr(id) != id.string():
-        raise ValueError("[Test] str/repr of uuid should return its string")
+    if str(id) != id.string():
+        raise ValueError("[Test] str of uuid should return its string")
+    if repr(id) != "uuid('" + id.string() + "')":
+        raise ValueError("[Test] repr of uuid should be an expression building it")
+    if eval(repr(id), {"uuid": basic.uuid}) != id:
+        raise ValueError("[Test] repr of uuid should rebuild the same uuid")

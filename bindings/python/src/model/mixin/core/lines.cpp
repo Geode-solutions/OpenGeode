@@ -28,11 +28,20 @@
 
 #define PYTHON_LINES( dimension )                                              \
     const auto name##dimension = "Lines" + std::to_string( dimension ) + "D";  \
-    pybind11::class_< Lines##dimension##D, pybind11::smart_holder >(           \
-        module, name##dimension.c_str() )                                      \
-        .def( "nb_lines", &Lines##dimension##D::nb_lines )                     \
-        .def( "line", &Lines##dimension##D::line,                              \
-            pybind11::return_value_policy::reference_internal )                \
+    pybind11::class_< Lines##dimension##D, pybind11::smart_holder >( module,   \
+        name##dimension.c_str(),                                               \
+        "Storage of the Line components of a model, read through the model "   \
+        "class" )                                                              \
+        .def( "nb_lines", &Lines##dimension##D::nb_lines,                      \
+            "Return the number of Line components of the model" )              \
+        .def( "has_line", &Lines##dimension##D::has_line,                      \
+            pybind11::arg( "id" ),                                             \
+            "Return True if the model has a Line with the given uuid "         \
+            "(False once it is removed)" )                                     \
+        .def( "line", &Lines##dimension##D::line, pybind11::arg( "id" ),       \
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the Line with the given uuid; raise an error if the "      \
+            "model has none" )                                                 \
         .def(                                                                  \
             "lines",                                                           \
             []( const Lines##dimension##D& self ) {                            \
@@ -43,7 +52,8 @@
                 }                                                              \
                 return components;                                             \
             },                                                                 \
-            pybind11::return_value_policy::reference_internal )
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the list of the Line components of the model" )
 
 namespace geode
 {

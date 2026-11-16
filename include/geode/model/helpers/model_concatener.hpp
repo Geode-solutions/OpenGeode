@@ -43,6 +43,14 @@ namespace geode
 
         ~ModelConcatener();
 
+        /*!
+         * Copy all the components of the other model into the model, with new
+         * uuids, together with their geometry and relationships.
+         * @param[in] other_model The model to copy. It must not be the model
+         * itself, otherwise an OpenGeodeException of type data is thrown.
+         * @return The mapping from the components of other_model to their
+         * copies.
+         */
         ModelCopyMapping concatenate( const Model& other_model );
 
     private:
