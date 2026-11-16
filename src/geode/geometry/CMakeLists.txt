@@ -51,6 +51,7 @@ add_geode_library(
         "mensuration.cpp"
         "nn_search.cpp"
         "normal_frame_transform.cpp"
+        "octree.cpp"
         "perpendicular.cpp"
         "points_sort.cpp"
         "position.cpp"
@@ -91,6 +92,7 @@ add_geode_library(
         "mensuration.hpp"
         "nn_search.hpp"
         "normal_frame_transform.hpp"
+        "octree.hpp"
         "perpendicular.hpp"
         "point.hpp"
         "points_sort.hpp"
@@ -105,6 +107,7 @@ add_geode_library(
     ADVANCED_HEADERS
         "detail/aabb_impl.hpp"
         "detail/bitsery_archive.hpp"
+        "detail/octree_impl.hpp"
         "detail/predicates.hpp"
     INTERNAL_HEADERS
         "internal/intersection_from_sides.hpp"
