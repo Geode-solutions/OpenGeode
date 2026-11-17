@@ -282,8 +282,27 @@ def copy_stubs(source, destination):
                 shutil.copyfile(os.path.join(root, name), target)
 
 
+# Since Python 3.8, Windows does not search the PATH for the DLLs of an extension
+# module: in the Python tests, geode_test_env adds the DLL directories of the test
+# dependencies (GEODE_DLL_DIRECTORIES). The tools importing the modules run in
+# their own process, which imports geode_test_env first when it is available.
+RUN_MODULE = """import runpy, sys
+try:
+    import geode_test_env
+except ImportError:
+    pass
+sys.argv[0] = sys.argv[1]
+del sys.argv[1]
+runpy.run_module(sys.argv[0], run_name="__main__", alter_sys=True)
+"""
+
+
+def python_module_command(module, arguments):
+    return [sys.executable, "-c", RUN_MODULE, module] + arguments
+
+
 def run_stubtest(modules, extra_arguments):
-    command = [sys.executable, "-m", "mypy.stubtest"] + extra_arguments + modules
+    command = python_module_command("mypy.stubtest", extra_arguments + modules)
     result = subprocess.run(
         command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
     )
@@ -322,15 +341,9 @@ def run_stubtest(modules, extra_arguments):
 
 
 def generate_stubs(module, directory):
-    command = [
-        sys.executable,
-        "-m",
-        "pybind11_stubgen",
-        "--exit-code",
-        "-o",
-        directory,
-        module,
-    ]
+    command = python_module_command(
+        "pybind11_stubgen", ["--exit-code", "-o", directory, module]
+    )
     if subprocess.run(command).returncode:
         print("error: pybind11-stubgen failed on %s" % module)
         return False
