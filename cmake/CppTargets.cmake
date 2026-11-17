@@ -11,14 +11,27 @@ if(DEFINED ENV{GEODE_CI_DEBUG_FLAGS})
     # optimizations of every object (about a third of the build time) for
     # binaries only tested once. Release builds keep it.
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_DEBUG OFF)
-    # Without link-time optimization, GCC runs its flow-sensitive warnings at
-    # compile time: false positives, mostly in third party headers (bitsery,
-    # abseil, libstdc++), that were never errors. Kept as warnings.
+    # Without link-time optimization, GCC runs its optimization-dependent
+    # warnings at compile time, after inlining: false positives, mostly in
+    # third party headers (bitsery, abseil, libstdc++), that were never errors.
+    # Being inlined into Geode functions, they are not silenced as system
+    # header warnings. Upgrading GCC does not remove them (checked with GCC 15).
+    # Kept as warnings.
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         string(APPEND CMAKE_CXX_FLAGS_DEBUG
             " -Wno-error=maybe-uninitialized"
             " -Wno-error=uninitialized"
             " -Wno-error=null-dereference"
+            " -Wno-error=free-nonheap-object"
+            " -Wno-error=array-bounds"
+            " -Wno-error=stringop-overflow"
+            " -Wno-error=stringop-overread"
+            " -Wno-error=stringop-truncation"
+            " -Wno-error=use-after-free"
+            " -Wno-error=dangling-pointer"
+            " -Wno-error=restrict"
+            " -Wno-error=format-overflow"
+            " -Wno-error=format-truncation"
         )
     endif()
 endif()
