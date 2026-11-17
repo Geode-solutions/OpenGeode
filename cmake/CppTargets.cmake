@@ -13,6 +13,13 @@ if(DEFINED ENV{GEODE_CI_DEBUG_FLAGS})
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_DEBUG OFF)
 endif()
 
+# CI compiler cache (ccache, sccache) of the Geode projects only: the third
+# party projects of a superbuild have their own cache, and may build with
+# flags a compiler cache does not support (MSVC /Zi)
+if(DEFINED ENV{GEODE_CI_COMPILER_LAUNCHER})
+    set(CMAKE_CXX_COMPILER_LAUNCHER "$ENV{GEODE_CI_COMPILER_LAUNCHER}")
+endif()
+
 function(_export_library library_name)
     export(TARGETS ${library_name}
         NAMESPACE ${PROJECT_NAME}::
