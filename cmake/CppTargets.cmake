@@ -106,6 +106,7 @@ function(add_geode_library)
     endif()
     add_library(${PROJECT_LIB_NAME} ALIAS ${GEODE_LIB_NAME})
     add_dependencies(essential ${GEODE_LIB_NAME})
+    add_dependencies(deliverables ${GEODE_LIB_NAME})
     string(TOLOWER ${PROJECT_NAME} project-name)
     string(REGEX REPLACE "-" "_" project_name ${project-name})
     set_target_properties(${GEODE_LIB_NAME}
@@ -288,6 +289,7 @@ function(add_geode_binary)
         ${ARGN}
     )
     _add_geode_executable(${GEODE_BINARY_SOURCE} "Utilities" ${GEODE_BINARY_DEPENDENCIES})
+    add_dependencies(deliverables ${target_name})
     install(TARGETS ${target_name}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         COMPONENT public

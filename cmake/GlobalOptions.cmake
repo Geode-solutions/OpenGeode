@@ -52,3 +52,6 @@ set(CPACK_COMPONENTS_ALL public)
 
 add_custom_target(third_party)
 add_custom_target(essential)
+# Everything a package or a wheel ships, without the tests: libraries,
+# binaries and Python modules
+add_custom_target(deliverables)
