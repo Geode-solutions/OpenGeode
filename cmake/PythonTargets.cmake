@@ -15,6 +15,7 @@ function(add_geode_python_binding)
     target_link_libraries(${GEODE_BINDING_NAME} 
         PRIVATE "${GEODE_BINDING_DEPENDENCIES}"
     )
+    add_dependencies(deliverables ${GEODE_BINDING_NAME})
     # The wheel puts the extension modules at the root of the package and the
     # shared libraries in its ${CMAKE_INSTALL_LIBDIR} subfolder (see
     # add_geode_python_wheel), the install and build trees next to them.
