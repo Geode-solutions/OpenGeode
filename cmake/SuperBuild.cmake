@@ -33,6 +33,17 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
         "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
+# CI test builds (GEODE_CI_DEBUG_FLAGS, see CppTargets.cmake) build the third
+# party projects in Release: their packages are installed with the release
+# packages of the downstream projects, which load the Release third party
+# libraries (e.g. gdal.dll, not gdald.dll). These Debug builds already use the
+# release runtime: their flags are replaced by GEODE_CI_DEBUG_FLAGS.
+if(DEFINED ENV{GEODE_CI_DEBUG_FLAGS})
+    set(GEODE_THIRD_PARTY_BUILD_TYPE "Release")
+else()
+    set(GEODE_THIRD_PARTY_BUILD_TYPE "${CMAKE_BUILD_TYPE}")
+endif()
+
 if("${CMAKE_CXX_STANDARD}" STREQUAL "")
     set(CMAKE_CXX_STANDARD 17)
 endif()
