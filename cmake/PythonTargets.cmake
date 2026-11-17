@@ -12,9 +12,14 @@ function(add_geode_python_binding)
         SHARED "${GEODE_BINDING_SOURCES}"
     )
     add_library(${PROJECT_NAME}::${GEODE_BINDING_NAME} ALIAS ${GEODE_BINDING_NAME})
-    target_link_libraries(${GEODE_BINDING_NAME} 
+    target_link_libraries(${GEODE_BINDING_NAME}
         PRIVATE "${GEODE_BINDING_DEPENDENCIES}"
     )
+    # The Python tests are essential tests: building the essential target
+    # builds the modules they import
+    if(TARGET essential)
+        add_dependencies(essential ${GEODE_BINDING_NAME})
+    endif()
     # The wheel puts the extension modules at the root of the package and the
     # shared libraries in its ${CMAKE_INSTALL_LIBDIR} subfolder (see
     # add_geode_python_wheel), the install and build trees next to them.
@@ -57,7 +62,11 @@ function(add_geode_python_test)
     add_test(NAME ${test_name}
         COMMAND ${test_python} ${absolute_path} ${GEODE_TEST_ARGUMENTS}
     )
-    set_tests_properties(${test_name} PROPERTIES TIMEOUT 300) 
+    set_tests_properties(${test_name}
+        PROPERTIES
+            TIMEOUT 300
+            LABELS essential
+    )
     _find_dependency_directories(directories ${GEODE_TEST_DEPENDENCIES})
     # Module imported by the tests before any binding, shipped with these CMake files
     set(test_env_directory "${PROJECT_BINARY_DIR}/geode_test_env")
