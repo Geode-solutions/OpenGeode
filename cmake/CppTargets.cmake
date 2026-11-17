@@ -11,6 +11,16 @@ if(DEFINED ENV{GEODE_CI_DEBUG_FLAGS})
     # optimizations of every object (about a third of the build time) for
     # binaries only tested once. Release builds keep it.
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_DEBUG OFF)
+    # Without link-time optimization, GCC runs its flow-sensitive warnings at
+    # compile time: false positives, mostly in third party headers (bitsery,
+    # abseil, libstdc++), that were never errors. Kept as warnings.
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        string(APPEND CMAKE_CXX_FLAGS_DEBUG
+            " -Wno-error=maybe-uninitialized"
+            " -Wno-error=uninitialized"
+            " -Wno-error=null-dereference"
+        )
+    endif()
 endif()
 
 # CI compiler cache (ccache, sccache) of the Geode projects only: the third
