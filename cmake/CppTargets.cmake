@@ -7,6 +7,10 @@ endif()
 # CI test builds may replace the Debug flags (e.g. optimized with assertions kept)
 if(DEFINED ENV{GEODE_CI_DEBUG_FLAGS})
     set(CMAKE_CXX_FLAGS_DEBUG "$ENV{GEODE_CI_DEBUG_FLAGS}")
+    # No link-time optimization in these Debug builds: the links redo the
+    # optimizations of every object (about a third of the build time) for
+    # binaries only tested once. Release builds keep it.
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_DEBUG OFF)
 endif()
 
 function(_export_library library_name)
