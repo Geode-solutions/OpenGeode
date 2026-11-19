@@ -107,7 +107,6 @@ add_geode_library(
     ADVANCED_HEADERS
         "detail/aabb_impl.hpp"
         "detail/bitsery_archive.hpp"
-        "detail/octree_impl.hpp"
         "detail/predicates.hpp"
     INTERNAL_HEADERS
         "internal/intersection_from_sides.hpp"

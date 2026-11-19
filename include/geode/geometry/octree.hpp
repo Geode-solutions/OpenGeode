@@ -32,6 +32,7 @@
 
 #include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/pimpl.hpp>
+#include <geode/basic/range.hpp>
 
 #include <geode/geometry/bounding_box.hpp>
 #include <geode/geometry/common.hpp>
@@ -85,8 +86,14 @@ namespace geode
         static constexpr index_t NB_CHILDREN{ 1u << dimension };
 
         /*!
-         * Side of a cell face along an axis: lower (minimal coordinate) or
-         * upper (maximal coordinate).
+         * Identifies, with an axis, one of the 2 * dimension faces of a cell:
+         * the face of minimal coordinate along the axis (lower) or of maximal
+         * coordinate (upper). face_neighbor_leaves( cell, axis, side ) uses
+         * it to select the face whose neighbors are returned: lower gives the
+         * leaves on the side of decreasing coordinates, upper on the side of
+         * increasing coordinates. Looping over every axis and both sides
+         * visits all the face neighbors of a cell, e.g. to propagate values
+         * between adjacent leaves.
          */
         enum struct FACE_SIDE
         {
@@ -95,9 +102,15 @@ namespace geode
         };
 
         /*!
-         * Adjacency considered by balance(): leaves sharing a face, or
-         * leaves sharing a face, an edge or a vertex (in 2D: a face or a
-         * vertex).
+         * Adjacency enforced by balance(), which refines leaves until any
+         * two adjacent leaves differ by at most one level:
+         * - faces: leaves sharing a face (an edge in 2D). It bounds the
+         * level jump across faces only, which is enough for algorithms
+         * walking from leaf to leaf through faces: face_neighbor_leaves() of
+         * a leaf then returns at most 2^(dimension-1) finer leaves.
+         * - full: leaves sharing a face, an edge or a vertex (in 2D: an
+         * edge or a vertex). It also bounds the level jump along edges and
+         * at vertices, for algorithms using these neighbors too.
          */
         enum struct BALANCE_TYPE
         {
@@ -279,4 +292,46 @@ namespace geode
     ALIAS_2D_AND_3D( Octree );
 } // namespace geode
 
-#include <geode/geometry/detail/octree_impl.hpp>
+namespace geode
+{
+    template < index_t dimension >
+    template < typename Filter, typename Action >
+    void Octree< dimension >::traverse( Filter&& filter, Action&& action ) const
+    {
+        if( nb_cells() == 0 )
+        {
+            return;
+        }
+        index_t nb_roots{ 1 };
+        for( const auto nb : nb_root_cells() )
+        {
+            nb_roots *= nb;
+        }
+        std::vector< index_t > to_visit;
+        to_visit.reserve( nb_roots );
+        for( const auto root : Range{ nb_roots } )
+        {
+            to_visit.push_back( nb_roots - 1 - root );
+        }
+        while( !to_visit.empty() )
+        {
+            const auto cell = to_visit.back();
+            to_visit.pop_back();
+            if( !filter( cell, cell_bounding_box( cell ) ) )
+            {
+                continue;
+            }
+            const auto first_child = children( cell );
+            if( !first_child )
+            {
+                action( cell );
+                continue;
+            }
+            for( const auto child : Range{ NB_CHILDREN } )
+            {
+                to_visit.push_back(
+                    first_child.value() + NB_CHILDREN - 1 - child );
+            }
+        }
+    }
+} // namespace geode
