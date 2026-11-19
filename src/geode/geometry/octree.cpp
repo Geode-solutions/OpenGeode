@@ -47,15 +47,6 @@ namespace
         // 21 bits in 3D (64 bits), 31 bits in 2D (63 bits, 32 would need 65).
         return dimension == 3 ? 21 : 31;
     }
-
-    template < geode::index_t dimension >
-    struct OctreeNode
-    {
-        geode::local_index_t level{ 0 };
-        std::array< uint32_t, dimension > anchor{};
-        geode::index_t parent{ geode::NO_ID };
-        geode::index_t first_child{ geode::NO_ID };
-    };
 } // namespace
 
 namespace geode
@@ -63,7 +54,15 @@ namespace geode
     template < index_t dimension >
     class Octree< dimension >::Impl
     {
-        using Node = OctreeNode< dimension >;
+        // Nested (not in the anonymous namespace): a member of Impl, which
+        // has external linkage, cannot have a type with internal linkage
+        struct Node
+        {
+            local_index_t level{ 0 };
+            std::array< uint32_t, dimension > anchor{};
+            index_t parent{ NO_ID };
+            index_t first_child{ NO_ID };
+        };
 
     public:
         Impl() = default;
