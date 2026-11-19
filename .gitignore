@@ -4,3 +4,4 @@ build
 examples/.ipynb*
 bindings/python/requirements.txt
 .mypy_cache
+__pycache__/

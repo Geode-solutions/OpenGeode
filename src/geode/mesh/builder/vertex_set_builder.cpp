@@ -90,6 +90,11 @@ namespace geode
     std::vector< index_t > VertexSetBuilder::delete_vertices(
         const std::vector< bool >& to_delete )
     {
+        OpenGeodeMeshException::check_exception(
+            to_delete.size() == vertex_set_.nb_vertices(), nullptr,
+            OpenGeodeException::TYPE::data,
+            "[VertexSetBuilder::delete_vertices] to_delete should have one "
+            "value per vertex" );
         const auto old2new = mapping_after_deletion( to_delete );
         if( absl::c_find( to_delete, true ) == to_delete.end() )
         {

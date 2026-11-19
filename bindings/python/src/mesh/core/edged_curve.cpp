@@ -22,6 +22,7 @@
  */
 
 #include "../../common.hpp"
+#include "../index_check.hpp"
 
 #include <geode/geometry/basic_objects/segment.hpp>
 #include <geode/geometry/bounding_box.hpp>
@@ -33,20 +34,52 @@
         "EdgedCurve" + std::to_string( dimension ) + "D";                      \
     pybind11::class_< EdgedCurve##dimension##D, Graph,                         \
         CoordinateReferenceSystemManagers##dimension##D,                       \
-        pybind11::smart_holder >( module, name##dimension.c_str() )            \
+        pybind11::smart_holder >( module, name##dimension.c_str(),             \
+        "Curve made of edges linking vertices that have coordinates" )         \
         .def_static( "create",                                                 \
             static_cast<                                                       \
                 std::unique_ptr< EdgedCurve##dimension##D > ( * )() >(         \
-                &EdgedCurve##dimension##D::create ) )                          \
-        .def( "clone", &EdgedCurve##dimension##D::clone )                      \
-        .def( "edge_length", &EdgedCurve##dimension##D::edge_length )          \
-        .def( "edge_barycenter", &EdgedCurve##dimension##D::edge_barycenter )  \
-        .def( "bounding_box", &EdgedCurve##dimension##D::bounding_box )        \
-        .def( "segment", &EdgedCurve##dimension##D::segment )                  \
+                &EdgedCurve##dimension##D::create ),                           \
+            "Create an empty edged curve with the default data structure" )    \
+        .def( "point",                                                         \
+            geode::checked_as< EdgedCurve##dimension##D >( "point",            \
+                &CoordinateReferenceSystemManagers< dimension >::point,        \
+                geode::VertexCheck{} ),                                        \
+            "Return the coordinates of a vertex in the active coordinate "     \
+            "reference system",                                                \
+            pybind11::arg( "vertex_id" ) )                                     \
+        .def( "clone", &EdgedCurve##dimension##D::clone,                       \
+            "Return a copy of the edged curve, with the same data structure, " \
+            "name and identifier" )                                            \
+        .def( "edge_length",                                                   \
+            geode::checked( "edge_length",                                     \
+                &EdgedCurve##dimension##D::edge_length, geode::EdgeCheck{} ),  \
+            "Return the length of the edge", pybind11::arg( "edge_id" ) )      \
+        .def( "edge_barycenter",                                               \
+            geode::checked( "edge_barycenter",                                 \
+                &EdgedCurve##dimension##D::edge_barycenter,                    \
+                geode::EdgeCheck{} ),                                          \
+            "Return the barycenter of the edge", pybind11::arg( "edge_id" ) )  \
+        .def( "bounding_box", &EdgedCurve##dimension##D::bounding_box,         \
+            "Return the bounding box of the vertices of the edged curve" )     \
+        .def( "segment",                                                       \
+            geode::checked_snapshot( "segment",                                \
+                &EdgedCurve##dimension##D::segment, geode::EdgeCheck{} ),      \
+            pybind11::arg( "edge_id" ),                                        \
+            "Return the segment geometry of the edge, built from copies of "   \
+            "the edge points: later changes of the mesh do not modify it" )    \
         .def( "vertices_around_vertex",                                        \
-            &EdgedCurve##dimension##D::vertices_around_vertex )                \
-        .def( "texture_manager", &EdgedCurve##dimension##D::texture_manager,   \
-            pybind11::return_value_policy::reference_internal )
+            geode::checked( "vertices_around_vertex",                          \
+                &EdgedCurve##dimension##D::vertices_around_vertex,             \
+                geode::VertexCheck{} ),                                        \
+            "Return the vertices linked to the vertex by an edge",             \
+            pybind11::arg( "vertex_id" ) )                                     \
+        .def( "texture_manager",                                               \
+            geode::texture_manager_with_elements(                              \
+                &EdgedCurve##dimension##D::texture_manager, "nb_edges" ),      \
+            pybind11::keep_alive< 0, 1 >(),                                    \
+            "Return the manager of the textures of the edged curve, which "    \
+            "keeps the mesh alive" )
 
 namespace geode
 {

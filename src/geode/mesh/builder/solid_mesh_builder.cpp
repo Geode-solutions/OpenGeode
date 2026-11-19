@@ -871,6 +871,11 @@ namespace geode
     std::vector< index_t > SolidMeshBuilder< dimension >::delete_polyhedra(
         const std::vector< bool >& to_delete )
     {
+        OpenGeodeMeshException::check_exception(
+            to_delete.size() == solid_mesh_.nb_polyhedra(), nullptr,
+            OpenGeodeException::TYPE::data,
+            "[SolidMeshBuilder::delete_polyhedra] to_delete should have one "
+            "value per polyhedron" );
         const auto old2new = mapping_after_deletion( to_delete );
         if( absl::c_find( to_delete, true ) == to_delete.end() )
         {
@@ -896,6 +901,11 @@ namespace geode
     std::vector< index_t > SolidMeshBuilder< dimension >::permute_polyhedra(
         absl::Span< const index_t > permutation )
     {
+        OpenGeodeMeshException::check_exception(
+            permutation.size() == solid_mesh_.nb_polyhedra(), nullptr,
+            OpenGeodeException::TYPE::data,
+            "[SolidMeshBuilder::permute_polyhedra] permutation should have one "
+            "value per polyhedron" );
         const auto old2new = old2new_permutation( permutation );
         update_polyhedron_around_vertices_from_polyhedron(
             solid_mesh_, *this, old2new );

@@ -30,12 +30,24 @@
     const auto name##dimension =                                               \
         "LineCollections" + std::to_string( dimension ) + "D";                 \
     pybind11::class_< LineCollections##dimension##D, pybind11::smart_holder >( \
-        module, name##dimension.c_str() )                                      \
+        module, name##dimension.c_str(),                                       \
+        "Storage of the LineCollection components of a model, read through "   \
+        "the model class" )                                                    \
         .def( "nb_line_collections",                                           \
-            &LineCollections##dimension##D::nb_line_collections )              \
+            &LineCollections##dimension##D::nb_line_collections,               \
+            "Return the number of LineCollection components of the model" )    \
+        .def( "has_line_collection",                                           \
+            &LineCollections##dimension##D::has_line_collection,               \
+            pybind11::arg( "id" ),                                             \
+            "Return True if the model has a LineCollection with the given "    \
+            "uuid "                                                            \
+            "(False once it is removed)" )                                     \
         .def( "line_collection",                                               \
             &LineCollections##dimension##D::line_collection,                   \
-            pybind11::return_value_policy::reference_internal )                \
+            pybind11::arg( "id" ),                                             \
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the LineCollection with the given uuid; raise an error "   \
+            "if the model has none" )                                          \
         .def(                                                                  \
             "line_collections",                                                \
             []( const LineCollections##dimension##D& self ) {                  \
@@ -46,7 +58,8 @@
                 }                                                              \
                 return components;                                             \
             },                                                                 \
-            pybind11::return_value_policy::reference_internal )
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the list of the LineCollection components of the model" )
 
 namespace geode
 {

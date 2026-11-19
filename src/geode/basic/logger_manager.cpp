@@ -25,6 +25,7 @@
 
 #include <absl/synchronization/mutex.h>
 
+#include <geode/basic/console_logger_client.hpp>
 #include <geode/basic/logger_client.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 
@@ -32,71 +33,98 @@ namespace geode
 {
     class LoggerManager::Impl
     {
+        struct RegisteredClient
+        {
+            std::unique_ptr< LoggerClient > client;
+            bool is_console;
+        };
+
     public:
         LoggerClient &register_client(
             std::unique_ptr< LoggerClient > &&client )
         {
+            const auto is_console =
+                dynamic_cast< const ConsoleLoggerClient * >( client.get() )
+                != nullptr;
             absl::MutexLock lock{ mutex_ };
-            return *loggers_.emplace_back( std::move( client ) );
+            return *loggers_
+                        .emplace_back( RegisteredClient{
+                            std::move( client ), is_console } )
+                        .client;
+        }
+
+        void set_console_output( bool enabled )
+        {
+            absl::MutexLock lock{ mutex_ };
+            console_output_ = enabled;
+        }
+
+        bool is_console_output_enabled()
+        {
+            absl::ReaderMutexLock lock{ mutex_ };
+            return console_output_;
         }
 
         void trace( const std::string &message )
         {
-            absl::ReaderMutexLock lock{ mutex_ };
-            for( auto &logger : loggers_ )
-            {
-                logger->trace( message );
-            }
+            dispatch( [&message]( LoggerClient &logger ) {
+                logger.trace( message );
+            } );
         }
 
         void debug( const std::string &message )
         {
-            absl::ReaderMutexLock lock{ mutex_ };
-            for( auto &logger : loggers_ )
-            {
-                logger->debug( message );
-            }
+            dispatch( [&message]( LoggerClient &logger ) {
+                logger.debug( message );
+            } );
         }
 
         void info( const std::string &message )
         {
-            absl::ReaderMutexLock lock{ mutex_ };
-            for( auto &logger : loggers_ )
-            {
-                logger->info( message );
-            }
+            dispatch( [&message]( LoggerClient &logger ) {
+                logger.info( message );
+            } );
         }
 
         void warning( const std::string &message )
         {
-            absl::ReaderMutexLock lock{ mutex_ };
-            for( auto &logger : loggers_ )
-            {
-                logger->warning( message );
-            }
+            dispatch( [&message]( LoggerClient &logger ) {
+                logger.warning( message );
+            } );
         }
 
         void error( const std::string &message )
         {
-            absl::ReaderMutexLock lock{ mutex_ };
-            for( auto &logger : loggers_ )
-            {
-                logger->error( message );
-            }
+            dispatch( [&message]( LoggerClient &logger ) {
+                logger.error( message );
+            } );
         }
 
         void critical( const std::string &message )
         {
+            dispatch( [&message]( LoggerClient &logger ) {
+                logger.critical( message );
+            } );
+        }
+
+    private:
+        template < typename Function >
+        void dispatch( const Function &function )
+        {
             absl::ReaderMutexLock lock{ mutex_ };
             for( auto &logger : loggers_ )
             {
-                logger->critical( message );
+                if( console_output_ || !logger.is_console )
+                {
+                    function( *logger.client );
+                }
             }
         }
 
     private:
         absl::Mutex mutex_;
-        std::vector< std::unique_ptr< LoggerClient > > loggers_;
+        std::vector< RegisteredClient > loggers_;
+        bool console_output_{ true };
     };
 
     LoggerManager::LoggerManager() = default;
@@ -107,6 +135,16 @@ namespace geode
         std::unique_ptr< LoggerClient > &&client )
     {
         return instance().impl_->register_client( std::move( client ) );
+    }
+
+    void LoggerManager::set_console_output( bool enabled )
+    {
+        instance().impl_->set_console_output( enabled );
+    }
+
+    bool LoggerManager::is_console_output_enabled()
+    {
+        return instance().impl_->is_console_output_enabled();
     }
 
     void LoggerManager::trace( const std::string &message )

@@ -206,6 +206,39 @@ def test_permutation(surface, builder):
         raise ValueError("[Test] Wrong polygons_4 after polygon permute")
 
 
+def expect_data_error(function, message):
+    try:
+        function()
+    except opengeode.OpenGeodeDataError:
+        return
+    raise ValueError(f"[Test] {message} should raise an OpenGeodeDataError")
+
+
+def test_invalid_polygon_operations():
+    surface = mesh.TriangulatedSurface3D.create()
+    builder = mesh.TriangulatedSurfaceBuilder3D.create(surface)
+    builder.create_vertices(4)
+    builder.create_triangle([0, 1, 2])
+    builder.create_triangle([1, 3, 2])
+    for call, label in [
+        (lambda: builder.permute_polygons([0]), "short permutation"),
+        (lambda: builder.permute_polygons([0, 1, 2]), "long permutation"),
+        (lambda: builder.permute_polygons([0, 0]), "duplicated permutation"),
+        (lambda: builder.delete_polygons([True]), "short flags"),
+        (lambda: builder.delete_polygons([False]), "short flags, none to delete"),
+        (lambda: builder.delete_polygons([True, False, False]), "long flags"),
+    ]:
+        expect_data_error(call, label)
+        if surface.nb_polygons() != 2:
+            raise ValueError(f"[Test] Wrong number of polygons after {label}")
+        if surface.polygon_vertex(mesh.PolygonVertex(0, 0)) != 0 or surface.polygon_vertex(mesh.PolygonVertex(1, 1)) != 3:
+            raise ValueError(f"[Test] Polygon vertices changed after {label}")
+        if surface.polygon_around_vertex(0).polygon_id != 0 or surface.polygon_around_vertex(3).polygon_id != 1:
+            raise ValueError(f"[Test] Polygon around vertex changed after {label}")
+    if builder.permute_polygons([1, 0]) != [1, 0]:
+        raise ValueError("[Test] A valid permutation should still work")
+
+
 if __name__ == '__main__':
     mesh.OpenGeodeMeshLibrary.initialize()
     surface = mesh.TriangulatedSurface3D.create()
@@ -224,3 +257,4 @@ if __name__ == '__main__':
     test_permutation(surface, builder)
     test_delete_polygon(surface, builder)
     test_clone(surface)
+    test_invalid_polygon_operations()

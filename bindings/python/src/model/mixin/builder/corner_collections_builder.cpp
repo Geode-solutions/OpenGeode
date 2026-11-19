@@ -31,11 +31,14 @@
 #define PYTHON_CORNER_COLLECTIONS_BUILDER( dimension )                         \
     const auto name##dimension =                                               \
         "CornerCollectionsBuilder" + std::to_string( dimension ) + "D";        \
-    pybind11::class_< CornerCollectionsBuilder##dimension##D >(                \
-        module, name##dimension.c_str() )                                      \
+    pybind11::class_< CornerCollectionsBuilder##dimension##D >( module,        \
+        name##dimension.c_str(),                                               \
+        "Builder modifying the CornerCollections of a model" )                 \
         .def( "set_corner_collection_name",                                    \
             &CornerCollectionsBuilder##dimension##D::                          \
-                set_corner_collection_name )
+                set_corner_collection_name,                                    \
+            pybind11::arg( "corner_collection" ), pybind11::arg( "name" ),     \
+            "Set the name of the corner collection" )
 
 namespace geode
 {

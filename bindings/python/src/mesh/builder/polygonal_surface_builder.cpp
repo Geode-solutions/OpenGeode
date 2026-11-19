@@ -30,9 +30,14 @@
     const auto name##dimension =                                               \
         "PolygonalSurfaceBuilder" + std::to_string( dimension ) + "D";         \
     pybind11::class_< PolygonalSurfaceBuilder##dimension##D,                   \
-        SurfaceMeshBuilder##dimension##D >( module, name##dimension.c_str() )  \
-        .def_static(                                                           \
-            "create", &PolygonalSurfaceBuilder##dimension##D::create )
+        SurfaceMeshBuilder##dimension##D >( module, name##dimension.c_str(),   \
+        "Builder to modify a polygonal surface" )                              \
+        .def_static( "create",                                                 \
+            geode::builder_creator(                                            \
+                &PolygonalSurfaceBuilder##dimension##D::create ),              \
+            pybind11::arg( "mesh" ), pybind11::keep_alive< 0, 1 >(),           \
+            "Return the builder to modify the polygonal surface, which keeps " \
+            "the mesh alive" )
 
 namespace geode
 {

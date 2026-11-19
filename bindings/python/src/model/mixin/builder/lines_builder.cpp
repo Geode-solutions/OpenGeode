@@ -26,6 +26,7 @@
 #include <geode/basic/uuid.hpp>
 
 #include <geode/mesh/builder/edged_curve_builder.hpp>
+#include <geode/mesh/core/edged_curve.hpp>
 
 #include <geode/model/mixin/builder/lines_builder.hpp>
 #include <geode/model/mixin/core/line.hpp>
@@ -33,11 +34,23 @@
 #define PYTHON_LINES_BUILDER( dimension )                                      \
     const auto name##dimension =                                               \
         "LinesBuilder" + std::to_string( dimension ) + "D";                    \
-    pybind11::class_< LinesBuilder##dimension##D >(                            \
-        module, name##dimension.c_str() )                                      \
-        .def( "line_mesh_builder",                                             \
-            &LinesBuilder##dimension##D::line_mesh_builder )                   \
-        .def( "set_line_name", &LinesBuilder##dimension##D::set_line_name )
+    pybind11::class_< LinesBuilder##dimension##D >( module,                    \
+        name##dimension.c_str(),                                               \
+        "Builder modifying the Lines of a model, in particular their meshes" ) \
+        .def(                                                                  \
+            "line_mesh_builder",                                               \
+            []( LinesBuilder##dimension##D& builder,                           \
+                const Line##dimension##D& component ) {                        \
+                return geode::builder_with_mesh(                               \
+                    builder.line_mesh_builder( component ),                    \
+                    component.mesh() );                                        \
+            },                                                                 \
+            pybind11::arg( "line" ), pybind11::keep_alive< 0, 1 >(),           \
+            "Return the EdgedCurveBuilder modifying the mesh of the line; it " \
+            "keeps the model builder alive" )                                  \
+        .def( "set_line_name", &LinesBuilder##dimension##D::set_line_name,     \
+            pybind11::arg( "line" ), pybind11::arg( "name" ),                  \
+            "Set the name of the line and of its mesh" )
 
 namespace geode
 {

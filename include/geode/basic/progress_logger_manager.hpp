@@ -42,6 +42,15 @@ namespace geode
         static void register_client(
             std::unique_ptr< ProgressLoggerClient >&& client );
 
+        /*!
+         * Enable or disable the output of every registered
+         * ConsoleProgressLoggerClient (enabled by default). The other clients
+         * are not affected.
+         */
+        static void set_console_output( bool enabled );
+
+        [[nodiscard]] static bool is_console_output_enabled();
+
         static void start( const uuid& progress_logger_id,
             Logger::LEVEL level,
             const std::string& message,

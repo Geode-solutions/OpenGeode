@@ -30,7 +30,11 @@ namespace geode
 {
     void define_perpendicular( pybind11::module& module )
     {
-        module.def( "perpendicular", &perpendicular );
-        module.def( "dot_perpendicular", &dot_perpendicular );
+        module.def( "perpendicular", &perpendicular, pybind11::arg( "v" ),
+            "Return a 2D vector perpendicular to the given one" );
+        module.def( "dot_perpendicular", &dot_perpendicular,
+            pybind11::arg( "v0" ), pybind11::arg( "v1" ),
+            "Return the dot product between v0 and a 2D vector perpendicular "
+            "to v1" );
     }
 } // namespace geode

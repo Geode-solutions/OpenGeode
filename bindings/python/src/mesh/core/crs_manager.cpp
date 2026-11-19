@@ -30,27 +30,41 @@
     const auto name##dimension = "CoordinateReferenceSystemManager"            \
                                  + std::to_string( dimension ) + "D";          \
     pybind11::class_< CoordinateReferenceSystemManager##dimension##D >(        \
-        module, name##dimension.c_str() )                                      \
+        module, name##dimension.c_str(),                                       \
+        "Named coordinate reference systems of a mesh, one of which is "       \
+        "active" )                                                             \
         .def( "nb_coordinate_reference_systems",                               \
             &CoordinateReferenceSystemManager<                                 \
-                dimension >::nb_coordinate_reference_systems )                 \
+                dimension >::nb_coordinate_reference_systems,                  \
+            "Return the number of registered coordinate reference systems" )   \
         .def( "find_coordinate_reference_system",                              \
             &CoordinateReferenceSystemManager<                                 \
                 dimension >::find_coordinate_reference_system,                 \
-            pybind11::return_value_policy::reference_internal )                \
+            pybind11::arg( "name" ),                                           \
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the coordinate reference system with this name; raise an " \
+            "error if there is none" )                                         \
         .def( "active_coordinate_reference_system",                            \
             &CoordinateReferenceSystemManager<                                 \
                 dimension >::active_coordinate_reference_system,               \
-            pybind11::return_value_policy::reference_internal )                \
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the active coordinate reference system; raise an error "   \
+            "if none is active" )                                              \
         .def( "active_coordinate_reference_system_name",                       \
             &CoordinateReferenceSystemManager<                                 \
-                dimension >::active_coordinate_reference_system_name )         \
+                dimension >::active_coordinate_reference_system_name,          \
+            "Return the name of the active coordinate reference system, "      \
+            "empty if none is active" )                                        \
         .def( "coordinate_reference_system_names",                             \
             &CoordinateReferenceSystemManager<                                 \
-                dimension >::coordinate_reference_system_names )               \
+                dimension >::coordinate_reference_system_names,                \
+            "Return the names of the registered coordinate reference "         \
+            "systems, in no particular order" )                                \
         .def( "coordinate_reference_system_exists",                            \
             &CoordinateReferenceSystemManager<                                 \
-                dimension >::coordinate_reference_system_exists )
+                dimension >::coordinate_reference_system_exists,               \
+            "Return True if a coordinate reference system has this name",      \
+            pybind11::arg( "name" ) )
 
 namespace geode
 {

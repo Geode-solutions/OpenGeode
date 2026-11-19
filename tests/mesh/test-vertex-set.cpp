@@ -131,7 +131,7 @@ void test_io_failures( const geode::VertexSet& vertex_set )
         [&vertex_set] {
             return geode::save_vertex_set( vertex_set, "unknown.extension" );
         },
-        geode::OpenGeodeException::TYPE::internal,
+        geode::OpenGeodeException::TYPE::data,
         "Cannot save VertexSet in file: unknown.extension: Unknown "
         "extension" );
 }
@@ -168,9 +168,43 @@ void test_mesh_element_hash()
     }
 }
 
+void test_invalid_delete_vertices()
+{
+    geode::OpenGeodeVertexSet vertex_set;
+    auto builder = geode::VertexSetBuilder::create( vertex_set );
+    builder->create_vertices( 3 );
+    for( const auto& to_delete :
+        { std::vector< bool >{ true }, std::vector< bool >{ false },
+            std::vector< bool >{ true, false, false, false },
+            std::vector< bool >{} } )
+    {
+        bool thrown{ false };
+        try
+        {
+            geode_unused( builder->delete_vertices( to_delete ) );
+        }
+        catch( const geode::OpenGeodeException& exception )
+        {
+            thrown = true;
+            geode::OpenGeodeMeshException::test(
+                exception.type() == geode::OpenGeodeException::TYPE::data,
+                "[Test] A wrong size of to_delete should be a data error" );
+        }
+        geode::OpenGeodeMeshException::test(
+            thrown, "[Test] A wrong size of to_delete should throw" );
+        geode::OpenGeodeMeshException::test( vertex_set.nb_vertices() == 3,
+            "[Test] The vertex set should be unchanged" );
+    }
+    geode::OpenGeodeMeshException::test(
+        builder->delete_vertices( { false, true, false } )
+            == std::vector< geode::index_t >{ 0, geode::NO_ID, 1 },
+        "[Test] Wrong mapping of a valid deletion" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
+    test_invalid_delete_vertices();
     geode::OpenGeodeVertexSet vertex_set;
     test_default_vertex_set( vertex_set );
     auto builder = geode::VertexSetBuilder::create( vertex_set );

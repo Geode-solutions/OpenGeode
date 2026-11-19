@@ -29,12 +29,16 @@
     const auto name##dimension =                                               \
         "HybridSolid" + std::to_string( dimension ) + "D";                     \
     pybind11::class_< HybridSolid##dimension##D, SolidMesh##dimension##D,      \
-        pybind11::smart_holder >( module, name##dimension.c_str() )            \
+        pybind11::smart_holder >( module, name##dimension.c_str(),             \
+        "Solid mesh made of tetrahedra, hexahedra, prisms and pyramids" )      \
         .def_static( "create",                                                 \
             static_cast<                                                       \
                 std::unique_ptr< HybridSolid##dimension##D > ( * )() >(        \
-                &HybridSolid##dimension##D::create ) )                         \
-        .def( "clone", &HybridSolid##dimension##D::clone )
+                &HybridSolid##dimension##D::create ),                          \
+            "Create an empty hybrid solid with the default data structure" )   \
+        .def( "clone", &HybridSolid##dimension##D::clone,                      \
+            "Return a copy of the hybrid solid, with the same data "           \
+            "structure, name and identifier" )
 
 namespace geode
 {

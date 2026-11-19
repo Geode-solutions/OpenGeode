@@ -29,11 +29,20 @@
 #define PYTHON_CORNERS( dimension )                                            \
     const auto name##dimension =                                               \
         "Corners" + std::to_string( dimension ) + "D";                         \
-    pybind11::class_< Corners##dimension##D, pybind11::smart_holder >(         \
-        module, name##dimension.c_str() )                                      \
-        .def( "nb_corners", &Corners##dimension##D::nb_corners )               \
-        .def( "corner", &Corners##dimension##D::corner,                        \
-            pybind11::return_value_policy::reference_internal )                \
+    pybind11::class_< Corners##dimension##D, pybind11::smart_holder >( module, \
+        name##dimension.c_str(),                                               \
+        "Storage of the Corner components of a model, read through the model " \
+        "class" )                                                              \
+        .def( "nb_corners", &Corners##dimension##D::nb_corners,                \
+            "Return the number of Corner components of the model" )            \
+        .def( "has_corner", &Corners##dimension##D::has_corner,                \
+            pybind11::arg( "id" ),                                             \
+            "Return True if the model has a Corner with the given uuid "       \
+            "(False once it is removed)" )                                     \
+        .def( "corner", &Corners##dimension##D::corner, pybind11::arg( "id" ), \
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the Corner with the given uuid; raise an error if the "    \
+            "model has none" )                                                 \
         .def(                                                                  \
             "corners",                                                         \
             []( const Corners##dimension##D& self ) {                          \
@@ -44,7 +53,8 @@
                 }                                                              \
                 return components;                                             \
             },                                                                 \
-            pybind11::return_value_policy::reference_internal )
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the list of the Corner components of the model" )
 
 namespace geode
 {

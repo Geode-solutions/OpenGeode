@@ -28,10 +28,14 @@
 #define PYTHON_SOLID_FACETS_BUILDER( dimension )                               \
     const auto name##dimension =                                               \
         "SolidFacetsBuilder" + std::to_string( dimension ) + "D";              \
-    pybind11::class_< SolidFacetsBuilder##dimension##D >(                      \
-        module, name##dimension.c_str() )                                      \
+    pybind11::class_< SolidFacetsBuilder##dimension##D >( module,              \
+        name##dimension.c_str(),                                               \
+        "Builder to modify the facets of a solid mesh" )                       \
         .def( "delete_isolated_facets",                                        \
-            &SolidFacetsBuilder##dimension##D::delete_isolated_facets )
+            &SolidFacetsBuilder##dimension##D::delete_isolated_facets,         \
+            "Delete the facets that are not used by any polyhedron and "       \
+            "return the mapping from the old facet indices to the new ones, "  \
+            "NO_ID for a deleted facet" )
 namespace geode
 {
     void define_solid_facets_builder( pybind11::module& module )

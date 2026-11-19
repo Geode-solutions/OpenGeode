@@ -80,6 +80,14 @@ add_geode_python_test(
         ${PROJECT_NAME}::py_mesh
 )
 add_geode_python_test(
+    SOURCE "test-py-mesh-lifetime.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_geometry
+        ${PROJECT_NAME}::py_image
+        ${PROJECT_NAME}::py_mesh
+)
+add_geode_python_test(
     SOURCE "test-py-light-regular-grid.py"
     DEPENDENCIES 
         ${PROJECT_NAME}::py_basic
@@ -108,3 +116,36 @@ add_geode_python_test(
         ${PROJECT_NAME}::py_mesh
 )
 
+add_geode_python_test(
+    SOURCE "test-py-index-check.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_geometry
+        ${PROJECT_NAME}::py_mesh
+        ${PROJECT_NAME}::py_model
+)
+
+add_geode_python_test(
+    SOURCE "test-py-gil-release.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_geometry
+        ${PROJECT_NAME}::py_mesh
+        ${PROJECT_NAME}::py_model
+)
+
+add_geode_python_test(
+    SOURCE "test-py-docstring-claims.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_geometry
+        ${PROJECT_NAME}::py_mesh
+        ${PROJECT_NAME}::py_model
+)
+add_geode_python_test(
+    SOURCE "test-py-numpy-bulk.py"
+    DEPENDENCIES
+        ${PROJECT_NAME}::py_basic
+        ${PROJECT_NAME}::py_geometry
+        ${PROJECT_NAME}::py_mesh
+)

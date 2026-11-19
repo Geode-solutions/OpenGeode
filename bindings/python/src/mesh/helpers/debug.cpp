@@ -35,13 +35,57 @@ namespace geode
 {
     void define_debug( pybind11::module& module )
     {
-        module.def( "save_segment2D", &detail::save_segment< 2 > )
-            .def( "save_segment3D", &detail::save_segment< 3 > )
-            .def( "save_triangle2D", &detail::save_triangle< 2 > )
-            .def( "save_triangle3D", &detail::save_triangle< 3 > )
-            .def( "save_triangle2D", &detail::save_triangles< 2 > )
-            .def( "save_triangle3D", &detail::save_triangles< 3 > )
-            .def( "save_tetrahedron", &detail::save_tetrahedron )
-            .def( "save_tetrahedra", &detail::save_tetrahedra );
+        module
+            .def( "save_segment2D", &detail::save_segment< 2 >,
+                pybind11::arg( "segment" ), pybind11::arg( "suffix" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Save the segment as the edged curve file "
+                "segment_<suffix>.og_edc2d in the current directory; debugging "
+                "helper" )
+            .def( "save_segment3D", &detail::save_segment< 3 >,
+                pybind11::arg( "segment" ), pybind11::arg( "suffix" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Save the segment as the edged curve file "
+                "segment_<suffix>.og_edc3d in the current directory; debugging "
+                "helper" )
+            .def( "save_triangle2D", &detail::save_triangle< 2 >,
+                pybind11::arg( "triangle" ), pybind11::arg( "suffix" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Save the triangle as the triangulated surface file "
+                "triangle_<suffix>.og_tsf2d in the current directory; "
+                "debugging helper" )
+            .def( "save_triangle3D", &detail::save_triangle< 3 >,
+                pybind11::arg( "triangle" ), pybind11::arg( "suffix" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Save the triangle as the triangulated surface file "
+                "triangle_<suffix>.og_tsf3d in the current directory; "
+                "debugging helper" )
+            .def( "save_triangle2D", &detail::save_triangles< 2 >,
+                pybind11::arg( "surface" ), pybind11::arg( "indices" ),
+                pybind11::arg( "suffix" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Save each triangle of the surface listed in indices as a "
+                "triangulated surface file triangle_<index>_<suffix>.og_tsf2d "
+                "in the current directory; debugging helper" )
+            .def( "save_triangle3D", &detail::save_triangles< 3 >,
+                pybind11::arg( "surface" ), pybind11::arg( "indices" ),
+                pybind11::arg( "suffix" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Save each triangle of the surface listed in indices as a "
+                "triangulated surface file triangle_<index>_<suffix>.og_tsf3d "
+                "in the current directory; debugging helper" )
+            .def( "save_tetrahedron", &detail::save_tetrahedron,
+                pybind11::arg( "tetrahedron" ), pybind11::arg( "suffix" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Save the tetrahedron as the triangulated surface file "
+                "tet_<suffix>.og_tsf3d in the current directory; debugging "
+                "helper" )
+            .def( "save_tetrahedra", &detail::save_tetrahedra,
+                pybind11::arg( "solid" ), pybind11::arg( "indices" ),
+                pybind11::arg( "suffix" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Save each tetrahedron of the solid listed in indices as a "
+                "triangulated surface file tet_<index>_<suffix>.og_tsf3d in "
+                "the current directory; debugging helper" );
     }
 } // namespace geode

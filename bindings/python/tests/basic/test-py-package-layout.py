@@ -1,0 +1,146 @@
+# Copyright (c) 2019 - 2026 Geode-solutions
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+
+"""The wheel ships the extension modules inside a package (opengeode.
+opengeode_py_image...), not as top-level modules: a module which imports another
+one by its top-level name only works from the build tree. Each extension module
+is imported alone, in a fresh interpreter, from a subpackage, so that the
+sibling import does not depend on the package depth (the wheel layout itself is
+tested by test-py-wheel-layout)."""
+
+import importlib.util
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+
+import geode_test_env
+
+MODULES = [
+    "opengeode_py_basic",
+    "opengeode_py_geometry",
+    "opengeode_py_image",
+    "opengeode_py_gdal",
+    "opengeode_py_mesh",
+    "opengeode_py_model",
+]
+
+if __name__ == "__main__":
+    with tempfile.TemporaryDirectory() as directory:
+        library = os.path.join(directory, "package", "lib")
+        os.makedirs(library)
+        for init in (
+            os.path.join(directory, "package", "__init__.py"),
+            os.path.join(library, "__init__.py"),
+        ):
+            open(init, "w").close()
+        for module in MODULES:
+            origin = importlib.util.find_spec(module).origin
+            shutil.copy(origin, os.path.join(library, os.path.basename(origin)))
+        # The directories of the extension modules are not on the path anymore (the
+        # libraries they link to are found by geode_test_env / LD_LIBRARY_PATH)
+        environment = dict(os.environ)
+        environment["PYTHONPATH"] = os.pathsep.join(
+            [directory, os.path.dirname(geode_test_env.__file__)]
+        )
+        failures = []
+        for module in MODULES:
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-c",
+                    f"import geode_test_env; import package.lib.{module} as m; "
+                    "assert m.__doc__",
+                ],
+                cwd=directory,
+                env=environment,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
+            if result.returncode != 0:
+                failures.append(f"{module}:\n{result.stdout}")
+        if failures:
+            raise ValueError(
+                "[Test] Modules not importable from a package:\n"
+                + "\n".join(failures)
+            )
+        # The exceptions are qualified by the module, so that the stubs and the
+        # pickles name an importable module
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                "import geode_test_env; import package.lib.opengeode_py_basic as m; "
+                "names = ['OpenGeodeError', 'OpenGeodeDataError', "
+                "'OpenGeodeInternalError', 'OpenGeodeResultError']; "
+                "modules = {getattr(m, n).__module__ for n in names}; "
+                "assert modules == {m.__name__}, modules",
+            ],
+            cwd=directory,
+            env=environment,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
+        if result.returncode != 0:
+            raise ValueError(
+                "[Test] Exceptions not qualified by their module:\n" + result.stdout
+            )
+
+    # A ModuleNotFoundError raised by hand has no module name: it must be
+    # surfaced as it is, not replaced by an error about the missing name
+    with tempfile.TemporaryDirectory() as directory:
+        library = os.path.join(directory, "package", "lib")
+        os.makedirs(library)
+        for init in (
+            os.path.join(directory, "package", "__init__.py"),
+            os.path.join(library, "__init__.py"),
+        ):
+            open(init, "w").close()
+        origin = importlib.util.find_spec("opengeode_py_image").origin
+        shutil.copy(origin, os.path.join(library, os.path.basename(origin)))
+        broken = os.path.join(directory, "broken")
+        os.makedirs(broken)
+        with open(os.path.join(broken, "opengeode_py_basic.py"), "w") as module:
+            module.write("raise ModuleNotFoundError('hand-raised-failure')\n")
+        environment = dict(os.environ)
+        environment["PYTHONPATH"] = os.pathsep.join(
+            [directory, broken, os.path.dirname(geode_test_env.__file__)]
+        )
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                "import geode_test_env; import package.lib.opengeode_py_image",
+            ],
+            cwd=directory,
+            env=environment,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
+        if result.returncode == 0 or "hand-raised-failure" not in result.stdout:
+            raise ValueError(
+                "[Test] The original ModuleNotFoundError should be surfaced:\n"
+                + result.stdout
+            )

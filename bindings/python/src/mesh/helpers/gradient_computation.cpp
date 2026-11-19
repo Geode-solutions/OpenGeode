@@ -38,10 +38,37 @@ namespace geode
     {
         module
             .def( "compute_surface_scalar_function_gradient2D",
-                &compute_surface_scalar_function_gradient< 2 > )
+                &compute_surface_scalar_function_gradient< 2 >,
+                pybind11::arg( "mesh" ), pybind11::arg( "scalar_function_id" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Compute the gradient of a scalar vertex attribute and store "
+                "it in a new vertex attribute named <attribute name>_gradient, "
+                "whose id is returned; vertices where the gradient cannot be "
+                "computed (a NaN scalar value on the vertex or on a neighbor, "
+                "or "
+                "no usable neighbor) hold the no_value of the attribute, a "
+                "vector of NaN, and has_value() is false for them" )
             .def( "compute_surface_scalar_function_gradient3D",
-                &compute_surface_scalar_function_gradient< 3 > )
+                &compute_surface_scalar_function_gradient< 3 >,
+                pybind11::arg( "mesh" ), pybind11::arg( "scalar_function_id" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Compute the gradient of a scalar vertex attribute and store "
+                "it in a new vertex attribute named <attribute name>_gradient, "
+                "whose id is returned; vertices where the gradient cannot be "
+                "computed (a NaN scalar value on the vertex or on a neighbor, "
+                "or "
+                "no usable neighbor) hold the no_value of the attribute, a "
+                "vector of NaN, and has_value() is false for them" )
             .def( "compute_solid_scalar_function_gradient3D",
-                &compute_solid_scalar_function_gradient );
+                &compute_solid_scalar_function_gradient,
+                pybind11::arg( "mesh" ), pybind11::arg( "scalar_function_id" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Compute the gradient of a scalar vertex attribute and store "
+                "it in a new vertex attribute named <attribute name>_gradient, "
+                "whose id is returned; vertices where the gradient cannot be "
+                "computed (a NaN scalar value on the vertex or on a neighbor, "
+                "or "
+                "no usable neighbor) hold the no_value of the attribute, a "
+                "vector of NaN, and has_value() is false for them" );
     }
 } // namespace geode

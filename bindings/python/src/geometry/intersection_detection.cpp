@@ -34,18 +34,45 @@ namespace geode
     void define_intersection_detection( pybind11::module& module )
     {
         module.def( "segment_segment_intersection_detection2D",
-            &segment_segment_intersection_detection< 2 > );
+            &segment_segment_intersection_detection< 2 >,
+            pybind11::arg( "segment0" ), pybind11::arg( "segment1" ),
+            "Return the position of the intersection on each of the two "
+            "segments: outside-outside if there is none, parallel-parallel if "
+            "all the points are colinear" );
         module.def( "segment_segment_intersection_detection3D",
-            &segment_segment_intersection_detection< 3 > );
+            &segment_segment_intersection_detection< 3 >,
+            pybind11::arg( "segment0" ), pybind11::arg( "segment1" ),
+            "Return the position of the intersection on each of the two "
+            "segments: outside-outside if there is none, parallel-parallel if "
+            "all the points are colinear" );
         module.def( "colinear_segment_segment_intersection_detection2D",
-            &colinear_segment_segment_intersection_detection );
+            &colinear_segment_segment_intersection_detection,
+            pybind11::arg( "segment0" ), pybind11::arg( "segment1" ),
+            "Return the configuration of two colinear 2D segments: "
+            "parallel-parallel if they overlap" );
         module.def( "segment_line_intersection_detection2D",
-            &segment_line_intersection_detection );
+            &segment_line_intersection_detection, pybind11::arg( "segment" ),
+            pybind11::arg( "line" ),
+            "Return the position of the intersection of a 2D line on a "
+            "segment: outside if there is none or all the points are "
+            "colinear" );
         module.def( "line_triangle_intersection_detection3D",
-            &line_triangle_intersection_detection );
+            &line_triangle_intersection_detection, pybind11::arg( "line" ),
+            pybind11::arg( "triangle" ),
+            "Return the position of the intersection of a line on a triangle: "
+            "outside if there is none or the line is coplanar with the "
+            "triangle" );
         module.def( "segment_triangle_intersection_detection3D",
-            &segment_triangle_intersection_detection );
+            &segment_triangle_intersection_detection,
+            pybind11::arg( "segment" ), pybind11::arg( "triangle" ),
+            "Return the position of the intersection on the segment and on the "
+            "triangle: outside if there is none or the segment is coplanar "
+            "with the triangle" );
         module.def( "segment_plane_intersection_detection3D",
-            &segment_plane_intersection_detection );
+            &segment_plane_intersection_detection, pybind11::arg( "segment" ),
+            pybind11::arg( "plane" ),
+            "Return the position of the intersection of a plane on a segment: "
+            "outside if there is none or the segment is coplanar with the "
+            "plane" );
     }
 } // namespace geode

@@ -30,10 +30,20 @@
     const auto name##dimension =                                               \
         "Surfaces" + std::to_string( dimension ) + "D";                        \
     pybind11::class_< Surfaces##dimension##D, pybind11::smart_holder >(        \
-        module, name##dimension.c_str() )                                      \
-        .def( "nb_surfaces", &Surfaces##dimension##D::nb_surfaces )            \
+        module, name##dimension.c_str(),                                       \
+        "Storage of the Surface components of a model, read through the "      \
+        "model class" )                                                        \
+        .def( "nb_surfaces", &Surfaces##dimension##D::nb_surfaces,             \
+            "Return the number of Surface components of the model" )           \
+        .def( "has_surface", &Surfaces##dimension##D::has_surface,             \
+            pybind11::arg( "id" ),                                             \
+            "Return True if the model has a Surface with the given uuid "      \
+            "(False once it is removed)" )                                     \
         .def( "surface", &Surfaces##dimension##D::surface,                     \
-            pybind11::return_value_policy::reference_internal )                \
+            pybind11::arg( "id" ),                                             \
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the Surface with the given uuid; raise an error if the "   \
+            "model has none" )                                                 \
         .def(                                                                  \
             "surfaces",                                                        \
             []( const Surfaces##dimension##D& self ) {                         \
@@ -44,7 +54,8 @@
                 }                                                              \
                 return components;                                             \
             },                                                                 \
-            pybind11::return_value_policy::reference_internal )
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the list of the Surface components of the model" )
 
 namespace geode
 {

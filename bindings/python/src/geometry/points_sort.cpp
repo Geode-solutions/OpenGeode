@@ -30,11 +30,14 @@
     const auto lexicographic_mapping##dimension =                              \
         "lexicographic_mapping" + std::to_string( dimension ) + "D";           \
     module.def( lexicographic_mapping##dimension.c_str(),                      \
-        &lexicographic_mapping< dimension > );                                 \
+        &lexicographic_mapping< dimension >, pybind11::arg( "points" ),        \
+        "Return the indices of the points sorted in lexicographic order" );    \
     const auto morton_mapping##dimension =                                     \
         "morton_mapping" + std::to_string( dimension ) + "D";                  \
-    module.def(                                                                \
-        morton_mapping##dimension.c_str(), &morton_mapping< dimension > )
+    module.def( morton_mapping##dimension.c_str(),                             \
+        &morton_mapping< dimension >, pybind11::arg( "points" ),               \
+        "Return the indices of the points sorted along the Morton (Z-order) "  \
+        "curve" )
 
 namespace geode
 {

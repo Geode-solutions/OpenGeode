@@ -26,6 +26,7 @@
 #include <geode/basic/uuid.hpp>
 
 #include <geode/mesh/builder/point_set_builder.hpp>
+#include <geode/mesh/core/point_set.hpp>
 
 #include <geode/model/mixin/builder/corners_builder.hpp>
 #include <geode/model/mixin/core/corner.hpp>
@@ -33,12 +34,25 @@
 #define PYTHON_CORNERS_BUILDER( dimension )                                    \
     const auto name##dimension =                                               \
         "CornersBuilder" + std::to_string( dimension ) + "D";                  \
-    pybind11::class_< CornersBuilder##dimension##D >(                          \
-        module, name##dimension.c_str() )                                      \
-        .def( "corner_mesh_builder",                                           \
-            &CornersBuilder##dimension##D::corner_mesh_builder )               \
+    pybind11::class_< CornersBuilder##dimension##D >( module,                  \
+        name##dimension.c_str(),                                               \
+        "Builder modifying the Corners of a model, in particular their "       \
+        "meshes" )                                                             \
+        .def(                                                                  \
+            "corner_mesh_builder",                                             \
+            []( CornersBuilder##dimension##D& builder,                         \
+                const Corner##dimension##D& component ) {                      \
+                return geode::builder_with_mesh(                               \
+                    builder.corner_mesh_builder( component ),                  \
+                    component.mesh() );                                        \
+            },                                                                 \
+            pybind11::arg( "corner" ), pybind11::keep_alive< 0, 1 >(),         \
+            "Return the PointSetBuilder modifying the mesh of the corner; it " \
+            "keeps the model builder alive" )                                  \
         .def( "set_corner_name",                                               \
-            &CornersBuilder##dimension##D::set_corner_name )
+            &CornersBuilder##dimension##D::set_corner_name,                    \
+            pybind11::arg( "corner" ), pybind11::arg( "name" ),                \
+            "Set the name of the corner and of its mesh" )
 
 namespace geode
 {

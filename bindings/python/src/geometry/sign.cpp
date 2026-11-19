@@ -32,12 +32,19 @@ namespace geode
 {
     void define_sign( pybind11::module& module )
     {
-        module.def( "tetrahedron_volume_sign", &tetrahedron_volume_sign );
+        module.def( "tetrahedron_volume_sign", &tetrahedron_volume_sign,
+            pybind11::arg( "tetra" ),
+            "Return the sign of the volume of a tetrahedron" );
         module.def( "triangle_area_sign2D",
             static_cast< SIGN ( * )( const Triangle2D& ) >(
-                &triangle_area_sign ) );
+                &triangle_area_sign ),
+            pybind11::arg( "triangle" ),
+            "Return the sign of the area of a 2D triangle" );
         module.def( "triangle_area_sign3D",
             static_cast< SIGN ( * )( const Triangle3D&, local_index_t ) >(
-                &triangle_area_sign ) );
+                &triangle_area_sign ),
+            pybind11::arg( "triangle" ), pybind11::arg( "axis" ),
+            "Return the sign of the area of a 3D triangle projected on the "
+            "plane orthogonal to the given axis (0 for X, 1 for Y, 2 for Z)" );
     }
 } // namespace geode

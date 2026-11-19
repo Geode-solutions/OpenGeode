@@ -30,16 +30,32 @@ namespace geode
 {
     void define_component_registry_builder( pybind11::module& module )
     {
-        pybind11::class_< ComponentRegistryBuilder >(
-            module, "ComponentRegistryBuilder" )
-            .def( pybind11::init< ComponentRegistry& >() )
+        pybind11::class_< ComponentRegistryBuilder >( module,
+            "ComponentRegistryBuilder",
+            "Builder modifying the ComponentRegistry of a model" )
+            .def( pybind11::init< ComponentRegistry& >(),
+                pybind11::arg( "component_registry" ),
+                pybind11::keep_alive< 1, 2 >(),
+                "Build a builder of the given ComponentRegistry, kept alive by "
+                "the builder" )
             .def( "add_mesh_component",
-                &ComponentRegistryBuilder::add_mesh_component )
+                &ComponentRegistryBuilder::add_mesh_component,
+                pybind11::arg( "type" ), pybind11::arg( "id" ),
+                "Register the uuid id as a mesh component of the given type" )
             .def( "add_collection_component",
-                &ComponentRegistryBuilder::add_collection_component )
+                &ComponentRegistryBuilder::add_collection_component,
+                pybind11::arg( "type" ), pybind11::arg( "id" ),
+                "Register the uuid id as a collection component of the given "
+                "type" )
             .def( "remove_mesh_component",
-                &ComponentRegistryBuilder::remove_mesh_component )
+                &ComponentRegistryBuilder::remove_mesh_component,
+                pybind11::arg( "type" ), pybind11::arg( "id" ),
+                "Unregister the uuid id of the mesh components of the given "
+                "type" )
             .def( "remove_collection_component",
-                &ComponentRegistryBuilder::remove_collection_component );
+                &ComponentRegistryBuilder::remove_collection_component,
+                pybind11::arg( "type" ), pybind11::arg( "id" ),
+                "Unregister the uuid id of the collection components of the "
+                "given type" );
     }
 } // namespace geode

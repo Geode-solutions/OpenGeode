@@ -22,6 +22,7 @@
  */
 
 #include "../../common.hpp"
+#include "../index_check.hpp"
 
 #include <geode/basic/attribute_manager.hpp>
 
@@ -30,15 +31,27 @@
 #define PYTHON_SURFACE_EDGES( dimension )                                      \
     const auto name##dimension =                                               \
         "SurfaceEdges" + std::to_string( dimension ) + "D";                    \
-    pybind11::class_< SurfaceEdges##dimension##D >(                            \
-        module, name##dimension.c_str() )                                      \
-        .def( "nb_edges", &SurfaceEdges##dimension##D::nb_edges )              \
-        .def( "edge_vertices", &SurfaceEdges##dimension##D::edge_vertices )    \
+    pybind11::class_< SurfaceEdges##dimension##D >( module,                    \
+        name##dimension.c_str(),                                               \
+        "Edges of a surface mesh, available once enabled with "                \
+        "enable_edges()" )                                                     \
+        .def( "nb_edges", &SurfaceEdges##dimension##D::nb_edges,               \
+            "Return the number of edges" )                                     \
+        .def( "edge_vertices",                                                 \
+            geode::checked( "edge_vertices",                                   \
+                &SurfaceEdges##dimension##D::edge_vertices,                    \
+                geode::EdgeCheck{} ),                                          \
+            "Return the indices of the two vertices of the edge",              \
+            pybind11::arg( "edge_id" ) )                                       \
         .def( "edge_from_vertices",                                            \
-            &SurfaceEdges##dimension##D::edge_from_vertices )                  \
+            &SurfaceEdges##dimension##D::edge_from_vertices,                   \
+            "Return the index of the edge between the two given vertices, in " \
+            "any order, or None if there is none",                             \
+            pybind11::arg( "vertices" ) )                                      \
         .def( "edge_attribute_manager",                                        \
             &SurfaceEdges##dimension##D::edge_attribute_manager,               \
-            pybind11::return_value_policy::reference_internal )
+            pybind11::return_value_policy::reference_internal,                 \
+            "Return the manager of the attributes associated with the edges" )
 
 namespace geode
 {

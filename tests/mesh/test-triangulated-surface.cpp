@@ -691,9 +691,82 @@ void test_polygon_vertex_edge_hash()
         "[hash] Diagonal PolygonEdge should not collide" );
 }
 
+template < typename Function >
+void expect_data_error( Function&& function, std::string_view message )
+{
+    bool thrown{ false };
+    try
+    {
+        function();
+    }
+    catch( const geode::OpenGeodeException& exception )
+    {
+        thrown = true;
+        geode::OpenGeodeMeshException::test(
+            exception.type() == geode::OpenGeodeException::TYPE::data,
+            "[Test] ", message, " should be a data error" );
+    }
+    geode::OpenGeodeMeshException::test(
+        thrown, "[Test] ", message, " should throw" );
+}
+
+void test_invalid_polygon_operations()
+{
+    auto surface = geode::TriangulatedSurface3D::create();
+    auto builder = geode::TriangulatedSurfaceBuilder3D::create( *surface );
+    builder->create_vertices( 4 );
+    builder->create_triangle( { 0, 1, 2 } );
+    builder->create_triangle( { 1, 3, 2 } );
+    const auto check_intact = [&surface]( std::string_view when ) {
+        geode::OpenGeodeMeshException::test( surface->nb_polygons() == 2,
+            "[Test] Wrong number of polygons after ", when );
+        geode::OpenGeodeMeshException::test(
+            surface->polygon_vertex( { 0, 0 } ) == 0
+                && surface->polygon_vertex( { 1, 1 } ) == 3,
+            "[Test] Polygon vertices changed after ", when );
+        const auto around_0 = surface->polygon_around_vertex( 0 );
+        const auto around_3 = surface->polygon_around_vertex( 3 );
+        geode::OpenGeodeMeshException::test(
+            around_0 && around_0->polygon_id == 0 && around_3
+                && around_3->polygon_id == 1,
+            "[Test] Polygon around vertex changed after ", when );
+    };
+    expect_data_error(
+        [&] {
+            geode_unused( builder->permute_polygons( { 0 } ) );
+        },
+        "permute_polygons with too few values" );
+    check_intact( "short permutation" );
+    expect_data_error(
+        [&] {
+            geode_unused( builder->permute_polygons( { 0, 1, 2 } ) );
+        },
+        "permute_polygons with too many values" );
+    check_intact( "long permutation" );
+    expect_data_error(
+        [&] {
+            geode_unused( builder->delete_polygons( { true } ) );
+        },
+        "delete_polygons with too few flags" );
+    check_intact( "short delete flags" );
+    expect_data_error(
+        [&] {
+            geode_unused( builder->delete_polygons( { true, false, false } ) );
+        },
+        "delete_polygons with too many flags" );
+    check_intact( "long delete flags" );
+    expect_data_error(
+        [&] {
+            geode_unused( builder->delete_polygons( { false } ) );
+        },
+        "delete_polygons with too few flags, none to delete" );
+    check_intact( "short delete flags, none to delete" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
+    test_invalid_polygon_operations();
     test_backward_v18_5();
     auto surface = geode::TriangulatedSurface3D::create(
         geode::OpenGeodeTriangulatedSurface3D::impl_name_static() );

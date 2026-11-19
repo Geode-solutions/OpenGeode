@@ -22,6 +22,7 @@
  */
 
 #include "../../common.hpp"
+#include "../index_check.hpp"
 
 #include <geode/geometry/bounding_box.hpp>
 #include <geode/geometry/point.hpp>
@@ -33,12 +34,24 @@
         "PointSet" + std::to_string( dimension ) + "D";                        \
     pybind11::class_< PointSet##dimension##D, VertexSet,                       \
         CoordinateReferenceSystemManagers##dimension##D,                       \
-        pybind11::smart_holder >( module, name##dimension.c_str() )            \
+        pybind11::smart_holder >( module, name##dimension.c_str(),             \
+        "Set of points: vertices that have coordinates" )                      \
         .def_static( "create",                                                 \
             static_cast< std::unique_ptr< PointSet##dimension##D > ( * )() >(  \
-                &PointSet##dimension##D::create ) )                            \
-        .def( "clone", &PointSet##dimension##D::clone )                        \
-        .def( "bounding_box", &PointSet##dimension##D::bounding_box )
+                &PointSet##dimension##D::create ),                             \
+            "Create an empty point set with the default data structure" )      \
+        .def( "point",                                                         \
+            geode::checked_as< PointSet##dimension##D >( "point",              \
+                &CoordinateReferenceSystemManagers< dimension >::point,        \
+                geode::VertexCheck{} ),                                        \
+            "Return the coordinates of a vertex in the active coordinate "     \
+            "reference system",                                                \
+            pybind11::arg( "vertex_id" ) )                                     \
+        .def( "clone", &PointSet##dimension##D::clone,                         \
+            "Return a copy of the point set, with the same data structure, "   \
+            "name and identifier" )                                            \
+        .def( "bounding_box", &PointSet##dimension##D::bounding_box,           \
+            "Return the bounding box of the vertices of the point set" )
 
 namespace geode
 {

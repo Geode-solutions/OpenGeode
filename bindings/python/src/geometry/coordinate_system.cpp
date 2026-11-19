@@ -30,17 +30,45 @@
         "CoordinateSystem" + std::to_string( dimension ) + "D";                \
     define_string_representation(                                              \
         pybind11::class_< CoordinateSystem##dimension##D,                      \
-            pybind11::smart_holder >( module, name##dimension.c_str() ) )      \
-        .def( pybind11::init<>() )                                             \
+            pybind11::smart_holder >( module, name##dimension.c_str(),         \
+            "Coordinate system defined by an origin and one direction per "    \
+            "axis" ),                                                          \
+        []( const CoordinateSystem##dimension##D& system ) {                   \
+            std::array< Vector< dimension >, dimension > directions;           \
+            for( const auto i : LRange{ dimension } )                          \
+            {                                                                  \
+                directions[i] = system.direction( i );                         \
+            }                                                                  \
+            return python_call_repr( "CoordinateSystem" #dimension "D",        \
+                { "directions=" + python_repr( directions ),                   \
+                    "origin=" + python_repr( system.origin() ) } );            \
+        } )                                                                    \
+        .def( pybind11::init<>(),                                              \
+            "Build the canonical coordinate system, centered on the origin" )  \
         .def( pybind11::init< std::array< Vector< dimension >, dimension >,    \
-            Point< dimension > >() )                                           \
+                  Point< dimension > >(),                                      \
+            pybind11::arg( "directions" ), pybind11::arg( "origin" ),          \
+            "Build a coordinate system from the directions of its axes and "   \
+            "its origin. Raise an error if the directions are colinear" )      \
         .def( pybind11::init< Point< dimension >,                              \
-            const std::array< Point< dimension >, dimension >& >() )           \
-        .def( "origin", &CoordinateSystem##dimension##D::origin )              \
-        .def( "set_origin", &CoordinateSystem##dimension##D::set_origin )      \
-        .def( "coordinates", &CoordinateSystem##dimension##D::coordinates )    \
+                  const std::array< Point< dimension >, dimension >& >(),      \
+            pybind11::arg( "origin" ), pybind11::arg( "other_points" ),        \
+            "Build a coordinate system from its origin and one point on each " \
+            "axis. Raise an error if the axes are colinear" )                  \
+        .def( "origin", &CoordinateSystem##dimension##D::origin,               \
+            "Return the origin of the coordinate system" )                     \
+        .def( "set_origin", &CoordinateSystem##dimension##D::set_origin,       \
+            pybind11::arg( "origin" ),                                         \
+            "Set the origin of the coordinate system" )                        \
+        .def( "coordinates", &CoordinateSystem##dimension##D::coordinates,     \
+            pybind11::arg( "global_coordinates" ),                             \
+            "Return the coordinates in this coordinate system of a point "     \
+            "given in the global one" )                                        \
         .def( "global_coordinates",                                            \
-            &CoordinateSystem##dimension##D::global_coordinates )
+            &CoordinateSystem##dimension##D::global_coordinates,               \
+            pybind11::arg( "coordinates" ),                                    \
+            "Return the global coordinates of a point given in this "          \
+            "coordinate system" )
 
 namespace geode
 {

@@ -124,6 +124,10 @@ namespace geode
 
         ModelCopyMapping concatenate( const Model& other_model )
         {
+            OpenGeodeModelException::check_exception( &other_model != &model_,
+                nullptr, OpenGeodeException::TYPE::data,
+                "[ModelConcatener::concatenate] Cannot concatenate a model "
+                "into itself" );
             auto mapping = builder_.copy_components( other_model );
             builder_.copy_component_geometry( mapping, other_model );
             copy_relationships( other_model, mapping );

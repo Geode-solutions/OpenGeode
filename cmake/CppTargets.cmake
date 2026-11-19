@@ -7,6 +7,40 @@ endif()
 # CI test builds may replace the Debug flags (e.g. optimized with assertions kept)
 if(DEFINED ENV{GEODE_CI_DEBUG_FLAGS})
     set(CMAKE_CXX_FLAGS_DEBUG "$ENV{GEODE_CI_DEBUG_FLAGS}")
+    # No link-time optimization in these Debug builds: the links redo the
+    # optimizations of every object (about a third of the build time) for
+    # binaries only tested once. Release builds keep it.
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_DEBUG OFF)
+    # Without link-time optimization, GCC runs its optimization-dependent
+    # warnings at compile time, after inlining: false positives, mostly in
+    # third party headers (bitsery, abseil, libstdc++), that were never errors.
+    # Being inlined into Geode functions, they are not silenced as system
+    # header warnings. Upgrading GCC does not remove them (checked with GCC 15).
+    # Kept as warnings.
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        string(APPEND CMAKE_CXX_FLAGS_DEBUG
+            " -Wno-error=maybe-uninitialized"
+            " -Wno-error=uninitialized"
+            " -Wno-error=null-dereference"
+            " -Wno-error=free-nonheap-object"
+            " -Wno-error=array-bounds"
+            " -Wno-error=stringop-overflow"
+            " -Wno-error=stringop-overread"
+            " -Wno-error=stringop-truncation"
+            " -Wno-error=use-after-free"
+            " -Wno-error=dangling-pointer"
+            " -Wno-error=restrict"
+            " -Wno-error=format-overflow"
+            " -Wno-error=format-truncation"
+        )
+    endif()
+endif()
+
+# CI compiler cache (ccache, sccache) of the Geode projects only: the third
+# party projects of a superbuild have their own cache, and may build with
+# flags a compiler cache does not support (MSVC /Zi)
+if(DEFINED ENV{GEODE_CI_COMPILER_LAUNCHER})
+    set(CMAKE_CXX_COMPILER_LAUNCHER "$ENV{GEODE_CI_COMPILER_LAUNCHER}")
 endif()
 
 function(_export_library library_name)
@@ -106,6 +140,7 @@ function(add_geode_library)
     endif()
     add_library(${PROJECT_LIB_NAME} ALIAS ${GEODE_LIB_NAME})
     add_dependencies(essential ${GEODE_LIB_NAME})
+    add_dependencies(deliverables ${GEODE_LIB_NAME})
     string(TOLOWER ${PROJECT_NAME} project-name)
     string(REGEX REPLACE "-" "_" project_name ${project-name})
     set_target_properties(${GEODE_LIB_NAME}
@@ -288,6 +323,7 @@ function(add_geode_binary)
         ${ARGN}
     )
     _add_geode_executable(${GEODE_BINARY_SOURCE} "Utilities" ${GEODE_BINARY_DEPENDENCIES})
+    add_dependencies(deliverables ${target_name})
     install(TARGETS ${target_name}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         COMPONENT public

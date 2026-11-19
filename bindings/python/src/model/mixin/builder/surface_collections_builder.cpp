@@ -31,11 +31,14 @@
 #define PYTHON_SURFACE_COLLECTIONS_BUILDER( dimension )                        \
     const auto name##dimension =                                               \
         "SurfaceCollectionsBuilder" + std::to_string( dimension ) + "D";       \
-    pybind11::class_< SurfaceCollectionsBuilder##dimension##D >(               \
-        module, name##dimension.c_str() )                                      \
+    pybind11::class_< SurfaceCollectionsBuilder##dimension##D >( module,       \
+        name##dimension.c_str(),                                               \
+        "Builder modifying the SurfaceCollections of a model" )                \
         .def( "set_surface_collection_name",                                   \
             &SurfaceCollectionsBuilder##dimension##D::                         \
-                set_surface_collection_name )
+                set_surface_collection_name,                                   \
+            pybind11::arg( "surface_collection" ), pybind11::arg( "name" ),    \
+            "Set the name of the surface collection" )
 
 namespace geode
 {

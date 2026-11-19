@@ -238,6 +238,39 @@ def test_permutation(solid, builder):
         raise ValueError("[Test] Wrong polyhedra_5 after polyhedron permute")
 
 
+def expect_data_error(function, message):
+    try:
+        function()
+    except opengeode.OpenGeodeDataError:
+        return
+    raise ValueError(f"[Test] {message} should raise an OpenGeodeDataError")
+
+
+def test_invalid_polyhedron_operations():
+    solid = mesh.TetrahedralSolid3D.create()
+    builder = mesh.TetrahedralSolidBuilder3D.create(solid)
+    builder.create_vertices(5)
+    builder.create_tetrahedron([0, 1, 2, 3])
+    builder.create_tetrahedron([1, 2, 3, 4])
+    for call, label in [
+        (lambda: builder.permute_polyhedra([0]), "short permutation"),
+        (lambda: builder.permute_polyhedra([0, 1, 2]), "long permutation"),
+        (lambda: builder.permute_polyhedra([1, 1]), "duplicated permutation"),
+        (lambda: builder.delete_polyhedra([True]), "short flags"),
+        (lambda: builder.delete_polyhedra([False]), "short flags, none to delete"),
+        (lambda: builder.delete_polyhedra([True, False, False]), "long flags"),
+    ]:
+        expect_data_error(call, label)
+        if solid.nb_polyhedra() != 2:
+            raise ValueError(f"[Test] Wrong number of polyhedra after {label}")
+        if solid.polyhedron_vertex(mesh.PolyhedronVertex(0, 0)) != 0 or solid.polyhedron_vertex(mesh.PolyhedronVertex(1, 3)) != 4:
+            raise ValueError(f"[Test] Polyhedron vertices changed after {label}")
+        if solid.polyhedron_around_vertex(0).polyhedron_id != 0 or solid.polyhedron_around_vertex(4).polyhedron_id != 1:
+            raise ValueError(f"[Test] Polyhedron around vertex changed after {label}")
+    if builder.permute_polyhedra([1, 0]) != [1, 0]:
+        raise ValueError("[Test] A valid permutation should still work")
+
+
 if __name__ == '__main__':
     mesh.OpenGeodeMeshLibrary.initialize()
     solid = mesh.TetrahedralSolid3D.create()
@@ -257,3 +290,4 @@ if __name__ == '__main__':
     test_permutation(solid, builder)
     test_delete_polyhedron(solid, builder)
     test_clone(solid)
+    test_invalid_polyhedron_operations()

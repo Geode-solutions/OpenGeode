@@ -88,6 +88,161 @@ def run_test_brep():
                             "[Test] Point on the edge and on the surface have different positions.")
 
 
+
+def check(condition, message):
+    if not condition:
+        raise ValueError("[Test] " + message)
+
+
+def check_raises(function, exception, message):
+    try:
+        function()
+    except exception:
+        return
+    raise ValueError("[Test] " + message + " should raise " + exception.__name__)
+
+
+def check_optional_field_live(result, field, make, read, mutate):
+    """An optional field of a bound class is None or a live reference to the
+    stored value: modifying it modifies the result, reassigning the field
+    keeps the storage (the references held stay valid and show the new
+    value), and None is refused."""
+    name = type(result).__name__ + "." + field
+    check(getattr(result, field) is None, name + " is None by default")
+    check_raises(lambda: setattr(result, field, None), TypeError, name + " = None when disengaged")
+    check(getattr(result, field) is None, name + " stays None after a refused None")
+    setattr(result, field, make(1))
+    live = getattr(result, field)
+    check(read(live) == 1, name + " assigned when disengaged")
+    # In-place edit through the getter changes the result
+    mutate(getattr(result, field), 2)
+    check(read(getattr(result, field)) == 2, name + " modified in place through the getter")
+    check(read(live) == 2, name + " reference sees the in-place edit")
+    # None is refused and leaves the field unchanged
+    check_raises(lambda: setattr(result, field, None), TypeError, name + " = None")
+    check(read(getattr(result, field)) == 2, name + " unchanged by a refused None")
+    check(read(live) == 2, name + " reference valid after a refused None")
+    # Reassigning keeps the storage: the reference shows the new value
+    other = make(3)
+    setattr(result, field, other)
+    check(read(live) == 3, name + " reference shows the reassigned value")
+    mutate(other, 4)
+    check(read(getattr(result, field)) == 3, name + " keeps its own copy of the assigned value")
+    mutate(live, 5)
+    check(read(getattr(result, field)) == 5, name + " modified through an older reference")
+    # Churn: many reassignments while holding the reference
+    for value in range(100):
+        setattr(result, field, make(value))
+        check(read(live) == value, name + " reference valid during reassignments")
+    # The reference keeps its object alive
+    del result
+    check(read(live) == 99, name + " reference keeps its object alive")
+
+
+def run_test_optional_fields():
+    def make_facet(value):
+        facet = model.BlockPolyhedronFacet(mesh.PolyhedronFacet(value, 0))
+        facet.vertices = [value, value + 1, value + 2]
+        return facet
+
+    def read_facet(facet):
+        check(list(facet.vertices) == [facet.facet.polyhedron_id + i for i in range(3)], "facet vertices")
+        return facet.facet.polyhedron_id
+
+    def mutate_facet(facet, value):
+        facet.facet.polyhedron_id = value
+        facet.vertices = [value, value + 1, value + 2]
+
+    def make_edge(value):
+        edge = model.SurfacePolygonEdge(mesh.PolygonEdge(value, 0))
+        edge.vertices = [value, value + 1]
+        return edge
+
+    def read_edge(edge):
+        check(list(edge.vertices) == [edge.facet.polygon_id, edge.facet.polygon_id + 1], "edge vertices")
+        return edge.facet.polygon_id
+
+    def mutate_edge(edge, value):
+        edge.facet.polygon_id = value
+        edge.vertices = [value, value + 1]
+
+    for field in ["oriented_polyhedron_facet", "opposite_polyhedron_facet"]:
+        check_optional_field_live(
+            model.BlockPolyhedraFacetVertices(), field, make_facet, read_facet, mutate_facet
+        )
+    for field in ["oriented_edge", "opposite_edge"]:
+        check_optional_field_live(
+            model.SurfacePolygonsEdgeVertices(), field, make_edge, read_edge, mutate_edge
+        )
+    # The two optional fields of one result are independent
+    result = model.SurfacePolygonsEdgeVertices()
+    result.oriented_edge = make_edge(1)
+    result.opposite_edge = make_edge(2)
+    result.oriented_edge.facet.polygon_id = 7
+    check(result.opposite_edge.facet.polygon_id == 2, "optional fields are independent")
+    check(result.nb_edges() == 2, "nb_edges sees both assigned fields")
+    # A non optional class field is a reference to the field of its object,
+    # which it keeps alive
+    edge = model.SurfacePolygonEdge(mesh.PolygonEdge(5, 1))
+    facet = edge.facet
+    facet.polygon_id = 6
+    check(edge.facet.polygon_id == 6, "a class field is a reference")
+    del edge
+    check(facet.polygon_id == 6, "a class field keeps its object alive")
+    # Docstrings: live optional fields, containers, scalars
+    for cls, field in [
+        (model.BlockPolyhedraFacetVertices, "oriented_polyhedron_facet"),
+        (model.BlockPolyhedraFacetVertices, "opposite_polyhedron_facet"),
+        (model.SurfacePolygonsEdgeVertices, "oriented_edge"),
+        (model.SurfacePolygonsEdgeVertices, "opposite_edge"),
+    ]:
+        doc = " ".join(getattr(cls, field).__doc__.split())
+        check("live reference" in doc and "modified in place" in doc and "cannot be set to None" in doc,
+              cls.__name__ + "." + field + " docstring")
+        check("copy" not in doc, cls.__name__ + "." + field + " docstring without copy")
+    for cls, field in [
+        (model.BlockPolyhedronFacet, "vertices"),
+        (model.SurfacePolygonEdge, "vertices"),
+    ]:
+        doc = " ".join(getattr(cls, field).__doc__.split())
+        check("returned as a copy" in doc and "assign" in doc, cls.__name__ + "." + field + " docstring")
+    for cls, field in [
+        (mesh.PolygonEdge, "polygon_id"),
+        (mesh.PolyhedronFacet, "facet_id"),
+        (basic.AttributeProperties, "assignable"),
+        (basic.AttributeProperties, "time"),
+        (model.BlockPolyhedronFacet, "facet"),
+    ]:
+        doc = getattr(cls, field).__doc__
+        check("copy" not in doc and "live reference" not in doc, cls.__name__ + "." + field + " docstring")
+    # A container field is a copy: modifying it does not modify the object
+    edge = model.SurfacePolygonEdge(mesh.PolygonEdge(5, 1))
+    edge.vertices = [1, 2]
+    vertices = edge.vertices
+    vertices[0] = 9
+    check(list(edge.vertices) == [1, 2], "a container field is a copy")
+
+
+def run_test_value_optional_fields():
+    # Optional fields of scalars keep value semantics: None allowed
+    properties = basic.AttributeProperties()
+    check(properties.time is None, "time is None by default")
+    properties.time = 2.5
+    check(properties.time == 2.5, "time assigned")
+    properties.time = None
+    check(properties.time is None, "time reset to None")
+    values = basic.AttributeValuesDouble()
+    check(values.no_value is None, "no_value is None by default")
+    values.no_value = -1.0
+    check(values.no_value == -1.0, "no_value assigned")
+    values.no_value = None
+    check(values.no_value is None, "no_value reset to None")
+    doc = basic.AttributeValuesDouble.no_value.__doc__
+    check("copy" not in doc and "live reference" not in doc, "AttributeValuesDouble.no_value docstring")
+
+
 if __name__ == '__main__':
     model.OpenGeodeModelLibrary.initialize()
     run_test_brep()
+    run_test_optional_fields()
+    run_test_value_optional_fields()

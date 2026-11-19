@@ -34,25 +34,48 @@
     const auto name##dimension =                                               \
         "RegularGridBuilder" + std::to_string( dimension ) + "D";              \
     pybind11::class_< RegularGridBuilder##dimension##D,                        \
-        Base##Builder##dimension##D >( module, name##dimension.c_str() )       \
-        .def_static( "create", &RegularGridBuilder##dimension##D::create )     \
+        Base##Builder##dimension##D >( module, name##dimension.c_str(),        \
+        "Builder to initialize and modify a regular grid" )                    \
+        .def_static( "create",                                                 \
+            geode::builder_creator(                                            \
+                &RegularGridBuilder##dimension##D::create ),                   \
+            pybind11::arg( "grid" ), pybind11::keep_alive< 0, 1 >(),           \
+            "Return the builder to modify the regular grid, which keeps the "  \
+            "grid alive" )                                                     \
         .def( "initialize_grid",                                               \
             static_cast< void ( RegularGridBuilder##dimension##D::* )(         \
                 const Point##dimension##D&, std::array< index_t, dimension >,  \
                 std::array< double, dimension > ) >(                           \
-                &RegularGridBuilder##dimension##D::initialize_grid ) )         \
+                &RegularGridBuilder##dimension##D::initialize_grid ),          \
+            "Create the vertices and the cells of the grid from its origin, "  \
+            "the number of cells and the cell length in each direction",       \
+            pybind11::arg( "origin" ), pybind11::arg( "cells_number" ),        \
+            pybind11::arg( "cells_length" ) )                                  \
         .def( "initialize_cartesian_grid",                                     \
             static_cast< void ( RegularGridBuilder##dimension##D::* )(         \
                 const Point##dimension##D&, std::array< index_t, dimension >,  \
                 double ) >(                                                    \
-                &RegularGridBuilder##dimension##D::initialize_grid ) )         \
+                &RegularGridBuilder##dimension##D::initialize_grid ),          \
+            "Create the vertices and the cells of the grid from its origin, "  \
+            "the number of cells in each direction and one cell length "       \
+            "shared by all the directions",                                    \
+            pybind11::arg( "origin" ), pybind11::arg( "cells_number" ),        \
+            pybind11::arg( "cells_length" ) )                                  \
         .def( "initialize_grid_with_directions",                               \
             static_cast< void ( RegularGridBuilder##dimension##D::* )(         \
                 Point##dimension##D, std::array< index_t, dimension >,         \
                 std::array< Vector##dimension##D, dimension > ) >(             \
-                &RegularGridBuilder##dimension##D::initialize_grid ) )         \
+                &RegularGridBuilder##dimension##D::initialize_grid ),          \
+            "Create the vertices and the cells of the grid from its origin, "  \
+            "the number of cells in each direction and the vector of a cell "  \
+            "along each direction",                                            \
+            pybind11::arg( "origin" ), pybind11::arg( "cells_number" ),        \
+            pybind11::arg( "cell_directions" ) )                               \
         .def( "update_origin",                                                 \
-            &RegularGridBuilder##dimension##D::update_origin )
+            &RegularGridBuilder##dimension##D::update_origin,                  \
+            "Move the grid so that its origin is the given point, updating "   \
+            "its vertices",                                                    \
+            pybind11::arg( "origin" ) )
 
 namespace geode
 {

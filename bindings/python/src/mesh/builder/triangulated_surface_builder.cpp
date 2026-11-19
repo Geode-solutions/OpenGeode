@@ -22,6 +22,7 @@
  */
 
 #include "../../common.hpp"
+#include "../index_check.hpp"
 
 #include <geode/mesh/builder/triangulated_surface_builder.hpp>
 #include <geode/mesh/core/triangulated_surface.hpp>
@@ -30,11 +31,22 @@
     const auto name##dimension =                                               \
         "TriangulatedSurfaceBuilder" + std::to_string( dimension ) + "D";      \
     pybind11::class_< TriangulatedSurfaceBuilder##dimension##D,                \
-        SurfaceMeshBuilder##dimension##D >( module, name##dimension.c_str() )  \
-        .def_static(                                                           \
-            "create", &TriangulatedSurfaceBuilder##dimension##D::create )      \
+        SurfaceMeshBuilder##dimension##D >( module, name##dimension.c_str(),   \
+        "Builder to modify a triangulated surface" )                           \
+        .def_static( "create",                                                 \
+            geode::builder_creator(                                            \
+                &TriangulatedSurfaceBuilder##dimension##D::create ),           \
+            pybind11::arg( "mesh" ), pybind11::keep_alive< 0, 1 >(),           \
+            "Return the builder to modify the triangulated surface, which "    \
+            "keeps the mesh alive" )                                           \
         .def( "create_triangle",                                               \
-            &TriangulatedSurfaceBuilder##dimension##D::create_triangle )
+            geode::checked_builder< TriangulatedSurfaceBuilder##dimension##D,  \
+                SurfaceMesh< dimension > >( "create_triangle",                 \
+                &TriangulatedSurfaceBuilder##dimension##D::create_triangle,    \
+                geode::VertexCheck{} ),                                        \
+            "Create a triangle from its three vertices and return its index. " \
+            "Raise IndexError if a vertex is not in [0, nb_vertices)",         \
+            pybind11::arg( "vertices" ) )
 
 namespace geode
 {

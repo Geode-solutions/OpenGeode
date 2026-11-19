@@ -152,7 +152,9 @@ namespace geode
         /*!
          * Permute polygons to match the given order.
          * @param[in] permutation Vector of size surface_mesh_.nb_polygons().
-         * Each value corresponds to the destination position.
+         * permutation[new_index] is the old index of the polygon that is moved
+         * to new_index. It must be a permutation of the indices, otherwise an
+         * OpenGeodeException of type data is thrown.
          * @return the mapping between old polygon indices to new ones.
          */
         std::vector< index_t > permute_polygons(

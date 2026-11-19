@@ -336,9 +336,130 @@ void test_delete_edges_and_vertices()
         "[Test] Wrong edges after edge permutation" );
 }
 
+void test_save_unknown_extension()
+{
+    auto graph =
+        geode::Graph::create( geode::OpenGeodeGraph::impl_name_static() );
+    for( const auto* filename : { "test.unknown_extension",
+             " test.unknown_extension ", "no_extension" } )
+    {
+        bool thrown{ false };
+        try
+        {
+            geode_unused( geode::save_graph( *graph, filename ) );
+        }
+        catch( const geode::OpenGeodeException& exception )
+        {
+            thrown = true;
+            geode::OpenGeodeMeshException::test(
+                exception.type() == geode::OpenGeodeException::TYPE::data,
+                "[Test] Saving in an unknown extension should be a data "
+                "error, like loading" );
+        }
+        geode::OpenGeodeMeshException::test(
+            thrown, "[Test] Saving in an unknown extension should throw" );
+    }
+}
+
+template < typename Function >
+void expect_data_error( Function&& function, std::string_view message )
+{
+    bool thrown{ false };
+    try
+    {
+        function();
+    }
+    catch( const geode::OpenGeodeException& exception )
+    {
+        thrown = true;
+        geode::OpenGeodeMeshException::test(
+            exception.type() == geode::OpenGeodeException::TYPE::data,
+            "[Test] ", message, " should be a data error" );
+    }
+    geode::OpenGeodeMeshException::test(
+        thrown, "[Test] ", message, " should throw" );
+}
+
+void test_invalid_edge_operations()
+{
+    auto graph =
+        geode::Graph::create( geode::OpenGeodeGraph::impl_name_static() );
+    auto builder = geode::GraphBuilder::create( *graph );
+    builder->create_vertices( 3 );
+    builder->create_edge( 0, 1 );
+    builder->create_edge( 1, 2 );
+    builder->create_edge( 0, 2 );
+    const auto check_intact = [&graph]( std::string_view when ) {
+        geode::OpenGeodeMeshException::test( graph->nb_edges() == 3,
+            "[Test] Wrong number of edges after ", when );
+        check_edges_around_consistency( *graph );
+        geode::OpenGeodeMeshException::test(
+            graph->edge_vertex( { 0, 0 } ) == 0
+                && graph->edge_vertex( { 1, 0 } ) == 1
+                && graph->edge_vertex( { 2, 1 } ) == 2,
+            "[Test] Edge vertices changed after ", when );
+        geode::OpenGeodeMeshException::test(
+            graph->edges_around_vertex( 0 ).size() == 2
+                && graph->edges_around_vertex( 1 ).size() == 2
+                && graph->edges_around_vertex( 2 ).size() == 2,
+            "[Test] Edges around vertices changed after ", when );
+    };
+    // Wrong sizes (shorter and longer) are rejected before any change
+    expect_data_error(
+        [&] {
+            geode_unused( builder->permute_edges( { 0, 1 } ) );
+        },
+        "permute_edges with too few values" );
+    check_intact( "short permutation" );
+    expect_data_error(
+        [&] {
+            geode_unused( builder->permute_edges( { 0, 1, 2, 3 } ) );
+        },
+        "permute_edges with too many values" );
+    check_intact( "long permutation" );
+    expect_data_error(
+        [&] {
+            geode_unused( builder->permute_edges( { 0, 0, 1 } ) );
+        },
+        "permute_edges with a duplicated value" );
+    check_intact( "duplicated permutation" );
+    expect_data_error(
+        [&] {
+            geode_unused( builder->permute_edges( { 0, 1, 3 } ) );
+        },
+        "permute_edges with an out of range value" );
+    check_intact( "out of range permutation" );
+    expect_data_error(
+        [&] {
+            geode_unused( builder->delete_edges( { true } ) );
+        },
+        "delete_edges with too few flags" );
+    check_intact( "short delete flags" );
+    expect_data_error(
+        [&] {
+            geode_unused(
+                builder->delete_edges( { true, false, false, false } ) );
+        },
+        "delete_edges with too many flags" );
+    check_intact( "long delete flags" );
+    expect_data_error(
+        [&] {
+            geode_unused( builder->delete_edges( { false } ) );
+        },
+        "delete_edges with too few flags, none to delete" );
+    check_intact( "short delete flags, none to delete" );
+    // The graph is still usable
+    builder->permute_edges( { 2, 1, 0 } );
+    check_edges_around_consistency( *graph );
+    geode::OpenGeodeMeshException::test( graph->edge_vertex( { 0, 1 } ) == 2,
+        "[Test] Wrong edge vertex after a valid permutation" );
+}
+
 void test()
 {
     geode::OpenGeodeMeshLibrary::initialize();
+    test_save_unknown_extension();
+    test_invalid_edge_operations();
     test_backward_v18_5();
     auto graph =
         geode::Graph::create( geode::OpenGeodeGraph::impl_name_static() );
