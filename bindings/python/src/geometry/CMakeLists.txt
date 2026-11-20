@@ -33,6 +33,7 @@ add_geode_python_binding(
         "intersection_detection.cpp"
         "mensuration.cpp"
         "nn_search.cpp"
+        "octree.cpp"
         "perpendicular.cpp"
         "point.cpp"
         "points_sort.cpp"

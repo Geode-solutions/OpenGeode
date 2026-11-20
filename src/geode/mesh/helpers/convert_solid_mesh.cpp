@@ -23,8 +23,12 @@
 
 #include <geode/mesh/helpers/convert_solid_mesh.hpp>
 
+#include <absl/container/flat_hash_map.h>
+
+#include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/logger.hpp>
 
+#include <geode/geometry/octree.hpp>
 #include <geode/geometry/point.hpp>
 
 #include <geode/mesh/builder/hybrid_solid_builder.hpp>
@@ -624,6 +628,54 @@ namespace
         return solid;
     }
 
+    std::unique_ptr< geode::HybridSolid3D > create_hybrid_solid_from_octree(
+        const geode::Octree3D& octree )
+    {
+        auto mesh = geode::HybridSolid3D::create();
+        auto builder = geode::HybridSolidBuilder3D::create( *mesh );
+        const auto leaves = octree.leaves();
+        absl::flat_hash_map< std::array< geode::index_t, 3 >, geode::index_t >
+            corner_ids;
+        corner_ids.reserve( leaves.size() * 2 );
+        geode::GenericMapping< geode::index_t > old2new_mapping;
+        for( const auto leaf : leaves )
+        {
+            const auto box = octree.cell_bounding_box( leaf );
+            const auto& anchor = octree.cell_anchor( leaf );
+            const geode::index_t size{ geode::index_t{ 1 }
+                                       << ( octree.max_depth()
+                                              - octree.level( leaf ) ) };
+            std::array< geode::index_t, 8 > corners;
+            for( const auto c : geode::LRange{ 8 } )
+            {
+                std::array< geode::index_t, 3 > key;
+                geode::Point3D point;
+                for( const auto d : geode::LRange{ 3 } )
+                {
+                    const auto upper = ( ( c >> d ) & 1u ) != 0;
+                    key[d] = anchor[d] + ( upper ? size : geode::index_t{ 0 } );
+                    point.set_value( d,
+                        upper ? box.max().value( d ) : box.min().value( d ) );
+                }
+                const auto it =
+                    corner_ids.try_emplace( key, mesh->nb_vertices() );
+                if( it.second )
+                {
+                    builder->create_point( point );
+                }
+                corners[c] = it.first->second;
+            }
+            const auto element_id = builder->create_hexahedron(
+                { corners[0], corners[1], corners[3], corners[2], corners[4],
+                    corners[5], corners[7], corners[6] } );
+            old2new_mapping.map( leaf, element_id );
+        }
+        builder->compute_polyhedron_adjacencies();
+        mesh->polyhedron_attribute_manager().import(
+            octree.cell_attribute_manager(), old2new_mapping );
+        return mesh;
+    }
+
     /*!
      * Copy polyhedron adjacencies from a solid to a converted one having the
      * same polyhedra but possibly with reordered vertices and facets.
@@ -919,6 +971,12 @@ namespace geode
         const Grid3D& grid )
     {
         return create_hybrid_solid_from_grid( grid );
+    }
+
+    std::unique_ptr< HybridSolid3D > convert_octree_into_hybrid_solid(
+        const Octree3D& octree )
+    {
+        return create_hybrid_solid_from_octree( octree );
     }
 
     std::unique_ptr< TetrahedralSolid3D >

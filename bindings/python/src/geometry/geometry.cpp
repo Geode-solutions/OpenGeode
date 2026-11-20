@@ -37,6 +37,7 @@ namespace geode
     void define_intersection_detection( pybind11::module& );
     void define_mensuration( pybind11::module& );
     void define_nn_search( pybind11::module& );
+    void define_octree( pybind11::module& );
     void define_perpendicular( pybind11::module& );
     void define_point( pybind11::module& );
     void define_points_sort( pybind11::module& );
@@ -52,12 +53,15 @@ namespace geode
 
 PYBIND11_MODULE( opengeode_py_geometry, module )
 {
+    // Octree returns the AttributeManager of opengeode_py_basic
+    geode::import_binding_dependency( module, "opengeode_py_basic" );
     pybind11::add_ostream_redirect( module );
     module.doc() =
         "Geometry of OpenGeode: Point, Vector, Frame, CoordinateSystem, Angle, "
         "BoundingBox, basic objects (Segment, Triangle, Tetrahedron, Plane, "
         "Sphere, Circle, Cylinder, InfiniteLine, Ray), nearest neighbor "
-        "search (NNSearch) and the geometric predicates and computations "
+        "search (NNSearch), adaptive octree (Octree) and the geometric "
+        "predicates and computations "
         "on them (distance, projection, intersection, position, sign, "
         "mensuration, quality, barycentric coordinates). Functions and "
         "classes depending on the dimension end with 2D or 3D";
@@ -77,6 +81,7 @@ PYBIND11_MODULE( opengeode_py_geometry, module )
     geode::define_intersection_detection( module );
     geode::define_mensuration( module );
     geode::define_nn_search( module );
+    geode::define_octree( module );
     geode::define_perpendicular( module );
     geode::define_points_sort( module );
     geode::define_position( module );
