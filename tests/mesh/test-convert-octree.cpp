@@ -95,18 +95,19 @@ namespace
     }
 
     template < geode::index_t dimension >
-    absl::flat_hash_set< std::array< uint64_t, dimension > >
+    absl::flat_hash_set< std::array< geode::index_t, dimension > >
         brute_force_corners( const geode::Octree< dimension >& octree )
     {
-        absl::flat_hash_set< std::array< uint64_t, dimension > > corners;
+        absl::flat_hash_set< std::array< geode::index_t, dimension > > corners;
         for( const auto leaf : octree.leaves() )
         {
             const auto& anchor = octree.cell_anchor( leaf );
-            const uint64_t size{ uint64_t{ 1 } << ( octree.max_depth()
-                                                    - octree.level( leaf ) ) };
+            const geode::index_t size{ geode::index_t{ 1 }
+                                       << ( octree.max_depth()
+                                              - octree.level( leaf ) ) };
             for( const auto c : geode::Range{ 1u << dimension } )
             {
-                std::array< uint64_t, dimension > key;
+                std::array< geode::index_t, dimension > key;
                 for( const auto d : geode::LRange{ dimension } )
                 {
                     key[d] = anchor[d] + ( ( ( c >> d ) & 1u ) ? size : 0 );

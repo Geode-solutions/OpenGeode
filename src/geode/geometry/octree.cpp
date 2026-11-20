@@ -59,7 +59,7 @@ namespace geode
         struct Node
         {
             local_index_t level{ 0 };
-            std::array< uint32_t, dimension > anchor{};
+            std::array< index_t, dimension > anchor{};
             index_t parent{ NO_ID };
             index_t first_child{ NO_ID };
         };
@@ -87,24 +87,22 @@ namespace geode
             }
             const auto smallest_side =
                 *std::min_element( sides.begin(), sides.end() );
-            uint64_t nb_roots{ 1 };
+            index_t nb_roots{ 1 };
             for( const auto d : LRange{ dimension } )
             {
                 const auto nb =
                     std::max( 1., std::round( sides[d] / smallest_side ) );
+                // Checked before the product: nb_roots * nb < NO_ID
                 OpenGeodeGeometryException::check_exception(
-                    nb < static_cast< double >( NO_ID ), nullptr,
+                    nb < static_cast< double >( NO_ID / nb_roots ), nullptr,
                     OpenGeodeException::TYPE::data,
                     "[Octree] Bounding box is too elongated" );
                 nb_root_cells_[d] = static_cast< index_t >( nb );
                 root_cell_length_[d] = sides[d] / nb;
                 nb_roots *= nb_root_cells_[d];
-                OpenGeodeGeometryException::check_exception( nb_roots < NO_ID,
-                    nullptr, OpenGeodeException::TYPE::data,
-                    "[Octree] Bounding box is too elongated" );
             }
             initialize_depth();
-            create_roots( static_cast< index_t >( nb_roots ) );
+            create_roots( nb_roots );
         }
 
         local_index_t max_depth() const
@@ -130,16 +128,16 @@ namespace geode
             return nodes_[cell];
         }
 
-        uint32_t cell_size( local_index_t level ) const
+        index_t cell_size( local_index_t level ) const
         {
-            return uint32_t{ 1 } << ( max_depth_ - level );
+            return index_t{ 1 } << ( max_depth_ - level );
         }
 
         /*!
          * The domain upper border is snapped to the input bounding box max:
          * origin + nb * ( side / nb ) may differ from it by rounding.
          */
-        double coordinate( local_index_t axis, uint32_t lattice_value ) const
+        double coordinate( local_index_t axis, index_t lattice_value ) const
         {
             if( lattice_value == lattice_extent( axis ) )
             {
@@ -151,7 +149,7 @@ namespace geode
                          * root_cell_length_[axis];
         }
 
-        uint32_t lattice_extent( local_index_t axis ) const
+        index_t lattice_extent( local_index_t axis ) const
         {
             return nb_root_cells_[axis] << max_depth_;
         }
@@ -183,7 +181,7 @@ namespace geode
         }
 
         std::optional< index_t > cell( local_index_t level,
-            const std::array< uint32_t, dimension >& anchor ) const
+            const std::array< index_t, dimension >& anchor ) const
         {
             if( nodes_.empty() || level > max_depth_ )
             {
@@ -435,12 +433,13 @@ namespace geode
         {
             const auto max_nb_roots = *std::max_element(
                 nb_root_cells_.begin(), nb_root_cells_.end() );
+            constexpr auto bits = lattice_bits< dimension >();
             local_index_t root_bits{ 0 };
-            while( ( uint64_t{ 1 } << root_bits ) < max_nb_roots )
+            while( root_bits < bits
+                   && ( index_t{ 1 } << root_bits ) < max_nb_roots )
             {
                 root_bits++;
             }
-            constexpr auto bits = lattice_bits< dimension >();
             OpenGeodeGeometryException::check_exception( root_bits < bits,
                 nullptr, OpenGeodeException::TYPE::data,
                 "[Octree] Bounding box is too elongated: ", max_nb_roots,
@@ -489,7 +488,7 @@ namespace geode
          * cell coordinates at its level (root_bits + level bits per axis).
          */
         uint64_t key( local_index_t level,
-            const std::array< uint32_t, dimension >& anchor ) const
+            const std::array< index_t, dimension >& anchor ) const
         {
             const auto shift = max_depth_ - level;
             const auto nb_bits = root_bits_ + level;
@@ -544,7 +543,7 @@ namespace geode
          * Anchor of the cell of the same level shifted by the offset (in
          * number of cells), std::nullopt if outside the domain.
          */
-        std::optional< std::array< uint32_t, dimension > > shifted_anchor(
+        std::optional< std::array< index_t, dimension > > shifted_anchor(
             const Node& cell_node, const Offset& offset ) const
         {
             const auto size = cell_size( cell_node.level );
@@ -576,8 +575,8 @@ namespace geode
          * cell of the given level and anchor (inside the domain). If it is
          * coarser than the given level, it is a leaf.
          */
-        index_t enclosing_cell( local_index_t level,
-            std::array< uint32_t, dimension > anchor ) const
+        index_t enclosing_cell(
+            local_index_t level, std::array< index_t, dimension > anchor ) const
         {
             for( auto current_level = level + 1; current_level-- > 0; )
             {
@@ -725,7 +724,7 @@ namespace geode
     }
 
     template < index_t dimension >
-    const std::array< uint32_t, dimension >& Octree< dimension >::cell_anchor(
+    const std::array< index_t, dimension >& Octree< dimension >::cell_anchor(
         index_t cell ) const
     {
         return impl_->node( cell ).anchor;
@@ -733,7 +732,7 @@ namespace geode
 
     template < index_t dimension >
     std::optional< index_t > Octree< dimension >::cell( local_index_t level,
-        const std::array< uint32_t, dimension >& anchor ) const
+        const std::array< index_t, dimension >& anchor ) const
     {
         return impl_->cell( level, anchor );
     }

@@ -634,7 +634,7 @@ namespace
         auto mesh = geode::HybridSolid3D::create();
         auto builder = geode::HybridSolidBuilder3D::create( *mesh );
         const auto leaves = octree.leaves();
-        absl::flat_hash_map< std::array< uint64_t, 3 >, geode::index_t >
+        absl::flat_hash_map< std::array< geode::index_t, 3 >, geode::index_t >
             corner_ids;
         corner_ids.reserve( leaves.size() * 2 );
         geode::GenericMapping< geode::index_t > old2new_mapping;
@@ -642,17 +642,18 @@ namespace
         {
             const auto box = octree.cell_bounding_box( leaf );
             const auto& anchor = octree.cell_anchor( leaf );
-            const uint64_t size{ uint64_t{ 1 } << ( octree.max_depth()
-                                                    - octree.level( leaf ) ) };
+            const geode::index_t size{ geode::index_t{ 1 }
+                                       << ( octree.max_depth()
+                                              - octree.level( leaf ) ) };
             std::array< geode::index_t, 8 > corners;
             for( const auto c : geode::LRange{ 8 } )
             {
-                std::array< uint64_t, 3 > key;
+                std::array< geode::index_t, 3 > key;
                 geode::Point3D point;
                 for( const auto d : geode::LRange{ 3 } )
                 {
                     const auto upper = ( ( c >> d ) & 1u ) != 0;
-                    key[d] = anchor[d] + ( upper ? size : uint64_t{ 0 } );
+                    key[d] = anchor[d] + ( upper ? size : geode::index_t{ 0 } );
                     point.set_value( d,
                         upper ? box.max().value( d ) : box.min().value( d ) );
                 }

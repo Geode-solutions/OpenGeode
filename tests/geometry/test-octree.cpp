@@ -219,7 +219,7 @@ namespace
             "[Test] Wrong 3D root ordering" );
         geode::OpenGeodeGeometryException::test(
             octree.cell_anchor( 13 )
-                == std::array< uint32_t, 3 >{ 3u << 17, 1u << 17, 0 },
+                == std::array< geode::index_t, 3 >{ 3u << 17, 1u << 17, 0 },
             "[Test] Wrong 3D root anchor" );
         // Shared face between roots goes to the upper root, domain border to
         // the last root
@@ -259,6 +259,41 @@ namespace
     }
 
     template < geode::index_t dimension >
+    void check_too_elongated( const geode::Point< dimension >& max )
+    {
+        try
+        {
+            const geode::Octree< dimension > octree{
+                { geode::Point< dimension >{}, max }
+            };
+            geode::OpenGeodeGeometryException::test(
+                false, "[Test] Too elongated box should throw" );
+        }
+        catch( const geode::OpenGeodeGeometryException& )
+        {
+        }
+    }
+
+    void test_elongated()
+    {
+        geode::Logger::info( "Test elongated boxes" );
+        // 1000 roots -> 10 root bits
+        const geode::Octree2D octree{ { geode::Point2D{ { 0., 0. } },
+            geode::Point2D{ { 1000., 1. } } } };
+        geode::OpenGeodeGeometryException::test(
+            octree.nb_root_cells() == std::array< geode::index_t, 2 >{ 1000, 1 }
+                && octree.max_depth() == 21,
+            "[Test] Wrong elongated 2D octree" );
+        // More roots along an axis than index_t can count
+        check_too_elongated( geode::Point2D{ { 1e10, 1. } } );
+        // 2^30 + 1 roots need 31 root bits: no refinement level left
+        check_too_elongated( geode::Point2D{
+            { static_cast< double >( ( 1u << 30 ) + 1 ), 1. } } );
+        // 7e4 roots per axis fit the lattice but not their product
+        check_too_elongated( geode::Point3D{ { 1., 7e4, 7e4 } } );
+    }
+
+    template < geode::index_t dimension >
     void test_refine()
     {
         geode::Logger::info( "Test refine ", dimension, "D" );
@@ -269,7 +304,7 @@ namespace
             first == 1 && octree.nb_cells() == 1 + nb_children
                 && octree.children( 0 ) == 1 && !octree.is_leaf( 0 ),
             "[Test] Wrong first refine" );
-        const auto half = uint32_t{ 1 } << ( octree.max_depth() - 1 );
+        const auto half = geode::index_t{ 1 } << ( octree.max_depth() - 1 );
         for( const auto c : geode::Range{ nb_children } )
         {
             const auto child = first + c;
@@ -277,7 +312,7 @@ namespace
                 octree.level( child ) == 1 && octree.parent( child ) == 0
                     && octree.is_leaf( child ),
                 "[Test] Wrong child ", child );
-            std::array< uint32_t, dimension > anchor;
+            std::array< geode::index_t, dimension > anchor;
             for( const auto d : geode::LRange{ dimension } )
             {
                 anchor[d] = ( ( c >> d ) & 1 ) != 0 ? half : 0;
@@ -299,7 +334,7 @@ namespace
                        == uniform_point< dimension >( 1.5 ),
             "[Test] Wrong last child geometry" );
 
-        std::vector< std::array< uint32_t, dimension > > anchors;
+        std::vector< std::array< geode::index_t, dimension > > anchors;
         std::vector< geode::local_index_t > levels;
         for( const auto cell : geode::Range{ octree.nb_cells() } )
         {
@@ -341,7 +376,7 @@ namespace
         }
 
         // Lookup of missing cells
-        std::array< uint32_t, dimension > zero{};
+        std::array< geode::index_t, dimension > zero{};
         geode::OpenGeodeGeometryException::test(
             octree.cell( 0, zero ) == 0 && octree.cell( 1, zero ) == first
                 && octree.cell( 2, zero ) == third,
@@ -1022,7 +1057,7 @@ namespace
                 .template find_attribute< geode::VariableAttribute, double >(
                     attribute_id );
         const auto old_nb_cells = octree.nb_cells();
-        std::vector< std::array< uint32_t, dimension > > old_anchors;
+        std::vector< std::array< geode::index_t, dimension > > old_anchors;
         std::vector< geode::local_index_t > old_levels;
         std::vector< std::optional< geode::index_t > > old_children;
         for( const auto cell : geode::Range{ old_nb_cells } )
@@ -1128,6 +1163,7 @@ void test()
     do_test< 3 >();
     test_non_cubic_2d();
     test_non_cubic_3d();
+    test_elongated();
 }
 
 OPENGEODE_TEST( "octree" )

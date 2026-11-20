@@ -24,7 +24,6 @@
 #pragma once
 
 #include <array>
-#include <cstdint>
 #include <optional>
 #include <vector>
 
@@ -84,6 +83,10 @@ namespace geode
 
     public:
         static constexpr index_t NB_CHILDREN{ 1u << dimension };
+        /*!
+         * Number of children of a cell touching one of its faces.
+         */
+        static constexpr index_t NB_FACE_CHILDREN{ 1u << ( dimension - 1 ) };
 
         /*!
          * Identifies, with an axis, one of the 2 * dimension faces of a cell:
@@ -107,7 +110,7 @@ namespace geode
          * - faces: leaves sharing a face (an edge in 2D). It bounds the
          * level jump across faces only, which is enough for algorithms
          * walking from leaf to leaf through faces: face_neighbor_leaves() of
-         * a leaf then returns at most 2^(dimension-1) finer leaves.
+         * a leaf then returns at most NB_FACE_CHILDREN finer leaves.
          * - full: leaves sharing a face, an edge or a vertex (in 2D: an
          * edge or a vertex). It also bounds the level jump along edges and
          * at vertices, for algorithms using these neighbors too.
@@ -120,10 +123,9 @@ namespace geode
 
         /*!
          * Leaves returned by face_neighbor_leaves(), inline up to the
-         * 2^(dimension-1) finer leaves of a one-level-finer neighbor.
+         * NB_FACE_CHILDREN finer leaves of a one-level-finer neighbor.
          */
-        using FaceNeighbors =
-            absl::InlinedVector< index_t, 1u << ( dimension - 1 ) >;
+        using FaceNeighbors = absl::InlinedVector< index_t, NB_FACE_CHILDREN >;
 
         /*!
          * Creates an empty octree (no cell).
@@ -193,7 +195,7 @@ namespace geode
         /*!
          * Minimal corner of the cell in the finest lattice.
          */
-        [[nodiscard]] const std::array< uint32_t, dimension >& cell_anchor(
+        [[nodiscard]] const std::array< index_t, dimension >& cell_anchor(
             index_t cell ) const;
 
         /*!
@@ -203,7 +205,7 @@ namespace geode
          * on the cell size of this level).
          */
         [[nodiscard]] std::optional< index_t > cell( local_index_t level,
-            const std::array< uint32_t, dimension >& anchor ) const;
+            const std::array< index_t, dimension >& anchor ) const;
 
         /*!
          * All the leaf cells, sorted by cell index.
