@@ -23,6 +23,8 @@
 
 #include "../../common.hpp"
 
+#include <geode/geometry/octree.hpp>
+
 #include <geode/mesh/core/light_regular_grid.hpp>
 #include <geode/mesh/core/polygonal_surface.hpp>
 #include <geode/mesh/core/regular_grid_surface.hpp>
@@ -52,6 +54,17 @@ namespace geode
                 pybind11::call_guard< pybind11::gil_scoped_release >(),
                 "Return a triangulated surface obtained by splitting every "
                 "cell of the 2D grid into triangles" )
+            .def( "convert_octree_into_polygonal_surface",
+                &convert_octree_into_polygonal_surface,
+                pybind11::arg( "octree" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Return a polygonal surface with one quadrangle per leaf of "
+                "the 2D octree (in the order of Octree2D.leaves()), vertices "
+                "shared between leaves at the same lattice position, and the "
+                "cell attributes of the leaves transferred to the polygons. "
+                "The mesh is non-conforming at level jumps (no hanging vertex "
+                "in the coarser cells, missing adjacencies): it is meant for "
+                "visualization and export" )
             .def( "triangulate_surface_mesh2D",
                 static_cast< void ( * )( SurfaceMesh< 2 >& ) >(
                     &triangulate_surface_mesh< 2 > ),

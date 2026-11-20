@@ -23,6 +23,9 @@
 
 #include "../../common.hpp"
 
+#include <geode/geometry/octree.hpp>
+
+#include <geode/mesh/core/hybrid_solid.hpp>
 #include <geode/mesh/core/light_regular_grid.hpp>
 #include <geode/mesh/core/regular_grid_solid.hpp>
 #include <geode/mesh/core/tetrahedral_solid.hpp>
@@ -43,6 +46,16 @@ namespace geode
                 &convert_grid_into_tetrahedral_solid, pybind11::arg( "grid" ),
                 pybind11::call_guard< pybind11::gil_scoped_release >(),
                 "Return a tetrahedral solid obtained by splitting every cell "
-                "of the 3D grid into tetrahedra" );
+                "of the 3D grid into tetrahedra" )
+            .def( "convert_octree_into_hybrid_solid",
+                &convert_octree_into_hybrid_solid, pybind11::arg( "octree" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Return a hybrid solid with one hexahedron per leaf of the 3D "
+                "octree (in the order of Octree3D.leaves()), vertices shared "
+                "between leaves at the same lattice position, and the cell "
+                "attributes of the leaves transferred to the polyhedra. The "
+                "mesh is non-conforming at level jumps (no hanging vertex in "
+                "the coarser cells, missing adjacencies): it is meant for "
+                "visualization and export" );
     }
 } // namespace geode
