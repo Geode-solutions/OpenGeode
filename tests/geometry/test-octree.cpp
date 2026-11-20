@@ -363,6 +363,27 @@ namespace
             "[Test] Wrong number of leaves" );
         geode::OpenGeodeGeometryException::test(
             absl::c_is_sorted( octree.leaves() ), "[Test] Unsorted leaves" );
+        auto subtree_leaves = octree.leaves( 0 );
+        absl::c_sort( subtree_leaves );
+        geode::OpenGeodeGeometryException::test(
+            subtree_leaves == octree.leaves(), "[Test] Wrong root leaves" );
+        geode::OpenGeodeGeometryException::test(
+            octree.leaves( first + 1 )
+                == std::vector< geode::index_t >{ first + 1 },
+            "[Test] Wrong leaves of a leaf" );
+        std::vector< geode::index_t > expected_leaves;
+        const auto fourth = 1 + 3 * nb_children;
+        for( const auto c : geode::Range{ nb_children } )
+        {
+            expected_leaves.push_back( fourth + c );
+        }
+        for( const auto c : geode::Range{ 1, nb_children } )
+        {
+            expected_leaves.push_back( second + c );
+        }
+        geode::OpenGeodeGeometryException::test(
+            octree.leaves( last_child ) == expected_leaves,
+            "[Test] Wrong depth-first leaves of an internal cell" );
         check_cell_consistency( octree );
 
         try
@@ -568,6 +589,10 @@ namespace
         geode::OpenGeodeGeometryException::test(
             all == expected_order && all.back() == 1,
             "[Test] Wrong full traversal order" );
+        auto root_leaves = octree.leaves( 0 );
+        root_leaves.push_back( 1 );
+        geode::OpenGeodeGeometryException::test( root_leaves == expected_order,
+            "[Test] Wrong subtree leaves order" );
         auto sorted_all = all;
         absl::c_sort( sorted_all );
         geode::OpenGeodeGeometryException::test(

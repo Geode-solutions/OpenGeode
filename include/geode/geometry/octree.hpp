@@ -213,6 +213,12 @@ namespace geode
         [[nodiscard]] std::vector< index_t > leaves() const;
 
         /*!
+         * Leaf cells of the subtree of the given cell (the cell itself if
+         * it is a leaf), in depth-first order, children in index order.
+         */
+        [[nodiscard]] std::vector< index_t > leaves( index_t cell ) const;
+
+        /*!
          * Domain covered by the root cells: exactly the bounding box given at
          * construction.
          */

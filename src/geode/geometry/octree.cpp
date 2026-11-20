@@ -216,6 +216,28 @@ namespace geode
             return result;
         }
 
+        std::vector< index_t > leaves( index_t cell ) const
+        {
+            std::vector< index_t > result;
+            std::vector< index_t > to_visit{ cell };
+            while( !to_visit.empty() )
+            {
+                const auto current = to_visit.back();
+                to_visit.pop_back();
+                const auto first_child = node( current ).first_child;
+                if( first_child == NO_ID )
+                {
+                    result.push_back( current );
+                    continue;
+                }
+                for( auto c = NB_CHILDREN; c-- > 0; )
+                {
+                    to_visit.push_back( first_child + c );
+                }
+            }
+            return result;
+        }
+
         BoundingBox< dimension > domain_bounding_box() const
         {
             if( nodes_.empty() )
@@ -741,6 +763,12 @@ namespace geode
     std::vector< index_t > Octree< dimension >::leaves() const
     {
         return impl_->leaves();
+    }
+
+    template < index_t dimension >
+    std::vector< index_t > Octree< dimension >::leaves( index_t cell ) const
+    {
+        return impl_->leaves( cell );
     }
 
     template < index_t dimension >
