@@ -46,10 +46,12 @@
         return read_mesh( content->span() );                                   \
     }                                                                          \
                                                                                \
-    [[nodiscard]] std::optional< std::vector< std::unique_ptr< Mesh > > >      \
-        read_bytes( geode::ByteSpan content, const MeshImpl& /*impl*/ ) final  \
+    [[nodiscard]] bool read_bytes( geode::ByteSpan content,                    \
+        std::vector< std::unique_ptr< Mesh > >& meshes,                        \
+        const MeshImpl& /*impl*/ ) final                                       \
     {                                                                          \
-        return read_mesh( content );                                           \
+        meshes = read_mesh( content );                                         \
+        return true;                                                           \
     }                                                                          \
                                                                                \
 private:                                                                       \

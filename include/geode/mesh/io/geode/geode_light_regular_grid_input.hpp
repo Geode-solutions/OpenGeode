@@ -65,11 +65,11 @@ namespace geode
             return read_grid( content->span() );
         }
 
-        [[nodiscard]] std::optional<
-            std::vector< LightRegularGrid< dimension > > >
-            read_bytes( ByteSpan content ) override
+        [[nodiscard]] bool read_bytes( ByteSpan content,
+            std::vector< LightRegularGrid< dimension > >& grids ) override
         {
-            return read_grid( content );
+            grids = read_grid( content );
+            return true;
         }
 
         AdditionalFiles additional_files() const override

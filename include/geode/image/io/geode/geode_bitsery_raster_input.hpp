@@ -51,10 +51,11 @@ namespace geode
             return read_image( content->span() );
         }
 
-        [[nodiscard]] std::optional< std::vector< RasterImage< dimension > > >
-            read_bytes( ByteSpan content ) final
+        [[nodiscard]] bool read_bytes( ByteSpan content,
+            std::vector< RasterImage< dimension > >& images ) final
         {
-            return read_image( content );
+            images = read_image( content );
+            return true;
         }
 
         AdditionalFiles additional_files() const final

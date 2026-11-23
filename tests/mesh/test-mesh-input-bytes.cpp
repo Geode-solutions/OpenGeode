@@ -219,13 +219,13 @@ namespace
         const auto reference = describe( *by_path );
 
         const auto bytes = read_whole_file( filename );
-        auto from_bytes = Factory::create( extension, "name_only" )
-                              ->read_bytes( bytes.span(), impl );
-        geode::OpenGeodeMeshException::test( from_bytes.has_value(),
+        std::vector< typename Factory::BaseClass::InputData > from_bytes;
+        geode::OpenGeodeMeshException::test(
+            Factory::create( extension, "name_only" )
+                ->read_bytes( bytes.span(), from_bytes, impl ),
             "Native input of ", filename, " cannot read bytes" );
         geode::OpenGeodeMeshException::test(
-            describe(
-                *geode::load_one( std::move( from_bytes.value() ), filename ) )
+            describe( *geode::load_one( std::move( from_bytes ), filename ) )
                 == reference,
             "Mesh read from bytes differs from the file ", filename );
 
@@ -249,13 +249,13 @@ namespace
         const auto by_path = geode::load_one(
             Factory::create( extension, filename )->read(), filename );
         const auto bytes = read_whole_file( filename );
-        auto from_bytes = Factory::create( extension, "name_only" )
-                              ->read_bytes( bytes.span() );
-        geode::OpenGeodeMeshException::test( from_bytes.has_value(),
+        std::vector< typename Factory::BaseClass::InputData > from_bytes;
+        geode::OpenGeodeMeshException::test(
+            Factory::create( extension, "name_only" )
+                ->read_bytes( bytes.span(), from_bytes ),
             "Native input of ", filename, " cannot read bytes" );
         geode::OpenGeodeMeshException::test(
-            describe(
-                geode::load_one( std::move( from_bytes.value() ), filename ) )
+            describe( geode::load_one( std::move( from_bytes ), filename ) )
                 == describe( by_path ),
             "Object read from bytes differs from the file ", filename );
     }
@@ -336,10 +336,14 @@ namespace
                     std::filesystem::u8path( geode::to_string( filename() ) ) ),
                 "[PathOnlyInput] File ", filename(), " does not exist" );
             const auto bytes = read_whole_file( filename() );
-            auto meshes = geode::TriangulatedSurfaceInputFactory3D::create(
-                "og_tsf3d", filename() )
-                              ->read_bytes( bytes.span(), impl );
-            return std::move( meshes.value() );
+            std::vector< std::unique_ptr< geode::TriangulatedSurface3D > >
+                meshes;
+            geode::OpenGeodeMeshException::test(
+                geode::TriangulatedSurfaceInputFactory3D::create(
+                    "og_tsf3d", filename() )
+                    ->read_bytes( bytes.span(), meshes, impl ),
+                "[PathOnlyInput] Cannot read bytes of ", filename() );
+            return meshes;
         }
 
         geode::AdditionalFiles additional_files() const final

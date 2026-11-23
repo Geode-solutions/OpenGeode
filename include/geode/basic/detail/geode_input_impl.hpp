@@ -107,9 +107,10 @@ namespace geode::detail
         auto objects = [&] {
             const auto content = files.content( name );
             auto input = Factory::create( extension, location );
-            if( auto from_bytes = input->read_bytes( content.span(), args... ) )
+            std::vector< typename Factory::BaseClass::InputData > from_bytes;
+            if( input->read_bytes( content.span(), from_bytes, args... ) )
             {
-                return std::move( from_bytes.value() );
+                return from_bytes;
             }
             if( const auto path = files.path( name ) )
             {

@@ -84,13 +84,16 @@ namespace geode
          * Read the objects from the content of the file, already in memory
          * (e.g. an entry of an archive), instead of opening the file: the
          * filename only names the content in messages.
-         * @return std::nullopt if this input can only read files: the caller
-         * then calls read() on a file holding the content.
+         * @param[out] objects Receives the objects read (only when returning
+         * true).
+         * @return false if this input can only read files: the caller then
+         * calls read() on a file holding the content.
          */
-        [[nodiscard]] virtual std::optional< std::vector< Object > > read_bytes(
-            ByteSpan /*content*/, const Args&... /*args*/ )
+        [[nodiscard]] virtual bool read_bytes( ByteSpan /*content*/,
+            std::vector< Object >& /*objects*/,
+            const Args&... /*args*/ )
         {
-            return std::nullopt;
+            return false;
         }
 
         ~Input()
