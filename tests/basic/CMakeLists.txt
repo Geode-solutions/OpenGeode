@@ -110,4 +110,5 @@ add_geode_test(
     SOURCE "test-zip-file.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
+        MINIZIP::minizip-ng
 )
