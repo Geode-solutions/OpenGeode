@@ -21,7 +21,6 @@
  *
  */
 
-#include <ctime>
 #include <filesystem>
 #include <fstream>
 #include <memory>
@@ -34,17 +33,14 @@
 #include <absl/strings/str_cat.h>
 #include <absl/strings/str_join.h>
 
-#include <mz.h>
-#include <mz_strm.h>
-#include <mz_zip.h>
-#include <mz_zip_rw.h>
-
 #include <geode/basic/assert.hpp>
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/detail/file_content.hpp>
 #include <geode/basic/detail/geode_input_impl.hpp>
 #include <geode/basic/detail/input_files.hpp>
 #include <geode/basic/range.hpp>
+#include <geode/basic/uuid.hpp>
+#include <geode/basic/zip_file.hpp>
 
 #include <geode/geometry/point.hpp>
 
@@ -372,23 +368,18 @@ namespace
         const std::string& name,
         geode::ByteSpan content )
     {
-        void* writer = mz_zip_writer_create();
-        mz_zip_writer_set_compress_method( writer, MZ_COMPRESS_METHOD_STORE );
-        auto status = mz_zip_writer_open_file( writer, zip.c_str(), 0, 0 );
-        if( status == MZ_OK )
+        const std::filesystem::path directory{ "path_only_zip_content" };
+        std::filesystem::create_directories( directory );
+        const auto file = directory / name;
         {
-            mz_zip_file info{};
-            info.filename = name.c_str();
-            info.compression_method = MZ_COMPRESS_METHOD_STORE;
-            info.flag = MZ_ZIP_FLAG_UTF8;
-            info.modified_date = std::time( nullptr );
-            status = mz_zip_writer_add_buffer( writer, content.data(),
-                static_cast< int32_t >( content.size() ), &info );
+            std::ofstream stream{ file, std::ios::binary };
+            stream.write( content.data(),
+                static_cast< std::streamsize >( content.size() ) );
         }
-        const auto close_status = mz_zip_writer_close( writer );
-        mz_zip_writer_delete( &writer );
-        geode::OpenGeodeMeshException::test(
-            status == MZ_OK && close_status == MZ_OK, "Cannot write zip" );
+        geode::ZipFile archive{ zip, geode::uuid{}.string() };
+        archive.archive_file( file.u8string() );
+        archive.finalize();
+        std::filesystem::remove_all( directory );
     }
 
     void test_fallback_to_file()

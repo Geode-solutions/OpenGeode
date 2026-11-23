@@ -22,7 +22,6 @@
  */
 
 #include <cstdint>
-#include <ctime>
 #include <filesystem>
 #include <fstream>
 #include <iterator>
@@ -31,11 +30,6 @@
 #include <vector>
 
 #include <absl/strings/str_cat.h>
-
-#include <mz.h>
-#include <mz_strm.h>
-#include <mz_zip.h>
-#include <mz_zip_rw.h>
 
 #include <geode/basic/assert.hpp>
 #include <geode/basic/range.hpp>
@@ -46,64 +40,67 @@
 
 using ZipEntries = std::vector< std::pair< std::string, std::string > >;
 
-void write_deflate_zip( const std::string& zip, const ZipEntries& entries )
-{
-    void* writer = mz_zip_writer_create();
-    mz_zip_writer_set_compress_method( writer, MZ_COMPRESS_METHOD_DEFLATE );
-    auto status = mz_zip_writer_open_file( writer, zip.c_str(), 0, 0 );
-    for( const auto& [name, content] : entries )
-    {
-        if( status != MZ_OK )
-        {
-            break;
-        }
-        mz_zip_file info{};
-        info.filename = name.c_str();
-        info.compression_method = MZ_COMPRESS_METHOD_DEFLATE;
-        info.flag = MZ_ZIP_FLAG_UTF8;
-        info.modified_date = std::time( nullptr );
-        status = mz_zip_writer_add_buffer( writer, content.data(),
-            static_cast< int32_t >( content.size() ), &info );
-    }
-    const auto close_status = mz_zip_writer_close( writer );
-    mz_zip_writer_delete( &writer );
-    geode::OpenGeodeBasicException::test(
-        status == MZ_OK && close_status == MZ_OK, "Cannot write DEFLATE zip (",
-        status, ", ", close_status, ")" );
-}
-
-void check_entries_are_deflated( const std::string& zip )
-{
-    void* reader = mz_zip_reader_create();
-    geode::OpenGeodeBasicException::test(
-        mz_zip_reader_open_file( reader, zip.c_str() ) == MZ_OK,
-        "Cannot open DEFLATE zip" );
-    auto status = mz_zip_reader_goto_first_entry( reader );
-    while( status == MZ_OK )
-    {
-        mz_zip_file* info = nullptr;
-        geode::OpenGeodeBasicException::test(
-            mz_zip_reader_entry_get_info( reader, &info ) == MZ_OK,
-            "Cannot read DEFLATE zip entry" );
-        geode::OpenGeodeBasicException::test(
-            info->compression_method == MZ_COMPRESS_METHOD_DEFLATE
-                && info->compressed_size < info->uncompressed_size,
-            "Zip entry ", info->filename, " is not DEFLATE-compressed" );
-        status = mz_zip_reader_goto_next_entry( reader );
-    }
-    mz_zip_reader_close( reader );
-    mz_zip_reader_delete( &reader );
-    geode::OpenGeodeBasicException::test(
-        status == MZ_END_OF_LIST, "Error while reading DEFLATE zip entries" );
-}
-
 std::string read_file( const std::filesystem::path& file )
 {
     std::ifstream stream{ file, std::ios::binary };
     geode::OpenGeodeBasicException::test(
-        stream.is_open(), "Cannot open extracted file ", file.u8string() );
+        stream.is_open(), "Cannot open file ", file.u8string() );
     return { std::istreambuf_iterator< char >{ stream },
         std::istreambuf_iterator< char >{} };
+}
+
+uint32_t read_uint( const std::string& data, size_t offset, size_t size )
+{
+    uint32_t value{ 0 };
+    for( const auto i : geode::Range{ size } )
+    {
+        value |= static_cast< uint32_t >(
+                     static_cast< unsigned char >( data[offset + i] ) )
+                 << ( 8 * i );
+    }
+    return value;
+}
+
+void check_entries_are_deflated(
+    const std::string& zip, const ZipEntries& entries )
+{
+    const auto archive = read_file( zip );
+    // End of central directory record (no archive comment)
+    constexpr size_t END_RECORD_SIZE{ 22 };
+    const auto end_record = archive.size() - END_RECORD_SIZE;
+    geode::OpenGeodeBasicException::test(
+        archive.compare( end_record, 4, "PK\x05\x06" ) == 0,
+        "End of central directory not found in ", zip );
+    const auto nb_entries = read_uint( archive, end_record + 10, 2 );
+    size_t header = read_uint( archive, end_record + 16, 4 );
+    geode::index_t nb_checked{ 0 };
+    for( const auto entry : geode::Range{ nb_entries } )
+    {
+        geode_unused( entry );
+        geode::OpenGeodeBasicException::test(
+            archive.compare( header, 4, "PK\x01\x02" ) == 0,
+            "Invalid central directory header in ", zip );
+        const auto name_length = read_uint( archive, header + 28, 2 );
+        const auto name = archive.substr( header + 46, name_length );
+        geode::OpenGeodeBasicException::test(
+            read_uint( archive, header + 10, 2 ) == 8, "Zip entry ", name,
+            " is not DEFLATE-compressed" );
+        for( const auto& [entry_name, content] : entries )
+        {
+            if( entry_name == name )
+            {
+                geode::OpenGeodeBasicException::test(
+                    read_uint( archive, header + 20, 4 )
+                        < read_uint( archive, header + 24, 4 ),
+                    "Zip entry ", name, " is not DEFLATE-compressed" );
+                nb_checked++;
+            }
+        }
+        header += 46 + name_length + read_uint( archive, header + 30, 2 )
+                  + read_uint( archive, header + 32, 2 );
+    }
+    geode::OpenGeodeBasicException::test( nb_checked == entries.size(),
+        "Missing DEFLATE-compressed entries in ", zip );
 }
 
 void test_unzip_deflate()
@@ -120,9 +117,10 @@ void test_unzip_deflate()
     }
     const ZipEntries entries{ { "text.txt", text },
         { "folder/binary.bin", binary } };
-    const std::string zip{ "deflate.zip" };
-    write_deflate_zip( zip, entries );
-    check_entries_are_deflated( zip );
+    // Written by Python zipfile with ZIP_DEFLATED
+    const auto zip =
+        absl::StrCat( geode::DATA_PATH, "input_files_deflate.zip" );
+    check_entries_are_deflated( zip, entries );
 
     const geode::UnzipFile unzip{ zip, geode::uuid{}.string() };
     unzip.extract_all();
@@ -133,7 +131,6 @@ void test_unzip_deflate()
             read_file( directory / name ) == content, "Extracted entry ", name,
             " differs from the DEFLATE-compressed content" );
     }
-    std::filesystem::remove( zip );
 }
 
 void test()

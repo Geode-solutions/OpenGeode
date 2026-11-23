@@ -23,7 +23,6 @@
 
 #include <cstdint>
 #include <cstdlib>
-#include <ctime>
 #include <filesystem>
 #include <fstream>
 #include <optional>
@@ -36,11 +35,6 @@
 
 #include <absl/strings/match.h>
 #include <absl/strings/str_cat.h>
-
-#include <mz.h>
-#include <mz_strm.h>
-#include <mz_zip.h>
-#include <mz_zip_rw.h>
 
 #include <geode/basic/assert.hpp>
 #include <geode/basic/detail/file_content.hpp>
@@ -66,31 +60,96 @@ void write_file( const std::filesystem::path& file, std::string_view content )
         stream.good(), "Cannot write file ", file.u8string() );
 }
 
-void write_zip(
-    const std::string& zip, const Entries& entries, uint16_t method )
+void append_uint( std::string& data, uint32_t value, size_t size )
 {
-    void* writer = mz_zip_writer_create();
-    mz_zip_writer_set_compress_method( writer, method );
-    auto status = mz_zip_writer_open_file( writer, zip.c_str(), 0, 0 );
+    for( const auto i : geode::Range{ size } )
+    {
+        data.push_back( static_cast< char >( ( value >> ( 8 * i ) ) & 0xFF ) );
+    }
+}
+
+uint32_t crc32( std::string_view content )
+{
+    uint32_t crc{ 0xFFFFFFFF };
+    for( const auto byte : content )
+    {
+        crc ^= static_cast< unsigned char >( byte );
+        for( const auto bit : geode::Range{ 8 } )
+        {
+            geode_unused( bit );
+            crc = ( crc >> 1 ) ^ ( 0xEDB88320 & ( 0 - ( crc & 1 ) ) );
+        }
+    }
+    return ~crc;
+}
+
+/*!
+ * Write a zip archive whose entries are stored (not compressed).
+ */
+void write_stored_zip( const std::string& zip, const Entries& entries )
+{
+    std::string archive;
+    std::string central_directory;
     for( const auto& [name, content] : entries )
     {
-        if( status != MZ_OK )
-        {
-            break;
-        }
-        mz_zip_file info{};
-        info.filename = name.c_str();
-        info.compression_method = method;
-        info.flag = MZ_ZIP_FLAG_UTF8;
-        info.modified_date = std::time( nullptr );
-        status = mz_zip_writer_add_buffer( writer, content.data(),
-            static_cast< int32_t >( content.size() ), &info );
+        const auto offset = static_cast< uint32_t >( archive.size() );
+        const auto crc = crc32( content );
+        const auto size = static_cast< uint32_t >( content.size() );
+        const auto name_size = static_cast< uint32_t >( name.size() );
+        append_uint( archive, 0x04034b50, 4 ); // local header signature
+        append_uint( archive, 20, 2 ); // version needed
+        append_uint( archive, 0, 2 ); // flags
+        append_uint( archive, 0, 2 ); // method: store
+        append_uint( archive, 0, 2 ); // time
+        append_uint( archive, 0x21, 2 ); // date: 1980-01-01
+        append_uint( archive, crc, 4 );
+        append_uint( archive, size, 4 ); // compressed size
+        append_uint( archive, size, 4 ); // uncompressed size
+        append_uint( archive, name_size, 2 );
+        append_uint( archive, 0, 2 ); // extra field length
+        absl::StrAppend( &archive, name, content );
+        append_uint( central_directory, 0x02014b50, 4 );
+        append_uint( central_directory, 20, 2 ); // version made by
+        append_uint( central_directory, 20, 2 ); // version needed
+        append_uint( central_directory, 0, 2 ); // flags
+        append_uint( central_directory, 0, 2 ); // method: store
+        append_uint( central_directory, 0, 2 ); // time
+        append_uint( central_directory, 0x21, 2 ); // date: 1980-01-01
+        append_uint( central_directory, crc, 4 );
+        append_uint( central_directory, size, 4 ); // compressed size
+        append_uint( central_directory, size, 4 ); // uncompressed size
+        append_uint( central_directory, name_size, 2 );
+        append_uint( central_directory, 0, 2 ); // extra field length
+        append_uint( central_directory, 0, 2 ); // comment length
+        append_uint( central_directory, 0, 2 ); // disk number
+        append_uint( central_directory, 0, 2 ); // internal attributes
+        append_uint( central_directory, 0, 4 ); // external attributes
+        append_uint( central_directory, offset, 4 ); // local header offset
+        absl::StrAppend( &central_directory, name );
     }
-    const auto close_status = mz_zip_writer_close( writer );
-    mz_zip_writer_delete( &writer );
-    geode::OpenGeodeBasicException::test(
-        status == MZ_OK && close_status == MZ_OK, "Cannot write zip (", status,
-        ", ", close_status, ")" );
+    const auto central_directory_offset =
+        static_cast< uint32_t >( archive.size() );
+    const auto nb_entries = static_cast< uint32_t >( entries.size() );
+    absl::StrAppend( &archive, central_directory );
+    append_uint( archive, 0x06054b50, 4 ); // end of central directory
+    append_uint( archive, 0, 2 ); // disk number
+    append_uint( archive, 0, 2 ); // disk of the central directory
+    append_uint( archive, nb_entries, 2 ); // entries on this disk
+    append_uint( archive, nb_entries, 2 ); // entries
+    append_uint(
+        archive, static_cast< uint32_t >( central_directory.size() ), 4 );
+    append_uint( archive, central_directory_offset, 4 );
+    append_uint( archive, 0, 2 ); // comment length
+    write_file( zip, archive );
+}
+
+/*!
+ * Archive written by Python zipfile with ZIP_DEFLATED, containing the
+ * test_entries() in the same order.
+ */
+std::string deflate_zip()
+{
+    return absl::StrCat( geode::DATA_PATH, "input_files_deflate.zip" );
 }
 
 Entries test_entries()
@@ -235,11 +294,10 @@ void test_directory_input_files()
     std::filesystem::remove_all( directory );
 }
 
-void test_archive_input_files( uint16_t method, std::string_view test_name )
+void test_archive_input_files(
+    const std::string& zip, std::string_view test_name )
 {
-    const auto zip = absl::StrCat( "input_files_", method, ".zip" );
     const auto entries = test_entries();
-    write_zip( zip, entries, method );
     const geode::detail::ArchiveInputFiles files{ zip };
     check_files_content( files, entries, test_name );
     std::vector< std::string > expected_names;
@@ -267,6 +325,13 @@ void test_archive_input_files( uint16_t method, std::string_view test_name )
         geode::OpenGeodeBasicException::test(
             task.get(), test_name, ": wrong concurrent content" );
     }
+}
+
+void test_stored_archive_input_files()
+{
+    const std::string zip{ "input_files_stored.zip" };
+    write_stored_zip( zip, test_entries() );
+    test_archive_input_files( zip, "[ArchiveInputFiles] stored" );
     std::filesystem::remove( zip );
 }
 
@@ -282,7 +347,7 @@ void test_corrupted_entry()
 {
     const std::string zip{ "corrupted_entry.zip" };
     const auto entries = test_entries();
-    write_zip( zip, entries, MZ_COMPRESS_METHOD_STORE );
+    write_stored_zip( zip, entries );
     auto archive = read_file( zip );
     // Flip one byte in the middle of the stored text entry
     const auto position = archive.find( "line 5000 " );
@@ -348,9 +413,7 @@ size_t central_header( const std::string& archive, std::string_view name )
 void test_corrupted_deflate_stream()
 {
     const std::string zip{ "corrupted_deflate.zip" };
-    const auto entries = test_entries();
-    write_zip( zip, entries, MZ_COMPRESS_METHOD_DEFLATE );
-    auto archive = read_file( zip );
+    auto archive = read_file( deflate_zip() );
     // First entry: its local header is at the start of the archive
     geode::OpenGeodeBasicException::test(
         archive.compare( 30, 8, "text.txt" ) == 0,
@@ -376,9 +439,7 @@ void test_corrupted_deflate_stream()
 void test_truncated_entry()
 {
     const std::string zip{ "truncated_entry.zip" };
-    const auto entries = test_entries();
-    write_zip( zip, entries, MZ_COMPRESS_METHOD_DEFLATE );
-    auto archive = read_file( zip );
+    auto archive = read_file( deflate_zip() );
     const auto archive_size = static_cast< uint32_t >( archive.size() );
     // Local header of "small" beyond the end of the archive
     write_uint( archive, central_header( archive, "small" ) + 42, 4,
@@ -417,7 +478,7 @@ void test_truncated_entry()
 void test_unsafe_entry()
 {
     const std::string zip{ "unsafe_entry.zip" };
-    write_zip( zip, { { "../outside", "abc" } }, MZ_COMPRESS_METHOD_STORE );
+    write_stored_zip( zip, { { "../outside", "abc" } } );
     check_data_error(
         [&zip] {
             const geode::detail::ArchiveInputFiles files{ zip };
@@ -523,10 +584,8 @@ void test()
 {
     test_mapped_file();
     test_directory_input_files();
-    test_archive_input_files(
-        MZ_COMPRESS_METHOD_STORE, "[ArchiveInputFiles] stored" );
-    test_archive_input_files(
-        MZ_COMPRESS_METHOD_DEFLATE, "[ArchiveInputFiles] deflated" );
+    test_stored_archive_input_files();
+    test_archive_input_files( deflate_zip(), "[ArchiveInputFiles] deflated" );
     test_corrupted_entry();
     test_corrupted_deflate_stream();
     test_truncated_entry();

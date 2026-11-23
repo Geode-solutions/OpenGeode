@@ -147,7 +147,6 @@ add_geode_test(
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::image
         ${PROJECT_NAME}::mesh
-        MINIZIP::minizip-ng
 )
 add_geode_test(
     SOURCE "test-mesh-corrupted-files.cpp"

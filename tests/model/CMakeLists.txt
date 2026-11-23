@@ -109,7 +109,6 @@ add_geode_test(
         ${PROJECT_NAME}::basic
         ${PROJECT_NAME}::mesh
         ${PROJECT_NAME}::model
-        MINIZIP::minizip-ng
 )
 add_geode_test(
     SOURCE "test-model-component-filter.cpp"

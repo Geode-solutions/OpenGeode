@@ -75,7 +75,6 @@ add_geode_test(
     DEPENDENCIES
         Async++
         ${PROJECT_NAME}::basic
-        MINIZIP::minizip-ng
 )
 add_geode_test(
     SOURCE "test-logger.cpp"
@@ -117,7 +116,6 @@ add_geode_test(
     SOURCE "test-zip-file.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
-        MINIZIP::minizip-ng
 )
 if(UNIX AND NOT APPLE AND BUILD_SHARED_LIBS AND CMAKE_NM)
     add_test(
