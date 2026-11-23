@@ -776,6 +776,97 @@ namespace
             "[Test] Truncated relationships should not be loaded" };
     }
 
+    /* Messages of the exception thrown by loading the BRep, parents included */
+    std::string brep_load_error(
+        std::string_view filename, geode::OpenGeodeException::TYPE type )
+    {
+        try
+        {
+            geode_unused( geode::load_brep( filename ) );
+        }
+        catch( const geode::OpenGeodeException& exception )
+        {
+            geode::OpenGeodeModelException::test( exception.type() == type,
+                "[Test] Wrong exception type loading ", filename, ": ",
+                exception.string() );
+            std::string messages;
+            const geode::OpenGeodeException* current = &exception;
+            while( true )
+            {
+                absl::StrAppend( &messages, current->what(), "\n" );
+                if( !current->has_parent() )
+                {
+                    break;
+                }
+                current = &current->parent();
+            }
+            return messages;
+        }
+        throw geode::OpenGeodeModelException{ nullptr,
+            geode::OpenGeodeException::TYPE::internal, "[Test] Loading ",
+            filename, " should throw" };
+    }
+
+    /*
+     * Truncated model files are not loaded: data error raised by the loading
+     * of the file.
+     */
+    void test_truncated_model_files()
+    {
+        saved_brep( "truncated_files.og_brep" );
+        const auto files = extract_archive( "truncated_files.og_brep" );
+        for( const std::string name : { "identifier", "physical_properties",
+                 "corners", "relationships", "vertices" } )
+        {
+            auto truncated = files;
+            auto& content = truncated.at( name );
+            content.resize( content.size() / 2 );
+            const auto filename =
+                absl::StrCat( "truncated_", name, ".og_brep" );
+            write_archive( truncated, filename );
+            const auto messages = brep_load_error(
+                filename, geode::OpenGeodeException::TYPE::data );
+            geode::Logger::info( "Truncated ", name, ": ", messages );
+            geode::OpenGeodeModelException::test(
+                absl::StrContains( messages, filename ),
+                "[Test] Wrong error for truncated ", name, ": ", messages );
+        }
+    }
+
+    /*
+     * Optional model files: missing ones are ignored, empty ones are not
+     * valid files.
+     */
+    void test_empty_optional_files()
+    {
+        saved_brep( "optional_files.og_brep" );
+        const auto files = extract_archive( "optional_files.og_brep" );
+        for( const std::string name : { "identifier", "physical_properties" } )
+        {
+            auto missing = files;
+            missing.erase( name );
+            const auto missing_filename =
+                absl::StrCat( "missing_", name, ".og_brep" );
+            write_archive( missing, missing_filename );
+            const auto loaded = geode::load_one(
+                geode::load_brep( missing_filename ), missing_filename );
+            geode::OpenGeodeModelException::test( loaded.nb_corners() != 0,
+                "[Test] Model without ", name, " should be loaded" );
+
+            auto empty = files;
+            empty.at( name ).clear();
+            const auto empty_filename =
+                absl::StrCat( "empty_", name, ".og_brep" );
+            write_archive( empty, empty_filename );
+            const auto messages = brep_load_error(
+                empty_filename, geode::OpenGeodeException::TYPE::data );
+            geode::Logger::info( "Empty ", name, ": ", messages );
+            geode::OpenGeodeModelException::test(
+                absl::StrContains( messages, empty_filename ),
+                "[Test] Wrong error for empty ", name, ": ", messages );
+        }
+    }
+
     template < typename Base >
     class ThrowingInput final : public Base
     {
@@ -902,6 +993,8 @@ void test()
     test_too_long_component_name();
     test_logger_level_restored();
     test_std_exceptions();
+    test_truncated_model_files();
+    test_empty_optional_files();
 }
 
 OPENGEODE_TEST( "model-corrupted-files" )

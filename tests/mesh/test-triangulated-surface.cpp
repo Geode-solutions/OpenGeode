@@ -805,6 +805,9 @@ void test()
     test_create_polygons( *surface, *builder );
     test_polygon_adjacencies( *surface, *builder );
     test_io( *surface, absl::StrCat( "test.", surface->native_extension() ) );
+    // UTF-8 file name
+    test_io( *surface, absl::StrCat( "surface_\xc3\xa9t\xc3\xa9.",
+                           surface->native_extension() ) );
     test_backward_io( absl::StrCat( geode::DATA_PATH, "backward_io/v17/v17.",
         surface->native_extension() ) );
     test_permutation( *surface, *builder );

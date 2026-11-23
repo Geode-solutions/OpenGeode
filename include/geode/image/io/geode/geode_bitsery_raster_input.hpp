@@ -41,24 +41,14 @@ namespace geode
 
         [[nodiscard]] std::vector< RasterImage< dimension > > read() final
         {
-            std::ifstream file{ to_string( this->filename() ),
-                std::ifstream::binary };
-            OpenGeodeImageException::check_exception( !file.fail(), nullptr,
-                OpenGeodeException::TYPE::data,
-                "[RasterImageInput] Failed to open file: ",
-                to_string( this->filename() ) );
-            TContext context{};
-            BitseryExtensions::register_deserialize_pcontext(
-                std::get< 0 >( context ) );
-            Deserializer archive{ context, file };
-            RasterImage< dimension > image;
-            archive.object( image );
-            const auto& adapter = archive.adapter();
-            OpenGeodeImageException::check_exception(
-                adapter.error() == bitsery::ReaderError::NoError
-                    && adapter.isCompletedSuccessfully()
-                    && std::get< 1 >( context ).isValid(),
+            const auto content = detail::read_file_content( this->filename() );
+            OpenGeodeImageException::check_exception( content.has_value(),
                 nullptr, OpenGeodeException::TYPE::data,
+                "[RasterImageInput] Failed to open file: ", this->filename() );
+            RasterImage< dimension > image;
+            OpenGeodeImageException::check_exception(
+                detail::deserialize_bytes( content->span(), image ), nullptr,
+                OpenGeodeException::TYPE::data,
                 "[Bitsery::read] Error while reading file: ",
                 this->filename() );
             std::vector< RasterImage< dimension > > images;

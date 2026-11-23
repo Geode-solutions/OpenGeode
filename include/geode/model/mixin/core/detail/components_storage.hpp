@@ -186,18 +186,15 @@ namespace geode::detail
                 }
                 return;
             }
-            std::ifstream file{ path, std::ifstream::binary };
-            TContext context{};
-            BitseryExtensions::register_deserialize_pcontext(
-                std::get< 0 >( context ) );
-            Deserializer archive{ context, file };
-            archive.object( *this );
-            const auto& adapter = archive.adapter();
-            OpenGeodeModelException::check_exception(
-                adapter.error() == bitsery::ReaderError::NoError
-                    && adapter.isCompletedSuccessfully()
-                    && std::get< 1 >( context ).isValid(),
+            const auto content = detail::read_file_content( filename );
+            OpenGeodeModelException::check_exception( content.has_value(),
                 nullptr, OpenGeodeException::TYPE::internal,
+                "[ComponentsStorage::load_components] Error while reading "
+                "file: ",
+                filename );
+            OpenGeodeModelException::check_exception(
+                detail::deserialize_bytes( content->span(), *this ), nullptr,
+                OpenGeodeException::TYPE::internal,
                 "[ComponentsStorage::load_components] Error while reading "
                 "file: ",
                 filename );

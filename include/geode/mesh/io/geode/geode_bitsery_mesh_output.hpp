@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <filesystem>
 #include <fstream>
 
 #include <geode/geometry/bitsery_archive.hpp>
@@ -44,7 +45,8 @@
             geode::OpenGeodeException::TYPE::data, "[Bitsery] Cannot save ",   \
             mesh.type_name().get(), " in native format because it is not ",    \
             OpenGeode##Mesh::impl_name_static().get() );                       \
-        std::ofstream file{ to_string( this->filename() ),                     \
+        std::ofstream file{ std::filesystem::u8path(                           \
+                                to_string( this->filename() ) ),               \
             std::ofstream::binary };                                           \
         geode::OpenGeodeMeshException::check_exception( !file.fail(), nullptr, \
             geode::OpenGeodeException::TYPE::data,                             \

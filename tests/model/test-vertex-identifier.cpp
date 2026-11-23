@@ -465,7 +465,8 @@ void test_component_mesh_vertex_deserialization()
     std::vector< geode::ComponentMeshVertex > loaded_vertices;
     {
         geode::TContext context{};
-        geode::Deserializer archive{ context, stream };
+        const auto bytes = stream.str();
+        geode::Deserializer archive{ context, bytes.data(), bytes.size() };
         archive.object( loaded_id );
         archive.container( loaded_vertices, vertices.size() );
         geode::OpenGeodeModelException::test(

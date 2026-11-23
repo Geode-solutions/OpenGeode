@@ -524,7 +524,9 @@ void test_serialize_manager( geode::AttributeManager& manager,
     geode::OpenGeodeBasicException::test( std::get< 1 >( context ).isValid(),
         "Error while writing file: ", filename );
 
-    std::ifstream infile{ filename, std::ifstream::binary };
+    const auto content = geode::detail::read_file_content( filename );
+    geode::OpenGeodeBasicException::test(
+        content.has_value(), "Cannot open file: ", filename );
     geode::AttributeManager reloaded_manager;
     geode::TContext reload_context{};
     geode::register_attribute_type< std::array< double, 30 >,
@@ -536,7 +538,8 @@ void test_serialize_manager( geode::AttributeManager& manager,
     geode::register_attribute_type< std::array< double, 2 >,
         geode::Deserializer >(
         std::get< 0 >( reload_context ), "array_double_2" );
-    geode::Deserializer unarchive{ reload_context, infile };
+    geode::Deserializer unarchive{ reload_context, content->span().data(),
+        content->size() };
     unarchive.object( reloaded_manager );
     const auto& adapter = unarchive.adapter();
     geode::OpenGeodeBasicException::test(
@@ -925,12 +928,15 @@ void test_no_value()
     geode::OpenGeodeBasicException::test( std::get< 1 >( context ).isValid(),
         "Error while writing file: ", filename );
 
-    std::ifstream infile{ filename, std::ifstream::binary };
+    const auto content = geode::detail::read_file_content( filename );
+    geode::OpenGeodeBasicException::test(
+        content.has_value(), "Cannot open file: ", filename );
     geode::AttributeManager reloaded_manager;
     geode::TContext reload_context{};
     geode::register_basic_deserialize_pcontext(
         std::get< 0 >( reload_context ) );
-    geode::Deserializer unarchive{ reload_context, infile };
+    geode::Deserializer unarchive{ reload_context, content->span().data(),
+        content->size() };
     unarchive.object( reloaded_manager );
     const auto& adapter = unarchive.adapter();
     geode::OpenGeodeBasicException::test(
@@ -1124,7 +1130,8 @@ void test_time_series_serialization( const geode::AttributeManager& manager )
     geode::TContext reload_context{};
     geode::register_basic_deserialize_pcontext(
         std::get< 0 >( reload_context ) );
-    geode::Deserializer unarchive{ reload_context, stream };
+    const auto bytes = stream.str();
+    geode::Deserializer unarchive{ reload_context, bytes.data(), bytes.size() };
     unarchive.object( reloaded );
     geode::OpenGeodeBasicException::test(
         unarchive.adapter().error() == bitsery::ReaderError::NoError,

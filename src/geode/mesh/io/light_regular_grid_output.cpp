@@ -23,6 +23,7 @@
 
 #include <geode/mesh/io/light_regular_grid_output.hpp>
 
+#include <filesystem>
 #include <fstream>
 #include <string>
 #include <string_view>
@@ -40,7 +41,8 @@ namespace geode
     std::vector< std::string > LightRegularGridOutput< dimension >::write(
         const LightRegularGrid< dimension >& grid ) const
     {
-        std::ofstream file{ to_string( this->filename() ),
+        std::ofstream file{ std::filesystem::u8path(
+                                to_string( this->filename() ) ),
             std::ofstream::binary };
         OpenGeodeMeshException::check_exception( !file.fail(), nullptr,
             OpenGeodeException::TYPE::data,

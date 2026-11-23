@@ -23,8 +23,6 @@
 
 #include <geode/model/representation/io/external_time_series_input.hpp>
 
-#include <fstream>
-
 #include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/filename.hpp>
 #include <geode/basic/logger.hpp>
@@ -44,22 +42,14 @@ namespace geode
             "[load_external_time_series] Wrong extension for file ", filename,
             ", only ", ExternalTimeSeries::native_extension_static(),
             " is supported" );
-        std::ifstream file{ to_string( filename ), std::ifstream::binary };
-        OpenGeodeModelException::check_exception( !file.fail(), nullptr,
+        const auto content = detail::read_file_content( filename );
+        OpenGeodeModelException::check_exception( content.has_value(), nullptr,
             OpenGeodeException::TYPE::data,
             "[load_external_time_series] Failed to open file: ", filename );
-        TContext context{};
-        BitseryExtensions::register_deserialize_pcontext(
-            std::get< 0 >( context ) );
-        Deserializer archive{ context, file };
         ExternalTimeSeries time_series;
-        archive.object( time_series );
-        const auto& adapter = archive.adapter();
         OpenGeodeModelException::check_exception(
-            adapter.error() == bitsery::ReaderError::NoError
-                && adapter.isCompletedSuccessfully()
-                && std::get< 1 >( context ).isValid(),
-            nullptr, OpenGeodeException::TYPE::internal,
+            detail::deserialize_bytes( content->span(), time_series ), nullptr,
+            OpenGeodeException::TYPE::internal,
             "[load_external_time_series] Error while reading file: ",
             filename );
         Logger::info( "ExternalTimeSeries loaded from ", filename, " in ",

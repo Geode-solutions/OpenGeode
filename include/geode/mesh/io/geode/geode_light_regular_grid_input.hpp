@@ -55,16 +55,11 @@ namespace geode
         [[nodiscard]] std::vector< LightRegularGrid< dimension > >
             read() override
         {
-            std::ifstream file{ to_string( this->filename() ),
-                std::ifstream::binary };
-            OpenGeodeMeshException::check_exception( !file.fail(), nullptr,
-                OpenGeodeException::TYPE::data,
+            const auto content = detail::read_file_content( this->filename() );
+            OpenGeodeMeshException::check_exception( content.has_value(),
+                nullptr, OpenGeodeException::TYPE::data,
                 "[LightRegularGridInput] Failed to open file: ",
-                to_string( this->filename() ) );
-            TContext context{};
-            BitseryExtensions::register_deserialize_pcontext(
-                std::get< 0 >( context ) );
-            Deserializer archive{ context, file };
+                this->filename() );
             Point< dimension > origin;
             std::array< index_t, dimension > cells_number;
             cells_number.fill( 1 );
@@ -72,9 +67,10 @@ namespace geode
             cells_length.fill( 1 );
             LightRegularGrid< dimension > grid{ origin, cells_number,
                 cells_length };
+            bool success{ false };
             try
             {
-                archive.object( grid );
+                success = detail::deserialize_bytes( content->span(), grid );
             }
             catch( const OpenGeodeException& )
             {
@@ -87,12 +83,8 @@ namespace geode
                     "[Bitsery::read] Error while reading file: ",
                     this->filename(), " (", exception.what(), ")" };
             }
-            const auto& adapter = archive.adapter();
-            OpenGeodeMeshException::check_exception(
-                adapter.error() == bitsery::ReaderError::NoError
-                    && adapter.isCompletedSuccessfully()
-                    && std::get< 1 >( context ).isValid(),
-                nullptr, OpenGeodeException::TYPE::internal,
+            OpenGeodeMeshException::check_exception( success, nullptr,
+                OpenGeodeException::TYPE::internal,
                 "[Bitsery::read] Error while reading file: ",
                 this->filename() );
             std::vector< LightRegularGrid< dimension > > grids;

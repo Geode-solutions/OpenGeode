@@ -23,9 +23,16 @@
 
 #pragma once
 
+#include <cstddef>
+#include <memory>
+#include <optional>
+#include <string_view>
+
 #include <absl/container/fixed_array.h>
 #include <absl/container/inlined_vector.h>
+#include <absl/types/span.h>
 
+#include <bitsery/adapter/buffer.h>
 #include <bitsery/adapter/stream.h>
 #include <bitsery/bitsery.h>
 #include <bitsery/ext/inheritance.h>
@@ -39,6 +46,41 @@
 
 namespace geode
 {
+    /*!
+     * Read-only bytes to deserialize, owned elsewhere (file content, slice of
+     * an archive in memory...).
+     */
+    using ByteSpan = absl::Span< const char >;
+} // namespace geode
+
+namespace bitsery
+{
+    namespace traits
+    {
+        template <>
+        struct ContainerTraits< geode::ByteSpan >
+        {
+            using TValue = char;
+            static constexpr bool isResizable = false;
+            static constexpr bool isContiguous = true;
+            static size_t size( const geode::ByteSpan &container )
+            {
+                return container.size();
+            }
+        };
+
+        template <>
+        struct BufferAdapterTraits< geode::ByteSpan >
+        {
+            using TIterator = const char *;
+            using TConstIterator = const char *;
+            using TValue = char;
+        };
+    } // namespace traits
+} // namespace bitsery
+
+namespace geode
+{
     using PContext =
         bitsery::ext::PolymorphicContext< bitsery::ext::StandardRTTI >;
     using TContext = std::tuple< PContext,
@@ -46,8 +88,13 @@ namespace geode
         bitsery::ext::InheritanceContext >;
     using Serializer =
         bitsery::Serializer< bitsery::OutputBufferedStreamAdapter, TContext >;
+    /*!
+     * Deserializer reading a ByteSpan:
+     * Deserializer archive{ context, bytes.data(), bytes.size() }.
+     */
     using Deserializer =
-        bitsery::Deserializer< bitsery::InputStreamAdapter, TContext >;
+        bitsery::Deserializer< bitsery::InputBufferAdapter< ByteSpan >,
+            TContext >;
 
     /*!
      * Register all the information needed by Bitsery to serialize the objects
@@ -79,6 +126,68 @@ namespace geode
 
         static void register_deserialize_pcontext( PContext &context );
     };
+
+    namespace detail
+    {
+        /*!
+         * Owned bytes, uninitialized at construction.
+         */
+        class ByteBuffer
+        {
+        public:
+            explicit ByteBuffer( size_t size )
+                : data_{ new char[size] }, size_{ size }
+            {
+            }
+
+            [[nodiscard]] char *data()
+            {
+                return data_.get();
+            }
+
+            [[nodiscard]] size_t size() const
+            {
+                return size_;
+            }
+
+            [[nodiscard]] ByteSpan span() const
+            {
+                return { data_.get(), size_ };
+            }
+
+        private:
+            std::unique_ptr< char[] > data_;
+            size_t size_;
+        };
+
+        /*!
+         * Read the whole content of a file (UTF-8 path) in one call.
+         * @return std::nullopt if the file cannot be opened.
+         * @exception OpenGeodeException (data) if the file cannot be read.
+         */
+        [[nodiscard]] std::optional< ByteBuffer >
+            opengeode_basic_api read_file_content( std::string_view filename );
+
+        /*!
+         * Deserialize an object from bytes, with the deserialize contexts of
+         * every registered library.
+         * @return true if the bytes were read without error, entirely, and
+         * every pointer was linked.
+         */
+        template < typename Object >
+        [[nodiscard]] bool deserialize_bytes( ByteSpan bytes, Object &object )
+        {
+            TContext context{};
+            BitseryExtensions::register_deserialize_pcontext(
+                std::get< 0 >( context ) );
+            Deserializer archive{ context, bytes.data(), bytes.size() };
+            archive.object( object );
+            const auto &adapter = archive.adapter();
+            return adapter.error() == bitsery::ReaderError::NoError
+                   && adapter.isCompletedSuccessfully()
+                   && std::get< 1 >( context ).isValid();
+        }
+    } // namespace detail
 } // namespace geode
 
 namespace bitsery

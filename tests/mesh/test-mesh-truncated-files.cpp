@@ -128,6 +128,38 @@ namespace
             nb_throws > 0, "Truncated files of ", filename, " should throw" );
     }
 
+    /*
+     * Load a copy of the given file truncated at half its size: data error.
+     */
+    void test_half_file( const std::string& filename, const Loader& loader )
+    {
+        const auto content = read_file( filename );
+        const auto extension =
+            std::filesystem::path{ filename }.extension().string();
+        const auto truncated_filename = absl::StrCat( "half", extension );
+        {
+            std::ofstream file{ truncated_filename, std::ofstream::binary };
+            file.write( content.data(),
+                static_cast< std::streamsize >( content.size() / 2 ) );
+        }
+        try
+        {
+            loader( truncated_filename );
+        }
+        catch( const geode::OpenGeodeException& exception )
+        {
+            geode::Logger::info( "Half ", filename, ": ", exception.what() );
+            geode::OpenGeodeMeshException::test(
+                exception.type() == geode::OpenGeodeException::TYPE::data,
+                "[Test] Half ", filename,
+                " should raise a data error: ", exception.string() );
+            return;
+        }
+        throw geode::OpenGeodeMeshException{ nullptr,
+            geode::OpenGeodeException::TYPE::internal, "[Test] Half ", filename,
+            " should not be loaded" };
+    }
+
     std::string data_file( std::string_view name )
     {
         return absl::StrCat( geode::DATA_PATH, "backward_io/", name );
@@ -233,6 +265,11 @@ void test()
         data_file( "v18_5/v18_5.og_tso3d" ), tetrahedral_solid );
     test_truncated_file( save_textured_surface(), triangulated_surface2d );
     test_truncated_file( save_light_grid(), light_grid );
+    test_half_file(
+        data_file( "v18_5/v18_5.og_tsf3d" ), triangulated_surface3d );
+    test_half_file( data_file( "v17/v17.og_pso3d" ), polyhedral_solid );
+    test_half_file( save_textured_surface(), triangulated_surface2d );
+    test_half_file( save_light_grid(), light_grid );
 }
 
 OPENGEODE_TEST( "mesh-truncated-files" )

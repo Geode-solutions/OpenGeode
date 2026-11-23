@@ -531,20 +531,16 @@ namespace geode
         void load( std::string_view directory )
         {
             const auto filename = absl::StrCat( directory, "/vertices" );
-            std::ifstream file{ std::filesystem::u8path( filename ),
-                std::ifstream::binary };
-            TContext context{};
-            BitseryExtensions::register_deserialize_pcontext(
-                std::get< 0 >( context ) );
-            Deserializer archive{ context, file };
-            archive.object( *this );
-            nb_component_mesh_vertices_up_to_date_ = false;
-            const auto& adapter = archive.adapter();
-            OpenGeodeModelException::check_exception(
-                adapter.error() == bitsery::ReaderError::NoError
-                    && adapter.isCompletedSuccessfully()
-                    && std::get< 1 >( context ).isValid(),
+            const auto content = detail::read_file_content( filename );
+            OpenGeodeModelException::check_exception( content.has_value(),
                 nullptr, OpenGeodeException::TYPE::internal,
+                "[VertexIdentifier::load] Error while reading file: ",
+                filename );
+            const auto success =
+                detail::deserialize_bytes( content->span(), *this );
+            nb_component_mesh_vertices_up_to_date_ = false;
+            OpenGeodeModelException::check_exception( success, nullptr,
+                OpenGeodeException::TYPE::internal,
                 "[VertexIdentifier::load] Error while reading file: ",
                 filename );
         }

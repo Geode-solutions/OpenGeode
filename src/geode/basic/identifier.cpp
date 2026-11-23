@@ -84,23 +84,14 @@ namespace geode
         void load( std::string_view directory )
         {
             const auto filename = absl::StrCat( directory, "/identifier" );
-            std::ifstream file{ std::filesystem::u8path( filename ),
-                std::ifstream::binary };
-            if( !file )
+            const auto content = detail::read_file_content( filename );
+            if( !content )
             {
                 return;
             }
-            TContext context{};
-            BitseryExtensions::register_deserialize_pcontext(
-                std::get< 0 >( context ) );
-            Deserializer archive{ context, file };
-            archive.object( *this );
-            const auto& adapter = archive.adapter();
             OpenGeodeBasicException::check_exception(
-                adapter.error() == bitsery::ReaderError::NoError
-                    && adapter.isCompletedSuccessfully()
-                    && std::get< 1 >( context ).isValid(),
-                nullptr, OpenGeodeException::TYPE::internal,
+                detail::deserialize_bytes( content->span(), *this ), nullptr,
+                OpenGeodeException::TYPE::internal,
                 "[Identifier::load] Error while reading file: ", filename );
         }
 

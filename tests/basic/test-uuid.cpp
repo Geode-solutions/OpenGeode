@@ -113,7 +113,8 @@ void test_deserialization()
     Map loaded_map;
     {
         geode::TContext context{};
-        geode::Deserializer archive{ context, stream };
+        const auto bytes = stream.str();
+        geode::Deserializer archive{ context, bytes.data(), bytes.size() };
         archive.object( loaded_id );
         archive.ext( loaded_map, bitsery::ext::StdMap{ map.size() },
             []( geode::Deserializer& local_archive, geode::uuid& key,

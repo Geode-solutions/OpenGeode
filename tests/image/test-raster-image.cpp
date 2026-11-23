@@ -235,6 +235,11 @@ void test()
         geode::load_one( geode::load_raster_image< 2 >( filename_with_spaces ),
             filename_with_spaces );
     test_raster( reload );
+    // UTF-8 file name
+    const std::string utf8_filename{ "image_\xc3\xa9t\xc3\xa9.og_img2d" };
+    geode::save_raster_image( raster, utf8_filename );
+    test_raster( geode::load_one(
+        geode::load_raster_image< 2 >( utf8_filename ), utf8_filename ) );
     test_save_failure( raster );
     test_unknown_extension( raster );
     test_io< 1 >( { 7 } );

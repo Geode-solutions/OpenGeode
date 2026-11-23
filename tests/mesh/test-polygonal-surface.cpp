@@ -785,12 +785,7 @@ std::string serialize_edges( const FacetEdges& edges )
 
 void deserialize_edges( const std::string& buffer, FacetEdges& edges )
 {
-    std::istringstream input{ buffer, std::ios::binary };
-    geode::TContext context{};
-    geode::BitseryExtensions::register_deserialize_pcontext(
-        std::get< 0 >( context ) );
-    geode::Deserializer archive{ context, input };
-    archive.object( edges );
+    geode_unused( geode::detail::deserialize_bytes( buffer, edges ) );
 }
 
 constexpr std::array< geode::index_t, 2 > EDGE_A{ 1000001, 1000002 };
