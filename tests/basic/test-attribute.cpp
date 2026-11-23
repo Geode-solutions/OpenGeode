@@ -30,8 +30,8 @@
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/attribute_time_series.hpp>
 #include <geode/basic/bitsery_archive.hpp>
-#include <geode/basic/detail/file_content.hpp>
 #include <geode/basic/bitsery_attribute.hpp>
+#include <geode/basic/detail/file_content.hpp>
 #include <geode/basic/logger.hpp>
 
 #include <geode/tests/common.hpp>
