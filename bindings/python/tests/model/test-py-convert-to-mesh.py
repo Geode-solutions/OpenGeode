@@ -24,6 +24,7 @@ import os
 import geode_test_env
 
 import opengeode_py_basic as basic
+import opengeode_py_mesh as mesh
 import opengeode_py_model as model
 import opengeode
 
@@ -69,6 +70,28 @@ def run_test_brep():
         raise ValueError("[Test] BRep - Mapped element should come from a block")
 
 
+def run_test_block_boundaries():
+    test_dir = os.path.dirname(__file__)
+    data_dir = os.path.abspath(os.path.join(test_dir, "../../../../tests/data"))
+    brep_filename = os.path.join(data_dir, "test_mesh3.og_brep")
+    brep = opengeode.load_one(model.load_brep(brep_filename), brep_filename)
+    for block in brep.blocks():
+        skin, mappings = model.convert_block_boundaries_into_surface(brep, block)
+        nb_polygons = sum(surface.mesh().nb_polygons() for surface in brep.boundary_surfaces(block))
+        if skin.nb_polygons() != nb_polygons:
+            raise ValueError("[Test] Block boundaries - Wrong number of polygons")
+        if mappings.surface_polygons_mapping.size() != nb_polygons:
+            raise ValueError("[Test] Block boundaries - Wrong number of polygon mappings")
+        if mappings.unique_vertices_mapping.size() != skin.nb_vertices():
+            raise ValueError("[Test] Block boundaries - Wrong number of vertex mappings")
+        if mappings.solid_polyhedra_mapping.size() != 0:
+            raise ValueError("[Test] Block boundaries - Unexpected polyhedron mappings")
+        for polygon in range(skin.nb_polygons()):
+            for edge in range(3):
+                if skin.polygon_adjacent(mesh.PolygonEdge(polygon, edge)) is None:
+                    raise ValueError("[Test] Block boundaries - Skin is not closed")
+
+
 def run_test_section():
     test_dir = os.path.dirname(__file__)
     data_dir = os.path.abspath(os.path.join(test_dir, "../../../../tests/data"))
@@ -95,4 +118,5 @@ def run_test_section():
 if __name__ == "__main__":
     model.OpenGeodeModelLibrary.initialize()
     run_test_brep()
+    run_test_block_boundaries()
     run_test_section()

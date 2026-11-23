@@ -61,6 +61,13 @@ add_geode_test(
         ${PROJECT_NAME}::mesh
 )
 add_geode_test(
+    SOURCE "test-convert-octree.cpp"
+    DEPENDENCIES
+        ${PROJECT_NAME}::basic
+        ${PROJECT_NAME}::geometry
+        ${PROJECT_NAME}::mesh
+)
+add_geode_test(
     SOURCE "test-convert-solid.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic

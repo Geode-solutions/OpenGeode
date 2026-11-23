@@ -29,6 +29,7 @@
 #include <geode/basic/logger.hpp>
 
 #include <geode/geometry/basic_objects/polygon.hpp>
+#include <geode/geometry/octree.hpp>
 #include <geode/geometry/point.hpp>
 #include <geode/geometry/vector.hpp>
 
@@ -310,6 +311,53 @@ namespace
         return surface;
     }
 
+    std::unique_ptr< geode::PolygonalSurface2D >
+        create_polygonal_surface_from_octree( const geode::Octree2D& octree )
+    {
+        auto mesh = geode::PolygonalSurface2D::create();
+        auto builder = geode::PolygonalSurfaceBuilder2D::create( *mesh );
+        const auto leaves = octree.leaves();
+        absl::flat_hash_map< std::array< geode::index_t, 2 >, geode::index_t >
+            corner_ids;
+        corner_ids.reserve( leaves.size() * 2 );
+        geode::GenericMapping< geode::index_t > old2new_mapping;
+        for( const auto leaf : leaves )
+        {
+            const auto box = octree.cell_bounding_box( leaf );
+            const auto& anchor = octree.cell_anchor( leaf );
+            const geode::index_t size{ geode::index_t{ 1 }
+                                       << ( octree.max_depth()
+                                              - octree.level( leaf ) ) };
+            std::array< geode::index_t, 4 > corners;
+            for( const auto c : geode::LRange{ 4 } )
+            {
+                std::array< geode::index_t, 2 > key;
+                geode::Point2D point;
+                for( const auto d : geode::LRange{ 2 } )
+                {
+                    const auto upper = ( ( c >> d ) & 1u ) != 0;
+                    key[d] = anchor[d] + ( upper ? size : geode::index_t{ 0 } );
+                    point.set_value( d,
+                        upper ? box.max().value( d ) : box.min().value( d ) );
+                }
+                const auto it =
+                    corner_ids.try_emplace( key, mesh->nb_vertices() );
+                if( it.second )
+                {
+                    builder->create_point( point );
+                }
+                corners[c] = it.first->second;
+            }
+            const auto element_id = builder->create_polygon(
+                { corners[0], corners[1], corners[3], corners[2] } );
+            old2new_mapping.map( leaf, element_id );
+        }
+        builder->compute_polygon_adjacencies();
+        mesh->polygon_attribute_manager().import(
+            octree.cell_attribute_manager(), old2new_mapping );
+        return mesh;
+    }
+
     std::vector< geode::index_t > checked_cells_to_densify(
         const geode::Grid2D& grid,
         absl::Span< const geode::index_t > cells_to_densify )
@@ -394,6 +442,12 @@ namespace geode
         const Grid2D& grid )
     {
         return create_polygonal_surface_from_grid( grid );
+    }
+
+    std::unique_ptr< PolygonalSurface2D > convert_octree_into_polygonal_surface(
+        const Octree2D& octree )
+    {
+        return create_polygonal_surface_from_octree( octree );
     }
 
     std::unique_ptr< TriangulatedSurface2D >

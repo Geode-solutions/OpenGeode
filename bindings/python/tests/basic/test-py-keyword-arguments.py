@@ -1647,6 +1647,7 @@ def test_model_helpers():
     model.convert_brep_block_meshes_into_tetrahedral_solids(model=brep)
     check(model.convert_brep_into_curve(brep=brep)[0].nb_edges() == 12, "convert_brep_into_curve(brep=)")
     check(model.convert_brep_into_surface(brep=brep)[0].nb_polygons() == 12, "convert_brep_into_surface(brep=)")
+    check(model.convert_block_boundaries_into_surface(brep=brep, block=block)[0].nb_polygons() == 12, "convert_block_boundaries_into_surface(brep=, block=)")
     check_raises(
         lambda: model.convert_brep_into_solid(brep=brep),
         basic.OpenGeodeDataError,
