@@ -21,6 +21,8 @@
  *
  */
 
+#include <algorithm>
+
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/logger.hpp>
 #include <geode/basic/mapping.hpp>
@@ -238,6 +240,24 @@ void test_delete_polygon( const geode::TriangulatedSurface3D& surface,
         "TriangulatedSurface should have 5 edges" );
 }
 
+void check_same_attribute_ids( const geode::AttributeManager& manager,
+    const geode::AttributeManager& manager2 )
+{
+    auto ids = manager.attribute_ids();
+    auto ids2 = manager2.attribute_ids();
+    std::sort( ids.begin(), ids.end() );
+    std::sort( ids2.begin(), ids2.end() );
+    geode::OpenGeodeMeshException::test(
+        std::equal( ids.begin(), ids.end(), ids2.begin(), ids2.end() ),
+        "Reloaded attribute ids should be the saved ones" );
+    for( const auto& id : ids2 )
+    {
+        geode::OpenGeodeMeshException::test(
+            manager2.find_generic_attribute( id )->id() == id,
+            "Reloaded attribute should keep its id" );
+    }
+}
+
 void test_io(
     const geode::TriangulatedSurface3D& surface, std::string_view filename )
 {
@@ -262,6 +282,12 @@ void test_io(
                 .inexact_equal( surface2->point( vertex_id ) ),
             "Wrong reloaded mesh point coordinates." );
     }
+    geode::OpenGeodeMeshException::test( surface2->id() == surface.id(),
+        "Reloaded TriangulatedSurface should keep its id" );
+    check_same_attribute_ids( surface.vertex_attribute_manager(),
+        surface2->vertex_attribute_manager() );
+    check_same_attribute_ids( surface.polygon_attribute_manager(),
+        surface2->polygon_attribute_manager() );
 }
 
 void test_backward_io( const std::string& filename )
@@ -270,6 +296,9 @@ void test_backward_io( const std::string& filename )
         geode::load_triangulated_surface< 3 >( filename ), filename );
     geode::OpenGeodeMeshException::test( surface->nb_vertices() == 5,
         "Backward TriangulatedSurface should have 5 vertices" );
+    geode::OpenGeodeMeshException::test(
+        surface->id() != geode::uuid{ geode::BITSERY::constructor },
+        "Backward TriangulatedSurface should have a valid id" );
     geode::OpenGeodeMeshException::test( surface->nb_polygons() == 3,
         "Backward TriangulatedSurface should have 3 polygons" );
     geode::OpenGeodeMeshException::test(

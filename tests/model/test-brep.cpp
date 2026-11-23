@@ -1190,6 +1190,48 @@ void test_block_collection_ranges( const geode::BRep& model,
         "ItemBlockRange should iterates on 1 Block." );
 }
 
+void test_compare_component_mesh_vertices(
+    const geode::BRep& model, const geode::BRep& model2 )
+{
+    geode::OpenGeodeModelException::test( model.nb_unique_vertices() > 0,
+        "[Test] Model should have unique vertices" );
+    geode::OpenGeodeModelException::test(
+        model.nb_unique_vertices() == model2.nb_unique_vertices(),
+        "[Test] Reloaded model should have ", model.nb_unique_vertices(),
+        " unique vertices" );
+    const geode::uuid nil{ geode::BITSERY::constructor };
+    for( const auto unique_vertex : geode::Range{ model.nb_unique_vertices() } )
+    {
+        const auto& vertices = model.component_mesh_vertices( unique_vertex );
+        const auto& vertices2 = model2.component_mesh_vertices( unique_vertex );
+        geode::OpenGeodeModelException::test( vertices == vertices2,
+            "[Test] Reloaded component mesh vertices of unique vertex ",
+            unique_vertex, " should be equal to the saved ones" );
+        for( const auto& vertex : vertices2 )
+        {
+            geode::OpenGeodeModelException::test( vertex.component_id.id != nil,
+                "[Test] Reloaded component id should not be nil" );
+            geode::OpenGeodeModelException::test(
+                model2.unique_vertex( vertex ) == unique_vertex,
+                "[Test] Reloaded component mesh vertex should map to unique "
+                "vertex ",
+                unique_vertex );
+        }
+    }
+}
+
+void test_component_mesh_vertices_round_trip()
+{
+    const auto filename = absl::StrCat( geode::DATA_PATH, "layers.og_brep" );
+    const auto model =
+        geode::load_one( geode::load_brep( filename ), filename );
+    const auto file_io = absl::StrCat(
+        "test_component_mesh_vertices.", model.native_extension() );
+    geode::save_brep( model, file_io );
+    const auto model2 = geode::load_one( geode::load_brep( file_io ), file_io );
+    test_compare_component_mesh_vertices( model, model2 );
+}
+
 void test_compare_brep( const geode::BRep& model, const geode::BRep& model2 )
 {
     geode::OpenGeodeModelException::test(
@@ -1824,6 +1866,11 @@ void test_backward_io()
         absl::StrCat( geode::DATA_PATH, "backward_io/v17/v17.og_brep" );
     auto brep_v17 = geode::load_one(
         geode::load_brep( brep_v17_filename ), brep_v17_filename );
+    geode::OpenGeodeModelException::test(
+        brep_v17.unique_vertex_attribute_id()
+            != geode::uuid{ geode::BITSERY::constructor },
+        "[Backward_IO] v17 BRep should have a valid unique vertex attribute "
+        "id" );
     geode::BRepBuilder brep_builder_v17{ brep_v17 };
     for( const auto& block : brep_v17.blocks() )
     {
@@ -1862,6 +1909,11 @@ void test_backward_io()
         absl::StrCat( geode::DATA_PATH, "backward_io/v18_0/v18_0.og_brep" );
     auto brep_v18_0 = geode::load_one(
         geode::load_brep( brep_v18_0_filename ), brep_v18_0_filename );
+    geode::OpenGeodeModelException::test(
+        brep_v18_0.unique_vertex_attribute_id()
+            != geode::uuid{ geode::BITSERY::constructor },
+        "[Backward_IO] v18_0 BRep should have a valid unique vertex attribute "
+        "id" );
     geode::BRepBuilder brep_builder_v18{ brep_v18_0 };
     for( const auto& block : brep_v18_0.blocks() )
     {
@@ -2353,6 +2405,7 @@ void test()
     geode::BRep model3{ std::move( model2 ) };
     test_compare_brep( model, model3 );
 
+    test_component_mesh_vertices_round_trip();
     test_backward_io();
     test_physical_properties_backward_io();
     test_components_filter();

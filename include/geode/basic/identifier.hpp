@@ -38,6 +38,7 @@ namespace geode
 {
     class IdentifierBuilder;
     struct uuid;
+    enum struct BITSERY;
 } // namespace geode
 
 namespace geode
@@ -70,6 +71,12 @@ namespace geode
 
     protected:
         Identifier();
+
+        /*!
+         * Nil identifier (no uuid generated), for an object about to be
+         * deserialized.
+         */
+        explicit Identifier( BITSERY bitsery );
 
         Identifier& operator=( Identifier&& other ) noexcept;
 

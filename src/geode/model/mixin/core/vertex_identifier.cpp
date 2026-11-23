@@ -66,7 +66,7 @@ namespace geode
     }
 
     ComponentMeshVertex::ComponentMeshVertex()
-        : component_id( bitsery::Access::create< ComponentID >() )
+        : component_id( BITSERY::constructor )
     {
     }
 
@@ -157,7 +157,10 @@ namespace geode
                                           unique_vertices_attribute_id );
         }
 
-        Impl( BITSERY ) {}
+        Impl( BITSERY bitsery )
+            : unique_vertices_{ bitsery }, unique_vertex_id_{ bitsery }
+        {
+        }
 
         index_t nb_unique_vertices() const
         {
@@ -554,6 +557,8 @@ namespace geode
             serializer.ext( *this,
                 Growable< Archive, Impl >{
                     { []( Archive& archive, Impl& impl ) {
+                         // Not stored in this version
+                         impl.unique_vertex_id_ = uuid{};
                          archive.object( impl.unique_vertices_ );
                          archive.ext( impl.component_vertices_,
                              bitsery::ext::StdSmartPtr{} );
@@ -577,6 +582,8 @@ namespace geode
                                  false } );
                      },
                         []( Archive& archive, Impl& impl ) {
+                            // Not stored in this version
+                            impl.unique_vertex_id_ = uuid{};
                             archive.object( impl.unique_vertices_ );
                             archive.ext( impl.component_vertices_,
                                 bitsery::ext::StdSmartPtr{} );
@@ -595,6 +602,8 @@ namespace geode
                                 } );
                         },
                         []( Archive& archive, Impl& impl ) {
+                            // Not stored in this version
+                            impl.unique_vertex_id_ = uuid{};
                             archive.object( impl.unique_vertices_ );
                             archive.ext( impl.component_vertices_,
                                 bitsery::ext::StdSmartPtr{} );

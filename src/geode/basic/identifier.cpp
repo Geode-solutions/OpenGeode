@@ -37,6 +37,10 @@ namespace geode
     class Identifier::Impl
     {
     public:
+        Impl() = default;
+
+        explicit Impl( BITSERY bitsery ) : id_{ bitsery } {}
+
         const uuid& id() const
         {
             return id_;
@@ -137,6 +141,8 @@ namespace geode
     };
 
     Identifier::Identifier() = default;
+
+    Identifier::Identifier( BITSERY bitsery ) : impl_{ bitsery } {}
 
     Identifier::~Identifier() = default;
 

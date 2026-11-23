@@ -44,7 +44,7 @@ namespace geode
         using Builder = OpenGeodeVertexSetBuilder;
 
         OpenGeodeVertexSet() = default;
-        OpenGeodeVertexSet( BITSERY ) {};
+        OpenGeodeVertexSet( BITSERY bitsery ) : VertexSet{ bitsery } {};
 
         [[nodiscard]] static MeshImpl impl_name_static()
         {

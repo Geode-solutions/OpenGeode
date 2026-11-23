@@ -22,6 +22,7 @@
  */
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/logger.hpp>
+#include <geode/basic/uuid.hpp>
 #include <geode/basic/variable_attribute.hpp>
 #include <iostream>
 
@@ -137,6 +138,9 @@ void test_io( const geode::Graph& graph, const std::string& filename )
 void test_backward_io( const std::string& filename )
 {
     auto graph = geode::load_one( geode::load_graph( filename ), filename );
+    geode::OpenGeodeMeshException::test(
+        graph->id() != geode::uuid{ geode::BITSERY::constructor },
+        "Backward Graph should have a valid id" );
 
     geode::OpenGeodeMeshException::test(
         graph->edges_around_vertex( 2 ).size() == 3,

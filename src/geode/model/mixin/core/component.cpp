@@ -77,7 +77,8 @@ namespace geode
 
     private:
         std::string backward_compatible_name_ = std::string{ "unknown" };
-        uuid backward_compatible_id_;
+        // Only read (and used) by the first version of Component
+        uuid backward_compatible_id_{ BITSERY::constructor };
         bool is_active_{ true };
     };
 

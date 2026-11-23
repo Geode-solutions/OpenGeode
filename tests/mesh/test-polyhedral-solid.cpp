@@ -29,6 +29,7 @@
 
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/logger.hpp>
+#include <geode/basic/uuid.hpp>
 #include <geode/basic/variable_attribute.hpp>
 
 #include <geode/geometry/bounding_box.hpp>
@@ -473,6 +474,10 @@ void test_backward_io( const std::string& filename )
 {
     const auto new_polyhedral_solid = geode::load_one(
         geode::load_polyhedral_solid< 3 >( filename ), filename );
+    geode::OpenGeodeMeshException::test(
+        new_polyhedral_solid->id()
+            != geode::uuid{ geode::BITSERY::constructor },
+        "Backward PolyhedralSolid should have a valid id" );
 
     geode::OpenGeodeMeshException::test(
         new_polyhedral_solid->nb_vertices() == 8,

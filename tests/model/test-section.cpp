@@ -880,6 +880,49 @@ void test_clone( const geode::Section& section )
     }
 }
 
+void test_compare_component_mesh_vertices(
+    const geode::Section& model, const geode::Section& model2 )
+{
+    geode::OpenGeodeModelException::test( model.nb_unique_vertices() > 0,
+        "[Test] Model should have unique vertices" );
+    geode::OpenGeodeModelException::test(
+        model.nb_unique_vertices() == model2.nb_unique_vertices(),
+        "[Test] Reloaded model should have ", model.nb_unique_vertices(),
+        " unique vertices" );
+    const geode::uuid nil{ geode::BITSERY::constructor };
+    for( const auto unique_vertex : geode::Range{ model.nb_unique_vertices() } )
+    {
+        const auto& vertices = model.component_mesh_vertices( unique_vertex );
+        const auto& vertices2 = model2.component_mesh_vertices( unique_vertex );
+        geode::OpenGeodeModelException::test( vertices == vertices2,
+            "[Test] Reloaded component mesh vertices of unique vertex ",
+            unique_vertex, " should be equal to the saved ones" );
+        for( const auto& vertex : vertices2 )
+        {
+            geode::OpenGeodeModelException::test( vertex.component_id.id != nil,
+                "[Test] Reloaded component id should not be nil" );
+            geode::OpenGeodeModelException::test(
+                model2.unique_vertex( vertex ) == unique_vertex,
+                "[Test] Reloaded component mesh vertex should map to unique "
+                "vertex ",
+                unique_vertex );
+        }
+    }
+}
+
+void test_component_mesh_vertices_round_trip()
+{
+    const auto filename = absl::StrCat( geode::DATA_PATH, "fractures.og_sctn" );
+    const auto model =
+        geode::load_one( geode::load_section( filename ), filename );
+    const auto file_io = absl::StrCat(
+        "test_component_mesh_vertices.", model.native_extension() );
+    geode::save_section( model, file_io );
+    const auto model2 =
+        geode::load_one( geode::load_section( file_io ), file_io );
+    test_compare_component_mesh_vertices( model, model2 );
+}
+
 void test_compare_section(
     const geode::Section& model, const geode::Section& model2 )
 {
@@ -1101,11 +1144,17 @@ void test()
     auto backward_model =
         geode::load_one( geode::load_section( backward_model_filename ),
             backward_model_filename );
+    geode::OpenGeodeModelException::test(
+        backward_model.unique_vertex_attribute_id()
+            != geode::uuid{ geode::BITSERY::constructor },
+        "[Backward_IO] v17 Section should have a valid unique vertex "
+        "attribute id" );
     auto model2 = geode::load_one( geode::load_section( file_io ), file_io );
     test_compare_section( model, model2 );
 
     geode::Section model3{ std::move( model2 ) };
     test_compare_section( model, model3 );
+    test_component_mesh_vertices_round_trip();
 }
 
 OPENGEODE_TEST( "section" )

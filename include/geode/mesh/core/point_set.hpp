@@ -73,6 +73,7 @@ namespace geode
 
     protected:
         PointSet() = default;
+        explicit PointSet( BITSERY bitsery ) : VertexSet{ bitsery } {}
         PointSet( PointSet&& other ) noexcept = default;
         PointSet& operator=( PointSet&& other ) noexcept = default;
 

@@ -21,7 +21,12 @@
  *
  */
 
+#include <sstream>
+
+#include <bitsery/traits/vector.h>
+
 #include <geode/basic/assert.hpp>
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/logger.hpp>
 #include <geode/geometry/point.hpp>
 
@@ -425,9 +430,59 @@ void test_unregister_after_load()
     }
 }
 
+void test_component_mesh_vertex_deserialization()
+{
+    const geode::uuid nil{ geode::BITSERY::constructor };
+    const auto created_id = bitsery::Access::create< geode::ComponentID >();
+    geode::OpenGeodeModelException::test(
+        created_id.type.get() == "undefined" && created_id.id == nil,
+        "ComponentID created by bitsery should be undefined and nil" );
+    const auto created_vertex =
+        bitsery::Access::create< geode::ComponentMeshVertex >();
+    geode::OpenGeodeModelException::test(
+        created_vertex.component_id.type.get() == "undefined"
+            && created_vertex.component_id.id == nil,
+        "ComponentMeshVertex created by bitsery should have an undefined and "
+        "nil ComponentID" );
+    const geode::ComponentID default_id;
+    geode::OpenGeodeModelException::test(
+        default_id.id != nil, "Default ComponentID should generate its uuid" );
+
+    const geode::ComponentID component_id{
+        geode::Corner2D::component_type_static(), geode::uuid{}
+    };
+    std::vector< geode::ComponentMeshVertex > vertices{ { component_id, 3 },
+        { { geode::Surface2D::component_type_static(), geode::uuid{} }, 7 } };
+    std::stringstream stream;
+    {
+        geode::TContext context{};
+        geode::Serializer archive{ context, stream };
+        archive.object( component_id );
+        archive.container( vertices, vertices.size() );
+        archive.adapter().flush();
+    }
+    geode::ComponentID loaded_id{ geode::BITSERY::constructor };
+    std::vector< geode::ComponentMeshVertex > loaded_vertices;
+    {
+        geode::TContext context{};
+        geode::Deserializer archive{ context, stream };
+        archive.object( loaded_id );
+        archive.container( loaded_vertices, vertices.size() );
+        geode::OpenGeodeModelException::test(
+            archive.adapter().error() == bitsery::ReaderError::NoError
+                && archive.adapter().isCompletedSuccessfully(),
+            "ComponentMeshVertex deserialization should succeed" );
+    }
+    geode::OpenGeodeModelException::test( loaded_id == component_id,
+        "Deserialized ComponentID should be the saved one" );
+    geode::OpenGeodeModelException::test( loaded_vertices == vertices,
+        "Deserialized ComponentMeshVertex should be the saved ones" );
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
+    test_component_mesh_vertex_deserialization();
     geode::VertexIdentifier vertex_identifier;
     geode::OpenGeodeModelException::test(
         vertex_identifier.nb_unique_vertices() == 0,

@@ -145,7 +145,8 @@ namespace
 namespace geode
 {
     PhysicalProperties::Info::Info()
-        : component_type( bitsery::Access::create< ComponentType >() )
+        : component_type( bitsery::Access::create< ComponentType >() ),
+          attribute_id( BITSERY::constructor )
     {
     }
 
