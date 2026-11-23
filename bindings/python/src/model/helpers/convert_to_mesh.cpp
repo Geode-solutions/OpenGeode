@@ -32,6 +32,7 @@
 #include <geode/mesh/core/tetrahedral_solid.hpp>
 #include <geode/mesh/core/triangulated_surface.hpp>
 
+#include <geode/model/mixin/core/block.hpp>
 #include <geode/model/representation/core/brep.hpp>
 #include <geode/model/representation/core/section.hpp>
 
@@ -127,6 +128,20 @@ namespace geode
                 "solid_polyhedra_mapping, unique_vertices_mapping and, only if "
                 "the solid has polyhedra, surface_polygons_mapping (to the "
                 "solid facets), line_edges_mapping and "
-                "corner_vertices_mapping; they stay empty otherwise" );
+                "corner_vertices_mapping; they stay empty otherwise" )
+            .def( "convert_block_boundaries_into_surface",
+                &convert_block_boundaries_into_surface, pybind11::arg( "brep" ),
+                pybind11::arg( "block" ),
+                pybind11::call_guard< pybind11::gil_scoped_release >(),
+                "Return (TriangulatedSurface3D, ModelToMeshMappings): the "
+                "surface bounding the Block, made of the triangles of all its "
+                "boundary Surfaces, vertices being shared according to the "
+                "unique vertices, with polygon orientations made consistent "
+                "across the Surfaces (not necessarily pointing outward). The "
+                "mappings filled are surface_polygons_mapping (all the "
+                "boundary polygons) and unique_vertices_mapping; the others "
+                "are empty. Raise OpenGeodeDataError if a boundary polygon is "
+                "not a triangle or if the orientations cannot be made "
+                "consistent" );
     }
 } // namespace geode

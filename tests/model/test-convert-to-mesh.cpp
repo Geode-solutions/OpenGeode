@@ -21,6 +21,8 @@
  *
  */
 
+#include <absl/container/flat_hash_set.h>
+
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
 #include <geode/basic/range.hpp>
@@ -33,10 +35,13 @@
 #include <geode/geometry/point.hpp>
 
 #include <geode/mesh/builder/edged_curve_builder.hpp>
+#include <geode/mesh/builder/polygonal_surface_builder.hpp>
 #include <geode/mesh/builder/surface_mesh_builder.hpp>
 #include <geode/mesh/builder/tetrahedral_solid_builder.hpp>
 #include <geode/mesh/core/mesh_factory.hpp>
+#include <geode/mesh/core/polygonal_surface.hpp>
 #include <geode/mesh/core/tetrahedral_solid.hpp>
+#include <geode/mesh/core/triangulated_surface.hpp>
 
 #include <geode/model/helpers/convert_to_mesh.hpp>
 #include <geode/model/helpers/simplicial_brep_creator.hpp>
@@ -229,6 +234,112 @@ void run_test_unlinked_vertices()
         "Unlinked vertices - Unlinked vertices should not be mapped" );
 }
 
+void run_test_block_boundaries()
+{
+    const auto model_filename =
+        absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" );
+    const auto model =
+        geode::load_one( geode::load_brep( model_filename ), model_filename );
+    for( const auto& block : model.blocks() )
+    {
+        const auto [skin, mappings] =
+            geode::convert_block_boundaries_into_surface( model, block );
+        geode::index_t nb_polygons{ 0 };
+        absl::flat_hash_set< geode::index_t > unique_vertices;
+        for( const auto& surface : model.boundaries( block ) )
+        {
+            const auto& mesh = surface.mesh();
+            nb_polygons += mesh.nb_polygons();
+            for( const auto p : geode::Range{ mesh.nb_polygons() } )
+            {
+                const auto polygon = mappings.surface_polygons_mapping.in2out(
+                    { surface.id(), p } );
+                absl::flat_hash_set< geode::index_t > expected;
+                absl::flat_hash_set< geode::index_t > found;
+                for( const auto v : geode::LRange{ 3 } )
+                {
+                    const auto unique_vertex =
+                        model.unique_vertex( { surface.component_id(),
+                            mesh.polygon_vertex( { p, v } ) } );
+                    unique_vertices.insert( unique_vertex );
+                    expected.insert( mappings.unique_vertices_mapping.in2out(
+                        unique_vertex ) );
+                    found.insert( skin->polygon_vertex( { polygon, v } ) );
+                }
+                geode::OpenGeodeModelException::test( expected == found,
+                    "Block boundaries - Wrong polygon vertices" );
+            }
+        }
+        geode::OpenGeodeModelException::test(
+            skin->nb_polygons() == nb_polygons,
+            "Block boundaries - Wrong number of polygons" );
+        geode::OpenGeodeModelException::test(
+            skin->nb_vertices() == unique_vertices.size()
+                && mappings.unique_vertices_mapping.size()
+                       == unique_vertices.size(),
+            "Block boundaries - Wrong number of vertices" );
+        geode::OpenGeodeModelException::test(
+            mappings.line_edges_mapping.size() == 0
+                && mappings.corner_vertices_mapping.size() == 0
+                && mappings.solid_polyhedra_mapping.size() == 0,
+            "Block boundaries - Unexpected mappings" );
+        for( const auto p : geode::Range{ skin->nb_polygons() } )
+        {
+            for( const auto e : geode::LRange{ 3 } )
+            {
+                const auto adjacent = skin->polygon_adjacent_edge( { p, e } );
+                geode::OpenGeodeModelException::test( adjacent.has_value(),
+                    "Block boundaries - Skin is not closed" );
+                const auto edge = skin->polygon_edge_vertices( { p, e } );
+                const auto adjacent_edge =
+                    skin->polygon_edge_vertices( adjacent.value() );
+                geode::OpenGeodeModelException::test(
+                    edge[0] == adjacent_edge[1] && edge[1] == adjacent_edge[0],
+                    "Block boundaries - Inconsistent orientations" );
+            }
+        }
+    }
+}
+
+void run_test_block_boundaries_not_triangles()
+{
+    geode::BRep brep;
+    geode::BRepBuilder builder{ brep };
+    const auto& block = brep.block( builder.add_block() );
+    const auto& surface =
+        brep.surface( builder.add_surface( geode::MeshFactory::default_impl(
+            geode::PolygonalSurface3D::type_name_static() ) ) );
+    builder.add_surface_block_boundary_relationship( surface, block );
+    auto mesh_builder =
+        builder.surface_mesh_builder< geode::PolygonalSurface3D >( surface );
+    mesh_builder->create_point( geode::Point3D{ { 0, 0, 0 } } );
+    mesh_builder->create_point( geode::Point3D{ { 1, 0, 0 } } );
+    mesh_builder->create_point( geode::Point3D{ { 1, 1, 0 } } );
+    mesh_builder->create_point( geode::Point3D{ { 0, 1, 0 } } );
+    mesh_builder->create_polygon( { 0, 1, 2, 3 } );
+    builder.create_unique_vertices( 4 );
+    for( const auto v : geode::Range{ 4 } )
+    {
+        builder.set_unique_vertex( { surface.component_id(), v }, v );
+    }
+    bool thrown{ false };
+    try
+    {
+        geode_unused(
+            geode::convert_block_boundaries_into_surface( brep, block ) );
+    }
+    catch( const geode::OpenGeodeException& exception )
+    {
+        thrown = true;
+        geode::OpenGeodeModelException::test(
+            exception.type() == geode::OpenGeodeException::TYPE::data,
+            "[Test] Block boundaries - Non triangle polygon should be a data "
+            "error" );
+    }
+    geode::OpenGeodeModelException::test(
+        thrown, "[Test] Block boundaries - Non triangle polygon should throw" );
+}
+
 void test()
 {
     geode::OpenGeodeModelLibrary::initialize();
@@ -237,6 +348,8 @@ void test()
     run_test_section_dangling_components();
     run_test_brep_dangling_components();
     run_test_unlinked_vertices();
+    run_test_block_boundaries();
+    run_test_block_boundaries_not_triangles();
 }
 
 OPENGEODE_TEST( "convert-to-mesh" )

@@ -36,9 +36,13 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( EdgedCurve );
     FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMesh );
     FORWARD_DECLARATION_DIMENSION_CLASS( SolidMesh );
+    FORWARD_DECLARATION_DIMENSION_CLASS( TriangulatedSurface );
+    FORWARD_DECLARATION_DIMENSION_CLASS( Block );
     ALIAS_2D_AND_3D( EdgedCurve );
     ALIAS_2D_AND_3D( SurfaceMesh );
     ALIAS_3D( SolidMesh );
+    ALIAS_3D( TriangulatedSurface );
+    ALIAS_3D( Block );
     class BRep;
     class Section;
     struct uuid;
@@ -83,4 +87,19 @@ namespace geode
     [[nodiscard]] std::tuple< std::unique_ptr< SolidMesh3D >,
         ModelToMeshMappings >
         opengeode_model_api convert_brep_into_solid( const BRep& brep );
+
+    /*!
+     * Builds the triangulated surface bounding a Block: the triangles of all
+     * its boundary Surfaces, vertices being shared according to the unique
+     * vertices, with polygon orientations made consistent across the
+     * Surfaces (not necessarily pointing outward).
+     * The mappings filled are surface_polygons_mapping (all the boundary
+     * polygons) and unique_vertices_mapping; the others are empty.
+     * @exception OpenGeodeException (data) if a boundary Surface polygon is
+     * not a triangle, or if the orientations cannot be made consistent.
+     */
+    [[nodiscard]] std::tuple< std::unique_ptr< TriangulatedSurface3D >,
+        ModelToMeshMappings >
+        opengeode_model_api convert_block_boundaries_into_surface(
+            const BRep& brep, const Block3D& block );
 } // namespace geode

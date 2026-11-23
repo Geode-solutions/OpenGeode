@@ -38,6 +38,7 @@
 #include <geode/mesh/builder/edged_curve_builder.hpp>
 #include <geode/mesh/builder/solid_mesh_builder.hpp>
 #include <geode/mesh/builder/surface_mesh_builder.hpp>
+#include <geode/mesh/builder/triangulated_surface_builder.hpp>
 #include <geode/mesh/core/edged_curve.hpp>
 #include <geode/mesh/core/hybrid_solid.hpp>
 #include <geode/mesh/core/point_set.hpp>
@@ -51,6 +52,7 @@
 #include <geode/mesh/core/tetrahedral_solid.hpp>
 #include <geode/mesh/core/triangulated_surface.hpp>
 #include <geode/mesh/helpers/detail/create_mesh.hpp>
+#include <geode/mesh/helpers/repair_polygon_orientations.hpp>
 
 #include <geode/model/helpers/component_mesh_edges.hpp>
 #include <geode/model/helpers/component_mesh_polygons.hpp>
@@ -581,6 +583,51 @@ namespace geode
             map_line_edges( brep, uv2mesh, brep2mesh, *mesh );
             map_corner_vertices( brep, uv2mesh, brep2mesh );
         }
+        return result;
+    }
+
+    std::tuple< std::unique_ptr< TriangulatedSurface3D >, ModelToMeshMappings >
+        convert_block_boundaries_into_surface(
+            const BRep& brep, const Block3D& block )
+    {
+        std::tuple< std::unique_ptr< TriangulatedSurface3D >,
+            ModelToMeshMappings >
+            result;
+        auto& [mesh, brep2mesh] = result;
+        mesh = TriangulatedSurface3D::create();
+        auto builder = TriangulatedSurfaceBuilder3D::create( *mesh );
+        for( const auto& surface : brep.boundaries( block ) )
+        {
+            const auto& surface_mesh = surface.mesh();
+            for( const auto p : Range{ surface_mesh.nb_polygons() } )
+            {
+                OpenGeodeModelException::check_exception(
+                    surface_mesh.nb_polygon_vertices( p ) == 3, surface.id(),
+                    OpenGeodeException::TYPE::data,
+                    "[convert_block_boundaries_into_surface] Polygon ", p,
+                    " of a boundary Surface is not a triangle" );
+                std::array< index_t, 3 > triangle;
+                for( const auto v : LRange{ 3 } )
+                {
+                    const auto vertex = surface_mesh.polygon_vertex( { p, v } );
+                    const auto unique_vertex = brep.unique_vertex(
+                        { surface.component_id(), vertex } );
+                    if( !brep2mesh.unique_vertices_mapping.has_mapping_input(
+                            unique_vertex ) )
+                    {
+                        brep2mesh.unique_vertices_mapping.map(
+                            unique_vertex, builder->create_point(
+                                               surface_mesh.point( vertex ) ) );
+                    }
+                    triangle[v] = brep2mesh.unique_vertices_mapping.in2out(
+                        unique_vertex );
+                }
+                brep2mesh.surface_polygons_mapping.map(
+                    { surface.id(), p }, builder->create_triangle( triangle ) );
+            }
+        }
+        builder->compute_polygon_adjacencies();
+        repair_polygon_orientations( *mesh, *builder );
         return result;
     }
 } // namespace geode
