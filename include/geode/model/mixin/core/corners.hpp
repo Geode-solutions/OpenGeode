@@ -31,6 +31,11 @@
 #include <geode/model/common.hpp>
 #include <geode/model/mixin/core/detail/component_range_iterator.hpp>
 
+namespace geode::detail
+{
+    class InputFiles;
+} // namespace geode::detail
+
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Corner );
@@ -169,7 +174,8 @@ namespace geode
         void delete_corner(
             const Corner< dimension >& corner, CornersBuilderKey key );
 
-        void load_corners( std::string_view directory, CornersBuilderKey key );
+        void load_corners(
+            const detail::InputFiles& files, CornersBuilderKey key );
 
         [[nodiscard]] ModifiableCornerRange modifiable_corners(
             CornersBuilderKey key );

@@ -31,6 +31,11 @@
 #include <geode/model/common.hpp>
 #include <geode/model/mixin/core/detail/component_range_iterator.hpp>
 
+namespace geode::detail
+{
+    class InputFiles;
+} // namespace geode::detail
+
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceCollection );
@@ -161,7 +166,7 @@ namespace geode
             SurfaceCollectionsBuilderKey key );
 
         void load_surface_collections(
-            std::string_view directory, SurfaceCollectionsBuilderKey key );
+            const detail::InputFiles& files, SurfaceCollectionsBuilderKey key );
 
         [[nodiscard]] ModifiableSurfaceCollectionRange
             modifiable_surface_collections( SurfaceCollectionsBuilderKey key );

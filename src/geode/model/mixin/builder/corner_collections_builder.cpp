@@ -23,6 +23,8 @@
 
 #include <geode/model/mixin/builder/corner_collections_builder.hpp>
 
+#include <geode/basic/detail/input_files.hpp>
+
 #include <geode/model/mixin/core/corner_collection.hpp>
 #include <geode/model/mixin/core/corner_collections.hpp>
 
@@ -60,9 +62,16 @@ namespace geode
     void CornerCollectionsBuilder< dimension >::load_corner_collections(
         std::string_view directory )
     {
-        return corner_collections_.load_corner_collections(
-            directory, typename CornerCollections<
-                           dimension >::CornerCollectionsBuilderKey{} );
+        load_corner_collections( detail::DirectoryInputFiles{ directory } );
+    }
+
+    template < index_t dimension >
+    void CornerCollectionsBuilder< dimension >::load_corner_collections(
+        const detail::InputFiles& files )
+    {
+        corner_collections_.load_corner_collections(
+            files, typename CornerCollections<
+                       dimension >::CornerCollectionsBuilderKey{} );
     }
 
     template < index_t dimension >

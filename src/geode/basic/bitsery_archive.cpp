@@ -23,12 +23,7 @@
 
 #include <geode/basic/bitsery_archive.hpp>
 
-#include <filesystem>
-#include <fstream>
-
 #include <absl/types/span.h>
-
-#include <geode/basic/types.hpp>
 
 namespace
 {
@@ -90,33 +85,4 @@ namespace geode
             function( context );
         }
     }
-
-    namespace detail
-    {
-        std::optional< ByteBuffer > read_file_content(
-            std::string_view filename )
-        {
-            std::ifstream file{ std::filesystem::u8path(
-                                    to_string( filename ) ),
-                std::ifstream::binary | std::ifstream::ate };
-            if( !file )
-            {
-                return std::nullopt;
-            }
-            const auto end = file.tellg();
-            OpenGeodeBasicException::check_exception( end >= 0, nullptr,
-                OpenGeodeException::TYPE::data,
-                "[read_file_content] Cannot read file: ", filename );
-            ByteBuffer buffer{ static_cast< size_t >( end ) };
-            file.seekg( 0 );
-            file.read( buffer.data(),
-                static_cast< std::streamsize >( buffer.size() ) );
-            OpenGeodeBasicException::check_exception(
-                file.gcount()
-                    == static_cast< std::streamsize >( buffer.size() ),
-                nullptr, OpenGeodeException::TYPE::data,
-                "[read_file_content] Cannot read file: ", filename );
-            return buffer;
-        }
-    } // namespace detail
 } // namespace geode

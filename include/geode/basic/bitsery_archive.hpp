@@ -40,18 +40,10 @@
 
 #include <geode/basic/attribute.hpp>
 #include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/byte_span.hpp>
 #include <geode/basic/common.hpp>
 #include <geode/basic/growable.hpp>
 #include <geode/basic/range.hpp>
-
-namespace geode
-{
-    /*!
-     * Read-only bytes to deserialize, owned elsewhere (file content, slice of
-     * an archive in memory...).
-     */
-    using ByteSpan = absl::Span< const char >;
-} // namespace geode
 
 namespace bitsery
 {
@@ -129,45 +121,6 @@ namespace geode
 
     namespace detail
     {
-        /*!
-         * Owned bytes, uninitialized at construction.
-         */
-        class ByteBuffer
-        {
-        public:
-            explicit ByteBuffer( size_t size )
-                : data_{ new char[size] }, size_{ size }
-            {
-            }
-
-            [[nodiscard]] char *data()
-            {
-                return data_.get();
-            }
-
-            [[nodiscard]] size_t size() const
-            {
-                return size_;
-            }
-
-            [[nodiscard]] ByteSpan span() const
-            {
-                return { data_.get(), size_ };
-            }
-
-        private:
-            std::unique_ptr< char[] > data_;
-            size_t size_;
-        };
-
-        /*!
-         * Read the whole content of a file (UTF-8 path) in one call.
-         * @return std::nullopt if the file cannot be opened.
-         * @exception OpenGeodeException (data) if the file cannot be read.
-         */
-        [[nodiscard]] std::optional< ByteBuffer >
-            opengeode_basic_api read_file_content( std::string_view filename );
-
         /*!
          * Deserialize an object from bytes, with the deserialize contexts of
          * every registered library.

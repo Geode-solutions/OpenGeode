@@ -31,6 +31,11 @@
 #include <geode/model/common.hpp>
 #include <geode/model/mixin/core/detail/component_range_iterator.hpp>
 
+namespace geode::detail
+{
+    class InputFiles;
+} // namespace geode::detail
+
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Block );
@@ -170,7 +175,8 @@ namespace geode
         void delete_block(
             const Block< dimension >& block, BlocksBuilderKey key );
 
-        void load_blocks( std::string_view directory, BlocksBuilderKey key );
+        void load_blocks(
+            const detail::InputFiles& files, BlocksBuilderKey key );
 
         [[nodiscard]] ModifiableBlockRange modifiable_blocks(
             BlocksBuilderKey key );

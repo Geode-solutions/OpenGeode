@@ -23,8 +23,10 @@
 
 #pragma once
 
+#include <optional>
 #include <string_view>
 
+#include <geode/basic/detail/file_content.hpp>
 #include <geode/basic/factory.hpp>
 #include <geode/basic/input.hpp>
 
@@ -55,11 +57,40 @@ namespace geode
         [[nodiscard]] std::vector< LightRegularGrid< dimension > >
             read() override
         {
-            const auto content = detail::read_file_content( this->filename() );
+            const auto content = detail::map_file_content( this->filename() );
             OpenGeodeMeshException::check_exception( content.has_value(),
                 nullptr, OpenGeodeException::TYPE::data,
                 "[LightRegularGridInput] Failed to open file: ",
                 this->filename() );
+            return read_grid( content->span() );
+        }
+
+        [[nodiscard]] std::optional<
+            std::vector< LightRegularGrid< dimension > > >
+            read_bytes( ByteSpan content ) override
+        {
+            return read_grid( content );
+        }
+
+        AdditionalFiles additional_files() const override
+        {
+            return {};
+        }
+
+        index_t object_priority() const override
+        {
+            return 0;
+        }
+
+        Percentage is_loadable() const final
+        {
+            return Percentage{ 1 };
+        }
+
+    private:
+        [[nodiscard]] std::vector< LightRegularGrid< dimension > > read_grid(
+            ByteSpan content ) const
+        {
             Point< dimension > origin;
             std::array< index_t, dimension > cells_number;
             cells_number.fill( 1 );
@@ -70,7 +101,7 @@ namespace geode
             bool success{ false };
             try
             {
-                success = detail::deserialize_bytes( content->span(), grid );
+                success = detail::deserialize_bytes( content, grid );
             }
             catch( const OpenGeodeException& )
             {
@@ -90,21 +121,6 @@ namespace geode
             std::vector< LightRegularGrid< dimension > > grids;
             grids.emplace_back( std::move( grid ) );
             return grids;
-        }
-
-        AdditionalFiles additional_files() const override
-        {
-            return {};
-        }
-
-        index_t object_priority() const override
-        {
-            return 0;
-        }
-
-        Percentage is_loadable() const final
-        {
-            return Percentage{ 1 };
         }
     };
     ALIAS_2D_AND_3D( OpenGeodeLightRegularGridInput );

@@ -34,6 +34,11 @@
 #include <geode/model/common.hpp>
 #include <geode/model/mixin/core/component_type.hpp>
 
+namespace geode::detail
+{
+    class InputFiles;
+} // namespace geode::detail
+
 namespace geode
 {
     class PhysicalPropertiesBuilder;
@@ -119,7 +124,7 @@ namespace geode
             const PhysicalProperties& other, BuilderKey /*key*/ );
 
         void load_physical_properties(
-            std::string_view directory, BuilderKey /*key*/ );
+            const detail::InputFiles& files, BuilderKey /*key*/ );
 
     protected:
         PhysicalProperties( PhysicalProperties&& other ) noexcept;

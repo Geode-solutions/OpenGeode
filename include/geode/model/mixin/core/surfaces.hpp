@@ -31,6 +31,11 @@
 #include <geode/model/common.hpp>
 #include <geode/model/mixin/core/detail/component_range_iterator.hpp>
 
+namespace geode::detail
+{
+    class InputFiles;
+} // namespace geode::detail
+
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Surface );
@@ -156,7 +161,7 @@ namespace geode
             const Surface< dimension >& surface, SurfacesBuilderKey key );
 
         void load_surfaces(
-            std::string_view directory, SurfacesBuilderKey key );
+            const detail::InputFiles& files, SurfacesBuilderKey key );
 
         [[nodiscard]] ModifiableSurfaceRange modifiable_surfaces(
             SurfacesBuilderKey key );

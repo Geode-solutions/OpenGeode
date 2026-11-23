@@ -29,6 +29,7 @@
 #include <bitsery/ext/std_optional.h>
 
 #include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/detail/input_files.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 #include <geode/basic/uuid.hpp>
 
@@ -81,18 +82,19 @@ namespace geode
                 "[Identifier::save] Error while writing file: ", filename );
         }
 
-        void load( std::string_view directory )
+        void load( const detail::InputFiles& files )
         {
-            const auto filename = absl::StrCat( directory, "/identifier" );
-            const auto content = detail::read_file_content( filename );
-            if( !content )
+            static constexpr auto FILENAME = "identifier";
+            if( !files.has( FILENAME ) )
             {
                 return;
             }
+            const auto content = files.content( FILENAME );
             OpenGeodeBasicException::check_exception(
-                detail::deserialize_bytes( content->span(), *this ), nullptr,
+                detail::deserialize_bytes( content.span(), *this ), nullptr,
                 OpenGeodeException::TYPE::internal,
-                "[Identifier::load] Error while reading file: ", filename );
+                "[Identifier::load] Error while reading file: ",
+                files.location( FILENAME ) );
         }
 
     private:
@@ -157,9 +159,9 @@ namespace geode
     }
 
     void Identifier::load_identifier(
-        std::string_view directory, IdentifierKey /*unused*/ )
+        const detail::InputFiles& files, IdentifierKey /*unused*/ )
     {
-        impl_->load( directory );
+        impl_->load( files );
     }
 
     void Identifier::set_id( const uuid& unique_id, IdentifierKey /*unused*/ )

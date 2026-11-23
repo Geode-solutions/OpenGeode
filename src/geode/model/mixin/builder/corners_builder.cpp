@@ -23,6 +23,8 @@
 
 #include <geode/model/mixin/builder/corners_builder.hpp>
 
+#include <geode/basic/detail/input_files.hpp>
+
 #include <geode/mesh/builder/point_set_builder.hpp>
 #include <geode/mesh/core/point_set.hpp>
 
@@ -72,8 +74,15 @@ namespace geode
     template < index_t dimension >
     void CornersBuilder< dimension >::load_corners( std::string_view directory )
     {
-        return corners_.load_corners(
-            directory, typename Corners< dimension >::CornersBuilderKey{} );
+        load_corners( detail::DirectoryInputFiles{ directory } );
+    }
+
+    template < index_t dimension >
+    void CornersBuilder< dimension >::load_corners(
+        const detail::InputFiles& files )
+    {
+        corners_.load_corners(
+            files, typename Corners< dimension >::CornersBuilderKey{} );
     }
 
     template < index_t dimension >

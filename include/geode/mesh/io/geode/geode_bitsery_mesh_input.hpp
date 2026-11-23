@@ -24,6 +24,9 @@
 #pragma once
 
 #include <fstream>
+#include <optional>
+
+#include <geode/basic/detail/file_content.hpp>
 
 #include <geode/geometry/bitsery_archive.hpp>
 
@@ -36,17 +39,30 @@
         const MeshImpl& /*impl*/ ) final                                       \
     {                                                                          \
         const auto content =                                                   \
-            geode::detail::read_file_content( this->filename() );              \
+            geode::detail::map_file_content( this->filename() );               \
         geode::OpenGeodeMeshException::check_exception( content.has_value(),   \
             nullptr, geode::OpenGeodeException::TYPE::data,                    \
             "[Bitsery::read] Failed to open file: ", this->filename() );       \
+        return read_mesh( content->span() );                                   \
+    }                                                                          \
+                                                                               \
+    [[nodiscard]] std::optional< std::vector< std::unique_ptr< Mesh > > >      \
+        read_bytes( geode::ByteSpan content, const MeshImpl& /*impl*/ ) final  \
+    {                                                                          \
+        return read_mesh( content );                                           \
+    }                                                                          \
+                                                                               \
+private:                                                                       \
+    [[nodiscard]] std::vector< std::unique_ptr< Mesh > > read_mesh(            \
+        geode::ByteSpan content ) const                                        \
+    {                                                                          \
         std::unique_ptr< Mesh > mesh{ new OpenGeode##Mesh{                     \
             BITSERY::constructor } };                                          \
         bool success{ false };                                                 \
         try                                                                    \
         {                                                                      \
             success = geode::detail::deserialize_bytes(                        \
-                content->span(), dynamic_cast< OpenGeode##Mesh& >( *mesh ) );  \
+                content, dynamic_cast< OpenGeode##Mesh& >( *mesh ) );          \
         }                                                                      \
         catch( const geode::OpenGeodeException& )                              \
         {                                                                      \
@@ -67,6 +83,7 @@
         return meshes;                                                         \
     }                                                                          \
                                                                                \
+public:                                                                        \
     index_t object_priority() const final                                      \
     {                                                                          \
         return 0;                                                              \

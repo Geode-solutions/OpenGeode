@@ -25,6 +25,11 @@
 
 #include <geode/basic/common.hpp>
 
+namespace geode::detail
+{
+    class InputFiles;
+} // namespace geode::detail
+
 namespace geode
 {
     class Identifier;
@@ -45,6 +50,8 @@ namespace geode
         void copy_identifier( const Identifier& other );
 
         void load_identifier( std::string_view directory );
+
+        void load_identifier( const detail::InputFiles& files );
 
     private:
         Identifier& identifier_;

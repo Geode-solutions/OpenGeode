@@ -31,6 +31,11 @@
 #include <geode/model/common.hpp>
 #include <geode/model/mixin/core/detail/component_range_iterator.hpp>
 
+namespace geode::detail
+{
+    class InputFiles;
+} // namespace geode::detail
+
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( ModelBoundary );
@@ -154,7 +159,7 @@ namespace geode
             ModelBoundariesBuilderKey key );
 
         void load_model_boundaries(
-            std::string_view directory, ModelBoundariesBuilderKey key );
+            const detail::InputFiles& files, ModelBoundariesBuilderKey key );
 
         [[nodiscard]] ModifiableModelBoundaryRange modifiable_model_boundaries(
             ModelBoundariesBuilderKey key );

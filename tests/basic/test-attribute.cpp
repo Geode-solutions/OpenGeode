@@ -30,6 +30,7 @@
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/attribute_time_series.hpp>
 #include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/detail/file_content.hpp>
 #include <geode/basic/bitsery_attribute.hpp>
 #include <geode/basic/logger.hpp>
 
@@ -524,7 +525,7 @@ void test_serialize_manager( geode::AttributeManager& manager,
     geode::OpenGeodeBasicException::test( std::get< 1 >( context ).isValid(),
         "Error while writing file: ", filename );
 
-    const auto content = geode::detail::read_file_content( filename );
+    const auto content = geode::detail::map_file_content( filename );
     geode::OpenGeodeBasicException::test(
         content.has_value(), "Cannot open file: ", filename );
     geode::AttributeManager reloaded_manager;
@@ -539,7 +540,7 @@ void test_serialize_manager( geode::AttributeManager& manager,
         geode::Deserializer >(
         std::get< 0 >( reload_context ), "array_double_2" );
     geode::Deserializer unarchive{ reload_context, content->span().data(),
-        content->size() };
+        content->span().size() };
     unarchive.object( reloaded_manager );
     const auto& adapter = unarchive.adapter();
     geode::OpenGeodeBasicException::test(
@@ -928,7 +929,7 @@ void test_no_value()
     geode::OpenGeodeBasicException::test( std::get< 1 >( context ).isValid(),
         "Error while writing file: ", filename );
 
-    const auto content = geode::detail::read_file_content( filename );
+    const auto content = geode::detail::map_file_content( filename );
     geode::OpenGeodeBasicException::test(
         content.has_value(), "Cannot open file: ", filename );
     geode::AttributeManager reloaded_manager;
@@ -936,7 +937,7 @@ void test_no_value()
     geode::register_basic_deserialize_pcontext(
         std::get< 0 >( reload_context ) );
     geode::Deserializer unarchive{ reload_context, content->span().data(),
-        content->size() };
+        content->span().size() };
     unarchive.object( reloaded_manager );
     const auto& adapter = unarchive.adapter();
     geode::OpenGeodeBasicException::test(

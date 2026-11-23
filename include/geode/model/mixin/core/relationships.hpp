@@ -35,6 +35,11 @@
 #include <geode/model/mixin/core/component_type.hpp>
 #include <geode/model/representation/core/mapping.hpp>
 
+namespace geode::detail
+{
+    class InputFiles;
+} // namespace geode::detail
+
 namespace geode
 {
     class AttributeManager;
@@ -489,7 +494,7 @@ namespace geode
             RelationshipsBuilderKey /*key*/ );
 
         void load_relationships(
-            std::string_view directory, RelationshipsBuilderKey /*key*/ );
+            const detail::InputFiles& files, RelationshipsBuilderKey /*key*/ );
 
     protected:
         Relationships( Relationships&& other ) noexcept;

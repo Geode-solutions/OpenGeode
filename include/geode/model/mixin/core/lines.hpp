@@ -31,6 +31,11 @@
 #include <geode/model/common.hpp>
 #include <geode/model/mixin/core/detail/component_range_iterator.hpp>
 
+namespace geode::detail
+{
+    class InputFiles;
+} // namespace geode::detail
+
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Line );
@@ -152,7 +157,7 @@ namespace geode
 
         void delete_line( const Line< dimension >& line, LinesBuilderKey key );
 
-        void load_lines( std::string_view directory, LinesBuilderKey key );
+        void load_lines( const detail::InputFiles& files, LinesBuilderKey key );
 
         [[nodiscard]] ModifiableLineRange modifiable_lines(
             LinesBuilderKey key );

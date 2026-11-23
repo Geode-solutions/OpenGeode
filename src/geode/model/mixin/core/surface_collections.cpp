@@ -99,10 +99,9 @@ namespace geode
 
     template < index_t dimension >
     void SurfaceCollections< dimension >::load_surface_collections(
-        std::string_view directory, SurfaceCollectionsBuilderKey /*key*/ )
+        const detail::InputFiles& files, SurfaceCollectionsBuilderKey /*key*/ )
     {
-        impl_->load_components(
-            absl::StrCat( directory, "/surface_collections" ), false );
+        impl_->load_components( files, "surface_collections", false );
     }
 
     template < index_t dimension >

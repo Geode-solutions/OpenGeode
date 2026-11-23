@@ -26,6 +26,11 @@
 #include <geode/model/common.hpp>
 #include <geode/model/mixin/core/relationships.hpp>
 
+namespace geode::detail
+{
+    class InputFiles;
+} // namespace geode::detail
+
 namespace geode
 {
     /*!
@@ -80,6 +85,8 @@ namespace geode
             const Relationships& relationships );
 
         void load_relationships( std::string_view directory );
+
+        void load_relationships( const detail::InputFiles& files );
 
     private:
         Relationships& relationships_;

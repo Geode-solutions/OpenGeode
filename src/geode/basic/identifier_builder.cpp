@@ -23,6 +23,7 @@
 
 #include <geode/basic/identifier_builder.hpp>
 
+#include <geode/basic/detail/input_files.hpp>
 #include <geode/basic/identifier.hpp>
 #include <geode/basic/uuid.hpp>
 
@@ -50,7 +51,12 @@ namespace geode
 
     void IdentifierBuilder::load_identifier( std::string_view directory )
     {
-        identifier_.load_identifier( directory, Identifier::IdentifierKey{} );
+        load_identifier( detail::DirectoryInputFiles{ directory } );
+    }
+
+    void IdentifierBuilder::load_identifier( const detail::InputFiles& files )
+    {
+        identifier_.load_identifier( files, Identifier::IdentifierKey{} );
     }
 
 } // namespace geode

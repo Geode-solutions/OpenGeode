@@ -23,11 +23,13 @@
 
 #pragma once
 
+#include <optional>
 #include <string_view>
 #include <vector>
 
 #include <absl/algorithm/container.h>
 
+#include <geode/basic/byte_span.hpp>
 #include <geode/basic/common.hpp>
 #include <geode/basic/io.hpp>
 #include <geode/basic/logger.hpp>
@@ -77,6 +79,19 @@ namespace geode
 
         [[nodiscard]] virtual std::vector< Object > read(
             const Args&... args ) = 0;
+
+        /*!
+         * Read the objects from the content of the file, already in memory
+         * (e.g. an entry of an archive), instead of opening the file: the
+         * filename only names the content in messages.
+         * @return std::nullopt if this input can only read files: the caller
+         * then calls read() on a file holding the content.
+         */
+        [[nodiscard]] virtual std::optional< std::vector< Object > > read_bytes(
+            ByteSpan /*content*/, const Args&... /*args*/ )
+        {
+            return std::nullopt;
+        }
 
         ~Input()
         {

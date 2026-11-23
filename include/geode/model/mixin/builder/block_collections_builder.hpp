@@ -27,6 +27,11 @@
 
 #include <geode/model/common.hpp>
 
+namespace geode::detail
+{
+    class InputFiles;
+} // namespace geode::detail
+
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( BlockCollection );
@@ -42,6 +47,8 @@ namespace geode
     {
     public:
         void load_block_collections( std::string_view directory );
+
+        void load_block_collections( const detail::InputFiles& files );
 
         void set_block_collection_name(
             const BlockCollection< dimension >& block_collection,

@@ -115,15 +115,15 @@ namespace geode
 
     template < index_t dimension >
     void Corners< dimension >::load_corners(
-        std::string_view directory, CornersBuilderKey key )
+        const detail::InputFiles& files, CornersBuilderKey key )
     {
-        impl_->load_components( absl::StrCat( directory, "/corners" ) );
-        const auto mapping = impl_->file_mapping( directory );
+        impl_->load_components( files, "corners", true );
+        const auto mapping = impl_->file_mapping( files );
         absl::FixedArray< async::task< void > > tasks( nb_corners() );
         index_t count{ 0 };
         for( auto& corner : modifiable_corners( key ) )
         {
-            tasks[count++] = async::spawn( [&corner, &mapping] {
+            tasks[count++] = async::spawn( [&corner, &mapping, &files] {
                 const auto& type = PointSet< dimension >::type_name_static();
                 const auto file = mapping.find( corner.id().string() );
                 if( file == mapping.end() )
@@ -134,11 +134,11 @@ namespace geode
                     return;
                 }
                 corner.set_mesh(
-                    load_one( load_point_set< dimension >(
-                                  detail::loadable_mesh_impl(
-                                      corner.mesh_type(), type, file->second ),
-                                  file->second ),
-                        file->second ),
+                    detail::load_component_mesh<
+                        PointSetInputFactory< dimension > >( files,
+                        file->second,
+                        detail::loadable_mesh_impl( corner.mesh_type(), type,
+                            files.location( file->second ) ) ),
                     typename Corner< dimension >::CornersKey{} );
             } );
         }

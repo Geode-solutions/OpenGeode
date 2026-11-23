@@ -31,6 +31,11 @@
 #include <geode/model/common.hpp>
 #include <geode/model/mixin/core/detail/component_range_iterator.hpp>
 
+namespace geode::detail
+{
+    class InputFiles;
+} // namespace geode::detail
+
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( CornerCollection );
@@ -159,7 +164,7 @@ namespace geode
             CornerCollectionsBuilderKey key );
 
         void load_corner_collections(
-            std::string_view directory, CornerCollectionsBuilderKey key );
+            const detail::InputFiles& files, CornerCollectionsBuilderKey key );
 
         [[nodiscard]] ModifiableCornerCollectionRange
             modifiable_corner_collections( CornerCollectionsBuilderKey key );

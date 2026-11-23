@@ -34,6 +34,11 @@ namespace bitsery
     class Access;
 } // namespace bitsery
 
+namespace geode::detail
+{
+    class InputFiles;
+} // namespace geode::detail
+
 namespace geode
 {
     class IdentifierBuilder;
@@ -65,7 +70,7 @@ namespace geode
         void set_name( std::string_view name, IdentifierKey /*key*/ );
 
         void load_identifier(
-            std::string_view directory, IdentifierKey /*key*/ );
+            const detail::InputFiles& files, IdentifierKey /*key*/ );
 
         void copy_identifier( const Identifier& other, IdentifierKey /*key*/ );
 

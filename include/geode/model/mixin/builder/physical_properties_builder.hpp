@@ -28,6 +28,11 @@
 #include <geode/model/common.hpp>
 #include <geode/model/mixin/core/physical_properties.hpp>
 
+namespace geode::detail
+{
+    class InputFiles;
+} // namespace geode::detail
+
 namespace geode
 {
     struct uuid;
@@ -59,6 +64,8 @@ namespace geode
         void copy_physical_properties( const PhysicalProperties& other );
 
         void load_physical_properties( std::string_view directory );
+
+        void load_physical_properties( const detail::InputFiles& files );
 
     private:
         PhysicalProperties& physical_properties_;

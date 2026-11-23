@@ -32,6 +32,11 @@
 
 #include <geode/model/common.hpp>
 
+namespace geode::detail
+{
+    class InputFiles;
+} // namespace geode::detail
+
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Line );
@@ -49,6 +54,8 @@ namespace geode
     {
     public:
         void load_lines( std::string_view directory );
+
+        void load_lines( const detail::InputFiles& files );
 
         /*!
          * Get a pointer to the builder of a Line mesh

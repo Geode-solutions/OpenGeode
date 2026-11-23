@@ -181,15 +181,15 @@ namespace geode
 
     template < index_t dimension >
     void Blocks< dimension >::load_blocks(
-        std::string_view directory, BlocksBuilderKey builder_key )
+        const detail::InputFiles& files, BlocksBuilderKey builder_key )
     {
-        impl_->load_components( absl::StrCat( directory, "/blocks" ) );
-        const auto mapping = impl_->file_mapping( directory );
+        impl_->load_components( files, "blocks", true );
+        const auto mapping = impl_->file_mapping( files );
         absl::FixedArray< async::task< void > > tasks( nb_blocks() );
         index_t count{ 0 };
         for( auto& block : modifiable_blocks( builder_key ) )
         {
-            tasks[count++] = async::spawn( [&block, &mapping] {
+            tasks[count++] = async::spawn( [&block, &mapping, &files] {
                 const auto file = mapping.find( block.id().string() );
                 if( file == mapping.end() )
                 {
@@ -199,38 +199,39 @@ namespace geode
                         typename Block< dimension >::BlocksKey{} );
                     return;
                 }
+                const auto& name = file->second;
                 const auto impl = detail::loadable_mesh_impl( block.mesh_type(),
-                    solid_type_from_file< dimension >( file->second ),
-                    file->second );
+                    solid_type_from_file< dimension >( name ),
+                    files.location( name ) );
                 const auto& type = MeshFactory::type( impl );
                 if( type == TetrahedralSolid< dimension >::type_name_static() )
                 {
                     block.set_mesh(
-                        load_one( load_tetrahedral_solid< dimension >(
-                                      impl, file->second ),
-                            file->second ),
+                        detail::load_component_mesh<
+                            TetrahedralSolidInputFactory< dimension > >(
+                            files, name, impl ),
                         typename Block< dimension >::BlocksKey{} );
                 }
                 else if( type == HybridSolid< dimension >::type_name_static() )
                 {
-                    block.set_mesh( load_one( load_hybrid_solid< dimension >(
-                                                  impl, file->second ),
-                                        file->second ),
+                    block.set_mesh( detail::load_component_mesh<
+                                        HybridSolidInputFactory< dimension > >(
+                                        files, name, impl ),
                         typename Block< dimension >::BlocksKey{} );
                 }
                 else if( type == RegularGrid< dimension >::type_name_static() )
                 {
-                    block.set_mesh( load_one( load_regular_grid< dimension >(
-                                                  impl, file->second ),
-                                        file->second ),
+                    block.set_mesh( detail::load_component_mesh<
+                                        RegularGridInputFactory< dimension > >(
+                                        files, name, impl ),
                         typename Block< dimension >::BlocksKey{} );
                 }
                 else
                 {
                     block.set_mesh(
-                        load_one( load_polyhedral_solid< dimension >(
-                                      impl, file->second ),
-                            file->second ),
+                        detail::load_component_mesh<
+                            PolyhedralSolidInputFactory< dimension > >(
+                            files, name, impl ),
                         typename Block< dimension >::BlocksKey{} );
                 }
             } );

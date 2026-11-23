@@ -27,6 +27,11 @@
 
 #include <geode/model/common.hpp>
 
+namespace geode::detail
+{
+    class InputFiles;
+} // namespace geode::detail
+
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( ModelBoundary );
@@ -42,6 +47,8 @@ namespace geode
     {
     public:
         void load_model_boundaries( std::string_view directory );
+
+        void load_model_boundaries( const detail::InputFiles& files );
 
         void set_model_boundary_name(
             const ModelBoundary< dimension >& id, std::string_view name );

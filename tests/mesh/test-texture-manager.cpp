@@ -24,6 +24,7 @@
 #include <fstream>
 
 #include <geode/basic/attribute_manager.hpp>
+#include <geode/basic/detail/file_content.hpp>
 #include <geode/basic/logger.hpp>
 
 #include <geode/geometry/bitsery_archive.hpp>
@@ -101,7 +102,7 @@ void save( const geode::TextureStorage2D& storage, std::string_view filename )
 
 geode::TextureStorage2D load( std::string_view filename )
 {
-    const auto content = geode::detail::read_file_content( filename );
+    const auto content = geode::detail::map_file_content( filename );
     geode::OpenGeodeMeshException::test(
         content.has_value(), "[Bitsery::read] Cannot open file: ", filename );
     geode::TContext context{};
@@ -110,7 +111,7 @@ geode::TextureStorage2D load( std::string_view filename )
     geode::register_image_deserialize_pcontext( std::get< 0 >( context ) );
     geode::register_mesh_deserialize_pcontext( std::get< 0 >( context ) );
     geode::Deserializer archive{ context, content->span().data(),
-        content->size() };
+        content->span().size() };
     geode::TextureStorage2D storage;
     archive.object( storage );
     const auto& adapter = archive.adapter();

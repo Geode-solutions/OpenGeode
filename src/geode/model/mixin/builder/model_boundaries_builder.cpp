@@ -23,6 +23,8 @@
 
 #include <geode/model/mixin/builder/model_boundaries_builder.hpp>
 
+#include <geode/basic/detail/input_files.hpp>
+
 #include <geode/model/mixin/core/model_boundaries.hpp>
 #include <geode/model/mixin/core/model_boundary.hpp>
 
@@ -58,9 +60,16 @@ namespace geode
     void ModelBoundariesBuilder< dimension >::load_model_boundaries(
         std::string_view directory )
     {
-        return model_boundaries_.load_model_boundaries(
-            directory, typename ModelBoundaries<
-                           dimension >::ModelBoundariesBuilderKey{} );
+        load_model_boundaries( detail::DirectoryInputFiles{ directory } );
+    }
+
+    template < index_t dimension >
+    void ModelBoundariesBuilder< dimension >::load_model_boundaries(
+        const detail::InputFiles& files )
+    {
+        model_boundaries_.load_model_boundaries(
+            files, typename ModelBoundaries<
+                       dimension >::ModelBoundariesBuilderKey{} );
     }
 
     template < index_t dimension >

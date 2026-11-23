@@ -23,10 +23,16 @@
 
 #include <geode/basic/zip_file.hpp>
 
+#include <algorithm>
+#include <array>
+#include <cstdint>
 #include <filesystem>
 #include <fstream>
 #include <limits>
 #include <string_view>
+
+#include <absl/container/flat_hash_map.h>
+#include <absl/strings/str_cat.h>
 
 #include <mz.h>
 #include <mz_strm.h>
@@ -34,6 +40,9 @@
 #include <mz_zip.h>
 #include <mz_zip_rw.h>
 
+#include <zlib.h>
+
+#include <geode/basic/detail/input_files.hpp>
 #include <geode/basic/logger.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 
@@ -73,6 +82,100 @@ namespace
             }
         }
         return true;
+    }
+
+    constexpr size_t LOCAL_HEADER_SIZE{ 30 };
+    constexpr uint32_t LOCAL_HEADER_SIGNATURE{ 0x04034b50 };
+
+    uint32_t read_little_endian( const char* bytes, size_t nb_bytes )
+    {
+        uint32_t value{ 0 };
+        for( size_t byte = nb_bytes; byte > 0; byte-- )
+        {
+            value = ( value << 8U )
+                    | static_cast< unsigned char >( bytes[byte - 1] );
+        }
+        return value;
+    }
+
+    class ZipReader
+    {
+    public:
+        explicit ZipReader( const std::filesystem::path& file )
+            : reader_{ mz_zip_reader_create() }
+        {
+            status_ = reader_ == nullptr ? MZ_MEM_ERROR
+                                         : mz_zip_reader_open_file( reader_,
+                                               file.u8string().c_str() );
+        }
+
+        ~ZipReader()
+        {
+            if( reader_ )
+            {
+                mz_zip_reader_close( reader_ );
+                mz_zip_reader_delete( &reader_ );
+            }
+        }
+
+        ZipReader( const ZipReader& ) = delete;
+        ZipReader& operator=( const ZipReader& ) = delete;
+
+        [[nodiscard]] bool is_open() const
+        {
+            return status_ == MZ_OK;
+        }
+
+        [[nodiscard]] void* get() const
+        {
+            return reader_;
+        }
+
+    private:
+        void* reader_;
+        int32_t status_;
+    };
+
+    geode::detail::ByteBuffer inflate_entry(
+        geode::ByteSpan compressed, size_t uncompressed_size, bool& success )
+    {
+        geode::detail::ByteBuffer buffer{ uncompressed_size };
+        z_stream stream{};
+        success = false;
+        if( inflateInit2_( &stream, -MAX_WBITS, ZLIB_VERSION,
+                static_cast< int >( sizeof( z_stream ) ) )
+            != Z_OK )
+        {
+            return buffer;
+        }
+        using Chunk = decltype( stream.avail_in );
+        constexpr auto MAX_CHUNK =
+            static_cast< size_t >( std::numeric_limits< Chunk >::max() );
+        const auto* input =
+            reinterpret_cast< const unsigned char* >( compressed.data() );
+        auto input_left = compressed.size();
+        auto* output = reinterpret_cast< unsigned char* >( buffer.data() );
+        auto output_left = buffer.size();
+        auto status = Z_OK;
+        while( status == Z_OK )
+        {
+            const auto input_chunk = std::min( input_left, MAX_CHUNK );
+            const auto output_chunk = std::min( output_left, MAX_CHUNK );
+            stream.next_in = const_cast< unsigned char* >( input );
+            stream.avail_in = static_cast< Chunk >( input_chunk );
+            stream.next_out = output;
+            stream.avail_out = static_cast< Chunk >( output_chunk );
+            status = inflate( &stream, Z_NO_FLUSH );
+            const auto nb_read = input_chunk - stream.avail_in;
+            const auto nb_written = output_chunk - stream.avail_out;
+            input += nb_read;
+            input_left -= nb_read;
+            output += nb_written;
+            output_left -= nb_written;
+        }
+        inflateEnd( &stream );
+        success = status == Z_STREAM_END && output_left == 0;
+        return buffer;
     }
 } // namespace
 
@@ -457,6 +560,294 @@ namespace geode
     {
         return impl_->directory();
     }
+
+    namespace detail
+    {
+        class ArchiveInputFiles::Impl
+        {
+            struct ArchiveEntry
+            {
+                uint64_t header_offset;
+                uint64_t compressed_size;
+                uint64_t uncompressed_size;
+                uint32_t crc;
+                uint16_t method;
+            };
+
+        public:
+            explicit Impl( std::string_view filename )
+                : filename_{ to_string( filename ) }
+            {
+                OpenGeodeBasicException::check_exception(
+                    std::filesystem::exists( to_path( filename ) ), nullptr,
+                    OpenGeodeException::TYPE::data, "[ArchiveInputFiles] File ",
+                    filename, " doesn't exist" );
+                read_entries();
+                mapping_ = MappedFile::map( filename_ );
+                if( !mapping_ )
+                {
+                    Logger::debug( "[ArchiveInputFiles] Cannot map ", filename_,
+                        ", reading its entries from disk" );
+                }
+            }
+
+            bool has( std::string_view name ) const
+            {
+                return entries_.contains( name );
+            }
+
+            std::vector< std::string > names() const
+            {
+                return names_;
+            }
+
+            FileContent content( std::string_view name ) const
+            {
+                const auto entry = entries_.find( name );
+                OpenGeodeBasicException::check_exception(
+                    entry != entries_.end(), nullptr,
+                    OpenGeodeException::TYPE::data,
+                    "[ArchiveInputFiles] Missing entry ", location( name ) );
+                auto content = entry->second.method == MZ_COMPRESS_METHOD_STORE
+                                   ? stored_content( name, entry->second )
+                                   : inflated_content( name, entry->second );
+                const auto bytes = content.span();
+                const auto crc = crc32_z( 0,
+                    reinterpret_cast< const unsigned char* >( bytes.data() ),
+                    bytes.size() );
+                OpenGeodeBasicException::check_exception(
+                    static_cast< uint32_t >( crc ) == entry->second.crc,
+                    nullptr, OpenGeodeException::TYPE::data,
+                    "[ArchiveInputFiles] Corrupted entry ", location( name ),
+                    " (CRC-32 mismatch)" );
+                return content;
+            }
+
+            std::string location( std::string_view name ) const
+            {
+                return absl::StrCat( filename_, "/", name );
+            }
+
+        private:
+            void read_entries()
+            {
+                const ZipReader reader{ to_path( filename_ ) };
+                OpenGeodeBasicException::check_exception( reader.is_open(),
+                    nullptr, OpenGeodeException::TYPE::data,
+                    "[ArchiveInputFiles] Error opening zip for reading: ",
+                    filename_ );
+                auto status = mz_zip_reader_goto_first_entry( reader.get() );
+                while( status == MZ_OK )
+                {
+                    read_entry( reader.get() );
+                    status = mz_zip_reader_goto_next_entry( reader.get() );
+                }
+                OpenGeodeBasicException::check_exception(
+                    status == MZ_END_OF_LIST, nullptr,
+                    OpenGeodeException::TYPE::data,
+                    "[ArchiveInputFiles] Error while reading zip entries of ",
+                    filename_, " (", status, ")" );
+            }
+
+            void read_entry( void* reader )
+            {
+                mz_zip_file* info = nullptr;
+                const auto info_status =
+                    mz_zip_reader_entry_get_info( reader, &info );
+                OpenGeodeBasicException::check_exception(
+                    info_status == MZ_OK && info != nullptr, nullptr,
+                    OpenGeodeException::TYPE::data,
+                    "[ArchiveInputFiles] Cannot read zip entry information "
+                    "of ",
+                    filename_, " (", info_status, ")" );
+                std::string name{ info->filename };
+                OpenGeodeBasicException::check_exception(
+                    is_safe_entry_path( to_path( name ) ), nullptr,
+                    OpenGeodeException::TYPE::data,
+                    "[ArchiveInputFiles] Unsafe zip entry path: ", name );
+                if( mz_zip_reader_entry_is_dir( reader ) == MZ_OK )
+                {
+                    return;
+                }
+                OpenGeodeBasicException::check_exception(
+                    ( info->flag & MZ_ZIP_FLAG_ENCRYPTED ) == 0, nullptr,
+                    OpenGeodeException::TYPE::data,
+                    "[ArchiveInputFiles] Encrypted zip entry: ",
+                    location( name ) );
+                OpenGeodeBasicException::check_exception(
+                    info->compression_method == MZ_COMPRESS_METHOD_STORE
+                        || info->compression_method
+                               == MZ_COMPRESS_METHOD_DEFLATE,
+                    nullptr, OpenGeodeException::TYPE::data,
+                    "[ArchiveInputFiles] Unsupported compression method ",
+                    info->compression_method, " of zip entry ",
+                    location( name ) );
+                OpenGeodeBasicException::check_exception(
+                    info->disk_offset >= 0 && info->compressed_size >= 0
+                        && info->uncompressed_size >= 0,
+                    nullptr, OpenGeodeException::TYPE::data,
+                    "[ArchiveInputFiles] Invalid zip entry ",
+                    location( name ) );
+                ArchiveEntry entry{ static_cast< uint64_t >(
+                                        info->disk_offset ),
+                    static_cast< uint64_t >( info->compressed_size ),
+                    static_cast< uint64_t >( info->uncompressed_size ),
+                    info->crc, info->compression_method };
+                const auto [_, inserted] =
+                    entries_.insert_or_assign( name, entry );
+                if( inserted )
+                {
+                    names_.emplace_back( std::move( name ) );
+                }
+            }
+
+            /*!
+             * Return the offset of the data of an entry, after its local
+             * header.
+             */
+            uint64_t data_offset(
+                std::string_view name, const ArchiveEntry& entry ) const
+            {
+                std::array< char, LOCAL_HEADER_SIZE > header_buffer;
+                const char* header = header_buffer.data();
+                if( mapping_ )
+                {
+                    const auto archive = mapping_->span();
+                    check_inside_archive(
+                        name, entry.header_offset, LOCAL_HEADER_SIZE );
+                    header = archive.data() + entry.header_offset;
+                }
+                else
+                {
+                    read_at( name, entry.header_offset, header_buffer.data(),
+                        LOCAL_HEADER_SIZE );
+                }
+                OpenGeodeBasicException::check_exception(
+                    read_little_endian( header, 4 ) == LOCAL_HEADER_SIGNATURE,
+                    nullptr, OpenGeodeException::TYPE::data,
+                    "[ArchiveInputFiles] Invalid local header of zip entry ",
+                    location( name ) );
+                const auto name_length = read_little_endian( header + 26, 2 );
+                const auto extra_length = read_little_endian( header + 28, 2 );
+                return entry.header_offset + LOCAL_HEADER_SIZE + name_length
+                       + extra_length;
+            }
+
+            /*!
+             * Return the raw (compressed) bytes of an entry: a slice of the
+             * mapped archive, or a buffer read from the file.
+             */
+            FileContent raw_content(
+                std::string_view name, const ArchiveEntry& entry ) const
+            {
+                const auto offset = data_offset( name, entry );
+                if( mapping_ )
+                {
+                    check_inside_archive( name, offset, entry.compressed_size );
+                    return { mapping_, mapping_->span().subspan(
+                                           offset, entry.compressed_size ) };
+                }
+                ByteBuffer buffer{ entry.compressed_size };
+                read_at( name, offset, buffer.data(), buffer.size() );
+                return FileContent{ std::move( buffer ) };
+            }
+
+            FileContent stored_content(
+                std::string_view name, const ArchiveEntry& entry ) const
+            {
+                OpenGeodeBasicException::check_exception(
+                    entry.compressed_size == entry.uncompressed_size, nullptr,
+                    OpenGeodeException::TYPE::data,
+                    "[ArchiveInputFiles] Invalid size of stored zip entry ",
+                    location( name ) );
+                return raw_content( name, entry );
+            }
+
+            FileContent inflated_content(
+                std::string_view name, const ArchiveEntry& entry ) const
+            {
+                const auto compressed = raw_content( name, entry );
+                bool success{ false };
+                auto buffer = inflate_entry(
+                    compressed.span(), entry.uncompressed_size, success );
+                OpenGeodeBasicException::check_exception( success, nullptr,
+                    OpenGeodeException::TYPE::data,
+                    "[ArchiveInputFiles] Cannot decompress zip entry ",
+                    location( name ) );
+                return FileContent{ std::move( buffer ) };
+            }
+
+            void check_inside_archive(
+                std::string_view name, uint64_t offset, uint64_t size ) const
+            {
+                const auto archive_size = mapping_->span().size();
+                OpenGeodeBasicException::check_exception(
+                    offset <= archive_size && size <= archive_size - offset,
+                    nullptr, OpenGeodeException::TYPE::data,
+                    "[ArchiveInputFiles] Truncated zip entry ",
+                    location( name ) );
+            }
+
+            /*!
+             * Positional read, used when the archive cannot be mapped.
+             */
+            void read_at( std::string_view name,
+                uint64_t offset,
+                char* data,
+                size_t size ) const
+            {
+                std::ifstream file{ to_path( filename_ ), std::ios::binary };
+                file.seekg( static_cast< std::streamoff >( offset ) );
+                file.read( data, static_cast< std::streamsize >( size ) );
+                OpenGeodeBasicException::check_exception(
+                    file.good()
+                        && file.gcount()
+                               == static_cast< std::streamsize >( size ),
+                    nullptr, OpenGeodeException::TYPE::data,
+                    "[ArchiveInputFiles] Cannot read zip entry ",
+                    location( name ) );
+            }
+
+        private:
+            std::string filename_;
+            absl::flat_hash_map< std::string, ArchiveEntry > entries_;
+            std::vector< std::string > names_;
+            std::shared_ptr< const MappedFile > mapping_;
+        };
+
+        ArchiveInputFiles::ArchiveInputFiles( std::string_view filename )
+            : impl_{ filename }
+        {
+        }
+
+        ArchiveInputFiles::~ArchiveInputFiles() = default;
+
+        bool ArchiveInputFiles::has( std::string_view name ) const
+        {
+            return impl_->has( name );
+        }
+
+        std::vector< std::string > ArchiveInputFiles::names() const
+        {
+            return impl_->names();
+        }
+
+        FileContent ArchiveInputFiles::content( std::string_view name ) const
+        {
+            return impl_->content( name );
+        }
+
+        std::optional< std::string > ArchiveInputFiles::path(
+            std::string_view /*name*/ ) const
+        {
+            return std::nullopt;
+        }
+
+        std::string ArchiveInputFiles::location( std::string_view name ) const
+        {
+            return impl_->location( name );
+        }
+    } // namespace detail
 
     bool is_zip_file( std::string_view file )
     {

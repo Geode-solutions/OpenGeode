@@ -24,6 +24,9 @@
 #pragma once
 
 #include <fstream>
+#include <optional>
+
+#include <geode/basic/detail/file_content.hpp>
 
 #include <geode/image/core/bitsery_archive.hpp>
 #include <geode/image/io/raster_image_input.hpp>
@@ -41,19 +44,17 @@ namespace geode
 
         [[nodiscard]] std::vector< RasterImage< dimension > > read() final
         {
-            const auto content = detail::read_file_content( this->filename() );
+            const auto content = detail::map_file_content( this->filename() );
             OpenGeodeImageException::check_exception( content.has_value(),
                 nullptr, OpenGeodeException::TYPE::data,
                 "[RasterImageInput] Failed to open file: ", this->filename() );
-            RasterImage< dimension > image;
-            OpenGeodeImageException::check_exception(
-                detail::deserialize_bytes( content->span(), image ), nullptr,
-                OpenGeodeException::TYPE::data,
-                "[Bitsery::read] Error while reading file: ",
-                this->filename() );
-            std::vector< RasterImage< dimension > > images;
-            images.emplace_back( std::move( image ) );
-            return images;
+            return read_image( content->span() );
+        }
+
+        [[nodiscard]] std::optional< std::vector< RasterImage< dimension > > >
+            read_bytes( ByteSpan content ) final
+        {
+            return read_image( content );
         }
 
         AdditionalFiles additional_files() const final
@@ -69,6 +70,21 @@ namespace geode
         Percentage is_loadable() const final
         {
             return Percentage{ 1 };
+        }
+
+    private:
+        [[nodiscard]] std::vector< RasterImage< dimension > > read_image(
+            ByteSpan content ) const
+        {
+            RasterImage< dimension > image;
+            OpenGeodeImageException::check_exception(
+                detail::deserialize_bytes( content, image ), nullptr,
+                OpenGeodeException::TYPE::data,
+                "[Bitsery::read] Error while reading file: ",
+                this->filename() );
+            std::vector< RasterImage< dimension > > images;
+            images.emplace_back( std::move( image ) );
+            return images;
         }
     };
     ALIAS_1D_AND_2D_AND_3D( OpenGeodeRasterImageInput );

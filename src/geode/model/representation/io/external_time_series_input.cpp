@@ -42,7 +42,7 @@ namespace geode
             "[load_external_time_series] Wrong extension for file ", filename,
             ", only ", ExternalTimeSeries::native_extension_static(),
             " is supported" );
-        const auto content = detail::read_file_content( filename );
+        const auto content = detail::map_file_content( filename );
         OpenGeodeModelException::check_exception( content.has_value(), nullptr,
             OpenGeodeException::TYPE::data,
             "[load_external_time_series] Failed to open file: ", filename );

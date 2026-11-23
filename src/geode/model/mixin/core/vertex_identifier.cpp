@@ -36,6 +36,7 @@
 
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/detail/input_files.hpp>
 #include <geode/basic/logger.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 #include <geode/basic/variable_attribute.hpp>
@@ -597,20 +598,21 @@ namespace geode
                 filename );
         }
 
-        void load( std::string_view directory )
+        void load( const detail::InputFiles& files )
         {
-            const auto filename = absl::StrCat( directory, "/vertices" );
-            const auto content = detail::read_file_content( filename );
-            OpenGeodeModelException::check_exception( content.has_value(),
+            static constexpr auto FILENAME = "vertices";
+            const auto filename = files.location( FILENAME );
+            OpenGeodeModelException::check_exception( files.has( FILENAME ),
                 nullptr, OpenGeodeException::TYPE::internal,
                 "[VertexIdentifier::load] Error while reading file: ",
                 filename );
+            const auto content = files.content( FILENAME );
             // Versions before 5 store the component vertices and reset this
             // flag
             component_vertices_.clear();
             rebuild_component_vertices_ = true;
             const auto success =
-                detail::deserialize_bytes( content->span(), *this );
+                detail::deserialize_bytes( content.span(), *this );
             nb_component_mesh_vertices_up_to_date_ = false;
             OpenGeodeModelException::check_exception( success, nullptr,
                 OpenGeodeException::TYPE::internal,
@@ -1110,9 +1112,9 @@ namespace geode
     }
 
     void VertexIdentifier::load_unique_vertices(
-        std::string_view directory, BuilderKey /*key*/ )
+        const detail::InputFiles& files, BuilderKey /*key*/ )
     {
-        return impl_->load( directory );
+        return impl_->load( files );
     }
 
     std::vector< index_t > VertexIdentifier::delete_isolated_vertices(

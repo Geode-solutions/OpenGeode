@@ -29,6 +29,11 @@
 #include <geode/model/common.hpp>
 #include <geode/model/mixin/core/detail/component_range_iterator.hpp>
 
+namespace geode::detail
+{
+    class InputFiles;
+} // namespace geode::detail
+
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( BlockCollection );
@@ -156,7 +161,7 @@ namespace geode
             BlockCollectionsBuilderKey key );
 
         void load_block_collections(
-            std::string_view directory, BlockCollectionsBuilderKey key );
+            const detail::InputFiles& files, BlockCollectionsBuilderKey key );
 
         [[nodiscard]] ModifiableBlockCollectionRange
             modifiable_block_collections( BlockCollectionsBuilderKey key );

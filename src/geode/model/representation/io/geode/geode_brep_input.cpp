@@ -24,8 +24,7 @@
 #include <geode/model/representation/io/geode/geode_brep_input.hpp>
 
 #include <geode/basic/bitsery_archive.hpp>
-#include <geode/basic/uuid.hpp>
-#include <geode/basic/zip_file.hpp>
+#include <geode/basic/detail/input_files.hpp>
 
 #include <geode/model/mixin/core/block.hpp>
 #include <geode/model/mixin/core/block_collection.hpp>
@@ -42,10 +41,9 @@ namespace geode
 {
     std::vector< BRep > OpenGeodeBRepInput::read()
     {
-        const UnzipFile zip_reader{ filename(), uuid{}.string() };
-        zip_reader.extract_all();
+        const detail::ArchiveInputFiles files{ filename() };
         BRep brep{ BITSERY::constructor };
-        detail::load_brep_files( brep, zip_reader.directory() );
+        detail::load_brep_files( brep, files );
         std::vector< BRep > breps;
         breps.emplace_back( std::move( brep ) );
         return breps;

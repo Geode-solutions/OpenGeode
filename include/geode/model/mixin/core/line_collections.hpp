@@ -31,6 +31,11 @@
 #include <geode/model/common.hpp>
 #include <geode/model/mixin/core/detail/component_range_iterator.hpp>
 
+namespace geode::detail
+{
+    class InputFiles;
+} // namespace geode::detail
+
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( LineCollection );
@@ -155,7 +160,7 @@ namespace geode
             LineCollectionsBuilderKey key );
 
         void load_line_collections(
-            std::string_view directory, LineCollectionsBuilderKey key );
+            const detail::InputFiles& files, LineCollectionsBuilderKey key );
 
         [[nodiscard]] ModifiableLineCollectionRange modifiable_line_collections(
             LineCollectionsBuilderKey key );

@@ -27,6 +27,11 @@
 
 #include <geode/model/common.hpp>
 
+namespace geode::detail
+{
+    class InputFiles;
+} // namespace geode::detail
+
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( LineCollection );
@@ -42,6 +47,8 @@ namespace geode
     {
     public:
         void load_line_collections( std::string_view directory );
+
+        void load_line_collections( const detail::InputFiles& files );
 
         void set_line_collection_name(
             const LineCollection< dimension >& line_collection,

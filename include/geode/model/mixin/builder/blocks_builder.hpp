@@ -33,6 +33,11 @@
 
 #include <geode/model/common.hpp>
 
+namespace geode::detail
+{
+    class InputFiles;
+} // namespace geode::detail
+
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Block );
@@ -50,6 +55,8 @@ namespace geode
     {
     public:
         void load_blocks( std::string_view directory );
+
+        void load_blocks( const detail::InputFiles& files );
 
         /*!
          * Get a pointer to the builder of a Block mesh

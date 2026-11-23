@@ -28,6 +28,11 @@
 #include <geode/model/common.hpp>
 #include <geode/model/mixin/core/vertex_identifier.hpp>
 
+namespace geode::detail
+{
+    class InputFiles;
+} // namespace geode::detail
+
 namespace geode
 {
     /*!
@@ -114,6 +119,8 @@ namespace geode
          * VertexIdentifier information.
          */
         void load_unique_vertices( std::string_view directory );
+
+        void load_unique_vertices( const detail::InputFiles& files );
 
         /*!
          * Delete all unique vertices not associated with any component

@@ -98,10 +98,9 @@ namespace geode
 
     template < index_t dimension >
     void CornerCollections< dimension >::load_corner_collections(
-        std::string_view directory, CornerCollectionsBuilderKey /*key*/ )
+        const detail::InputFiles& files, CornerCollectionsBuilderKey /*key*/ )
     {
-        impl_->load_components(
-            absl::StrCat( directory, "/corner_collections" ), false );
+        impl_->load_components( files, "corner_collections", false );
     }
 
     template < index_t dimension >

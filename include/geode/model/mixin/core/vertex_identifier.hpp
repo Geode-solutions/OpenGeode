@@ -35,6 +35,11 @@
 #include <geode/model/common.hpp>
 #include <geode/model/mixin/core/component_type.hpp>
 
+namespace geode::detail
+{
+    class InputFiles;
+} // namespace geode::detail
+
 namespace geode
 {
     struct MeshVertex;
@@ -219,7 +224,7 @@ namespace geode
          * VertexIdentifier information.
          */
         void load_unique_vertices(
-            std::string_view directory, BuilderKey /*key*/ );
+            const detail::InputFiles& files, BuilderKey /*key*/ );
 
         /*!
          * Delete all unique vertices not associated with any component

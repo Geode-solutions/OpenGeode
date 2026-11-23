@@ -32,6 +32,7 @@
 #include <absl/strings/ascii.h>
 #include <absl/strings/str_join.h>
 
+#include <geode/basic/detail/input_files.hpp>
 #include <geode/basic/filename.hpp>
 #include <geode/basic/identifier.hpp>
 #include <geode/basic/identifier_builder.hpp>
@@ -75,6 +76,53 @@ namespace geode::detail
             OpenGeodeException::TYPE::data, "[", type,
             "] No object found in file \"", filename, "\"" );
         Logger::info( type, " loaded from ", filename, " in ", timer.duration(),
+            " (", objects.size(),
+            objects.size() == 1 ? " object)" : " objects)" );
+        return objects;
+    }
+
+    /*!
+     * Load the objects of one of the given files with the input registered
+     * for its extension: from its content in memory when the input supports
+     * it, otherwise from the file on disk (written to a temporary directory
+     * if the files are not in a directory).
+     */
+    template < typename Factory, typename... Args >
+    [[nodiscard]] std::vector< typename Factory::BaseClass::InputData >
+        geode_object_input_from_files( std::string_view type,
+            const InputFiles& files,
+            std::string_view name,
+            const Args&... args )
+    {
+        const Timer timer;
+        const auto location = files.location( name );
+        const auto extension = lowercase_extension( name );
+        OpenGeodeBasicException::check_exception(
+            Factory::has_creator( extension ), nullptr,
+            OpenGeodeException::TYPE::data, "Unknown extension \"", extension,
+            "\" for file \"", location, "\". Available extensions: ",
+            absl::StrJoin( Factory::list_creators(), ", " ),
+            ". Other formats may be provided by IO libraries, which must be "
+            "initialized (or imported in Python) first" );
+        auto objects = [&] {
+            const auto content = files.content( name );
+            auto input = Factory::create( extension, location );
+            if( auto from_bytes = input->read_bytes( content.span(), args... ) )
+            {
+                return std::move( from_bytes.value() );
+            }
+            if( const auto path = files.path( name ) )
+            {
+                return Factory::create( extension, path.value() )
+                    ->read( args... );
+            }
+            const TemporaryFile file{ name, content.span() };
+            return Factory::create( extension, file.path() )->read( args... );
+        }();
+        OpenGeodeBasicException::check_exception( !objects.empty(), nullptr,
+            OpenGeodeException::TYPE::data, "[", type,
+            "] No object found in file \"", location, "\"" );
+        Logger::info( type, " loaded from ", location, " in ", timer.duration(),
             " (", objects.size(),
             objects.size() == 1 ? " object)" : " objects)" );
         return objects;

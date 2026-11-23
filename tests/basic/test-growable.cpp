@@ -24,6 +24,7 @@
 #include <fstream>
 
 #include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/detail/file_content.hpp>
 #include <geode/basic/growable.hpp>
 #include <geode/basic/logger.hpp>
 
@@ -111,12 +112,12 @@ Out test_growable( const T &foo )
     serializer.adapter().flush();
 
     output.close();
-    const auto content = geode::detail::read_file_content( "name" );
+    const auto content = geode::detail::map_file_content( "name" );
     geode::OpenGeodeBasicException::test(
         content.has_value(), "Cannot open file" );
     geode::TContext context_input{};
     geode::Deserializer deserializer{ context_input, content->span().data(),
-        content->size() };
+        content->span().size() };
     Out new_foo;
     deserializer.object( new_foo );
     const auto &adapter = deserializer.adapter();
