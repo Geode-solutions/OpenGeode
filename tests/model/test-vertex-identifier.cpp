@@ -21,9 +21,12 @@
  *
  */
 
+#include <filesystem>
 #include <sstream>
 
 #include <bitsery/traits/vector.h>
+
+#include <absl/algorithm/container.h>
 
 #include <geode/basic/assert.hpp>
 #include <geode/basic/bitsery_archive.hpp>
@@ -170,10 +173,31 @@ void test_modify_unique_vertices( geode::VertexIdentifier& vertex_identifier )
         "Reset of a unique vertex is not correct - values" );
 }
 
+std::vector< geode::ComponentMeshVertex > sorted_component_mesh_vertices(
+    const geode::VertexIdentifier& vertex_identifier,
+    geode::index_t unique_vertex )
+{
+    auto vertices = vertex_identifier.component_mesh_vertices( unique_vertex );
+    absl::c_sort( vertices );
+    return vertices;
+}
+
+std::uintmax_t vertices_file_size()
+{
+    return std::filesystem::file_size( std::filesystem::u8path( "vertices" ) );
+}
+
+/*
+ * The vertices file stores the number of unique vertices, not their component
+ * mesh vertices: these are rebuilt from the component mesh attributes when
+ * the components are loaded, by repair_component_vertices. The rebuilt order
+ * follows the component registration order, so lists are compared as sets.
+ */
 void test_save_and_load_unique_vertices(
-    geode::VertexIdentifier& vertex_identifier )
+    geode::VertexIdentifier& vertex_identifier, const CornerProvider& provider )
 {
     vertex_identifier.save_unique_vertices( "." );
+    const auto file_size = vertices_file_size();
     geode::VertexIdentifier vertex_identifier2;
     geode::VertexIdentifierBuilder loader{ vertex_identifier2 };
     loader.load_unique_vertices( "." );
@@ -186,20 +210,34 @@ void test_save_and_load_unique_vertices(
         geode::Range{ vertex_identifier2.nb_unique_vertices() } )
     {
         geode::OpenGeodeModelException::test(
-            vertex_identifier.component_mesh_vertices( v_id ).size()
-                == vertex_identifier2.component_mesh_vertices( v_id ).size(),
-            "Save/Load of unique vertices are not correct (different "
-            "number of component mesh vertices)" );
-        for( const auto cmv : geode::Range{
-                 vertex_identifier.component_mesh_vertices( v_id ).size() } )
-        {
-            geode::OpenGeodeModelException::test(
-                vertex_identifier.component_mesh_vertices( v_id )[cmv]
-                    == vertex_identifier2.component_mesh_vertices( v_id )[cmv],
-                "Save/Load of unique vertices are not correct "
-                "(different component mesh vertices)" );
-        }
+            vertex_identifier2.is_unique_vertex_isolated( v_id ),
+            "Loaded unique vertices should be isolated before loading their "
+            "components" );
     }
+    for( const auto& corner : provider.corners() )
+    {
+        loader.load_mesh_component( corner );
+    }
+    loader.repair_component_vertices();
+    for( const auto v_id :
+        geode::Range{ vertex_identifier2.nb_unique_vertices() } )
+    {
+        geode::OpenGeodeModelException::test(
+            sorted_component_mesh_vertices( vertex_identifier, v_id )
+                == sorted_component_mesh_vertices( vertex_identifier2, v_id ),
+            "Save/Load of unique vertices are not correct (different "
+            "component mesh vertices)" );
+    }
+
+    // The file size does not depend on the number of component mesh vertices
+    geode::VertexIdentifier empty_identifier;
+    geode::VertexIdentifierBuilder{ empty_identifier }.create_unique_vertices(
+        vertex_identifier.nb_unique_vertices() );
+    empty_identifier.save_unique_vertices( "." );
+    geode::OpenGeodeModelException::test( vertices_file_size() == file_size,
+        "Saved unique vertices should not store the component mesh vertices "
+        "(file size ",
+        file_size, " instead of ", vertices_file_size(), ")" );
 }
 
 void test_update_unique_vertices()
@@ -514,7 +552,7 @@ void test()
     test_create_unique_vertices( vertex_identifier );
     test_set_unique_vertices( vertex_identifier, provider );
     test_modify_unique_vertices( vertex_identifier );
-    test_save_and_load_unique_vertices( vertex_identifier );
+    test_save_and_load_unique_vertices( vertex_identifier, provider );
 
     test_update_unique_vertices();
     test_unregister_mesh_component();

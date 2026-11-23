@@ -338,12 +338,16 @@ namespace
     /*
      * Mesh components have a "unique vertices" attribute linking their
      * vertices to the model unique vertices. When this attribute is missing,
-     * it is restored from the unique vertices.
+     * it is restored from the unique vertices of the files storing their
+     * component mesh vertices (before version 5 of the vertices file).
      */
     void test_missing_unique_vertices_attribute()
     {
-        const auto brep = saved_brep( "unique_vertices.og_brep" );
-        auto files = extract_archive( "unique_vertices.og_brep" );
+        const auto legacy_filename =
+            absl::StrCat( geode::DATA_PATH, "backward_io/v20_2/v20_2.og_brep" );
+        const auto brep = geode::load_one(
+            geode::load_brep( legacy_filename ), legacy_filename );
+        auto files = extract_archive( legacy_filename );
         replace_unique( files.at( "vertices" ),
             serialized_uuid( brep.unique_vertex_attribute_id() ),
             serialized_uuid( geode::uuid{} ), "Unique vertex attribute id" );
@@ -359,6 +363,60 @@ namespace
             geode::load_brep( "corrupted_unique_vertices.og_brep" ),
             "corrupted_unique_vertices.og_brep" );
         check_same_unique_vertices( brep, loaded );
+    }
+
+    /*
+     * The vertices file stores the number of unique vertices, the component
+     * mesh vertices are rebuilt from the "unique vertices" attribute of the
+     * component meshes. Attribute values out of the unique vertex range are
+     * removed.
+     */
+    void test_invalid_unique_vertex_links()
+    {
+        const auto brep = saved_brep( "invalid_links.og_brep" );
+        auto files = extract_archive( "invalid_links.og_brep" );
+        const auto nb_unique_vertices = brep.nb_unique_vertices();
+        const auto last = nb_unique_vertices - 1;
+        geode::OpenGeodeModelException::test(
+            !brep.is_unique_vertex_isolated( last ),
+            "[Test] Last unique vertex should not be isolated" );
+        const auto id = serialized_uuid( brep.unique_vertex_attribute_id() );
+        replace_unique( files.at( "vertices" ),
+            absl::StrCat( serialized_u32( nb_unique_vertices ), id ),
+            absl::StrCat( serialized_u32( last ), id ),
+            "Number of unique vertices" );
+        write_archive( files, "corrupted_invalid_links.og_brep" );
+
+        WarningRecorder::start();
+        const auto loaded = geode::load_one(
+            geode::load_brep( "corrupted_invalid_links.og_brep" ),
+            "corrupted_invalid_links.og_brep" );
+        check_warning( "component vertex links to unknown unique vertices" );
+        geode::OpenGeodeModelException::test(
+            loaded.nb_unique_vertices() == last,
+            "[Test] Wrong number of unique vertices" );
+        for( const auto& vertex : brep.component_mesh_vertices( last ) )
+        {
+            geode::OpenGeodeModelException::test(
+                loaded.unique_vertex( vertex ) == geode::NO_ID,
+                "[Test] Link to a removed unique vertex should be removed" );
+        }
+        for( const auto unique_vertex : geode::Range{ last } )
+        {
+            const auto& vertices =
+                brep.component_mesh_vertices( unique_vertex );
+            geode::OpenGeodeModelException::test(
+                loaded.component_mesh_vertices( unique_vertex ).size()
+                    == vertices.size(),
+                "[Test] Wrong number of component vertices for unique vertex ",
+                unique_vertex );
+            for( const auto& vertex : vertices )
+            {
+                geode::OpenGeodeModelException::test(
+                    loaded.unique_vertex( vertex ) == unique_vertex,
+                    "[Test] Wrong unique vertex for component vertex" );
+            }
+        }
     }
 
     /*
@@ -981,6 +1039,7 @@ void test()
     geode::OpenGeodeModelLibrary::initialize();
     test_inconsistent_relationships_map();
     test_missing_unique_vertices_attribute();
+    test_invalid_unique_vertex_links();
     test_unknown_component_vertices();
     test_missing_components_file();
     test_wrong_component_key();

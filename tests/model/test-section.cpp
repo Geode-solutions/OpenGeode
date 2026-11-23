@@ -21,6 +21,9 @@
  *
  */
 
+#include <absl/algorithm/container.h>
+#include <absl/container/flat_hash_map.h>
+
 #include <geode/basic/assert.hpp>
 #include <geode/basic/detail/count_range_elements.hpp>
 #include <geode/basic/logger.hpp>
@@ -880,6 +883,53 @@ void test_clone( const geode::Section& section )
     }
 }
 
+std::vector< geode::ComponentMeshVertex > sorted_component_mesh_vertices(
+    const geode::Section& model, geode::index_t unique_vertex )
+{
+    auto vertices = model.component_mesh_vertices( unique_vertex );
+    absl::c_sort( vertices );
+    return vertices;
+}
+
+/*
+ * Loaded component mesh vertices are rebuilt from the component meshes:
+ * components in the model order (Corners, Lines, Surfaces), then
+ * their vertices in increasing order.
+ */
+void check_loaded_component_mesh_vertices_order( const geode::Section& model )
+{
+    absl::flat_hash_map< geode::uuid, geode::index_t > ranks;
+    geode::index_t rank{ 0 };
+    for( const auto& component : model.corners() )
+    {
+        ranks.emplace( component.id(), rank++ );
+    }
+    for( const auto& component : model.lines() )
+    {
+        ranks.emplace( component.id(), rank++ );
+    }
+    for( const auto& component : model.surfaces() )
+    {
+        ranks.emplace( component.id(), rank++ );
+    }
+    for( const auto unique_vertex : geode::Range{ model.nb_unique_vertices() } )
+    {
+        const auto& vertices = model.component_mesh_vertices( unique_vertex );
+        for( const auto v : geode::Range{ 1, vertices.size() } )
+        {
+            const auto& previous = vertices[v - 1];
+            const auto& current = vertices[v];
+            geode::OpenGeodeModelException::test(
+                std::make_pair(
+                    ranks.at( previous.component_id.id ), previous.vertex )
+                    < std::make_pair(
+                        ranks.at( current.component_id.id ), current.vertex ),
+                "[Test] Loaded component mesh vertices of unique vertex ",
+                unique_vertex, " are not in the model order" );
+        }
+    }
+}
+
 void test_compare_component_mesh_vertices(
     const geode::Section& model, const geode::Section& model2 )
 {
@@ -892,12 +942,13 @@ void test_compare_component_mesh_vertices(
     const geode::uuid nil{ geode::BITSERY::constructor };
     for( const auto unique_vertex : geode::Range{ model.nb_unique_vertices() } )
     {
-        const auto& vertices = model.component_mesh_vertices( unique_vertex );
-        const auto& vertices2 = model2.component_mesh_vertices( unique_vertex );
-        geode::OpenGeodeModelException::test( vertices == vertices2,
+        geode::OpenGeodeModelException::test(
+            sorted_component_mesh_vertices( model, unique_vertex )
+                == sorted_component_mesh_vertices( model2, unique_vertex ),
             "[Test] Reloaded component mesh vertices of unique vertex ",
             unique_vertex, " should be equal to the saved ones" );
-        for( const auto& vertex : vertices2 )
+        for( const auto& vertex :
+            model2.component_mesh_vertices( unique_vertex ) )
         {
             geode::OpenGeodeModelException::test( vertex.component_id.id != nil,
                 "[Test] Reloaded component id should not be nil" );
@@ -907,6 +958,24 @@ void test_compare_component_mesh_vertices(
                 "vertex ",
                 unique_vertex );
         }
+    }
+    check_loaded_component_mesh_vertices_order( model2 );
+}
+
+/*
+ * Loading the same model twice gives the same component mesh vertices, in
+ * the same order.
+ */
+void test_compare_component_mesh_vertices_order(
+    const geode::Section& model, const geode::Section& model2 )
+{
+    for( const auto unique_vertex : geode::Range{ model.nb_unique_vertices() } )
+    {
+        geode::OpenGeodeModelException::test(
+            model.component_mesh_vertices( unique_vertex )
+                == model2.component_mesh_vertices( unique_vertex ),
+            "[Test] Component mesh vertices of unique vertex ", unique_vertex,
+            " should be in the same order in both loaded models" );
     }
 }
 
@@ -921,6 +990,87 @@ void test_component_mesh_vertices_round_trip()
     const auto model2 =
         geode::load_one( geode::load_section( file_io ), file_io );
     test_compare_component_mesh_vertices( model, model2 );
+    const auto file_io2 = absl::StrCat(
+        "test_component_mesh_vertices2.", model.native_extension() );
+    geode::save_section( model2, file_io2 );
+    const auto model3 =
+        geode::load_one( geode::load_section( file_io2 ), file_io2 );
+    test_compare_component_mesh_vertices( model, model3 );
+    test_compare_component_mesh_vertices_order( model2, model3 );
+}
+
+/*
+ * v20_2.og_sctn was saved when the component mesh vertices were stored in the
+ * file: a triangle Surface, its 3 Lines and 3 Corners on unique vertices 0 to
+ * 2, and 2 isolated unique vertices.
+ */
+void test_backward_io_component_mesh_vertices()
+{
+    const auto filename =
+        absl::StrCat( geode::DATA_PATH, "backward_io/v20_2/v20_2.og_sctn" );
+    const auto section =
+        geode::load_one( geode::load_section( filename ), filename );
+    geode::OpenGeodeModelException::test( section.nb_unique_vertices() == 5,
+        "[Backward_IO] Wrong number of unique vertices" );
+    for( const auto unique_vertex : geode::Range{ 3 } )
+    {
+        const auto& vertices = section.component_mesh_vertices( unique_vertex );
+        geode::index_t nb_corners{ 0 };
+        geode::index_t nb_lines{ 0 };
+        geode::index_t nb_surfaces{ 0 };
+        for( const auto& vertex : vertices )
+        {
+            geode::OpenGeodeModelException::test(
+                section.unique_vertex( vertex ) == unique_vertex,
+                "[Backward_IO] Wrong unique vertex of ", vertex.string() );
+            if( vertex.component_id.type
+                == geode::Corner2D::component_type_static() )
+            {
+                nb_corners++;
+            }
+            else if( vertex.component_id.type
+                     == geode::Line2D::component_type_static() )
+            {
+                nb_lines++;
+            }
+            else if( vertex.component_id.type
+                     == geode::Surface2D::component_type_static() )
+            {
+                geode::OpenGeodeModelException::test(
+                    vertex.vertex == unique_vertex,
+                    "[Backward_IO] Wrong surface vertex" );
+                nb_surfaces++;
+            }
+        }
+        geode::OpenGeodeModelException::test(
+            vertices.size() == 4 && nb_corners == 1 && nb_lines == 2
+                && nb_surfaces == 1,
+            "[Backward_IO] Wrong component mesh vertices of unique vertex ",
+            unique_vertex );
+    }
+    for( const auto unique_vertex : geode::Range{ 3, 5 } )
+    {
+        geode::OpenGeodeModelException::test(
+            section.is_unique_vertex_isolated( unique_vertex ),
+            "[Backward_IO] Unique vertex ", unique_vertex,
+            " should be isolated" );
+    }
+
+    const auto file_io =
+        absl::StrCat( "v20_2_resaved.", section.native_extension() );
+    geode::save_section( section, file_io );
+    auto reloaded = geode::load_one( geode::load_section( file_io ), file_io );
+    test_compare_component_mesh_vertices( section, reloaded );
+
+    geode::SectionBuilder builder{ reloaded };
+    const auto old2new = builder.delete_isolated_vertices();
+    geode::OpenGeodeModelException::test(
+        old2new
+            == std::vector< geode::index_t >{ 0, 1, 2, geode::NO_ID,
+                geode::NO_ID },
+        "[Backward_IO] Wrong mapping after deleting isolated unique vertices" );
+    geode::OpenGeodeModelException::test( reloaded.nb_unique_vertices() == 3,
+        "[Backward_IO] Wrong number of unique vertices after deletion" );
 }
 
 void test_compare_section(
@@ -1155,6 +1305,7 @@ void test()
     geode::Section model3{ std::move( model2 ) };
     test_compare_section( model, model3 );
     test_component_mesh_vertices_round_trip();
+    test_backward_io_component_mesh_vertices();
 }
 
 OPENGEODE_TEST( "section" )

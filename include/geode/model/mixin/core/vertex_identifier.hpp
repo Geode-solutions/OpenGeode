@@ -103,6 +103,10 @@ namespace geode
 
         /*!
          * Return the component vertices identified with an unique vertex.
+         * The order is the insertion order; after loading a file, it is the
+         * order of the rebuild done by repair_component_vertices (components
+         * in their registration order, then vertices in increasing order),
+         * which can differ from the order before saving.
          * @param[in] unique_vertex_id Indice of the unique vertex.
          */
         [[nodiscard]] const std::vector< ComponentMeshVertex >&
@@ -130,6 +134,10 @@ namespace geode
 
         /*!
          * Save the VertexIdentifier into a file.
+         * The file stores the number of unique vertices and the identifier of
+         * the "unique vertices" attribute of the component meshes, not the
+         * component vertices: these are rebuilt from the component mesh
+         * attributes when loading (see repair_component_vertices).
          * @param[in] directory Folder in which create the file.
          */
         void save_unique_vertices( std::string_view directory ) const;
@@ -203,6 +211,10 @@ namespace geode
 
         /*!
          * Load the VertexIdentifier from a file.
+         * Files saved by the current version do not store the component
+         * vertices: unique vertices are isolated until the mesh components
+         * are loaded (load_mesh_component) and repair_component_vertices
+         * rebuilds the component vertices. Older files store them.
          * @param[in] directory Folder containing the file that stores
          * VertexIdentifier information.
          */
@@ -215,9 +227,14 @@ namespace geode
         std::vector< index_t > delete_isolated_vertices( BuilderKey /*key*/ );
 
         /*!
-         * Remove component vertices referencing an unregistered component or
-         * an invalid vertex, and restore missing links from component vertices
-         * to their unique vertex. Used after loading a model.
+         * Used after loading a model, once its mesh components are loaded.
+         * If the loaded file does not store the component vertices, rebuild
+         * them from the component mesh attributes: components in their
+         * registration order, then their vertices in increasing order.
+         * Attribute values out of the unique vertex range are removed.
+         * Otherwise, remove component vertices referencing an unregistered
+         * component or an invalid vertex, and restore missing links from
+         * component vertices to their unique vertex.
          */
         void repair_component_vertices( BuilderKey /*key*/ );
 
