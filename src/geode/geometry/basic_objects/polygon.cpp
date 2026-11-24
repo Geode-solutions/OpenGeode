@@ -88,6 +88,43 @@ namespace
         return polygons;
     }
 
+    // Flips the triangulation if more triangles vote for the opposite
+    // orientation than for the expected one. vote( triangle ) returns nullopt
+    // for no vote, true for the expected orientation. Without any vote (or on
+    // a tie), earcut order is kept.
+    template < typename Vote >
+    void reoriente_from_votes(
+        std::vector< std::array< geode::index_t, 3 > >& triangles,
+        const Vote& vote )
+    {
+        geode::index_t nb_same_orientation{ 0 };
+        geode::index_t nb_opposite_orientation{ 0 };
+        for( const auto& triangle : triangles )
+        {
+            const auto same_orientation = vote( triangle );
+            if( !same_orientation )
+            {
+                continue;
+            }
+            if( same_orientation.value() )
+            {
+                nb_same_orientation++;
+            }
+            else
+            {
+                nb_opposite_orientation++;
+            }
+        }
+        if( nb_opposite_orientation <= nb_same_orientation )
+        {
+            return;
+        }
+        for( auto& triangle : triangles )
+        {
+            std::swap( triangle[1], triangle[2] );
+        }
+    }
+
     template < typename PointType >
     void reoriente_triangulation(
         const geode::GenericPolygon< PointType, 2 >& /*polygon*/,
@@ -102,28 +139,22 @@ namespace
     {
         const auto normal =
             polygon.normal().value_or( geode::Vector3D{ { 0, 0, 1 } } );
-        geode::index_t nb_same_orientation{ 0 };
-        for( const auto& triangle : triangles )
-        {
-            const auto& vertices = polygon.vertices();
-            const auto& point0 = vertices[triangle[0]];
-            const auto& point1 = vertices[triangle[1]];
-            const auto& point2 = vertices[triangle[2]];
-            const auto triangle_normal =
-                geode::Triangle< 3 >{ point0, point1, point2 }.normal();
-            if( triangle_normal && triangle_normal->dot( normal ) > 0 )
-            {
-                nb_same_orientation++;
-            }
-        }
-        if( nb_same_orientation > triangles.size() / 2 )
-        {
-            return;
-        }
-        for( auto& triangle : triangles )
-        {
-            std::swap( triangle[1], triangle[2] );
-        }
+        // Triangles without a normal (collinear points) do not vote
+        reoriente_from_votes( triangles,
+            [&polygon, &normal](
+                const std::array< geode::index_t, 3 >& triangle )
+                -> std::optional< bool > {
+                const auto& vertices = polygon.vertices();
+                const auto triangle_normal =
+                    geode::Triangle< 3 >{ vertices[triangle[0]],
+                        vertices[triangle[1]], vertices[triangle[2]] }
+                        .normal();
+                if( !triangle_normal )
+                {
+                    return std::nullopt;
+                }
+                return triangle_normal->dot( normal ) > 0;
+            } );
     }
 } // namespace
 

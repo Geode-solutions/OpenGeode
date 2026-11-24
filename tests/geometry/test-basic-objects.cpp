@@ -21,6 +21,12 @@
  *
  */
 
+#include <algorithm>
+#include <string_view>
+#include <vector>
+
+#include <absl/strings/str_cat.h>
+
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
 
@@ -344,6 +350,111 @@ void test_polygon()
         tilted_normal * -1 );
 }
 
+// Triangles without a normal (collinear points) are allowed: earcut may return
+// them, and the others must follow the polygon orientation.
+void check_triangulation_orientation(
+    const geode::OwnerPolygon3D& polygon, std::string_view name )
+{
+    const auto normal = polygon.normal();
+    geode::OpenGeodeGeometryException::test(
+        normal.has_value(), name, ": no polygon normal" );
+    const auto triangles = polygon.triangulate();
+    geode::OpenGeodeGeometryException::test(
+        triangles.size() == polygon.nb_vertices() - 2, name,
+        ": wrong number of triangles" );
+    const auto& vertices = polygon.vertices();
+    geode::index_t nb_oriented{ 0 };
+    for( const auto& triangle : triangles )
+    {
+        const auto triangle_normal = geode::Triangle3D{ vertices[triangle[0]],
+            vertices[triangle[1]], vertices[triangle[2]] }
+                                         .normal();
+        if( !triangle_normal )
+        {
+            continue;
+        }
+        nb_oriented++;
+        geode::OpenGeodeGeometryException::test(
+            triangle_normal->dot( normal.value() ) > 0, name,
+            ": wrong triangle orientation" );
+    }
+    geode::OpenGeodeGeometryException::test(
+        nb_oriented > 0, name, ": no triangle with a normal" );
+}
+
+template < geode::index_t dimension >
+void check_triangulation_both_windings(
+    std::vector< geode::Point< dimension > > points, std::string_view name )
+{
+    check_triangulation_orientation(
+        geode::OwnerPolygon< dimension >{ points }, name );
+    std::reverse( points.begin(), points.end() );
+    check_triangulation_orientation(
+        geode::OwnerPolygon< dimension >{ std::move( points ) },
+        absl::StrCat( name, " reversed" ) );
+}
+
+void test_polygon_triangulation_with_collinear_points()
+{
+    // 4 points, the first 3 collinear: earcut returns 1 triangle without
+    // normal out of 2
+    const std::vector< geode::Point3D > quad{
+        geode::Point3D{ { 0, 7000, -5406.3798828125 } },
+        geode::Point3D{ { 433.0127018922193, 7000, -5656.3798828125 } },
+        geode::Point3D{ { 866.02540378443916, 7000, -5906.3798828125 } },
+        geode::Point3D{ { 866.02540378443882, 7000, -5406.3798828125 } }
+    };
+    check_triangulation_both_windings< 3 >( quad, "Quad" );
+
+    // Comb with collinear runs along y = -1, y = 0 and y = 1: earcut returns
+    // 13 triangles without normal out of 22
+    std::vector< geode::Point3D > comb{ geode::Point3D{
+                                            { -2, -1, 0.5500000000000056 } },
+        geode::Point3D{ { -2, -0.99999999999999989, 0.45000000000000551 } },
+        geode::Point3D{ { -2, -1.0000000000000002, 0.35000000000000542 } },
+        geode::Point3D{ { -2, 6.3837823915946501e-16, 0.40000000000000557 } },
+        geode::Point3D{ { -2, -1.2490009027033011e-16, 0.50000000000000555 } },
+        geode::Point3D{ { -2, 1.7763568394002505e-15, 0.60000000000000564 } },
+        geode::Point3D{ { -2, 6.5854412903732108e-16, 0.70000000000000562 } },
+        geode::Point3D{ { -2, -1.3468048661638304e-15, 0.80000000000000571 } },
+        geode::Point3D{ { -2, -1.2111710391207129e-15, 0.90000000000000568 } },
+        geode::Point3D{ { -2, 9.0075462384020925e-16, 1.0000000000000056 } },
+        geode::Point3D{ { -2, 1.2212453270876722e-15, 1.1000000000000054 } },
+        geode::Point3D{ { -2, 0.99999999999999756, 1.150000000000005 } },
+        geode::Point3D{ { -2, 0.99999999999999623, 1.250000000000004 } },
+        geode::Point3D{ { -2, -8.1785425744099724e-16, 1.3000000000000036 } },
+        geode::Point3D{ { -2, -2.195879817686426e-16, 1.4000000000000037 } },
+        geode::Point3D{ { -2, -0.99999999999999989, 1.4500000000000037 } },
+        geode::Point3D{ { -2, -1.0000000000000004, 1.3500000000000036 } },
+        geode::Point3D{ { -2, -0.99999999999999623, 1.250000000000004 } },
+        geode::Point3D{ { -2, -0.99999999999999756, 1.150000000000005 } },
+        geode::Point3D{ { -2, -1, 1.0500000000000054 } },
+        geode::Point3D{ { -2, -0.99999999999999822, 0.9500000000000054 } },
+        geode::Point3D{ { -2, -1, 0.85000000000000586 } },
+        geode::Point3D{ { -2, -1, 0.75000000000000577 } },
+        geode::Point3D{ { -2, -1.0000000000000011, 0.65000000000000568 } } };
+    check_triangulation_both_windings< 3 >( comb, "Comb" );
+    for( auto& point : comb )
+    {
+        point.set_value( 0, 2 );
+        point.set_value( 1, -point.value( 1 ) );
+    }
+    check_triangulation_both_windings< 3 >( comb, "Mirrored comb" );
+}
+
+void test_polygon_triangulation_without_normal()
+{
+    // No triangle has a normal: earcut order is kept
+    const geode::OwnerPolygon3D polygon{ { geode::Point3D{ { 0, 0, 0 } },
+        geode::Point3D{ { 1, 1, 1 } }, geode::Point3D{ { 2, 2, 2 } },
+        geode::Point3D{ { 3, 3, 3 } } } };
+    geode::OpenGeodeGeometryException::test( !polygon.normal().has_value(),
+        "Collinear polygon should have no normal" );
+    const auto triangles = polygon.triangulate();
+    geode::OpenGeodeGeometryException::test( triangles.size() <= 2,
+        "Wrong number of triangles for a collinear polygon" );
+}
+
 void test()
 {
     test_segment();
@@ -354,6 +465,8 @@ void test()
     test_sphere();
     test_circle();
     test_polygon();
+    test_polygon_triangulation_with_collinear_points();
+    test_polygon_triangulation_without_normal();
 }
 
 OPENGEODE_TEST( "basic-object" )
