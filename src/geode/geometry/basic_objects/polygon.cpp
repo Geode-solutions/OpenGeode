@@ -38,6 +38,8 @@
 #include <geode/geometry/basic_objects/triangle.hpp>
 #include <geode/geometry/bounding_box.hpp>
 #include <geode/geometry/distance.hpp>
+#include <geode/geometry/information.hpp>
+#include <geode/geometry/sign.hpp>
 
 namespace mapbox::util
 {
@@ -127,9 +129,31 @@ namespace
 
     template < typename PointType >
     void reoriente_triangulation(
-        const geode::GenericPolygon< PointType, 2 >& /*polygon*/,
-        std::vector< std::array< geode::index_t, 3 > >& /*triangles*/ )
+        const geode::GenericPolygon< PointType, 2 >& polygon,
+        std::vector< std::array< geode::index_t, 3 > >& triangles )
     {
+        // Earcut orients its triangles regardless of the polygon orientation.
+        // Degenerated triangles do not vote.
+        const auto& vertices = polygon.vertices();
+        const auto polygon_sign = geode::polygon_area_sign(
+            geode::Polygon2D{ std::vector< geode::RefPoint2D >(
+                vertices.begin(), vertices.end() ) } );
+        if( polygon_sign == geode::SIGN::zero )
+        {
+            return;
+        }
+        reoriente_from_votes( triangles,
+            [&vertices, polygon_sign](
+                const std::array< geode::index_t, 3 >& triangle )
+                -> std::optional< bool > {
+                const geode::Triangle2D geometry{ vertices[triangle[0]],
+                    vertices[triangle[1]], vertices[triangle[2]] };
+                if( geometry.is_degenerated() )
+                {
+                    return std::nullopt;
+                }
+                return geode::triangle_area_sign( geometry ) == polygon_sign;
+            } );
     }
 
     template < typename PointType >

@@ -42,6 +42,7 @@
 #include <geode/geometry/basic_objects/tetrahedron.hpp>
 #include <geode/geometry/basic_objects/triangle.hpp>
 #include <geode/geometry/bounding_box.hpp>
+#include <geode/geometry/sign.hpp>
 
 #include <geode/tests/common.hpp>
 
@@ -382,6 +383,35 @@ void check_triangulation_orientation(
         nb_oriented > 0, name, ": no triangle with a normal" );
 }
 
+void check_triangulation_orientation(
+    const geode::OwnerPolygon2D& polygon, std::string_view name )
+{
+    const auto triangles = polygon.triangulate();
+    geode::OpenGeodeGeometryException::test(
+        triangles.size() == polygon.nb_vertices() - 2, name,
+        ": wrong number of triangles" );
+    std::vector< geode::RefPoint2D > points;
+    for( const auto& point : polygon.vertices() )
+    {
+        points.emplace_back( point );
+    }
+    const auto polygon_sign =
+        geode::polygon_area_sign( geode::Polygon2D{ std::move( points ) } );
+    const auto& vertices = polygon.vertices();
+    for( const auto& triangle : triangles )
+    {
+        const geode::Triangle2D geometry{ vertices[triangle[0]],
+            vertices[triangle[1]], vertices[triangle[2]] };
+        if( geometry.is_degenerated() )
+        {
+            continue;
+        }
+        geode::OpenGeodeGeometryException::test(
+            geode::triangle_area_sign( geometry ) == polygon_sign, name,
+            ": wrong triangle orientation" );
+    }
+}
+
 template < geode::index_t dimension >
 void check_triangulation_both_windings(
     std::vector< geode::Point< dimension > > points, std::string_view name )
@@ -392,6 +422,33 @@ void check_triangulation_both_windings(
     check_triangulation_orientation(
         geode::OwnerPolygon< dimension >{ std::move( points ) },
         absl::StrCat( name, " reversed" ) );
+}
+
+std::vector< geode::Point2D > project_points(
+    absl::Span< const geode::Point3D > points,
+    geode::local_index_t axis0,
+    geode::local_index_t axis1 )
+{
+    std::vector< geode::Point2D > result;
+    result.reserve( points.size() );
+    for( const auto& point : points )
+    {
+        result.emplace_back(
+            geode::Point2D{ { point.value( axis0 ), point.value( axis1 ) } } );
+    }
+    return result;
+}
+
+void test_polygon_triangulation_orientation()
+{
+    check_triangulation_both_windings< 2 >(
+        { geode::Point2D{ { 0, 0 } }, geode::Point2D{ { 1, 0 } },
+            geode::Point2D{ { 1, 1 } }, geode::Point2D{ { 0, 1 } } },
+        "Square 2D" );
+    check_triangulation_both_windings< 2 >(
+        { geode::Point2D{ { 0, 0 } }, geode::Point2D{ { 1, 1 } },
+            geode::Point2D{ { 2, 0 } }, geode::Point2D{ { 1, 3 } } },
+        "Concave quad 2D" );
 }
 
 void test_polygon_triangulation_with_collinear_points()
@@ -405,6 +462,8 @@ void test_polygon_triangulation_with_collinear_points()
         geode::Point3D{ { 866.02540378443882, 7000, -5406.3798828125 } }
     };
     check_triangulation_both_windings< 3 >( quad, "Quad" );
+    check_triangulation_both_windings< 2 >(
+        project_points( quad, 0, 2 ), "Quad 2D" );
 
     // Comb with collinear runs along y = -1, y = 0 and y = 1: earcut returns
     // 13 triangles without normal out of 22
@@ -434,6 +493,8 @@ void test_polygon_triangulation_with_collinear_points()
         geode::Point3D{ { -2, -1, 0.75000000000000577 } },
         geode::Point3D{ { -2, -1.0000000000000011, 0.65000000000000568 } } };
     check_triangulation_both_windings< 3 >( comb, "Comb" );
+    check_triangulation_both_windings< 2 >(
+        project_points( comb, 1, 2 ), "Comb 2D" );
     for( auto& point : comb )
     {
         point.set_value( 0, 2 );
@@ -465,6 +526,7 @@ void test()
     test_sphere();
     test_circle();
     test_polygon();
+    test_polygon_triangulation_orientation();
     test_polygon_triangulation_with_collinear_points();
     test_polygon_triangulation_without_normal();
 }
