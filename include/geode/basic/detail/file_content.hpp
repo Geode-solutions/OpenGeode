@@ -38,6 +38,9 @@ namespace geode::detail
     class ByteBuffer
     {
     public:
+        // Not std::make_unique< char[] >( size ): it zero-fills the buffer,
+        // an extra pass over bytes that are overwritten right away
+        // (std::make_unique_for_overwrite is C++20).
         explicit ByteBuffer( size_t size )
             : data_{ new char[size] }, size_{ size }
         {
