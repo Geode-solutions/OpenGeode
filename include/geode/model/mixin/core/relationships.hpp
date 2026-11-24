@@ -35,17 +35,17 @@
 #include <geode/model/mixin/core/component_type.hpp>
 #include <geode/model/representation/core/mapping.hpp>
 
-namespace geode::detail
-{
-    class InputFiles;
-} // namespace geode::detail
-
 namespace geode
 {
     class AttributeManager;
     struct EdgeVertex;
     class RelationshipsBuilder;
     struct uuid;
+
+    namespace detail
+    {
+        class InputFiles;
+    } // namespace detail
 } // namespace geode
 
 namespace geode

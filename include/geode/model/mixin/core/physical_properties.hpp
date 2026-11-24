@@ -34,14 +34,14 @@
 #include <geode/model/common.hpp>
 #include <geode/model/mixin/core/component_type.hpp>
 
-namespace geode::detail
-{
-    class InputFiles;
-} // namespace geode::detail
-
 namespace geode
 {
     class PhysicalPropertiesBuilder;
+
+    namespace detail
+    {
+        class InputFiles;
+    } // namespace detail
 } // namespace geode
 
 namespace geode

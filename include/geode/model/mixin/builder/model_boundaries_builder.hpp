@@ -27,17 +27,17 @@
 
 #include <geode/model/common.hpp>
 
-namespace geode::detail
-{
-    class InputFiles;
-} // namespace geode::detail
-
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( ModelBoundary );
     FORWARD_DECLARATION_DIMENSION_CLASS( ModelBoundaries );
 
     struct uuid;
+
+    namespace detail
+    {
+        class InputFiles;
+    } // namespace detail
 } // namespace geode
 
 namespace geode

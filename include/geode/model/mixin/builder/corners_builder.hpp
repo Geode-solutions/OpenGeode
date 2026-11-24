@@ -32,11 +32,6 @@
 
 #include <geode/model/common.hpp>
 
-namespace geode::detail
-{
-    class InputFiles;
-} // namespace geode::detail
-
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Corner );
@@ -45,6 +40,11 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( PointSetBuilder );
 
     struct uuid;
+
+    namespace detail
+    {
+        class InputFiles;
+    } // namespace detail
 } // namespace geode
 
 namespace geode

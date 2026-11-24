@@ -28,14 +28,14 @@
 #include <geode/model/common.hpp>
 #include <geode/model/mixin/core/physical_properties.hpp>
 
-namespace geode::detail
-{
-    class InputFiles;
-} // namespace geode::detail
-
 namespace geode
 {
     struct uuid;
+
+    namespace detail
+    {
+        class InputFiles;
+    } // namespace detail
 } // namespace geode
 
 namespace geode

@@ -28,7 +28,6 @@
 #include <optional>
 #include <string_view>
 
-#include <geode/basic/byte_span.hpp>
 #include <geode/basic/common.hpp>
 
 namespace geode::detail
@@ -71,6 +70,8 @@ namespace geode::detail
      */
     class opengeode_basic_api MappedFile
     {
+        OPENGEODE_DISABLE_COPY_AND_MOVE( MappedFile );
+
     public:
         /*!
          * Map a whole file (UTF-8 path) read-only.
@@ -80,10 +81,6 @@ namespace geode::detail
         [[nodiscard]] static std::shared_ptr< const MappedFile > map(
             std::string_view filename );
 
-        MappedFile( const MappedFile& ) = delete;
-        MappedFile& operator=( const MappedFile& ) = delete;
-        MappedFile( MappedFile&& ) = delete;
-        MappedFile& operator=( MappedFile&& ) = delete;
         ~MappedFile();
 
         /*!
@@ -113,6 +110,8 @@ namespace geode::detail
      */
     class opengeode_basic_api FileContent
     {
+        OPENGEODE_DISABLE_COPY( FileContent );
+
     public:
         explicit FileContent( ByteBuffer buffer );
 
@@ -122,10 +121,7 @@ namespace geode::detail
         FileContent(
             std::shared_ptr< const MappedFile > mapping, ByteSpan bytes );
 
-        FileContent( const FileContent& ) = delete;
-        FileContent& operator=( const FileContent& ) = delete;
         FileContent( FileContent&& other ) noexcept;
-        FileContent& operator=( FileContent&& ) = delete;
         ~FileContent();
 
         [[nodiscard]] ByteSpan span() const

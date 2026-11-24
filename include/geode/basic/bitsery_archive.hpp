@@ -40,7 +40,6 @@
 
 #include <geode/basic/attribute.hpp>
 #include <geode/basic/attribute_manager.hpp>
-#include <geode/basic/byte_span.hpp>
 #include <geode/basic/common.hpp>
 #include <geode/basic/growable.hpp>
 #include <geode/basic/range.hpp>

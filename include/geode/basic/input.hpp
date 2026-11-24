@@ -29,7 +29,6 @@
 
 #include <absl/algorithm/container.h>
 
-#include <geode/basic/byte_span.hpp>
 #include <geode/basic/common.hpp>
 #include <geode/basic/io.hpp>
 #include <geode/basic/logger.hpp>

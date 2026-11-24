@@ -60,7 +60,6 @@ add_geode_library(
         "attribute.hpp"
         "bitsery_archive.hpp"
         "bitsery_attribute.hpp"
-        "byte_span.hpp"
         "cell_array.hpp"
         "chronometer.hpp"
         "common.hpp"

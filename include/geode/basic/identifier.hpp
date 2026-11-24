@@ -34,16 +34,16 @@ namespace bitsery
     class Access;
 } // namespace bitsery
 
-namespace geode::detail
-{
-    class InputFiles;
-} // namespace geode::detail
-
 namespace geode
 {
     class IdentifierBuilder;
     struct uuid;
     enum struct BITSERY;
+
+    namespace detail
+    {
+        class InputFiles;
+    } // namespace detail
 } // namespace geode
 
 namespace geode

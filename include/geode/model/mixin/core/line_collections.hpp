@@ -31,17 +31,17 @@
 #include <geode/model/common.hpp>
 #include <geode/model/mixin/core/detail/component_range_iterator.hpp>
 
-namespace geode::detail
-{
-    class InputFiles;
-} // namespace geode::detail
-
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( LineCollection );
     FORWARD_DECLARATION_DIMENSION_CLASS( LineCollectionsBuilder );
 
     struct uuid;
+
+    namespace detail
+    {
+        class InputFiles;
+    } // namespace detail
 } // namespace geode
 
 namespace geode

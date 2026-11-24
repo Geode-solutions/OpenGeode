@@ -41,11 +41,9 @@ namespace geode::detail
      */
     class opengeode_basic_api InputFiles
     {
+        OPENGEODE_DISABLE_COPY_AND_MOVE( InputFiles );
+
     public:
-        InputFiles( const InputFiles& ) = delete;
-        InputFiles& operator=( const InputFiles& ) = delete;
-        InputFiles( InputFiles&& ) = delete;
-        InputFiles& operator=( InputFiles&& ) = delete;
         virtual ~InputFiles();
 
         /*!
@@ -153,6 +151,8 @@ namespace geode::detail
      */
     class opengeode_basic_api TemporaryFile
     {
+        OPENGEODE_DISABLE_COPY_AND_MOVE( TemporaryFile );
+
     public:
         /*!
          * @param[in] name Name of the file (without directory).
@@ -160,10 +160,6 @@ namespace geode::detail
          * directory, or if the directory or the file cannot be created.
          */
         TemporaryFile( std::string_view name, ByteSpan content );
-        TemporaryFile( const TemporaryFile& ) = delete;
-        TemporaryFile& operator=( const TemporaryFile& ) = delete;
-        TemporaryFile( TemporaryFile&& ) = delete;
-        TemporaryFile& operator=( TemporaryFile&& ) = delete;
         ~TemporaryFile();
 
         [[nodiscard]] const std::string& path() const;

@@ -100,6 +100,8 @@ namespace
 
     class ZipReader
     {
+        OPENGEODE_DISABLE_COPY( ZipReader );
+
     public:
         explicit ZipReader( const std::filesystem::path& file )
             : reader_{ mz_zip_reader_create() }
@@ -117,9 +119,6 @@ namespace
                 mz_zip_reader_delete( &reader_ );
             }
         }
-
-        ZipReader( const ZipReader& ) = delete;
-        ZipReader& operator=( const ZipReader& ) = delete;
 
         [[nodiscard]] bool is_open() const
         {

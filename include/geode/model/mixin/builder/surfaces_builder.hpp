@@ -33,11 +33,6 @@
 
 #include <geode/model/common.hpp>
 
-namespace geode::detail
-{
-    class InputFiles;
-} // namespace geode::detail
-
 namespace geode
 {
     FORWARD_DECLARATION_DIMENSION_CLASS( Surface );
@@ -46,6 +41,11 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMeshBuilder );
 
     struct uuid;
+
+    namespace detail
+    {
+        class InputFiles;
+    } // namespace detail
 } // namespace geode
 
 namespace geode
