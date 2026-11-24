@@ -21,6 +21,13 @@
  *
  */
 
+#include <algorithm>
+#include <string_view>
+#include <vector>
+
+#include <absl/container/flat_hash_map.h>
+#include <absl/strings/str_cat.h>
+
 #include <geode/basic/assert.hpp>
 #include <geode/basic/logger.hpp>
 
@@ -344,6 +351,73 @@ void test_polygon()
         tilted_normal * -1 );
 }
 
+// The triangles form a disk oriented like the polygon: each boundary edge is
+// used once in the polygon direction, each interior edge once in each
+// direction. Triangles of a non planar polygon may face away from its normal.
+void check_triangulation_disk(
+    const geode::OwnerPolygon3D& polygon, std::string_view name )
+{
+    const auto nb_vertices = polygon.nb_vertices();
+    const auto triangles = polygon.triangulate();
+    geode::OpenGeodeGeometryException::test(
+        triangles.size() == nb_vertices - 2, name,
+        ": wrong number of triangles" );
+    absl::flat_hash_map< std::pair< geode::index_t, geode::index_t >,
+        geode::index_t >
+        edges;
+    for( const auto& triangle : triangles )
+    {
+        for( const auto e : geode::LRange{ 3 } )
+        {
+            edges[{ triangle[e], triangle[e == 2 ? 0 : e + 1] }]++;
+        }
+    }
+    for( const auto& [edge, count] : edges )
+    {
+        const auto [v0, v1] = edge;
+        const auto is_boundary = v1 == ( v0 + 1 ) % nb_vertices;
+        geode::OpenGeodeGeometryException::test( count == 1, name, ": edge ",
+            v0, "-", v1, " used ", count, " times" );
+        geode::OpenGeodeGeometryException::test(
+            is_boundary || edges.contains( { v1, v0 } ), name, ": edge ", v0,
+            "-", v1, " not paired" );
+    }
+    for( const auto v : geode::Range{ nb_vertices } )
+    {
+        geode::OpenGeodeGeometryException::test(
+            edges.contains( { v, ( v + 1 ) % nb_vertices } ), name,
+            ": boundary edge ", v, " missing or reversed" );
+    }
+}
+
+void test_polygon_triangulation_non_planar()
+{
+    // Remaining polygon of a remesh (Geode-Simplex salt model): about 30 cm
+    // wide, on two levels 3.5 cm apart. Removing the z axis (the most
+    // meaningful of its normal) folds it: edges 2-3 and 4-5 cross.
+    std::vector< geode::Point3D > points{
+        geode::Point3D{
+            { 4588.75589326798, 18893.4004347541, -999.789476606242 } },
+        geode::Point3D{
+            { 4588.80973476938, 18893.5177894767, -999.789558488747 } },
+        geode::Point3D{
+            { 4588.87073456111, 18893.6507466465, -999.789651257627 } },
+        geode::Point3D{
+            { 4589.0776823745, 18893.6564740894, -999.824234378945 } },
+        geode::Point3D{
+            { 4588.88955100947, 18893.6528730966, -999.824370786674 } },
+        geode::Point3D{
+            { 4588.89663907164, 18893.4648408769, -999.824170777021 } },
+        geode::Point3D{
+            { 4588.7685699226, 18893.398186215, -999.824201307792 } }
+    };
+    check_triangulation_disk(
+        geode::OwnerPolygon3D{ points }, "Non planar polygon" );
+    std::reverse( points.begin(), points.end() );
+    check_triangulation_disk( geode::OwnerPolygon3D{ std::move( points ) },
+        "Reversed non planar polygon" );
+}
+
 void test()
 {
     test_segment();
@@ -354,6 +428,7 @@ void test()
     test_sphere();
     test_circle();
     test_polygon();
+    test_polygon_triangulation_non_planar();
 }
 
 OPENGEODE_TEST( "basic-object" )
