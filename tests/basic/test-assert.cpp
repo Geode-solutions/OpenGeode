@@ -170,8 +170,60 @@ void test_exception()
     }
 }
 
+void test_exception_string()
+{
+    try
+    {
+        try
+        {
+            try
+            {
+                throw std::runtime_error{ "root cause" };
+            }
+            catch( ... )
+            {
+                geode::throw_lippincott< geode::OpenGeodeBasicException >(
+                    geode::OpenGeodeException::TYPE::internal, "middle" );
+            }
+        }
+        catch( ... )
+        {
+            geode::throw_lippincott< geode::OpenGeodeBasicException >(
+                geode::OpenGeodeException::TYPE::data, "top" );
+        }
+    }
+    catch( const geode::OpenGeodeException& exception )
+    {
+        const auto expected = absl::StrCat( exception.string(),
+            "\nFrom: ", exception.parent().string(),
+            "\nFrom: ", exception.parent().parent().string() );
+        geode::OpenGeodeBasicException::test(
+            exception.full_string() == expected,
+            "[Test] Wrong full_string: ", exception.full_string() );
+        geode::OpenGeodeBasicException::test(
+            geode::exception_string( exception ) == expected,
+            "[Test] Wrong exception_string of an OpenGeodeException" );
+        geode::OpenGeodeBasicException::test(
+            exception.parent().parent().string().find(
+                "std::exception: root cause" )
+                != std::string::npos,
+            "[Test] Root cause not in the chain" );
+    }
+
+    const geode::OpenGeodeBasicException single{ nullptr,
+        geode::OpenGeodeException::TYPE::data, "alone" };
+    geode::OpenGeodeBasicException::test(
+        single.full_string() == single.string(),
+        "[Test] full_string without parent should be string()" );
+    geode::OpenGeodeBasicException::test(
+        geode::exception_string( std::runtime_error{ "plain" } )
+            == "std::exception: plain",
+        "[Test] Wrong exception_string of a std::exception" );
+}
+
 void test()
 {
+    test_exception_string();
     test_exception();
     test_async();
     test_parallel();
