@@ -24,7 +24,6 @@
 #include <geode/basic/assert.hpp>
 
 #include <cassert>
-#include <functional>
 
 #include <geode/basic/library.hpp>
 #include <geode/basic/logger.hpp>
@@ -37,20 +36,9 @@ namespace
         {
             throw;
         }
-        catch( const geode::OpenGeodeException& exception )
-        {
-            geode::Logger::critical( exception.string() );
-            std::reference_wrapper< const geode::OpenGeodeException > current =
-                exception;
-            while( current.get().has_parent() )
-            {
-                current = current.get().parent();
-                geode::Logger::critical( "From: ", current.get().string() );
-            }
-        }
         catch( const std::exception& exception )
         {
-            geode::Logger::critical( "std::exception: ", exception.what() );
+            geode::Logger::critical( geode::exception_string( exception ) );
         }
         catch( ... )
         {
@@ -104,6 +92,28 @@ namespace geode
         return absl::StrCat( "OpenGeodeException of type ", type_name(),
             " from project ", project(), " and library ", library(), ": ",
             what() );
+    }
+
+    std::string OpenGeodeException::full_string() const
+    {
+        auto result = string();
+        const auto* current = this;
+        while( current->has_parent() )
+        {
+            current = &current->parent();
+            absl::StrAppend( &result, "\nFrom: ", current->string() );
+        }
+        return result;
+    }
+
+    std::string exception_string( const std::exception& exception )
+    {
+        if( const auto* opengeode_exception =
+                dynamic_cast< const OpenGeodeException* >( &exception ) )
+        {
+            return opengeode_exception->full_string();
+        }
+        return absl::StrCat( "std::exception: ", exception.what() );
     }
 
     int geode_lippincott()
