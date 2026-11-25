@@ -62,30 +62,110 @@ namespace mapbox::util
 
 namespace
 {
-    template < typename PointType >
-    std::array< std::vector< PointType >, 1 > polygon_points(
-        const geode::GenericPolygon< PointType, 2 >& polygon )
+    template < typename Polygons >
+    std::vector< std::array< geode::index_t, 3 > > earcut_triangles(
+        const Polygons& polygons )
     {
-        return { { polygon.vertices() } };
+        const auto new_triangles = mapbox::earcut< geode::index_t >( polygons );
+        const auto nb_new_triangles = new_triangles.size() / 3;
+        std::vector< std::array< geode::index_t, 3 > > result;
+        result.reserve( nb_new_triangles );
+        for( const auto trgl : geode::Range{ nb_new_triangles } )
+        {
+            const auto cur_trgl = 3 * trgl;
+            result.emplace_back( std::array{ new_triangles[cur_trgl],
+                new_triangles[cur_trgl + 1], new_triangles[cur_trgl + 2] } );
+        }
+        return result;
     }
 
     template < typename PointType >
-    std::array< absl::FixedArray< geode::Point2D >, 1 > polygon_points(
-        const geode::GenericPolygon< PointType, 3 >& polygon )
+    std::vector< std::array< geode::index_t, 3 > > triangulate_polygon(
+        const geode::GenericPolygon< PointType, 2 >& polygon )
+    {
+        return earcut_triangles( std::array< std::vector< PointType >, 1 >{
+            { polygon.vertices() } } );
+    }
+
+    template < typename PointType >
+    std::vector< std::array< geode::index_t, 3 > > triangulate_along_axis(
+        const geode::GenericPolygon< PointType, 3 >& polygon,
+        geode::local_index_t axis_to_remove )
     {
         const auto& vertices = polygon.vertices();
         std::array< absl::FixedArray< geode::Point2D >, 1 > polygons{
             absl::FixedArray< geode::Point2D >( vertices.size() )
         };
-        const auto normal =
-            polygon.normal().value_or( geode::Vector3D{ { 0, 0, 1 } } );
-        const auto axis_to_remove = normal.most_meaningful_axis();
         for( const auto v : geode::LIndices{ vertices } )
         {
             const geode::Point3D& point = vertices[v];
             polygons[0][v] = point.project_point( axis_to_remove );
         }
-        return polygons;
+        return earcut_triangles( polygons );
+    }
+
+    template < typename PointType >
+    std::vector< std::array< geode::index_t, 3 > > triangulate_in_plane(
+        const geode::GenericPolygon< PointType, 3 >& polygon,
+        const geode::Vector3D& normal )
+    {
+        const auto& vertices = polygon.vertices();
+        const auto first_axis =
+            normal
+                .cross( geode::Vector3D{
+                    { normal.most_meaningful_axis() == 0 ? 0. : 1.,
+                        normal.most_meaningful_axis() == 0 ? 1. : 0., 0. } } )
+                .normalize();
+        const auto second_axis = normal.cross( first_axis );
+        const geode::Point3D& origin = vertices.front();
+        std::array< absl::FixedArray< geode::Point2D >, 1 > polygons{
+            absl::FixedArray< geode::Point2D >( vertices.size() )
+        };
+        for( const auto v : geode::LIndices{ vertices } )
+        {
+            const geode::Vector3D from_origin{ origin, vertices[v] };
+            polygons[0][v] = geode::Point2D{ { from_origin.dot( first_axis ),
+                from_origin.dot( second_axis ) } };
+        }
+        return earcut_triangles( polygons );
+    }
+
+    // Removing an axis keeps the coordinates exact: the axes are tried from
+    // the most meaningful component of the normal while the projection of a
+    // non planar polygon folds it (earcut then misses triangles). The
+    // projection on the polygon plane is the last resort.
+    template < typename PointType >
+    std::vector< std::array< geode::index_t, 3 > > triangulate_polygon(
+        const geode::GenericPolygon< PointType, 3 >& polygon )
+    {
+        const auto expected_nb_triangles = polygon.nb_vertices() - 2;
+        const auto normal =
+            polygon.normal().value_or( geode::Vector3D{ { 0, 0, 1 } } );
+        std::array< geode::local_index_t, 3 > axes{ 0, 1, 2 };
+        absl::c_stable_sort( axes, [&normal]( geode::local_index_t axis0,
+                                       geode::local_index_t axis1 ) {
+            return std::fabs( normal.value( axis0 ) )
+                   > std::fabs( normal.value( axis1 ) );
+        } );
+        auto result = triangulate_along_axis( polygon, axes[0] );
+        if( result.size() == expected_nb_triangles )
+        {
+            return result;
+        }
+        for( const auto axis : { axes[1], axes[2] } )
+        {
+            auto other = triangulate_along_axis( polygon, axis );
+            if( other.size() == expected_nb_triangles )
+            {
+                return other;
+            }
+        }
+        auto in_plane = triangulate_in_plane( polygon, normal );
+        if( in_plane.size() == expected_nb_triangles )
+        {
+            return in_plane;
+        }
+        return result;
     }
 
     template < typename PointType >
@@ -260,17 +340,7 @@ namespace geode
     std::vector< std::array< index_t, 3 > >
         GenericPolygon< PointType, dimension >::triangulate() const
     {
-        const auto new_triangles =
-            mapbox::earcut< index_t >( polygon_points( *this ) );
-        const auto nb_new_triangles = new_triangles.size() / 3;
-        std::vector< std::array< index_t, 3 > > result;
-        result.reserve( nb_new_triangles );
-        for( const auto trgl : Range{ nb_new_triangles } )
-        {
-            const auto cur_trgl = 3 * trgl;
-            result.emplace_back( std::array{ new_triangles[cur_trgl],
-                new_triangles[cur_trgl + 1], new_triangles[cur_trgl + 2] } );
-        }
+        auto result = triangulate_polygon( *this );
         reoriente_triangulation( *this, result );
         return result;
     }
