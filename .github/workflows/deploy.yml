@@ -3,6 +3,9 @@ name: Deploy
 on:
   workflow_dispatch:
 
+# id-token: Azure Artifact Signing (GitHub OIDC)
+permissions: write-all
+
 jobs:
   deploy:
     uses: Geode-solutions/actions/.github/workflows/cpp-deploy.yml@master
