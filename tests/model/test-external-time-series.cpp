@@ -70,6 +70,9 @@ namespace
     // typical UTM coordinates (up to 0.28)
     constexpr double UTM_SCALE{ 10. };
     const geode::Vector3D UTM_TRANSLATION{ { 500000., 7000000., 3000. } };
+    // Beyond the single precision rounding (about 0.25 here), below the
+    // barycenter spacing
+    constexpr double UTM_WRONG_TRANSLATION{ 1. };
 
     double pressure( geode::index_t unique_vertex, double time )
     {
@@ -357,9 +360,7 @@ namespace
         check_velocities( model, block_id );
     }
 
-    // Georeferenced model with only cell values written in single
-    // precision: the unique vertices carry no value
-    void check_georeferenced_model( const geode::uuid& block_id )
+    geode::BRep load_georeferenced_model()
     {
         const auto model_filename =
             absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" );
@@ -376,6 +377,14 @@ namespace
                     mesh.point( vertex ) * UTM_SCALE + UTM_TRANSLATION );
             }
         }
+        return model;
+    }
+
+    // Georeferenced model with only cell values written in single
+    // precision: the unique vertices carry no value
+    void check_georeferenced_cell_values( const geode::uuid& block_id )
+    {
+        auto model = load_georeferenced_model();
         std::vector< geode::index_t > unique_vertices;
         const auto vertices =
             create_unique_vertex_points( model, unique_vertices );
@@ -385,6 +394,44 @@ namespace
             *create_cell_barycenters( model, block_id, geode::Vector3D{} ) ) );
         time_series.apply_to( model );
         check_velocities( model, block_id );
+    }
+
+    // Georeferenced model with vertex and cell values written in single
+    // precision
+    void check_georeferenced_values( const geode::uuid& block_id )
+    {
+        auto model = load_georeferenced_model();
+        geode::ExternalTimeSeries time_series;
+        time_series.set_unique_vertices(
+            round_to_float( *create_unique_vertices( model ) ) );
+        time_series.set_cell_barycenters( round_to_float(
+            *create_cell_barycenters( model, block_id, geode::Vector3D{} ) ) );
+        time_series.apply_to( model );
+        check_pressures( model );
+        check_velocities( model, block_id );
+    }
+
+    // Points translated beyond the single precision rounding of UTM
+    // coordinates are rejected
+    void check_georeferenced_tolerance( const geode::uuid& block_id )
+    {
+        auto model = load_georeferenced_model();
+        geode::ExternalTimeSeries time_series;
+        time_series.set_cell_barycenters(
+            round_to_float( *create_cell_barycenters( model, block_id,
+                geode::Vector3D{ { 0, UTM_WRONG_TRANSLATION, 0 } } ) ) );
+        bool thrown{ false };
+        try
+        {
+            time_series.apply_to( model );
+        }
+        catch( const geode::OpenGeodeException& )
+        {
+            thrown = true;
+        }
+        geode::OpenGeodeModelException::test( thrown,
+            "[Test] Applying georeferenced barycenters translated beyond the "
+            "tolerance should throw" );
     }
 
     void check_null_point_set()
@@ -454,7 +501,9 @@ void test()
     check_tolerance( block_id );
     check_colocated_points( block_id );
     check_unattributed_vertices( block_id );
-    check_georeferenced_model( block_id );
+    check_georeferenced_cell_values( block_id );
+    check_georeferenced_values( block_id );
+    check_georeferenced_tolerance( block_id );
     check_null_point_set();
     check_wrong_extension( time_series );
 }

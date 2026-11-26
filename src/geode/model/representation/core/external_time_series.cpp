@@ -104,8 +104,13 @@ namespace
     }
 
     // Points may be rounded to single precision: the tolerance bounds this
-    // rounding over the point set, GLOBAL_EPSILON is added for the
-    // computations made on the rounded coordinates (e.g. barycenters)
+    // rounding over the point set. Points computed in double precision from
+    // rounded coordinates (e.g. barycenters of rounded vertices) are within
+    // the same bound, GLOBAL_EPSILON is added for the double precision
+    // computations. Points rounded twice (e.g. barycenters of rounded
+    // vertices written in single precision) are not covered: a wider
+    // tolerance would reject meshes whose elements are closer than one
+    // float gap.
     double matching_tolerance( const geode::PointSet3D& point_set )
     {
         const auto box = point_set.bounding_box();
