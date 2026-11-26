@@ -25,6 +25,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <optional>
 #include <vector>
 
@@ -90,20 +91,47 @@ namespace
         }
     }
 
-    // Coordinates are rounded relatively to their magnitude
+    // Largest rounding of a coordinate stored in single precision, as
+    // simulators often do: half the gap between consecutive floats around
+    // the coordinate, magnitudes below 1 being rounded as 1
+    double single_precision_rounding( double coordinate )
+    {
+        const auto magnitude =
+            static_cast< float >( std::max( std::fabs( coordinate ), 1. ) );
+        const auto next = std::nextafter(
+            magnitude, std::numeric_limits< float >::infinity() );
+        return ( static_cast< double >( next ) - magnitude ) / 2;
+    }
+
+    // Points may be rounded to single precision: the tolerance bounds this
+    // rounding over the point set, GLOBAL_EPSILON is added for the
+    // computations made on the rounded coordinates (e.g. barycenters)
     double matching_tolerance( const geode::PointSet3D& point_set )
     {
         const auto box = point_set.bounding_box();
-        double largest_coordinate{ 1 };
-        for( const auto& point : { box.min(), box.max() } )
+        double squared_rounding{ 0 };
+        for( const auto axis : geode::LRange{ 3 } )
         {
-            for( const auto axis : geode::LRange{ 3 } )
-            {
-                largest_coordinate = std::max(
-                    largest_coordinate, std::fabs( point.value( axis ) ) );
-            }
+            const auto largest_coordinate =
+                std::max( std::fabs( box.min().value( axis ) ),
+                    std::fabs( box.max().value( axis ) ) );
+            const auto rounding =
+                single_precision_rounding( largest_coordinate );
+            squared_rounding += rounding * rounding;
         }
-        return geode::GLOBAL_EPSILON * largest_coordinate;
+        return std::sqrt( squared_rounding ) + geode::GLOBAL_EPSILON;
+    }
+
+    // Point sets without transferable attribute have nothing to apply
+    bool has_transferable_attribute( const geode::PointSet3D& point_set )
+    {
+        const auto& manager = point_set.vertex_attribute_manager();
+        return absl::c_any_of(
+            manager.attribute_ids(), [&manager]( const geode::uuid& id ) {
+                return manager.find_generic_attribute( id )
+                    ->properties()
+                    .transferable;
+            } );
     }
 
     // Each point is matched with the closest element, elements without
@@ -371,21 +399,30 @@ namespace geode
 
         void apply_to( const BRep& model ) const
         {
-            const auto vertex_matches =
-                match_block_vertices( model, *unique_vertices_ );
-            const auto polyhedron_matches =
-                match_block_polyhedra( model, *cell_barycenters_ );
-            index_t block_index{ 0 };
-            for( const auto& block : model.blocks() )
+            if( has_transferable_attribute( *unique_vertices_ ) )
             {
-                const auto& mesh = block.mesh();
-                apply_matches( unique_vertices_->vertex_attribute_manager(),
-                    vertex_matches[block_index],
-                    mesh.vertex_attribute_manager() );
-                apply_matches( cell_barycenters_->vertex_attribute_manager(),
-                    polyhedron_matches[block_index],
-                    mesh.polyhedron_attribute_manager() );
-                block_index++;
+                const auto vertex_matches =
+                    match_block_vertices( model, *unique_vertices_ );
+                index_t block_index{ 0 };
+                for( const auto& block : model.blocks() )
+                {
+                    apply_matches( unique_vertices_->vertex_attribute_manager(),
+                        vertex_matches[block_index++],
+                        block.mesh().vertex_attribute_manager() );
+                }
+            }
+            if( has_transferable_attribute( *cell_barycenters_ ) )
+            {
+                const auto polyhedron_matches =
+                    match_block_polyhedra( model, *cell_barycenters_ );
+                index_t block_index{ 0 };
+                for( const auto& block : model.blocks() )
+                {
+                    apply_matches(
+                        cell_barycenters_->vertex_attribute_manager(),
+                        polyhedron_matches[block_index++],
+                        block.mesh().polyhedron_attribute_manager() );
+                }
             }
         }
 

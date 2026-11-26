@@ -40,11 +40,13 @@
 #include <geode/geometry/vector.hpp>
 
 #include <geode/mesh/builder/point_set_builder.hpp>
+#include <geode/mesh/builder/solid_mesh_builder.hpp>
 #include <geode/mesh/core/point_set.hpp>
 #include <geode/mesh/core/solid_mesh.hpp>
 
 #include <geode/model/mixin/core/block.hpp>
 #include <geode/model/mixin/core/vertex_identifier.hpp>
+#include <geode/model/representation/builder/brep_builder.hpp>
 #include <geode/model/representation/core/brep.hpp>
 #include <geode/model/representation/core/external_time_series.hpp>
 #include <geode/model/representation/io/brep_input.hpp>
@@ -59,10 +61,15 @@ namespace
     constexpr auto PRESSURE = "pressure";
     constexpr auto VELOCITY = "velocity";
     constexpr std::array< double, 2 > TIMES{ 0., 10. };
-    // test_mesh3 coordinates go up to 10: the matching tolerance is
-    // 10 * GLOBAL_EPSILON
+    // test_mesh3 coordinates go up to 10: the matching tolerance (single
+    // precision rounding + GLOBAL_EPSILON) is about 2 * GLOBAL_EPSILON
     constexpr double ROUNDING_TRANSLATION{ geode::GLOBAL_EPSILON };
     constexpr double WRONG_TRANSLATION{ 100 * geode::GLOBAL_EPSILON };
+    // Georeferenced model: test_mesh3 barycenters are at least 0.19 apart,
+    // scaled to stay farther apart than single precision rounding of
+    // typical UTM coordinates (up to 0.28)
+    constexpr double UTM_SCALE{ 10. };
+    const geode::Vector3D UTM_TRANSLATION{ { 500000., 7000000., 3000. } };
 
     double pressure( geode::index_t unique_vertex, double time )
     {
@@ -86,13 +93,13 @@ namespace
             attribute_id );
     }
 
-    // One point per model unique vertex
-    std::unique_ptr< geode::PointSet3D > create_unique_vertices(
-        const geode::BRep& model )
+    // One point per model unique vertex, in the order of the Block vertices
+    std::unique_ptr< geode::PointSet3D > create_unique_vertex_points(
+        const geode::BRep& model,
+        std::vector< geode::index_t >& unique_vertices )
     {
         auto vertices = geode::PointSet3D::create();
         auto builder = geode::PointSetBuilder3D::create( *vertices );
-        std::vector< geode::index_t > unique_vertices;
         std::vector< bool > visited( model.nb_unique_vertices(), false );
         for( const auto& block : model.blocks() )
         {
@@ -110,6 +117,14 @@ namespace
                 unique_vertices.push_back( unique_vertex );
             }
         }
+        return vertices;
+    }
+
+    std::unique_ptr< geode::PointSet3D > create_unique_vertices(
+        const geode::BRep& model )
+    {
+        std::vector< geode::index_t > unique_vertices;
+        auto vertices = create_unique_vertex_points( model, unique_vertices );
         for( const auto time : TIMES )
         {
             auto attribute = create_time_step< double >(
@@ -297,6 +312,81 @@ namespace
             thrown, "[Test] Applying colocated barycenters should throw" );
     }
 
+    // Simulators often write single precision coordinates
+    geode::Point3D round_to_float( const geode::Point3D& point )
+    {
+        geode::Point3D rounded;
+        for( const auto axis : geode::LRange{ 3 } )
+        {
+            rounded.set_value(
+                axis, static_cast< float >( point.value( axis ) ) );
+        }
+        return rounded;
+    }
+
+    std::unique_ptr< geode::PointSet3D > round_to_float(
+        const geode::PointSet3D& point_set )
+    {
+        auto rounded = point_set.clone();
+        auto builder = geode::PointSetBuilder3D::create( *rounded );
+        for( const auto vertex : geode::Range{ rounded->nb_vertices() } )
+        {
+            builder->set_point(
+                vertex, round_to_float( rounded->point( vertex ) ) );
+        }
+        return rounded;
+    }
+
+    // Unique vertices without values are not matched, even when they
+    // could not be
+    void check_unattributed_vertices( const geode::uuid& block_id )
+    {
+        const auto model_filename =
+            absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" );
+        auto model = geode::load_one(
+            geode::load_brep( model_filename ), model_filename );
+        std::vector< geode::index_t > unique_vertices;
+        auto vertices = create_unique_vertex_points( model, unique_vertices );
+        geode::PointSetBuilder3D::create( *vertices )
+            ->create_point( vertices->point( 0 ) );
+        geode::ExternalTimeSeries time_series;
+        time_series.set_unique_vertices( std::move( vertices ) );
+        time_series.set_cell_barycenters(
+            create_cell_barycenters( model, block_id, geode::Vector3D{} ) );
+        time_series.apply_to( model );
+        check_velocities( model, block_id );
+    }
+
+    // Georeferenced model with only cell values written in single
+    // precision: the unique vertices carry no value
+    void check_georeferenced_model( const geode::uuid& block_id )
+    {
+        const auto model_filename =
+            absl::StrCat( geode::DATA_PATH, "test_mesh3.og_brep" );
+        auto model = geode::load_one(
+            geode::load_brep( model_filename ), model_filename );
+        geode::BRepBuilder model_builder{ model };
+        for( const auto& block : model.blocks() )
+        {
+            const auto& mesh = block.mesh();
+            const auto mesh_builder = model_builder.block_mesh_builder( block );
+            for( const auto vertex : geode::Range{ mesh.nb_vertices() } )
+            {
+                mesh_builder->set_point( vertex,
+                    mesh.point( vertex ) * UTM_SCALE + UTM_TRANSLATION );
+            }
+        }
+        std::vector< geode::index_t > unique_vertices;
+        const auto vertices =
+            create_unique_vertex_points( model, unique_vertices );
+        geode::ExternalTimeSeries time_series;
+        time_series.set_unique_vertices( round_to_float( *vertices ) );
+        time_series.set_cell_barycenters( round_to_float(
+            *create_cell_barycenters( model, block_id, geode::Vector3D{} ) ) );
+        time_series.apply_to( model );
+        check_velocities( model, block_id );
+    }
+
     void check_null_point_set()
     {
         geode::ExternalTimeSeries time_series;
@@ -363,6 +453,8 @@ void test()
     check_other_model( time_series );
     check_tolerance( block_id );
     check_colocated_points( block_id );
+    check_unattributed_vertices( block_id );
+    check_georeferenced_model( block_id );
     check_null_point_set();
     check_wrong_extension( time_series );
 }
