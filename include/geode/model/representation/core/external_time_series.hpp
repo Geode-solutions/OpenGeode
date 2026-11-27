@@ -99,9 +99,12 @@ namespace geode
          * Attribute ids and properties (time steps included) are kept. A
          * Block time step with the same name and time as an applied one is
          * replaced.
-         * The matching tolerance is GLOBAL_EPSILON relative to the largest
-         * absolute coordinate of the points (when larger than 1), to accept
-         * points rounded by the simulator (e.g. stored in single precision).
+         * A point set without transferable attribute is not matched.
+         * The matching tolerance bounds the rounding of the points to single
+         * precision (as simulators often store them), computed from their
+         * largest absolute coordinates. Points computed in double precision
+         * from rounded coordinates (e.g. barycenters) are accepted, points
+         * rounded twice may not be.
          * @exception OpenGeodeException if a point is farther than the
          * tolerance from its closest Block element, if several points are
          * matched with the same Block element, or if a point is within the
