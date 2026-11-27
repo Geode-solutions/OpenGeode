@@ -201,7 +201,7 @@ namespace geode
 
     Graph::Graph() = default;
 
-    Graph::Graph( BITSERY ) {}
+    Graph::Graph( BITSERY bitsery ) : VertexSet{ bitsery } {}
 
     Graph::Graph( Graph&& ) noexcept = default;
 

@@ -41,6 +41,11 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( SurfaceMeshBuilder );
 
     struct uuid;
+
+    namespace detail
+    {
+        class InputFiles;
+    } // namespace detail
 } // namespace geode
 
 namespace geode
@@ -50,6 +55,8 @@ namespace geode
     {
     public:
         void load_surfaces( std::string_view directory );
+
+        void load_surfaces( const detail::InputFiles& files );
 
         /*!
          * Get a pointer to the builder of a Surface mesh

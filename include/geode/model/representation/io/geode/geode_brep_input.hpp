@@ -25,6 +25,8 @@
 
 #include <async++.h>
 
+#include <geode/basic/detail/input_files.hpp>
+
 #include <geode/model/representation/builder/brep_builder.hpp>
 #include <geode/model/representation/builder/detail/filter.hpp>
 #include <geode/model/representation/builder/detail/register.hpp>
@@ -66,52 +68,56 @@ namespace geode
 
     namespace detail
     {
+        /*!
+         * Load the files of a BRep (identifier, components, meshes,
+         * relationships, unique vertices) into an empty model.
+         */
         template < typename Model >
-        void load_brep_files( Model& brep, std::string_view directory )
+        void load_brep_files( Model& brep, const detail::InputFiles& files )
         {
             BRepBuilder builder{ brep };
             const detail::ScopedLoggerLevel scoped_level{
                 Logger::LEVEL::warning
             };
             async::parallel_invoke(
-                [&builder, &directory] {
-                    builder.load_identifier( directory );
+                [&builder, &files] {
+                    builder.load_identifier( files );
                 },
-                [&builder, &directory] {
-                    builder.load_physical_properties( directory );
+                [&builder, &files] {
+                    builder.load_physical_properties( files );
                 },
-                [&builder, &directory] {
-                    builder.load_corners( directory );
+                [&builder, &files] {
+                    builder.load_corners( files );
                 },
-                [&builder, &directory] {
-                    builder.load_lines( directory );
+                [&builder, &files] {
+                    builder.load_lines( files );
                 },
-                [&builder, &directory] {
-                    builder.load_surfaces( directory );
+                [&builder, &files] {
+                    builder.load_surfaces( files );
                 },
-                [&builder, &directory] {
-                    builder.load_blocks( directory );
+                [&builder, &files] {
+                    builder.load_blocks( files );
                 },
-                [&builder, &directory] {
-                    builder.load_model_boundaries( directory );
+                [&builder, &files] {
+                    builder.load_model_boundaries( files );
                 },
-                [&builder, &directory] {
-                    builder.load_corner_collections( directory );
+                [&builder, &files] {
+                    builder.load_corner_collections( files );
                 },
-                [&builder, &directory] {
-                    builder.load_line_collections( directory );
+                [&builder, &files] {
+                    builder.load_line_collections( files );
                 },
-                [&builder, &directory] {
-                    builder.load_surface_collections( directory );
+                [&builder, &files] {
+                    builder.load_surface_collections( files );
                 },
-                [&builder, &directory] {
-                    builder.load_block_collections( directory );
+                [&builder, &files] {
+                    builder.load_block_collections( files );
                 },
-                [&builder, &directory] {
-                    builder.load_relationships( directory );
+                [&builder, &files] {
+                    builder.load_relationships( files );
                 },
-                [&builder, &directory] {
-                    builder.load_unique_vertices( directory );
+                [&builder, &files] {
+                    builder.load_unique_vertices( files );
                 } );
             detail::register_all_components( brep );
             detail::filter_unsupported_components( brep );

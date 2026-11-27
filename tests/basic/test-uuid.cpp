@@ -21,6 +21,13 @@
  *
  */
 
+#include <sstream>
+
+#include <absl/container/flat_hash_map.h>
+
+#include <bitsery/ext/std_map.h>
+
+#include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/logger.hpp>
 #include <geode/basic/range.hpp>
 #include <geode/basic/uuid.hpp>
@@ -70,10 +77,67 @@ void test_invalid_string()
     }
 }
 
+void test_deserialization()
+{
+    const geode::uuid nil{ geode::BITSERY::constructor };
+    for( const auto byte : nil.bytes_ )
+    {
+        geode::OpenGeodeBasicException::test(
+            byte == 0, "UUID built for deserialization should be nil" );
+    }
+    geode::OpenGeodeBasicException::test(
+        bitsery::Access::create< geode::uuid >() == nil,
+        "UUID created by bitsery should be nil (not generated)" );
+
+    using Map = absl::flat_hash_map< geode::uuid, geode::index_t >;
+    const geode::uuid id;
+    Map map;
+    for( const auto i : geode::Range{ 10 } )
+    {
+        map.emplace( geode::uuid{}, i );
+    }
+    std::stringstream stream;
+    {
+        geode::TContext context{};
+        geode::Serializer archive{ context, stream };
+        archive.object( id );
+        archive.ext( map, bitsery::ext::StdMap{ map.size() },
+            []( geode::Serializer& local_archive, geode::uuid& key,
+                geode::index_t& value ) {
+                local_archive.object( key );
+                local_archive.value4b( value );
+            } );
+        archive.adapter().flush();
+    }
+    geode::uuid loaded_id{ geode::BITSERY::constructor };
+    Map loaded_map;
+    {
+        geode::TContext context{};
+        const auto bytes = stream.str();
+        geode::Deserializer archive{ context, bytes.data(), bytes.size() };
+        archive.object( loaded_id );
+        archive.ext( loaded_map, bitsery::ext::StdMap{ map.size() },
+            []( geode::Deserializer& local_archive, geode::uuid& key,
+                geode::index_t& value ) {
+                local_archive.object( key );
+                local_archive.value4b( value );
+            } );
+        geode::OpenGeodeBasicException::test(
+            archive.adapter().error() == bitsery::ReaderError::NoError
+                && archive.adapter().isCompletedSuccessfully(),
+            "UUID deserialization should succeed" );
+    }
+    geode::OpenGeodeBasicException::test(
+        loaded_id == id, "Deserialized UUID should be the saved one" );
+    geode::OpenGeodeBasicException::test(
+        loaded_map == map, "Deserialized UUID keys should be the saved ones" );
+}
+
 void test()
 {
     test_generation();
     test_invalid_string();
+    test_deserialization();
 }
 
 OPENGEODE_TEST( "uuid" )

@@ -23,6 +23,8 @@
 
 #include <geode/model/mixin/builder/surfaces_builder.hpp>
 
+#include <geode/basic/detail/input_files.hpp>
+
 #include <geode/mesh/builder/surface_mesh_builder.hpp>
 #include <geode/mesh/core/surface_mesh.hpp>
 
@@ -73,8 +75,15 @@ namespace geode
     void SurfacesBuilder< dimension >::load_surfaces(
         std::string_view directory )
     {
-        return surfaces_.load_surfaces(
-            directory, typename Surface< dimension >::SurfacesBuilderKey{} );
+        load_surfaces( detail::DirectoryInputFiles{ directory } );
+    }
+
+    template < index_t dimension >
+    void SurfacesBuilder< dimension >::load_surfaces(
+        const detail::InputFiles& files )
+    {
+        surfaces_.load_surfaces(
+            files, typename Surface< dimension >::SurfacesBuilderKey{} );
     }
 
     template < index_t dimension >

@@ -23,6 +23,8 @@
 
 #include <geode/model/mixin/builder/vertex_identifier_builder.hpp>
 
+#include <geode/basic/detail/input_files.hpp>
+
 namespace geode
 {
     VertexIdentifierBuilder::VertexIdentifierBuilder(
@@ -68,8 +70,14 @@ namespace geode
     void VertexIdentifierBuilder::load_unique_vertices(
         std::string_view directory )
     {
+        load_unique_vertices( detail::DirectoryInputFiles{ directory } );
+    }
+
+    void VertexIdentifierBuilder::load_unique_vertices(
+        const detail::InputFiles& files )
+    {
         vertex_identifier_.load_unique_vertices(
-            directory, VertexIdentifier::BuilderKey{} );
+            files, VertexIdentifier::BuilderKey{} );
     }
 
     std::vector< index_t > VertexIdentifierBuilder::delete_isolated_vertices()

@@ -87,14 +87,15 @@ namespace
     std::unique_ptr< geode::SurfaceMesh< dimension > > load_grid_surface(
         const geode::MeshType& type,
         const geode::MeshImpl& impl,
-        std::string_view file )
+        const geode::detail::InputFiles& files,
+        std::string_view name )
     {
         if constexpr( dimension == 2 )
         {
             if( type == geode::RegularGrid< 2 >::type_name_static() )
             {
-                return geode::load_one(
-                    geode::load_regular_grid< 2 >( impl, file ), file );
+                return geode::detail::load_component_mesh<
+                    geode::RegularGridInputFactory< 2 > >( files, name, impl );
             }
         }
         return nullptr;
@@ -197,15 +198,15 @@ namespace geode
 
     template < index_t dimension >
     void Surfaces< dimension >::load_surfaces(
-        std::string_view directory, SurfacesBuilderKey key )
+        const detail::InputFiles& files, SurfacesBuilderKey key )
     {
-        impl_->load_components( absl::StrCat( directory, "/surfaces" ) );
-        const auto mapping = impl_->file_mapping( directory );
+        impl_->load_components( files, "surfaces", true );
+        const auto mapping = impl_->file_mapping( files );
         absl::FixedArray< async::task< void > > tasks( nb_surfaces() );
         index_t count{ 0 };
         for( auto& surface : modifiable_surfaces( key ) )
         {
-            tasks[count++] = async::spawn( [&surface, &mapping] {
+            tasks[count++] = async::spawn( [&surface, &mapping, &files] {
                 const auto file = mapping.find( surface.id().string() );
                 if( file == mapping.end() )
                 {
@@ -215,22 +216,23 @@ namespace geode
                         typename Surface< dimension >::SurfacesKey{} );
                     return;
                 }
+                const auto& name = file->second;
                 const auto impl =
                     detail::loadable_mesh_impl( surface.mesh_type(),
-                        surface_type_from_file< dimension >( file->second ),
-                        file->second );
+                        surface_type_from_file< dimension >( name ),
+                        files.location( name ) );
                 const auto& type = MeshFactory::type( impl );
                 if( type
                     == TriangulatedSurface< dimension >::type_name_static() )
                 {
                     surface.set_mesh(
-                        load_one( load_triangulated_surface< dimension >(
-                                      impl, file->second ),
-                            file->second ),
+                        detail::load_component_mesh<
+                            TriangulatedSurfaceInputFactory< dimension > >(
+                            files, name, impl ),
                         typename Surface< dimension >::SurfacesKey{} );
                 }
                 else if( auto grid = load_grid_surface< dimension >(
-                             type, impl, file->second ) )
+                             type, impl, files, name ) )
                 {
                     surface.set_mesh( std::move( grid ),
                         typename Surface< dimension >::SurfacesKey{} );
@@ -238,9 +240,9 @@ namespace geode
                 else
                 {
                     surface.set_mesh(
-                        load_one( load_polygonal_surface< dimension >(
-                                      impl, file->second ),
-                            file->second ),
+                        detail::load_component_mesh<
+                            PolygonalSurfaceInputFactory< dimension > >(
+                            files, name, impl ),
                         typename Surface< dimension >::SurfacesKey{} );
                 }
             } );

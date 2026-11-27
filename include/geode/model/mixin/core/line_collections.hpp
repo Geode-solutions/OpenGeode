@@ -37,6 +37,11 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( LineCollectionsBuilder );
 
     struct uuid;
+
+    namespace detail
+    {
+        class InputFiles;
+    } // namespace detail
 } // namespace geode
 
 namespace geode
@@ -155,7 +160,7 @@ namespace geode
             LineCollectionsBuilderKey key );
 
         void load_line_collections(
-            std::string_view directory, LineCollectionsBuilderKey key );
+            const detail::InputFiles& files, LineCollectionsBuilderKey key );
 
         [[nodiscard]] ModifiableLineCollectionRange modifiable_line_collections(
             LineCollectionsBuilderKey key );

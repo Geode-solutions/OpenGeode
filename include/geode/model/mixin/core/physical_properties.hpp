@@ -37,6 +37,11 @@
 namespace geode
 {
     class PhysicalPropertiesBuilder;
+
+    namespace detail
+    {
+        class InputFiles;
+    } // namespace detail
 } // namespace geode
 
 namespace geode
@@ -119,7 +124,7 @@ namespace geode
             const PhysicalProperties& other, BuilderKey /*key*/ );
 
         void load_physical_properties(
-            std::string_view directory, BuilderKey /*key*/ );
+            const detail::InputFiles& files, BuilderKey /*key*/ );
 
     protected:
         PhysicalProperties( PhysicalProperties&& other ) noexcept;

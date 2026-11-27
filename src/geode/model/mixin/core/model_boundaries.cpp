@@ -97,10 +97,9 @@ namespace geode
 
     template < index_t dimension >
     void ModelBoundaries< dimension >::load_model_boundaries(
-        std::string_view directory, ModelBoundariesBuilderKey /*key*/ )
+        const detail::InputFiles& files, ModelBoundariesBuilderKey /*key*/ )
     {
-        impl_->load_components(
-            absl::StrCat( directory, "/model_boundaries" ) );
+        impl_->load_components( files, "model_boundaries", true );
     }
 
     template < index_t dimension >

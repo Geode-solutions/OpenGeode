@@ -37,8 +37,16 @@ namespace geode
     struct opengeode_basic_api uuid
     {
     public:
+        /*!
+         * Generate a new unique identifier (UUIDv7).
+         */
         uuid();
         explicit uuid( std::string_view string );
+        /*!
+         * Nil uuid (all bytes zero), without generating a new identifier: for
+         * a uuid about to be overwritten by deserialization.
+         */
+        explicit uuid( BITSERY /*unused*/ ) : bytes_{} {}
         uuid( const uuid & ) = default;
         uuid( uuid && ) = default;
         uuid &operator=( uuid &&other ) = default;
@@ -95,6 +103,17 @@ namespace geode
         }
     };
 } // namespace geode
+
+namespace bitsery
+{
+    // Bitsery builds the uuids it deserializes (map keys, optionals...) with
+    // Access::create: do not generate an identifier about to be overwritten.
+    template <>
+    inline geode::uuid Access::create< geode::uuid >()
+    {
+        return geode::uuid{ geode::BITSERY::constructor };
+    }
+} // namespace bitsery
 
 namespace std
 {

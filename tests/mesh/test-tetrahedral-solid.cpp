@@ -21,6 +21,7 @@
  *
  */
 
+#include <algorithm>
 #include <atomic>
 #include <thread>
 
@@ -343,6 +344,24 @@ void test_delete_polyhedron( const geode::TetrahedralSolid3D& solid,
         "TetrahedralSolid facet vertex index is not correct" );
 }
 
+void check_same_attribute_ids( const geode::AttributeManager& manager,
+    const geode::AttributeManager& manager2 )
+{
+    auto ids = manager.attribute_ids();
+    auto ids2 = manager2.attribute_ids();
+    std::sort( ids.begin(), ids.end() );
+    std::sort( ids2.begin(), ids2.end() );
+    geode::OpenGeodeMeshException::test(
+        std::equal( ids.begin(), ids.end(), ids2.begin(), ids2.end() ),
+        "Reloaded attribute ids should be the saved ones" );
+    for( const auto& id : ids2 )
+    {
+        geode::OpenGeodeMeshException::test(
+            manager2.find_generic_attribute( id )->id() == id,
+            "Reloaded attribute should keep its id" );
+    }
+}
+
 void test_io(
     const geode::TetrahedralSolid3D& solid, const std::string& filename )
 {
@@ -369,6 +388,12 @@ void test_io(
         "Reloaded TetrahedralSolid should have 12 edges" );
     geode::OpenGeodeMeshException::test( new_solid->nb_polyhedra() == 3,
         "Reloaded TetrahedralSolid should have 3 polyhedra" );
+    geode::OpenGeodeMeshException::test( new_solid->id() == solid.id(),
+        "Reloaded TetrahedralSolid should keep its id" );
+    check_same_attribute_ids( solid.vertex_attribute_manager(),
+        new_solid->vertex_attribute_manager() );
+    check_same_attribute_ids( solid.polyhedron_attribute_manager(),
+        new_solid->polyhedron_attribute_manager() );
 }
 
 void test_backward_io( const std::string& filename )
@@ -377,6 +402,9 @@ void test_backward_io( const std::string& filename )
         geode::load_tetrahedral_solid< 3 >( filename ), filename );
     geode::OpenGeodeMeshException::test( solid->nb_vertices() == 6,
         "Backward TetrahedralSolid should have 6 vertices" );
+    geode::OpenGeodeMeshException::test(
+        solid->id() != geode::uuid{ geode::BITSERY::constructor },
+        "Backward TetrahedralSolid should have a valid id" );
     geode::OpenGeodeMeshException::test( solid->nb_polyhedra() == 3,
         "Backward TetrahedralSolid should have 3 polyhedra" );
     geode::OpenGeodeMeshException::test( solid->edges().nb_edges() == 12,

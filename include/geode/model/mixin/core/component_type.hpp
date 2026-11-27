@@ -48,6 +48,15 @@ namespace geode
     {
         ComponentID() : ComponentID( ComponentType{ "undefined" }, uuid{} ) {}
 
+        /*!
+         * Undefined type and nil uuid, without generating a new identifier:
+         * for a ComponentID about to be overwritten by deserialization.
+         */
+        explicit ComponentID( BITSERY bitsery )
+            : ComponentID( ComponentType{ "undefined" }, uuid{ bitsery } )
+        {
+        }
+
         ComponentID( ComponentType component_type, uuid input_id )
             : type{ std::move( component_type ) },
               id{ std::move( input_id ) } {};
@@ -100,6 +109,15 @@ namespace geode
     };
 
 } // namespace geode
+
+namespace bitsery
+{
+    template <>
+    inline geode::ComponentID Access::create< geode::ComponentID >()
+    {
+        return geode::ComponentID{ geode::BITSERY::constructor };
+    }
+} // namespace bitsery
 
 namespace std
 {

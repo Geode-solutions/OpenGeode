@@ -23,6 +23,8 @@
 
 #include <geode/model/mixin/builder/blocks_builder.hpp>
 
+#include <geode/basic/detail/input_files.hpp>
+
 #include <geode/mesh/builder/polyhedral_solid_builder.hpp>
 #include <geode/mesh/core/polyhedral_solid.hpp>
 
@@ -71,8 +73,15 @@ namespace geode
     template < index_t dimension >
     void BlocksBuilder< dimension >::load_blocks( std::string_view directory )
     {
-        return blocks_.load_blocks(
-            directory, typename Blocks< dimension >::BlocksBuilderKey{} );
+        load_blocks( detail::DirectoryInputFiles{ directory } );
+    }
+
+    template < index_t dimension >
+    void BlocksBuilder< dimension >::load_blocks(
+        const detail::InputFiles& files )
+    {
+        blocks_.load_blocks(
+            files, typename Blocks< dimension >::BlocksBuilderKey{} );
     }
 
     template < index_t dimension >

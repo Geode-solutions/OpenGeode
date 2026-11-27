@@ -28,6 +28,11 @@
 #include <geode/model/common.hpp>
 #include <geode/model/mixin/core/vertex_identifier.hpp>
 
+namespace geode::detail
+{
+    class InputFiles;
+} // namespace geode::detail
+
 namespace geode
 {
     /*!
@@ -107,10 +112,15 @@ namespace geode
 
         /*!
          * Load the VertexIdentifier from a file.
+         * Files saved by the current version do not store the component
+         * vertices: they are rebuilt by repair_component_vertices once the
+         * mesh components are loaded.
          * @param[in] directory Folder containing the file that stores
          * VertexIdentifier information.
          */
         void load_unique_vertices( std::string_view directory );
+
+        void load_unique_vertices( const detail::InputFiles& files );
 
         /*!
          * Delete all unique vertices not associated with any component
@@ -118,9 +128,13 @@ namespace geode
         std::vector< index_t > delete_isolated_vertices();
 
         /*!
-         * Remove component vertices referencing an unregistered component or
-         * an invalid vertex, and restore missing links from component vertices
-         * to their unique vertex. Used after loading a model.
+         * Used after loading a model, once its mesh components are loaded.
+         * Rebuild the component vertices from the component mesh attributes
+         * if the file does not store them (components in their registration
+         * order, then vertices in increasing order), otherwise remove
+         * component vertices referencing an unregistered component or an
+         * invalid vertex, and restore missing links from component vertices
+         * to their unique vertex.
          */
         void repair_component_vertices();
 

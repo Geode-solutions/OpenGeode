@@ -37,6 +37,11 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( ModelBoundariesBuilder );
 
     struct uuid;
+
+    namespace detail
+    {
+        class InputFiles;
+    } // namespace detail
 } // namespace geode
 
 namespace geode
@@ -154,7 +159,7 @@ namespace geode
             ModelBoundariesBuilderKey key );
 
         void load_model_boundaries(
-            std::string_view directory, ModelBoundariesBuilderKey key );
+            const detail::InputFiles& files, ModelBoundariesBuilderKey key );
 
         [[nodiscard]] ModifiableModelBoundaryRange modifiable_model_boundaries(
             ModelBoundariesBuilderKey key );

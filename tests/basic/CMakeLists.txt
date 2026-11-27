@@ -71,6 +71,12 @@ add_geode_test(
         ${PROJECT_NAME}::basic
 )
 add_geode_test(
+    SOURCE "test-input-files.cpp"
+    DEPENDENCIES
+        Async++
+        ${PROJECT_NAME}::basic
+)
+add_geode_test(
     SOURCE "test-logger.cpp"
     DEPENDENCIES
         ${PROJECT_NAME}::basic
@@ -111,3 +117,12 @@ add_geode_test(
     DEPENDENCIES
         ${PROJECT_NAME}::basic
 )
+if(UNIX AND NOT APPLE AND BUILD_SHARED_LIBS AND CMAKE_NM)
+    add_test(
+        NAME test-hidden-zlib-symbols
+        COMMAND ${CMAKE_COMMAND}
+            -DNM=${CMAKE_NM}
+            -DLIBRARY=$<TARGET_FILE:${PROJECT_NAME}::basic>
+            -P ${CMAKE_CURRENT_SOURCE_DIR}/check-hidden-symbols.cmake
+    )
+endif()

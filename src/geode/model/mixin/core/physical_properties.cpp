@@ -36,6 +36,7 @@
 #include <absl/strings/str_cat.h>
 
 #include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/detail/input_files.hpp>
 #include <geode/basic/growable.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 #include <geode/basic/uuid.hpp>
@@ -145,7 +146,8 @@ namespace
 namespace geode
 {
     PhysicalProperties::Info::Info()
-        : component_type( bitsery::Access::create< ComponentType >() )
+        : component_type( bitsery::Access::create< ComponentType >() ),
+          attribute_id( BITSERY::constructor )
     {
     }
 
@@ -220,28 +222,18 @@ namespace geode
                 filename );
         }
 
-        void load( std::string_view directory )
+        void load( const detail::InputFiles& files )
         {
-            const auto filename =
-                absl::StrCat( directory, "/physical_properties" );
-            if( !std::filesystem::exists(
-                    std::filesystem::u8path( filename ) ) )
+            static constexpr auto FILENAME = "physical_properties";
+            if( !files.has( FILENAME ) )
             {
                 return;
             }
-            std::ifstream file{ std::filesystem::u8path( filename ),
-                std::ifstream::binary };
-            TContext context{};
-            BitseryExtensions::register_deserialize_pcontext(
-                std::get< 0 >( context ) );
-            Deserializer archive{ context, file };
-            archive.object( *this );
-            const auto& adapter = archive.adapter();
+            const auto filename = files.location( FILENAME );
+            const auto content = files.content( FILENAME );
             OpenGeodeModelException::check_exception(
-                adapter.error() == bitsery::ReaderError::NoError
-                    && adapter.isCompletedSuccessfully()
-                    && std::get< 1 >( context ).isValid(),
-                nullptr, OpenGeodeException::TYPE::internal,
+                detail::deserialize_bytes( content.span(), *this ), nullptr,
+                OpenGeodeException::TYPE::internal,
                 "[PhysicalProperties::load] Error while reading file: ",
                 filename );
         }
@@ -321,9 +313,9 @@ namespace geode
     }
 
     void PhysicalProperties::load_physical_properties(
-        std::string_view directory, BuilderKey /*key*/ )
+        const detail::InputFiles& files, BuilderKey /*key*/ )
     {
-        impl_->load( directory );
+        impl_->load( files );
     }
 
     void PhysicalProperties::set_physical_property( PHYSICAL_PROPERTY_NAME name,

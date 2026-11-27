@@ -41,6 +41,11 @@ namespace geode
     struct EdgeVertex;
     class RelationshipsBuilder;
     struct uuid;
+
+    namespace detail
+    {
+        class InputFiles;
+    } // namespace detail
 } // namespace geode
 
 namespace geode
@@ -489,7 +494,7 @@ namespace geode
             RelationshipsBuilderKey /*key*/ );
 
         void load_relationships(
-            std::string_view directory, RelationshipsBuilderKey /*key*/ );
+            const detail::InputFiles& files, RelationshipsBuilderKey /*key*/ );
 
     protected:
         Relationships( Relationships&& other ) noexcept;

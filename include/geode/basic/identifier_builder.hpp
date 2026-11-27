@@ -29,6 +29,11 @@ namespace geode
 {
     class Identifier;
     struct uuid;
+
+    namespace detail
+    {
+        class InputFiles;
+    } // namespace detail
 } // namespace geode
 
 namespace geode
@@ -45,6 +50,8 @@ namespace geode
         void copy_identifier( const Identifier& other );
 
         void load_identifier( std::string_view directory );
+
+        void load_identifier( const detail::InputFiles& files );
 
     private:
         Identifier& identifier_;

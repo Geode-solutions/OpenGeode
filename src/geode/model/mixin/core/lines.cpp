@@ -113,15 +113,15 @@ namespace geode
 
     template < index_t dimension >
     void Lines< dimension >::load_lines(
-        std::string_view directory, LinesBuilderKey key )
+        const detail::InputFiles& files, LinesBuilderKey key )
     {
-        impl_->load_components( absl::StrCat( directory, "/lines" ) );
-        const auto mapping = impl_->file_mapping( directory );
+        impl_->load_components( files, "lines", true );
+        const auto mapping = impl_->file_mapping( files );
         absl::FixedArray< async::task< void > > tasks( nb_lines() );
         index_t count{ 0 };
         for( auto& line : modifiable_lines( key ) )
         {
-            tasks[count++] = async::spawn( [&line, &mapping] {
+            tasks[count++] = async::spawn( [&line, &mapping, &files] {
                 const auto& type = EdgedCurve< dimension >::type_name_static();
                 const auto file = mapping.find( line.id().string() );
                 if( file == mapping.end() )
@@ -131,12 +131,11 @@ namespace geode
                         typename Line< dimension >::LinesKey{} );
                     return;
                 }
-                line.set_mesh(
-                    load_one( load_edged_curve< dimension >(
-                                  detail::loadable_mesh_impl(
-                                      line.mesh_type(), type, file->second ),
-                                  file->second ),
-                        file->second ),
+                line.set_mesh( detail::load_component_mesh<
+                                   EdgedCurveInputFactory< dimension > >( files,
+                                   file->second,
+                                   detail::loadable_mesh_impl( line.mesh_type(),
+                                       type, files.location( file->second ) ) ),
                     typename Line< dimension >::LinesKey{} );
             } );
         }

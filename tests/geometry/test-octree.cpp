@@ -33,6 +33,7 @@
 
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/detail/file_content.hpp>
 #include <geode/basic/logger.hpp>
 #include <geode/basic/variable_attribute.hpp>
 
@@ -690,13 +691,16 @@ namespace
         }
         geode::Octree< dimension > reloaded;
         {
-            std::ifstream file{ filename, std::ifstream::binary };
+            const auto content = geode::detail::map_file_content( filename );
+            geode::OpenGeodeGeometryException::test(
+                content.has_value(), "[Test] Cannot open file" );
             geode::TContext context{};
             geode::register_basic_deserialize_pcontext(
                 std::get< 0 >( context ) );
             geode::register_geometry_deserialize_pcontext(
                 std::get< 0 >( context ) );
-            geode::Deserializer archive{ context, file };
+            geode::Deserializer archive{ context, content->span().data(),
+                content->span().size() };
             archive.object( reloaded );
             const auto& adapter = archive.adapter();
             geode::OpenGeodeGeometryException::test(

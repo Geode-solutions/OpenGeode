@@ -21,6 +21,9 @@
  *
  */
 
+// common.hpp includes library.hpp, which needs singleton.hpp
+#include <geode/basic/common.hpp>
+
 #include <geode/basic/singleton.hpp>
 
 #include <absl/container/flat_hash_map.h>

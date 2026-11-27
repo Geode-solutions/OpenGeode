@@ -33,6 +33,11 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( BlockCollections );
 
     struct uuid;
+
+    namespace detail
+    {
+        class InputFiles;
+    } // namespace detail
 } // namespace geode
 
 namespace geode
@@ -42,6 +47,8 @@ namespace geode
     {
     public:
         void load_block_collections( std::string_view directory );
+
+        void load_block_collections( const detail::InputFiles& files );
 
         void set_block_collection_name(
             const BlockCollection< dimension >& block_collection,

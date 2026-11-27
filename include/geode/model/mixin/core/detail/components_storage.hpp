@@ -34,7 +34,10 @@
 #include <bitsery/ext/std_map.h>
 #include <bitsery/ext/std_smart_ptr.h>
 
+#include <geode/basic/detail/geode_input_impl.hpp>
+#include <geode/basic/detail/input_files.hpp>
 #include <geode/basic/growable.hpp>
+#include <geode/basic/input.hpp>
 #include <geode/basic/logger.hpp>
 
 #include <geode/geometry/bitsery_archive.hpp>
@@ -85,6 +88,31 @@ namespace geode::detail
         }
         return Component::Mesh::create(
             MeshFactory::default_impl( fallback_type ) );
+    }
+
+    /*!
+     * Load the single mesh of a component file of the input files, with the
+     * input of the given factory registered for its extension.
+     */
+    template < typename Factory >
+    [[nodiscard]] typename Factory::BaseClass::InputData load_component_mesh(
+        const InputFiles& files, std::string_view name, const MeshImpl& impl )
+    {
+        const auto& type = MeshFactory::type( impl ).get();
+        try
+        {
+            return load_one( geode_object_input_from_files< Factory >(
+                                 type, files, name, impl ),
+                files.location( name ) );
+        }
+        catch( const std::exception& exception )
+        {
+            Logger::error( exception.what() );
+            throw OpenGeodeModelException{ nullptr,
+                OpenGeodeException::TYPE::data, "Cannot load ", type,
+                " from file: ", files.location( name ), ": ",
+                exception.what() };
+        }
     }
 
     template < typename Component >
@@ -168,56 +196,53 @@ namespace geode::detail
         }
 
         /*!
-         * Load the components stored in the given file.
+         * Load the components stored in the given file of the input files.
          * @param[in] required If false, a missing file is expected (e.g. for
          * files written before this component type existed) and silently
          * ignored. Otherwise a warning is emitted.
          */
-        void load_components( std::string_view filename, bool required = true )
+        void load_components(
+            const InputFiles& files, std::string_view name, bool required )
         {
-            const auto path = std::filesystem::u8path( to_string( filename ) );
-            if( !std::filesystem::exists( path ) )
+            if( !files.has( name ) )
             {
                 if( required )
                 {
                     Logger::warning( "[ComponentsStorage::load_components] "
                                      "Missing file: ",
-                        filename, ", no component loaded from it" );
+                        files.location( name ),
+                        ", no component loaded from it" );
                 }
                 return;
             }
-            std::ifstream file{ path, std::ifstream::binary };
-            TContext context{};
-            BitseryExtensions::register_deserialize_pcontext(
-                std::get< 0 >( context ) );
-            Deserializer archive{ context, file };
-            archive.object( *this );
-            const auto& adapter = archive.adapter();
+            const auto location = files.location( name );
+            const auto content = files.content( name );
             OpenGeodeModelException::check_exception(
-                adapter.error() == bitsery::ReaderError::NoError
-                    && adapter.isCompletedSuccessfully()
-                    && std::get< 1 >( context ).isValid(),
-                nullptr, OpenGeodeException::TYPE::internal,
+                detail::deserialize_bytes( content.span(), *this ), nullptr,
+                OpenGeodeException::TYPE::internal,
                 "[ComponentsStorage::load_components] Error while reading "
                 "file: ",
-                filename );
-            repair_loaded_components( filename );
+                location );
+            repair_loaded_components( location );
         }
 
+        /*!
+         * Map the uuid ending the name of each file (before its extension)
+         * to the file name.
+         */
         [[nodiscard]] absl::flat_hash_map< std::string, std::string >
-            file_mapping( std::string_view directory ) const
+            file_mapping( const InputFiles& files ) const
         {
             absl::flat_hash_map< std::string, std::string > mapping;
-            for( const auto& file : std::filesystem::directory_iterator(
-                     std::filesystem::u8path( to_string( directory ) ) ) )
+            for( auto& name : files.names() )
             {
-                auto path = file.path();
-                auto filename = path.replace_extension( "" ).u8string();
-                if( filename.size() > 36 )
+                const auto stem = std::filesystem::u8path( name )
+                                      .replace_extension( "" )
+                                      .u8string();
+                if( stem.size() > 36 )
                 {
-                    auto uuid = filename.substr( filename.size() - 36 );
                     mapping.emplace(
-                        std::move( uuid ), file.path().u8string() );
+                        stem.substr( stem.size() - 36 ), std::move( name ) );
                 }
             }
             return mapping;

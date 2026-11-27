@@ -40,6 +40,11 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( PointSetBuilder );
 
     struct uuid;
+
+    namespace detail
+    {
+        class InputFiles;
+    } // namespace detail
 } // namespace geode
 
 namespace geode
@@ -49,6 +54,8 @@ namespace geode
     {
     public:
         void load_corners( std::string_view directory );
+
+        void load_corners( const detail::InputFiles& files );
 
         /*!
          * Get a pointer to the builder of a Corner mesh

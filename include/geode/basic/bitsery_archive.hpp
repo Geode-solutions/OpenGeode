@@ -23,9 +23,16 @@
 
 #pragma once
 
+#include <cstddef>
+#include <memory>
+#include <optional>
+#include <string_view>
+
 #include <absl/container/fixed_array.h>
 #include <absl/container/inlined_vector.h>
+#include <absl/types/span.h>
 
+#include <bitsery/adapter/buffer.h>
 #include <bitsery/adapter/stream.h>
 #include <bitsery/bitsery.h>
 #include <bitsery/ext/inheritance.h>
@@ -34,7 +41,34 @@
 #include <geode/basic/attribute.hpp>
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/common.hpp>
+#include <geode/basic/growable.hpp>
 #include <geode/basic/range.hpp>
+
+namespace bitsery
+{
+    namespace traits
+    {
+        template <>
+        struct ContainerTraits< geode::ByteSpan >
+        {
+            using TValue = char;
+            static constexpr bool isResizable = false;
+            static constexpr bool isContiguous = true;
+            static size_t size( const geode::ByteSpan &container )
+            {
+                return container.size();
+            }
+        };
+
+        template <>
+        struct BufferAdapterTraits< geode::ByteSpan >
+        {
+            using TIterator = const char *;
+            using TConstIterator = const char *;
+            using TValue = char;
+        };
+    } // namespace traits
+} // namespace bitsery
 
 namespace geode
 {
@@ -45,13 +79,13 @@ namespace geode
         bitsery::ext::InheritanceContext >;
     using Serializer =
         bitsery::Serializer< bitsery::OutputBufferedStreamAdapter, TContext >;
+    /*!
+     * Deserializer reading a ByteSpan:
+     * Deserializer archive{ context, bytes.data(), bytes.size() }.
+     */
     using Deserializer =
-        bitsery::Deserializer< bitsery::InputStreamAdapter, TContext >;
-
-    enum struct BITSERY
-    {
-        constructor
-    };
+        bitsery::Deserializer< bitsery::InputBufferAdapter< ByteSpan >,
+            TContext >;
 
     /*!
      * Register all the information needed by Bitsery to serialize the objects
@@ -83,6 +117,29 @@ namespace geode
 
         static void register_deserialize_pcontext( PContext &context );
     };
+
+    namespace detail
+    {
+        /*!
+         * Deserialize an object from bytes, with the deserialize contexts of
+         * every registered library.
+         * @return true if the bytes were read without error, entirely, and
+         * every pointer was linked.
+         */
+        template < typename Object >
+        [[nodiscard]] bool deserialize_bytes( ByteSpan bytes, Object &object )
+        {
+            TContext context{};
+            BitseryExtensions::register_deserialize_pcontext(
+                std::get< 0 >( context ) );
+            Deserializer archive{ context, bytes.data(), bytes.size() };
+            archive.object( object );
+            const auto &adapter = archive.adapter();
+            return adapter.error() == bitsery::ReaderError::NoError
+                   && adapter.isCompletedSuccessfully()
+                   && std::get< 1 >( context ).isValid();
+        }
+    } // namespace detail
 } // namespace geode
 
 namespace bitsery

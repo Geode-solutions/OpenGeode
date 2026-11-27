@@ -23,6 +23,8 @@
 
 #include <geode/model/mixin/builder/line_collections_builder.hpp>
 
+#include <geode/basic/detail/input_files.hpp>
+
 #include <geode/model/mixin/core/line_collection.hpp>
 #include <geode/model/mixin/core/line_collections.hpp>
 
@@ -59,9 +61,16 @@ namespace geode
     void LineCollectionsBuilder< dimension >::load_line_collections(
         std::string_view directory )
     {
-        return line_collections_.load_line_collections(
-            directory, typename LineCollections<
-                           dimension >::LineCollectionsBuilderKey{} );
+        load_line_collections( detail::DirectoryInputFiles{ directory } );
+    }
+
+    template < index_t dimension >
+    void LineCollectionsBuilder< dimension >::load_line_collections(
+        const detail::InputFiles& files )
+    {
+        line_collections_.load_line_collections(
+            files, typename LineCollections<
+                       dimension >::LineCollectionsBuilderKey{} );
     }
 
     template < index_t dimension >

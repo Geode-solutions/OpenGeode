@@ -23,6 +23,8 @@
 
 #include <geode/model/mixin/builder/lines_builder.hpp>
 
+#include <geode/basic/detail/input_files.hpp>
+
 #include <geode/mesh/builder/edged_curve_builder.hpp>
 #include <geode/mesh/core/edged_curve.hpp>
 
@@ -70,8 +72,15 @@ namespace geode
     template < index_t dimension >
     void LinesBuilder< dimension >::load_lines( std::string_view directory )
     {
-        return lines_.load_lines(
-            directory, typename Lines< dimension >::LinesBuilderKey{} );
+        load_lines( detail::DirectoryInputFiles{ directory } );
+    }
+
+    template < index_t dimension >
+    void LinesBuilder< dimension >::load_lines(
+        const detail::InputFiles& files )
+    {
+        lines_.load_lines(
+            files, typename Lines< dimension >::LinesBuilderKey{} );
     }
 
     template < index_t dimension >

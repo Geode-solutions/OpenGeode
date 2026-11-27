@@ -31,6 +31,11 @@
 namespace geode
 {
     struct uuid;
+
+    namespace detail
+    {
+        class InputFiles;
+    } // namespace detail
 } // namespace geode
 
 namespace geode
@@ -59,6 +64,8 @@ namespace geode
         void copy_physical_properties( const PhysicalProperties& other );
 
         void load_physical_properties( std::string_view directory );
+
+        void load_physical_properties( const detail::InputFiles& files );
 
     private:
         PhysicalProperties& physical_properties_;

@@ -37,6 +37,11 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( SurfacesBuilder );
 
     struct uuid;
+
+    namespace detail
+    {
+        class InputFiles;
+    } // namespace detail
 } // namespace geode
 
 namespace geode
@@ -156,7 +161,7 @@ namespace geode
             const Surface< dimension >& surface, SurfacesBuilderKey key );
 
         void load_surfaces(
-            std::string_view directory, SurfacesBuilderKey key );
+            const detail::InputFiles& files, SurfacesBuilderKey key );
 
         [[nodiscard]] ModifiableSurfaceRange modifiable_surfaces(
             SurfacesBuilderKey key );

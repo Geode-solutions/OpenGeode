@@ -37,6 +37,11 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( BlocksBuilder );
 
     struct uuid;
+
+    namespace detail
+    {
+        class InputFiles;
+    } // namespace detail
 } // namespace geode
 
 namespace geode
@@ -170,7 +175,8 @@ namespace geode
         void delete_block(
             const Block< dimension >& block, BlocksBuilderKey key );
 
-        void load_blocks( std::string_view directory, BlocksBuilderKey key );
+        void load_blocks(
+            const detail::InputFiles& files, BlocksBuilderKey key );
 
         [[nodiscard]] ModifiableBlockRange modifiable_blocks(
             BlocksBuilderKey key );

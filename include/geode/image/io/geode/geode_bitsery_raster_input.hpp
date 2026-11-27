@@ -24,6 +24,9 @@
 #pragma once
 
 #include <fstream>
+#include <optional>
+
+#include <geode/basic/detail/file_content.hpp>
 
 #include <geode/image/core/bitsery_archive.hpp>
 #include <geode/image/io/raster_image_input.hpp>
@@ -41,29 +44,18 @@ namespace geode
 
         [[nodiscard]] std::vector< RasterImage< dimension > > read() final
         {
-            std::ifstream file{ to_string( this->filename() ),
-                std::ifstream::binary };
-            OpenGeodeImageException::check_exception( !file.fail(), nullptr,
-                OpenGeodeException::TYPE::data,
-                "[RasterImageInput] Failed to open file: ",
-                to_string( this->filename() ) );
-            TContext context{};
-            BitseryExtensions::register_deserialize_pcontext(
-                std::get< 0 >( context ) );
-            Deserializer archive{ context, file };
-            RasterImage< dimension > image;
-            archive.object( image );
-            const auto& adapter = archive.adapter();
-            OpenGeodeImageException::check_exception(
-                adapter.error() == bitsery::ReaderError::NoError
-                    && adapter.isCompletedSuccessfully()
-                    && std::get< 1 >( context ).isValid(),
+            const auto content = detail::map_file_content( this->filename() );
+            OpenGeodeImageException::check_exception( content.has_value(),
                 nullptr, OpenGeodeException::TYPE::data,
-                "[Bitsery::read] Error while reading file: ",
-                this->filename() );
-            std::vector< RasterImage< dimension > > images;
-            images.emplace_back( std::move( image ) );
-            return images;
+                "[RasterImageInput] Failed to open file: ", this->filename() );
+            return read_image( content->span() );
+        }
+
+        [[nodiscard]] bool read_bytes( ByteSpan content,
+            std::vector< RasterImage< dimension > >& images ) final
+        {
+            images = read_image( content );
+            return true;
         }
 
         AdditionalFiles additional_files() const final
@@ -79,6 +71,21 @@ namespace geode
         Percentage is_loadable() const final
         {
             return Percentage{ 1 };
+        }
+
+    private:
+        [[nodiscard]] std::vector< RasterImage< dimension > > read_image(
+            ByteSpan content ) const
+        {
+            RasterImage< dimension > image;
+            OpenGeodeImageException::check_exception(
+                detail::deserialize_bytes( content, image ), nullptr,
+                OpenGeodeException::TYPE::data,
+                "[Bitsery::read] Error while reading file: ",
+                this->filename() );
+            std::vector< RasterImage< dimension > > images;
+            images.emplace_back( std::move( image ) );
+            return images;
         }
     };
     ALIAS_1D_AND_2D_AND_3D( OpenGeodeRasterImageInput );

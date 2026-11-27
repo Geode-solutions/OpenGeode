@@ -32,6 +32,8 @@
 #include <string_view>
 #include <tuple>
 
+#include <absl/types/span.h>
+
 namespace geode
 {
     static constexpr double GLOBAL_EPSILON{ 1E-6 };
@@ -69,4 +71,10 @@ namespace geode
      */
     template < typename... tuples >
     using tuple_cat = decltype( std::tuple_cat( std::declval< tuples >()... ) );
+
+    /*!
+     * Read-only bytes to deserialize, owned elsewhere (file content, slice of
+     * an archive in memory...).
+     */
+    using ByteSpan = absl::Span< const char >;
 } // namespace geode

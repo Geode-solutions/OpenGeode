@@ -58,6 +58,8 @@ namespace geode
 
     VertexSet::VertexSet() = default;
 
+    VertexSet::VertexSet( BITSERY bitsery ) : Identifier{ bitsery } {}
+
     VertexSet::VertexSet( VertexSet&& ) noexcept = default;
 
     VertexSet& VertexSet::operator=( VertexSet&& ) noexcept = default;
@@ -97,6 +99,8 @@ namespace geode
             *this, Growable< Archive, VertexSet >{
                        { []( Archive& archive, VertexSet& vertex_set ) {
                             archive.object( vertex_set.impl_ );
+                            // Identifier not stored in this version
+                            vertex_set.set_id( uuid{} );
                         },
                            []( Archive& archive, VertexSet& vertex_set ) {
                                archive.object( vertex_set.impl_ );

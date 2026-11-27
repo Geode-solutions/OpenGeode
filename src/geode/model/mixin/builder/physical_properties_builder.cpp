@@ -23,6 +23,8 @@
 
 #include <geode/model/mixin/builder/physical_properties_builder.hpp>
 
+#include <geode/basic/detail/input_files.hpp>
+
 #include <geode/basic/uuid.hpp>
 
 namespace geode
@@ -53,7 +55,13 @@ namespace geode
     void PhysicalPropertiesBuilder::load_physical_properties(
         std::string_view directory )
     {
+        load_physical_properties( detail::DirectoryInputFiles{ directory } );
+    }
+
+    void PhysicalPropertiesBuilder::load_physical_properties(
+        const detail::InputFiles& files )
+    {
         physical_properties_.load_physical_properties(
-            directory, PhysicalProperties::BuilderKey{} );
+            files, PhysicalProperties::BuilderKey{} );
     }
 } // namespace geode

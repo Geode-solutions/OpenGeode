@@ -37,6 +37,11 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( CornersBuilder );
 
     struct uuid;
+
+    namespace detail
+    {
+        class InputFiles;
+    } // namespace detail
 } // namespace geode
 
 namespace geode
@@ -169,7 +174,8 @@ namespace geode
         void delete_corner(
             const Corner< dimension >& corner, CornersBuilderKey key );
 
-        void load_corners( std::string_view directory, CornersBuilderKey key );
+        void load_corners(
+            const detail::InputFiles& files, CornersBuilderKey key );
 
         [[nodiscard]] ModifiableCornerRange modifiable_corners(
             CornersBuilderKey key );

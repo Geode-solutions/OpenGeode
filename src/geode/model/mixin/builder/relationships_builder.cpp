@@ -23,6 +23,8 @@
 
 #include <geode/model/mixin/builder/relationships_builder.hpp>
 
+#include <geode/basic/detail/input_files.hpp>
+
 namespace geode
 {
     RelationshipsBuilder::RelationshipsBuilder( Relationships& relationships )
@@ -80,8 +82,14 @@ namespace geode
 
     void RelationshipsBuilder::load_relationships( std::string_view directory )
     {
+        load_relationships( detail::DirectoryInputFiles{ directory } );
+    }
+
+    void RelationshipsBuilder::load_relationships(
+        const detail::InputFiles& files )
+    {
         relationships_.load_relationships(
-            directory, Relationships::RelationshipsBuilderKey{} );
+            files, Relationships::RelationshipsBuilderKey{} );
     }
 
 } // namespace geode

@@ -1045,7 +1045,7 @@ namespace geode
     SolidMesh< dimension >::SolidMesh() = default;
 
     template < index_t dimension >
-    SolidMesh< dimension >::SolidMesh( BITSERY )
+    SolidMesh< dimension >::SolidMesh( BITSERY bitsery ) : VertexSet{ bitsery }
     {
     }
 

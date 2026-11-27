@@ -23,6 +23,8 @@
 
 #include <geode/model/mixin/builder/block_collections_builder.hpp>
 
+#include <geode/basic/detail/input_files.hpp>
+
 #include <geode/model/mixin/core/block_collection.hpp>
 #include <geode/model/mixin/core/block_collections.hpp>
 
@@ -59,9 +61,16 @@ namespace geode
     void BlockCollectionsBuilder< dimension >::load_block_collections(
         std::string_view directory )
     {
-        return block_collections_.load_block_collections(
-            directory, typename BlockCollections<
-                           dimension >::BlockCollectionsBuilderKey{} );
+        load_block_collections( detail::DirectoryInputFiles{ directory } );
+    }
+
+    template < index_t dimension >
+    void BlockCollectionsBuilder< dimension >::load_block_collections(
+        const detail::InputFiles& files )
+    {
+        block_collections_.load_block_collections(
+            files, typename BlockCollections<
+                       dimension >::BlockCollectionsBuilderKey{} );
     }
 
     template < index_t dimension >

@@ -29,6 +29,7 @@
 #include <bitsery/ext/std_optional.h>
 
 #include <geode/basic/bitsery_archive.hpp>
+#include <geode/basic/detail/input_files.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 #include <geode/basic/uuid.hpp>
 
@@ -37,6 +38,10 @@ namespace geode
     class Identifier::Impl
     {
     public:
+        Impl() = default;
+
+        explicit Impl( BITSERY bitsery ) : id_{ bitsery } {}
+
         const uuid& id() const
         {
             return id_;
@@ -77,27 +82,19 @@ namespace geode
                 "[Identifier::save] Error while writing file: ", filename );
         }
 
-        void load( std::string_view directory )
+        void load( const detail::InputFiles& files )
         {
-            const auto filename = absl::StrCat( directory, "/identifier" );
-            std::ifstream file{ std::filesystem::u8path( filename ),
-                std::ifstream::binary };
-            if( !file )
+            static constexpr auto FILENAME = "identifier";
+            if( !files.has( FILENAME ) )
             {
                 return;
             }
-            TContext context{};
-            BitseryExtensions::register_deserialize_pcontext(
-                std::get< 0 >( context ) );
-            Deserializer archive{ context, file };
-            archive.object( *this );
-            const auto& adapter = archive.adapter();
+            const auto content = files.content( FILENAME );
             OpenGeodeBasicException::check_exception(
-                adapter.error() == bitsery::ReaderError::NoError
-                    && adapter.isCompletedSuccessfully()
-                    && std::get< 1 >( context ).isValid(),
-                nullptr, OpenGeodeException::TYPE::internal,
-                "[Identifier::load] Error while reading file: ", filename );
+                detail::deserialize_bytes( content.span(), *this ), nullptr,
+                OpenGeodeException::TYPE::internal,
+                "[Identifier::load] Error while reading file: ",
+                files.location( FILENAME ) );
         }
 
     private:
@@ -138,6 +135,8 @@ namespace geode
 
     Identifier::Identifier() = default;
 
+    Identifier::Identifier( BITSERY bitsery ) : impl_{ bitsery } {}
+
     Identifier::~Identifier() = default;
 
     Identifier::Identifier( Identifier&& ) noexcept = default;
@@ -160,9 +159,9 @@ namespace geode
     }
 
     void Identifier::load_identifier(
-        std::string_view directory, IdentifierKey /*unused*/ )
+        const detail::InputFiles& files, IdentifierKey /*unused*/ )
     {
-        impl_->load( directory );
+        impl_->load( files );
     }
 
     void Identifier::set_id( const uuid& unique_id, IdentifierKey /*unused*/ )

@@ -35,6 +35,11 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( BlockCollectionsBuilder );
 
     struct uuid;
+
+    namespace detail
+    {
+        class InputFiles;
+    } // namespace detail
 } // namespace geode
 
 namespace geode
@@ -156,7 +161,7 @@ namespace geode
             BlockCollectionsBuilderKey key );
 
         void load_block_collections(
-            std::string_view directory, BlockCollectionsBuilderKey key );
+            const detail::InputFiles& files, BlockCollectionsBuilderKey key );
 
         [[nodiscard]] ModifiableBlockCollectionRange
             modifiable_block_collections( BlockCollectionsBuilderKey key );

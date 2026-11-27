@@ -23,6 +23,8 @@
 
 #include <geode/model/mixin/builder/surface_collections_builder.hpp>
 
+#include <geode/basic/detail/input_files.hpp>
+
 #include <geode/model/mixin/core/surface_collection.hpp>
 #include <geode/model/mixin/core/surface_collections.hpp>
 
@@ -60,9 +62,16 @@ namespace geode
     void SurfaceCollectionsBuilder< dimension >::load_surface_collections(
         std::string_view directory )
     {
-        return surface_collections_.load_surface_collections(
-            directory, typename SurfaceCollections<
-                           dimension >::SurfaceCollectionsBuilderKey{} );
+        load_surface_collections( detail::DirectoryInputFiles{ directory } );
+    }
+
+    template < index_t dimension >
+    void SurfaceCollectionsBuilder< dimension >::load_surface_collections(
+        const detail::InputFiles& files )
+    {
+        surface_collections_.load_surface_collections(
+            files, typename SurfaceCollections<
+                       dimension >::SurfaceCollectionsBuilderKey{} );
     }
 
     template < index_t dimension >

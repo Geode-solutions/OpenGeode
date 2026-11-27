@@ -97,10 +97,9 @@ namespace geode
 
     template < index_t dimension >
     void LineCollections< dimension >::load_line_collections(
-        std::string_view directory, LineCollectionsBuilderKey /*key*/ )
+        const detail::InputFiles& files, LineCollectionsBuilderKey /*key*/ )
     {
-        impl_->load_components(
-            absl::StrCat( directory, "/line_collections" ), false );
+        impl_->load_components( files, "line_collections", false );
     }
 
     template < index_t dimension >

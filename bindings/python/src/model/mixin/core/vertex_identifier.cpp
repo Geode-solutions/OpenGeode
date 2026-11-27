@@ -90,8 +90,11 @@ namespace geode
                 },
                 pybind11::arg( "unique_vertex_id" ),
                 "Return the list of ComponentMeshVertex identified with the "
-                "unique vertex; raise an IndexError if unique_vertex_id is not "
-                "in [0, nb_unique_vertices)" )
+                "unique vertex, in insertion order (after loading a native "
+                "file of the current format: Corners, Lines, Surfaces then "
+                "Blocks in the model order, then increasing vertex "
+                "indices); raise an IndexError if "
+                "unique_vertex_id is not in [0, nb_unique_vertices)" )
             .def(
                 "is_unique_vertex_isolated",
                 []( const VertexIdentifier& identifier,

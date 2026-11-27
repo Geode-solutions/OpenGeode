@@ -37,6 +37,11 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( CornerCollectionsBuilder );
 
     struct uuid;
+
+    namespace detail
+    {
+        class InputFiles;
+    } // namespace detail
 } // namespace geode
 
 namespace geode
@@ -159,7 +164,7 @@ namespace geode
             CornerCollectionsBuilderKey key );
 
         void load_corner_collections(
-            std::string_view directory, CornerCollectionsBuilderKey key );
+            const detail::InputFiles& files, CornerCollectionsBuilderKey key );
 
         [[nodiscard]] ModifiableCornerCollectionRange
             modifiable_corner_collections( CornerCollectionsBuilderKey key );

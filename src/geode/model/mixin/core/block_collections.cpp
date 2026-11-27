@@ -97,10 +97,9 @@ namespace geode
 
     template < index_t dimension >
     void BlockCollections< dimension >::load_block_collections(
-        std::string_view directory, BlockCollectionsBuilderKey /*key*/ )
+        const detail::InputFiles& files, BlockCollectionsBuilderKey /*key*/ )
     {
-        impl_->load_components(
-            absl::StrCat( directory, "/block_collections" ), false );
+        impl_->load_components( files, "block_collections", false );
     }
 
     template < index_t dimension >

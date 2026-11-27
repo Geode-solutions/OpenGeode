@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <filesystem>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -44,7 +45,8 @@ namespace geode
         std::vector< std::string > write(
             const RasterImage< dimension >& mesh ) const final
         {
-            std::ofstream file{ to_string( this->filename() ),
+            std::ofstream file{ std::filesystem::u8path(
+                                    to_string( this->filename() ) ),
                 std::ofstream::binary };
             OpenGeodeImageException::check_exception( !file.fail(), nullptr,
                 OpenGeodeException::TYPE::data,

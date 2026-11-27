@@ -33,6 +33,15 @@
 namespace geode
 {
     /*!
+     * Tag of the constructors building an object only to deserialize it
+     * (no expensive initialization of values about to be overwritten).
+     */
+    enum struct BITSERY
+    {
+        constructor
+    };
+
+    /*!
      * Maximum size of a serialized name. Prevents corrupted files from
      * requesting huge allocations.
      */

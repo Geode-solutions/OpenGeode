@@ -719,6 +719,9 @@ void test()
     test_nan_query( grid );
     test_clone_exact_geometry();
     test_io( grid, absl::StrCat( "test.", grid.native_extension() ) );
+    // UTF-8 file name
+    test_io( grid,
+        absl::StrCat( "grille_\xc3\xa9t\xc3\xa9.", grid.native_extension() ) );
     test_save_unwritable( grid );
     test_coordinate_reference_systems();
     test_backward_io();

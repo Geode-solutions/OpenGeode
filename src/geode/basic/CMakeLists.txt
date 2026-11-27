@@ -33,10 +33,12 @@ add_geode_library(
         "console_logger_client.cpp"
         "console_progress_logger_client.cpp"
         "file.cpp"
+        "file_content.cpp"
         "file_logger_client.cpp"
         "filename.cpp"
         "identifier.cpp"
         "identifier_builder.cpp"
+        "input_files.cpp"
         "library.cpp"
         "logger.cpp"
         "logger_manager.cpp"
@@ -103,8 +105,10 @@ add_geode_library(
         "detail/count_range_elements.hpp"
         "detail/disable_debug_logger.hpp"
         "detail/enable_debug_logger.hpp"
+        "detail/file_content.hpp"
         "detail/geode_input_impl.hpp"
         "detail/geode_output_impl.hpp"
+        "detail/input_files.hpp"
     INTERNAL_HEADERS
         "internal/array_impl.hpp"
     PUBLIC_DEPENDENCIES
@@ -120,7 +124,19 @@ add_geode_library(
         absl::time
         spdlog::spdlog_header_only
         MINIZIP::minizip-ng
+        ZLIB::ZLIB
 )
 if(WIN32 AND BUILD_SHARED_LIBS)
     target_link_libraries(basic PUBLIC absl::abseil_dll)
+endif()
+if(UNIX AND NOT APPLE AND BUILD_SHARED_LIBS)
+    # Keep the static zlib-ng and minizip-ng private: exported, they would
+    # interpose the zlib of the process (or be interposed by it)
+    include(CheckLinkerFlag)
+    check_linker_flag(CXX "-Wl,--exclude-libs,ALL" GEODE_LINKER_EXCLUDE_LIBS)
+    if(GEODE_LINKER_EXCLUDE_LIBS)
+        target_link_options(basic PRIVATE
+            "-Wl,--exclude-libs,$<TARGET_FILE_NAME:ZLIB::ZLIB>:$<TARGET_FILE_NAME:MINIZIP::minizip-ng>"
+        )
+    endif()
 endif()

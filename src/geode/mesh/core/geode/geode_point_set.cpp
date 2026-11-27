@@ -69,7 +69,8 @@ namespace geode
     }
 
     template < index_t dimension >
-    OpenGeodePointSet< dimension >::OpenGeodePointSet( BITSERY )
+    OpenGeodePointSet< dimension >::OpenGeodePointSet( BITSERY bitsery )
+        : PointSet< dimension >{ bitsery }
     {
     }
 

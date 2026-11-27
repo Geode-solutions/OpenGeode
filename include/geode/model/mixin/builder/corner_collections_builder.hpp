@@ -33,6 +33,11 @@ namespace geode
     FORWARD_DECLARATION_DIMENSION_CLASS( CornerCollections );
 
     struct uuid;
+
+    namespace detail
+    {
+        class InputFiles;
+    } // namespace detail
 } // namespace geode
 
 namespace geode
@@ -42,6 +47,8 @@ namespace geode
     {
     public:
         void load_corner_collections( std::string_view directory );
+
+        void load_corner_collections( const detail::InputFiles& files );
 
         void set_corner_collection_name(
             const CornerCollection< dimension >& corner_collection,

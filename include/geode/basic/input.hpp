@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <optional>
 #include <string_view>
 #include <vector>
 
@@ -77,6 +78,22 @@ namespace geode
 
         [[nodiscard]] virtual std::vector< Object > read(
             const Args&... args ) = 0;
+
+        /*!
+         * Read the objects from the content of the file, already in memory
+         * (e.g. an entry of an archive), instead of opening the file: the
+         * filename only names the content in messages.
+         * @param[out] objects Receives the objects read (only when returning
+         * true).
+         * @return false if this input can only read files: the caller then
+         * calls read() on a file holding the content.
+         */
+        [[nodiscard]] virtual bool read_bytes( ByteSpan /*content*/,
+            std::vector< Object >& /*objects*/,
+            const Args&... /*args*/ )
+        {
+            return false;
+        }
 
         ~Input()
         {

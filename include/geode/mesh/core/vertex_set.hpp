@@ -82,6 +82,11 @@ namespace geode
 
     protected:
         VertexSet();
+        /*!
+         * Nil identifier (no uuid generated), for a mesh about to be
+         * deserialized.
+         */
+        explicit VertexSet( BITSERY bitsery );
         VertexSet( VertexSet&& other ) noexcept;
         VertexSet& operator=( VertexSet&& other ) noexcept;
 

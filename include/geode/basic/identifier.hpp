@@ -38,6 +38,12 @@ namespace geode
 {
     class IdentifierBuilder;
     struct uuid;
+    enum struct BITSERY;
+
+    namespace detail
+    {
+        class InputFiles;
+    } // namespace detail
 } // namespace geode
 
 namespace geode
@@ -64,12 +70,18 @@ namespace geode
         void set_name( std::string_view name, IdentifierKey /*key*/ );
 
         void load_identifier(
-            std::string_view directory, IdentifierKey /*key*/ );
+            const detail::InputFiles& files, IdentifierKey /*key*/ );
 
         void copy_identifier( const Identifier& other, IdentifierKey /*key*/ );
 
     protected:
         Identifier();
+
+        /*!
+         * Nil identifier (no uuid generated), for an object about to be
+         * deserialized.
+         */
+        explicit Identifier( BITSERY bitsery );
 
         Identifier& operator=( Identifier&& other ) noexcept;
 

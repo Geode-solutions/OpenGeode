@@ -26,8 +26,7 @@
 #include <async++.h>
 
 #include <geode/basic/bitsery_archive.hpp>
-#include <geode/basic/uuid.hpp>
-#include <geode/basic/zip_file.hpp>
+#include <geode/basic/detail/input_files.hpp>
 
 #include <geode/model/mixin/core/corner.hpp>
 #include <geode/model/mixin/core/corner_collection.hpp>
@@ -42,10 +41,9 @@ namespace geode
 {
     std::vector< Section > OpenGeodeSectionInput::read()
     {
-        const UnzipFile zip_reader{ filename(), uuid{}.string() };
-        zip_reader.extract_all();
+        const detail::ArchiveInputFiles files{ filename() };
         Section section{ BITSERY::constructor };
-        detail::load_section_files( section, zip_reader.directory() );
+        detail::load_section_files( section, files );
         std::vector< Section > sections;
         sections.emplace_back( std::move( section ) );
         return sections;

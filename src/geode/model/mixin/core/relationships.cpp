@@ -29,6 +29,7 @@
 #include <geode/basic/attribute_manager.hpp>
 #include <geode/basic/bitsery_archive.hpp>
 #include <geode/basic/detail/count_range_elements.hpp>
+#include <geode/basic/detail/input_files.hpp>
 #include <geode/basic/pimpl_impl.hpp>
 #include <geode/basic/uuid.hpp>
 
@@ -198,22 +199,17 @@ namespace geode
                 "[Relationships::save] Error while writing file: ", filename );
         }
 
-        void load( std::string_view directory )
+        void load( const detail::InputFiles& files )
         {
-            const auto filename = absl::StrCat( directory, "/relationships" );
-            std::ifstream file{ std::filesystem::u8path( filename ),
-                std::ifstream::binary };
-            TContext context{};
-            BitseryExtensions::register_deserialize_pcontext(
-                std::get< 0 >( context ) );
-            Deserializer archive{ context, file };
-            archive.object( *this );
-            const auto& adapter = archive.adapter();
-            OpenGeodeModelException::check_exception(
-                adapter.error() == bitsery::ReaderError::NoError
-                    && adapter.isCompletedSuccessfully()
-                    && std::get< 1 >( context ).isValid(),
+            static constexpr auto FILENAME = "relationships";
+            const auto filename = files.location( FILENAME );
+            OpenGeodeModelException::check_exception( files.has( FILENAME ),
                 nullptr, OpenGeodeException::TYPE::internal,
+                "[Relationships::load] Error while reading file: ", filename );
+            const auto content = files.content( FILENAME );
+            OpenGeodeModelException::check_exception(
+                detail::deserialize_bytes( content.span(), *this ), nullptr,
+                OpenGeodeException::TYPE::internal,
                 "[Relationships::load] Error while reading file: ", filename );
         }
 
@@ -483,9 +479,9 @@ namespace geode
     }
 
     void Relationships::load_relationships(
-        std::string_view directory, RelationshipsBuilderKey /*key*/ )
+        const detail::InputFiles& files, RelationshipsBuilderKey /*key*/ )
     {
-        return impl_->load( directory );
+        return impl_->load( files );
     }
 
     AttributeManager& Relationships::relation_attribute_manager() const

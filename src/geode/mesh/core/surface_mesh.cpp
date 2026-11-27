@@ -589,7 +589,8 @@ namespace geode
     SurfaceMesh< dimension >::SurfaceMesh() = default;
 
     template < index_t dimension >
-    SurfaceMesh< dimension >::SurfaceMesh( BITSERY )
+    SurfaceMesh< dimension >::SurfaceMesh( BITSERY bitsery )
+        : VertexSet{ bitsery }
     {
     }
 
