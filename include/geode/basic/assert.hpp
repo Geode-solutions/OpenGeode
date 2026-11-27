@@ -115,6 +115,12 @@ namespace geode
 
         [[nodiscard]] std::string string() const;
 
+        /*!
+         * Return string() followed by one line "From: <parent string()>" per
+         * parent exception, from the direct parent to the root cause.
+         */
+        [[nodiscard]] std::string full_string() const;
+
     protected:
         template < typename... Args >
         explicit OpenGeodeException( std::string project,
@@ -143,6 +149,13 @@ namespace geode
      * Always return 1.
      */
     int opengeode_basic_api geode_lippincott();
+
+    /*!
+     * Return the full_string() of an OpenGeodeException (with its parents),
+     * or "std::exception: " followed by what() for any other exception.
+     */
+    [[nodiscard]] std::string opengeode_basic_api exception_string(
+        const std::exception& exception );
 
     /*!
      * Catch all exceptions and rethrow an OpenGeodeException
